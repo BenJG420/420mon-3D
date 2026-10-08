@@ -140,6 +140,54 @@ hud.innerHTML = `
 `;
 app.appendChild(hud);
 
+// Mobile touch controls: joystick + sprint button.
+const touch = { x: 0, y: 0, sprint: false };
+const controls = document.createElement("div");
+controls.className = "touch-controls";
+controls.innerHTML = '<div class="joystick" aria-label="Movement joystick"><div class="joystick-knob"></div></div><button class="sprint-button" type="button">SPRINT</button>';
+app.appendChild(controls);
+const joystick = controls.querySelector<HTMLElement>(".joystick")!;
+const knob = controls.querySelector<HTMLElement>(".joystick-knob")!;
+let joystickPointer: number | null = null;
+function updateJoystick(event: PointerEvent) {
+  const rect = joystick.getBoundingClientRect();
+  const radius = rect.width * 0.36;
+  const x = event.clientX - (rect.left + rect.width / 2);
+  const y = event.clientY - (rect.top + rect.height / 2);
+  const length = Math.hypot(x, y);
+  const scale = length > radius ? radius / length : 1;
+  touch.x = x * scale / radius;
+  touch.y = -y * scale / radius;
+  knob.style.transform = `translate(${touch.x * radius}px, ${-touch.y * radius}px)`;
+}
+joystick.addEventListener("pointerdown", event => {
+  joystickPointer = event.pointerId;
+  joystick.setPointerCapture(event.pointerId);
+  updateJoystick(event);
+});
+joystick.addEventListener("pointermove", event => {
+  if (event.pointerId === joystickPointer) updateJoystick(event);
+});
+function releaseJoystick(event: PointerEvent) {
+  if (event.pointerId !== joystickPointer) return;
+  joystickPointer = null;
+  touch.x = 0; touch.y = 0;
+  knob.style.transform = "translate(0px, 0px)";
+}
+joystick.addEventListener("pointerup", releaseJoystick);
+joystick.addEventListener("pointercancel", releaseJoystick);
+const sprintButton = controls.querySelector<HTMLButtonElement>(".sprint-button")!;
+sprintButton.addEventListener("pointerdown", event => {
+  sprintButton.setPointerCapture(event.pointerId);
+  touch.sprint = true;
+});
+sprintButton.addEventListener("pointerup", () => { touch.sprint = false; });
+sprintButton.addEventListener("pointercancel", () => { touch.sprint = false; });
+window.addEventListener("blur", () => {
+  touch.x = 0; touch.y = 0; touch.sprint = false;
+  knob.style.transform = "translate(0px, 0px)";
+});
+
 const clock = new THREE.Clock();
 const velocity = new THREE.Vector3();
 const cameraTarget = new THREE.Vector3();
@@ -162,14 +210,14 @@ function animate() {
   const dt = Math.min(clock.getDelta(), 0.05);
 
   const input = new THREE.Vector3(
-    Number(state.right) - Number(state.left),
+    Number(state.right) - Number(state.left) + touch.x,
     0,
-    Number(state.backward) - Number(state.forward),
+    Number(state.backward) - Number(state.forward) - touch.y,
   );
 
   if (input.lengthSq() > 0) input.normalize();
 
-  const speed = state.sprint ? 7.5 : 4.2;
+  const speed = (state.sprint || touch.sprint) ? 7.5 : 4.2;
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
   player.position.addScaledVector(velocity, dt);
 
