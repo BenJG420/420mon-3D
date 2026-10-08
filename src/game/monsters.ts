@@ -26,14 +26,18 @@ const saved = (() => {
       wins: Number.isFinite(data.wins) ? Math.max(0, data.wins) : 0,
       balls: Number.isFinite(data.balls) ? Math.max(0, data.balls) : 12,
       team: Array.isArray(data.team) ? data.team.filter((m: TeamMon) => m && (!!m.id && !!DEX[m.id] || species.some(s => s.name === m.name))).slice(0, 6)  .map((m: TeamMon) => ({ ...m, hp: Number.isFinite(m.hp) ? Math.max(1, m.hp) : 35 })) as TeamMon[] : [] as TeamMon[],
-      collection: Array.isArray(data.collection) ? data.collection.filter((x: unknown) => typeof x === "string").slice(0, 200) as string[] : [] as string[],
+      collection: Array.isArray(data.collection) ? data.collection.filter((x: unknown) => typeof x === "string").slice(0, 420) as string[] : [] as string[],
+      box: Array.isArray(data.box) ? data.box as TeamMon[] : [] as TeamMon[],
+      gold: Number.isFinite(data.gold) ? data.gold as number : 150,
+      inventory: data.inventory && typeof data.inventory === "object" ? data.inventory as Record<string, number> : {} as Record<string, number>,
     };
-  } catch { return { captures: 0, wins: 0, balls: 12, team: [] as TeamMon[], collection: [] as string[] }; }
+  } catch { return { captures: 0, wins: 0, balls: 12, team: [] as TeamMon[], collection: [] as string[], box: [] as TeamMon[], gold: 150, inventory: {} as Record<string, number> }; }
 })();
-function save() { localStorage.setItem("420mon-progress-v1", JSON.stringify(saved)); }
+function save() { const current = JSON.parse(localStorage.getItem("420mon-progress-v1") || "{}"); localStorage.setItem("420mon-progress-v1", JSON.stringify({ ...current, ...saved })); window.dispatchEvent(new Event("420mon-save-changed")); }
 const monsterRoot = new THREE.Group();
 export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   scene.add(monsterRoot);
+  window.addEventListener("420mon-save-changed", () => { try { Object.assign(saved, JSON.parse(localStorage.getItem("420mon-progress-v1") || "{}")); } catch { /* Keep active save. */ } });
   const sphere = new THREE.SphereGeometry(0.54, 14, 12);
   const ear = new THREE.ConeGeometry(0.24, 0.65, 6);
   const eye = new THREE.SphereGeometry(0.085, 8, 6);
@@ -224,6 +228,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       active.alive = false;
       active.mesh.visible = false;
       saved.wins++;
+      saved.gold += 15 + active.level * 2;
       awardXp(15);
       saved.balls += 2;
       notify("⚔ SIEG! +15 EP · +2 KAPSELN");
@@ -248,7 +253,8 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       saved.captures++;
       saved.collection.push(active.species.name);
       // Capturing does not reduce HP to zero: preserve the actual remaining HP.
-      if (saved.team.length < 6) saved.team.push({ id: active.species.id, name: active.species.name, level: active.level, xp: 0, hp: active.hp });
+      const caught: TeamMon = { id: active.species.id, name: active.species.name, level: active.level, xp: 0, hp: active.hp };
+      if (saved.team.length < 6) saved.team.push(caught); else saved.box.push(caught);
       awardXp(8);
       if (saved.captures === 3) saved.balls += 5;
       notify(`✓ ${active.species.name} GEFANGEN! ${active.hp} HP verbleiben`);

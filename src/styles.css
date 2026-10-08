@@ -135,3 +135,23 @@ canvas {
 .monster-toast { position: fixed; z-index: 90; top: 21%; left: 50%; transform: translateX(-50%); width: max-content; max-width: 90vw; text-align: center; border: 1px solid #6affb7; border-radius: 12px; padding: 13px 18px; background: #07291ef0; box-shadow: 0 0 28px #1afa9b55; color: white; font: 800 13px system-ui; }
 .monster-heal { position: fixed; top: 253px; right: 16px; z-index: 25; border: 1px solid #69fbc2; border-radius: 9px; background: #15483cdd; color: #dfffee; padding: 11px; font-size: 11px; font-weight: 800; }
 @media (max-width: 680px) { .monster-heal { top: 235px; right: 10px; } .monster-toast { top: 16%; font-size: 11px; } }
+
+
+/* Original 420mon data-driven game menu */
+.systems-root { position: fixed; inset: 0; z-index: 150; pointer-events: none; font-family: system-ui, sans-serif; }
+.systems-root [hidden] { display: none !important; }
+.systems-toggle { position: absolute; left: 12px; bottom: 14px; z-index: 1; pointer-events: auto; border: 1px solid #5affb1; border-radius: 10px; background: #071611eb; color: #8affc5; padding: 11px 14px; font-weight: 800; box-shadow: 0 0 20px #00ff8844; }
+.systems-panel { position: absolute; inset: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)) 8px; max-width: 720px; margin: auto; background: #071013f7; color: #e4fff1; border: 1px solid #3fffaa; border-radius: 16px; box-shadow: 0 0 60px #00ff8833; display: flex; flex-direction: column; overflow: hidden; pointer-events: auto; }
+.systems-panel header { display: flex; justify-content: space-between; align-items: center; padding: 13px 15px; background: #102923; color: #77ffb2; letter-spacing: .09em; }
+.systems-panel button { cursor: pointer; color: inherit; background: #123027; border: 1px solid #2c7054; border-radius: 8px; padding: 9px 11px; }
+.systems-panel button:disabled { opacity: .7; cursor: default; }
+.systems-panel nav { display: flex; gap: 5px; padding: 10px; flex-wrap: wrap; border-bottom: 1px solid #265c47; }
+.systems-panel nav button { font-size: 12px; padding: 8px; }
+.systems-panel nav button.selected { background: #1c7a4d; color: white; }
+.systems-content { flex: 1; overflow: auto; padding: 12px; overscroll-behavior: contain; }
+.systems-content h3 { color: #9fffc8; margin: 5px 0 14px; font-size: 17px; }
+.systems-content input { box-sizing: border-box; width: 100%; border: 1px solid #378c68; border-radius: 9px; background: #081e1a; color: white; padding: 11px; margin-bottom: 10px; }
+.systems-content .systems-row { width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; text-align: left; margin-bottom: 7px; line-height: 1.35; }
+.systems-content .systems-row small { font-size: 11px; color: #b3d2c1; }
+.systems-panel footer { min-height: 25px; padding: 9px 12px; color: #b9f5d3; background: #0c241b; font-size: 12px; }
+@media (max-width: 560px) { .systems-toggle { left: 8px; bottom: 8px; font-size: 11px; padding: 9px; } .systems-panel nav button { font-size: 11px; padding: 6px; } .systems-panel header { font-size: 13px; } }
