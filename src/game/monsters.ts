@@ -41,6 +41,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     const mat = new THREE.MeshStandardMaterial({ color: kind.color, emissive: kind.glow, emissiveIntensity: 0.32, roughness: 0.45 });
     const body = new THREE.Mesh(sphere, mat);
     body.position.y = 0.76;
+    body.scale.set(kind.name === "Noctra" ? 0.86 : 1, kind.name === "Voltling" ? 0.8 : 1.15, kind.name === "Pyrox" ? 1.24 : 1);
     body.castShadow = true;
     root.add(body);
     for (const side of [-1, 1]) {
@@ -55,6 +56,16 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       const iris = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), dark);
       iris.position.set(side * 0.2, 0.85, 0.546);
       root.add(iris);
+    }
+    const tail = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.85, 7), mat);
+    tail.position.set(0, 0.7, -0.65);
+    tail.rotation.x = -Math.PI / 2.8;
+    tail.castShadow = true;
+    root.add(tail);
+    if (kind.name === "Noctra") {
+      const wings = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.07, 0.52), mat);
+      wings.position.set(0, 0.88, -0.2);
+      root.add(wings);
     }
     const ring = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.035, 6, 28), new THREE.MeshBasicMaterial({ color: kind.glow }));
     ring.rotation.x = -Math.PI / 2;
@@ -108,10 +119,32 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     get("monster-count").textContent = `GEFANGEN ${saved.captures} · SIEGE ${saved.wins} · KAPSELN ${saved.balls}`;
     get("monster-quest").textContent = saved.captures >= 3 ? "✓ QUEST: 3 MONSTER GEFANGEN" : `QUEST: FANGE 3 MONSTER (${Math.min(3, saved.captures)}/3)`;
     get("monster-list").textContent = saved.collection.length ? saved.collection.join(" · ") : "Noch keine Monster gefangen.";
+    const teamList = get("monster-team-list");
+    teamList.replaceChildren();
+    const heading = document.createElement("h4");
+    heading.textContent = "DEIN TEAM (MAX. 6) – TIPPE ZUM WECHSELN";
+    teamList.appendChild(heading);
+    saved.team.forEach((mon, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = `${index === 0 ? "★ " : ""}${mon.name} · LV ${mon.level} · ${mon.xp}/${mon.level * 20} EP`;
+      button.addEventListener("click", () => {
+        if (active) return;
+        saved.team.splice(index, 1);
+        saved.team.unshift(mon);
+        save();
+        updateProgress();
+      });
+      teamList.appendChild(button);
+    });
   };
   updateProgress();
   const updateBattle = (message: string) => {
     if (!active) return;
+    get("monster-team-status").textContent = lead()
+      ? `DEIN ${lead()!.name} · LV ${lead()!.level} · ENERGIE ${energy}/3`
+      : `TRAINER · ENERGIE ${energy}/3`;
+    (get("monster-special") as HTMLButtonElement).disabled = energy < 2;
     get("monster-name").textContent = `${active.species.name} · HP ${active.hp}/${active.species.maxHp} · DEINE HP ${heroHp}/100`;
     get("monster-hp-bar").style.width = `${100 * active.hp / active.species.maxHp}%`;
     get("monster-message").textContent = message;
@@ -128,17 +161,22 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     if (!nearest || active || cooldown > 0) return;
     active = nearest;
     heroHp = 100;
+    energy = 3;
     battle.hidden = false;
     encounterButton.hidden = true;
     updateBattle("Wähle ANGRIFF, FANGEN oder FLIEHEN.");
   }
-  function attack() {
+  function attack(special = false) {
     if (!active) return;
-    active.hp = Math.max(0, active.hp - (10 + Math.floor(Math.random() * 13)));
+    if (special && energy < 2) return;
+    energy = special ? energy - 2 : Math.min(3, energy + 1);
+    const damage = (special ? 19 : 9) + Math.floor(Math.random() * 11) + (lead() ? Math.floor(lead()!.level * 1.8) : 0);
+    active.hp = Math.max(0, active.hp - damage);
     if (active.hp === 0) {
       active.alive = false;
       active.mesh.visible = false;
       saved.wins++;
+      awardXp(15);
       saved.balls += 2;
       get("monster-message").textContent = "SIEG! +1 KAMPF GEWONNEN";
       finish();
@@ -146,7 +184,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     }
     heroHp = Math.max(0, heroHp - (5 + Math.floor(Math.random() * 13)));
     if (heroHp === 0) { finish(); return; }
-    updateBattle("Treffer! Das wilde Monster schlägt zurück.");
+    updateBattle(`${special ? "SPEZIAL" : "ATTACKE"}: ${damage} Schaden! Das Monster schlägt zurück.`);
   }
   function capture() {
     if (!active || saved.balls <= 0) return;
@@ -155,6 +193,8 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     if (Math.random() < chance) {
       saved.captures++;
       saved.collection.push(active.species.name);
+      if (saved.team.length < 6) saved.team.push({ name: active.species.name, level: 1, xp: 0 });
+      awardXp(8);
       if (saved.captures === 3) saved.balls += 5;
       active.alive = false;
       active.mesh.visible = false;
@@ -168,7 +208,8 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     save();
   }
   encounterButton.addEventListener("click", start);
-  get("monster-attack").addEventListener("click", attack);
+  get("monster-attack").addEventListener("click", () => attack(false));
+  get("monster-special").addEventListener("click", () => attack(true));
   get("monster-catch").addEventListener("click", capture);
   get("monster-run").addEventListener("click", finish);
   get("monster-collection-toggle").addEventListener("click", () => { collection.hidden = !collection.hidden; });
