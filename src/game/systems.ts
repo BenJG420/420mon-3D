@@ -17,7 +17,7 @@ const maxHp = (m: Partner) => m.id ? Math.max(15, Math.round(speciesById(m.id).b
 export function createGameSystems(world: DistrictTravel) {
   const host = document.createElement("div");
   host.className = "systems-root";
-  host.innerHTML = `<button class="systems-toggle" id="systems-open">☰ 420MON MENÜ</button>
+  host.innerHTML = `<button class="systems-toggle" id="systems-open">☰ 420MON MENÜ</button><button class="world-map-shortcut" id="world-map-open">🗺 KARTE · 10 BEZIRKE</button>
   <section class="systems-panel" id="systems-panel" hidden>
     <header><strong>420MON // LOWTOWN</strong><button id="systems-close">✕</button></header>
     <nav id="systems-tabs"></nav>
@@ -154,6 +154,7 @@ export function createGameSystems(world: DistrictTravel) {
     }
   }
   q("systems-open").onclick = () => { if (tab === "shop") tab = "world"; panel.hidden = false; render(); };
+  q("world-map-open").onclick = () => { tab = "world"; panel.hidden = false; render(); };
   q("systems-close").onclick = () => { panel.hidden = true; };
   window.addEventListener("420mon-save-changed", () => { if (!panel.hidden) render(); });
   render();

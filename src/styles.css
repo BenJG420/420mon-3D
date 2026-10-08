@@ -166,3 +166,6 @@ canvas {
 .npc-shop-prompt { position: fixed; z-index: 90; right: 12px; bottom: 74px; background: #0b3025ed; border: 1px solid #69ffb0; color: #e3ffec; padding: 12px; border-radius: 12px; font-weight: 800; }
 .npc-shop-prompt[hidden] { display: none !important; }
 @media (max-width: 420px) { .district-map { gap: 6px; padding: 6px; } .systems-panel .district-map-pin { min-height: 65px; font-size: 11px; } }
+
+.world-map-shortcut { position: absolute; bottom: 65px; left: 12px; pointer-events: auto; background: #06372bfa; border: 2px solid #6dffb3; border-radius: 11px; color: #eafff1; padding: 12px 16px; font-weight: 900; box-shadow: 0 0 24px #00ff8870; cursor: pointer; }
+@media (max-width: 560px) { .world-map-shortcut { left: 8px; bottom: 54px; font-size: 12px; padding: 10px; } }
