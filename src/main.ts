@@ -81,15 +81,58 @@ player.add(head);
 scene.add(player);
 
 const blocks: THREE.Mesh[] = [];
-const playerRadius = 0.42;
-const buildingHalfSize = 2.25;
-const collisionPadding = 0.03;
+const buildingColliders: THREE.Box3[] = [];
+const playerRadius = 0.48;
+const collisionPadding = 0.05;
+let collisionCount = 0;
+let blockedThisFrame = false;
+
+// Horizontal circle-vs-box collision using actual building world bounds.
+// Unlike a point check, this also catches the player's body at corners.
 function collidesWithBuilding(x: number, z: number): boolean {
-  return blocks.some(building => {
-    const dx = Math.max(Math.abs(x - building.position.x) - buildingHalfSize, 0);
-    const dz = Math.max(Math.abs(z - building.position.z) - buildingHalfSize, 0);
-    return dx * dx + dz * dz < (playerRadius + collisionPadding) ** 2;
-  });
+  const radius = playerRadius + collisionPadding;
+  for (const box of buildingColliders) {
+    const nearestX = THREE.MathUtils.clamp(x, box.min.x, box.max.x);
+    const nearestZ = THREE.MathUtils.clamp(z, box.min.z, box.max.z);
+    const dx = x - nearestX;
+    const dz = z - nearestZ;
+    if (dx * dx + dz * dz < radius * radius) return true;
+  }
+  return false;
+}
+
+function movePlayer(dx: number, dz: number) {
+  // Sweep in small increments; resolve each axis separately for wall sliding.
+  const steps = Math.max(1, Math.ceil(Math.hypot(dx, dz) / 0.08));
+  for (let i = 0; i < steps; i++) {
+    const nextX = player.position.x + dx / steps;
+    if (!collidesWithBuilding(nextX, player.position.z)) {
+      player.position.x = nextX;
+    } else {
+      blockedThisFrame = true;
+    }
+    const nextZ = player.position.z + dz / steps;
+    if (!collidesWithBuilding(player.position.x, nextZ)) {
+      player.position.z = nextZ;
+    } else {
+      blockedThisFrame = true;
+    }
+  }
+}
+
+// Ensure the character can never start inside a solid building.
+function ensureValidSpawn() {
+  if (!collidesWithBuilding(player.position.x, player.position.z)) return;
+  for (let radius = 0; radius <= 40; radius += 1) {
+    for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
+      const x = Math.cos(angle) * radius;
+      const z = Math.sin(angle) * radius;
+      if (!collidesWithBuilding(x, z)) {
+        player.position.set(x, 0, z);
+        return;
+      }
+    }
+  }
 }
 
 for (let x = -18; x <= 18; x += 6) {
@@ -109,8 +152,12 @@ for (let x = -18; x <= 18; x += 6) {
     building.receiveShadow = true;
     scene.add(building);
     blocks.push(building);
+    building.updateMatrixWorld(true);
+    buildingColliders.push(new THREE.Box3().setFromObject(building));
   }
 }
+
+ensureValidSpawn();
 
 const state = {
   forward: false,
@@ -147,7 +194,7 @@ hud.innerHTML = `
   <div class="brand">420MON // 3D</div>
   <div class="status">FOUNDATION BUILD <span></span></div>
   <div class="hint">WASD / ARROWS · SHIFT SPRINT</div>
-  <div class="target">3D WORLD ONLINE</div>
+  <div class="target">WALL COLLISIONS v2 · RUN INTO A BUILDING</div>
 `;
 app.appendChild(hud);
 
@@ -233,16 +280,9 @@ function animate() {
 
   const speed = (state.sprint || touch.sprint) ? 7.5 : 4.2;
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
-  // Resolve X and Z separately so the player slides along building walls.
-  // Substeps prevent sprinting through thin collision boundaries on slow frames.
-  const movement = velocity.clone().multiplyScalar(dt);
-  const steps = Math.max(1, Math.ceil(movement.length() / 0.2));
-  for (let step = 0; step < steps; step++) {
-    const nextX = player.position.x + movement.x / steps;
-    if (!collidesWithBuilding(nextX, player.position.z)) player.position.x = nextX;
-    const nextZ = player.position.z + movement.z / steps;
-    if (!collidesWithBuilding(player.position.x, nextZ)) player.position.z = nextZ;
-  }
+  blockedThisFrame = false;
+  movePlayer(velocity.x * dt, velocity.z * dt);
+  if (blockedThisFrame) collisionCount++;
 
   if (velocity.lengthSq() > 0.01) {
     const angle = Math.atan2(velocity.x, velocity.z);
@@ -277,7 +317,7 @@ function animate() {
 
   const fps = Math.round(1 / Math.max(dt, 0.001));
   const status = hud.querySelector(".status");
-  if (status) status.innerHTML = `FOUNDATION BUILD <span></span> ${fps} FPS`;
+  if (status) status.innerHTML = `COLLISION TEST <span></span> ${fps} FPS · ${blockedThisFrame ? "🧱 WAND" : "FREI"} · BLOCKS ${collisionCount}`;
 }
 
 animate();
