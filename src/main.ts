@@ -204,6 +204,9 @@ const velocity = new THREE.Vector3();
 const cameraTarget = new THREE.Vector3();
 const desiredCamera = new THREE.Vector3();
 const up = new THREE.Vector3(0, 1, 0);
+const cameraRaycaster = new THREE.Raycaster();
+const cameraDirection = new THREE.Vector3();
+const cameraOffset = new THREE.Vector3(7.5, 5.8, 9.5);
 
 function resize() {
   const width = window.innerWidth;
@@ -250,8 +253,21 @@ function animate() {
   cameraTarget.copy(player.position);
   cameraTarget.y += 1.0;
 
-  desiredCamera.copy(player.position).add(new THREE.Vector3(7.5, 5.8, 9.5));
-  camera.position.lerp(desiredCamera, 1 - Math.pow(0.00001, dt));
+  // Keep buildings between the player and camera from hiding the character.
+  desiredCamera.copy(player.position).add(cameraOffset);
+  cameraDirection.subVectors(desiredCamera, cameraTarget);
+  const cameraDistance = cameraDirection.length();
+  cameraDirection.normalize();
+  cameraRaycaster.set(cameraTarget, cameraDirection);
+  cameraRaycaster.far = cameraDistance;
+  const cameraHits = cameraRaycaster.intersectObjects(blocks, false);
+  if (cameraHits.length > 0) {
+    const safeDistance = Math.max(1.4, cameraHits[0].distance - 0.35);
+    desiredCamera.copy(cameraTarget).addScaledVector(cameraDirection, safeDistance);
+  }
+  // Move inward immediately on obstruction, smooth out again afterward.
+  const followFactor = cameraHits.length > 0 ? 1 : 1 - Math.pow(0.00001, dt);
+  camera.position.lerp(desiredCamera, followFactor);
   camera.lookAt(cameraTarget);
 
   moon.position.x = player.position.x - 20;
