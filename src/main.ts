@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { createMonsterGame } from "./game/monsters";
+import { createGameSystems } from "./game/systems";
 import "./styles.css";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -264,6 +265,7 @@ scene.add(plazaMarker);
 
 ensureValidSpawn();
 const monsterGame = createMonsterGame(scene, player);
+createGameSystems();
 
 const state = {
   forward: false,
@@ -509,7 +511,7 @@ const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
 const cameraOffset = new THREE.Vector3(0, 12, 18);
 const cameraMinDistance = 10;
-const buildLabel = "ORIGINAL DEX v13";
+const buildLabel = "LOWTOWN SYSTEMS v14";
 
 function resize() {
   const width = window.innerWidth;
