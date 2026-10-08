@@ -33,10 +33,11 @@ const saved = (() => {
     };
   } catch { return { captures: 0, wins: 0, balls: 12, team: [] as TeamMon[], collection: [] as string[], box: [] as TeamMon[], gold: 150, inventory: {} as Record<string, number> }; }
 })();
-function save() { localStorage.setItem("420mon-progress-v1", JSON.stringify(saved)); window.dispatchEvent(new Event("420mon-save-changed")); }
+function save() { const current = JSON.parse(localStorage.getItem("420mon-progress-v1") || "{}"); localStorage.setItem("420mon-progress-v1", JSON.stringify({ ...current, ...saved })); window.dispatchEvent(new Event("420mon-save-changed")); }
 const monsterRoot = new THREE.Group();
 export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   scene.add(monsterRoot);
+  window.addEventListener("420mon-save-changed", () => { try { Object.assign(saved, JSON.parse(localStorage.getItem("420mon-progress-v1") || "{}")); } catch { /* Keep active save. */ } });
   const sphere = new THREE.SphereGeometry(0.54, 14, 12);
   const ear = new THREE.ConeGeometry(0.24, 0.65, 6);
   const eye = new THREE.SphereGeometry(0.085, 8, 6);
