@@ -123,3 +123,11 @@ canvas {
 #monster-list { padding: 16px 0; line-height: 1.8; }
 #monster-collection-close { padding: 10px 16px; color: white; background: #533e87; border: 0; border-radius: 8px; }
 @media (max-width: 680px) { .monster-progress { top: 8px; left: 8px; transform: none; padding: 5px 9px; font-size: 9px; } .monster-progress strong { display: none; } .monster-collection-toggle { top: 188px; right: 10px; } .monster-battle { bottom: 20%; padding: 12px; } .monster-interact { bottom: 35%; } }
+
+/* Team and skill update */
+#monster-team-status { color: #6fffc5; margin-top: 8px; font-weight: 800; }
+#monster-team-list { border-top: 1px solid #8054bd66; padding: 10px 0; display: grid; gap: 6px; max-height: 160px; overflow: auto; }
+#monster-team-list h4 { font-size: 11px; letter-spacing: .08em; margin: 4px 0; }
+#monster-team-list button { text-align: left; border: 1px solid #6845a4; border-radius: 7px; background: #231b40; color: #e8dcff; padding: 9px; }
+.monster-actions { flex-wrap: wrap; }
+.monster-actions button { min-width: 40%; }

@@ -12,6 +12,7 @@ const positions: [number, number][] = [
   [11, -9], [-11, -10], [10, 11], [-12, 10], [22, 5], [-23, -4],
   [5, 23], [-7, -23], [28, 20], [-27, 22], [23, -27], [-25, -25],
 ];
+type TeamMon = { name: string; level: number; xp: number };
 const monsters: WildMon[] = [];
 const saved = (() => {
   try {
@@ -20,9 +21,10 @@ const saved = (() => {
       captures: Number.isFinite(data.captures) ? Math.max(0, data.captures) : 0,
       wins: Number.isFinite(data.wins) ? Math.max(0, data.wins) : 0,
       balls: Number.isFinite(data.balls) ? Math.max(0, data.balls) : 12,
+      team: Array.isArray(data.team) ? data.team.filter((m: TeamMon) => m && species.some(s => s.name === m.name)).slice(0, 6) as TeamMon[] : [] as TeamMon[],
       collection: Array.isArray(data.collection) ? data.collection.filter((x: unknown) => typeof x === "string").slice(0, 200) as string[] : [] as string[],
     };
-  } catch { return { captures: 0, wins: 0, balls: 12, collection: [] as string[] }; }
+  } catch { return { captures: 0, wins: 0, balls: 12, team: [] as TeamMon[], collection: [] as string[] }; }
 })();
 function save() { localStorage.setItem("420mon-progress-v1", JSON.stringify(saved)); }
 const monsterRoot = new THREE.Group();
@@ -39,6 +41,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     const mat = new THREE.MeshStandardMaterial({ color: kind.color, emissive: kind.glow, emissiveIntensity: 0.32, roughness: 0.45 });
     const body = new THREE.Mesh(sphere, mat);
     body.position.y = 0.76;
+    body.scale.set(kind.name === "Noctra" ? 0.86 : 1, kind.name === "Voltling" ? 0.8 : 1.15, kind.name === "Pyrox" ? 1.24 : 1);
     body.castShadow = true;
     root.add(body);
     for (const side of [-1, 1]) {
@@ -53,6 +56,16 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       const iris = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), dark);
       iris.position.set(side * 0.2, 0.85, 0.546);
       root.add(iris);
+    }
+    const tail = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.85, 7), mat);
+    tail.position.set(0, 0.7, -0.65);
+    tail.rotation.x = -Math.PI / 2.8;
+    tail.castShadow = true;
+    root.add(tail);
+    if (kind.name === "Noctra") {
+      const wings = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.07, 0.52), mat);
+      wings.position.set(0, 0.88, -0.2);
+      root.add(wings);
     }
     const ring = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.035, 6, 28), new THREE.MeshBasicMaterial({ color: kind.glow }));
     ring.rotation.x = -Math.PI / 2;
@@ -70,17 +83,17 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     <button type="button" class="monster-interact" id="monster-interact" hidden>⚡ BEGEGNEN</button>
     <div class="monster-battle" id="monster-battle" hidden>
       <div class="monster-battle-title">⚡ WILDE BEGEGNUNG</div>
-      <div id="monster-name"></div>
+      <div id="monster-name"></div><div id="monster-team-status"></div>
       <div class="monster-hp"><div id="monster-hp-bar"></div></div>
       <div id="monster-message" aria-live="polite"></div>
       <div class="monster-actions">
-        <button type="button" id="monster-attack">⚔ ANGRIFF</button>
+        <button type="button" id="monster-attack">⚔ ATTACKE</button><button type="button" id="monster-special">✦ SPEZIAL</button>
         <button type="button" id="monster-catch">◉ FANGEN</button>
         <button type="button" id="monster-run">↩ FLIEHEN</button>
       </div>
     </div>
     <button type="button" class="monster-collection-toggle" id="monster-collection-toggle">◈ SAMMLUNG</button>
-    <div class="monster-collection" id="monster-collection" hidden><strong>DEINE 420MON</strong><div id="monster-list"></div><button type="button" id="monster-collection-close">SCHLIESSEN</button></div>`;
+    <div class="monster-collection" id="monster-collection" hidden><strong>DEINE 420MON</strong><div id="monster-list"></div><div id="monster-team-list"></div><button type="button" id="monster-collection-close">SCHLIESSEN</button></div>`;
   document.querySelector("#app")!.appendChild(ui);
   const get = (id: string) => ui.querySelector<HTMLElement>("#" + id)!;
   const encounterButton = get("monster-interact") as HTMLButtonElement;
@@ -91,14 +104,47 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   let cooldown = 0;
   let time = 0;
   let heroHp = 100;
+  let energy = 3;
+  const lead = () => saved.team[0];
+  function awardXp(amount: number) {
+    const mon = lead();
+    if (!mon) return;
+    mon.xp += amount;
+    while (mon.level < 50 && mon.xp >= mon.level * 20) {
+      mon.xp -= mon.level * 20;
+      mon.level++;
+    }
+  }
   const updateProgress = () => {
     get("monster-count").textContent = `GEFANGEN ${saved.captures} · SIEGE ${saved.wins} · KAPSELN ${saved.balls}`;
     get("monster-quest").textContent = saved.captures >= 3 ? "✓ QUEST: 3 MONSTER GEFANGEN" : `QUEST: FANGE 3 MONSTER (${Math.min(3, saved.captures)}/3)`;
     get("monster-list").textContent = saved.collection.length ? saved.collection.join(" · ") : "Noch keine Monster gefangen.";
+    const teamList = get("monster-team-list");
+    teamList.replaceChildren();
+    const heading = document.createElement("h4");
+    heading.textContent = "DEIN TEAM (MAX. 6) – TIPPE ZUM WECHSELN";
+    teamList.appendChild(heading);
+    saved.team.forEach((mon, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = `${index === 0 ? "★ " : ""}${mon.name} · LV ${mon.level} · ${mon.xp}/${mon.level * 20} EP`;
+      button.addEventListener("click", () => {
+        if (active) return;
+        saved.team.splice(index, 1);
+        saved.team.unshift(mon);
+        save();
+        updateProgress();
+      });
+      teamList.appendChild(button);
+    });
   };
   updateProgress();
   const updateBattle = (message: string) => {
     if (!active) return;
+    get("monster-team-status").textContent = lead()
+      ? `DEIN ${lead()!.name} · LV ${lead()!.level} · ENERGIE ${energy}/3`
+      : `TRAINER · ENERGIE ${energy}/3`;
+    (get("monster-special") as HTMLButtonElement).disabled = energy < 2;
     get("monster-name").textContent = `${active.species.name} · HP ${active.hp}/${active.species.maxHp} · DEINE HP ${heroHp}/100`;
     get("monster-hp-bar").style.width = `${100 * active.hp / active.species.maxHp}%`;
     get("monster-message").textContent = message;
@@ -115,17 +161,22 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     if (!nearest || active || cooldown > 0) return;
     active = nearest;
     heroHp = 100;
+    energy = 3;
     battle.hidden = false;
     encounterButton.hidden = true;
     updateBattle("Wähle ANGRIFF, FANGEN oder FLIEHEN.");
   }
-  function attack() {
+  function attack(special = false) {
     if (!active) return;
-    active.hp = Math.max(0, active.hp - (10 + Math.floor(Math.random() * 13)));
+    if (special && energy < 2) return;
+    energy = special ? energy - 2 : Math.min(3, energy + 1);
+    const damage = (special ? 19 : 9) + Math.floor(Math.random() * 11) + (lead() ? Math.floor(lead()!.level * 1.8) : 0);
+    active.hp = Math.max(0, active.hp - damage);
     if (active.hp === 0) {
       active.alive = false;
       active.mesh.visible = false;
       saved.wins++;
+      awardXp(15);
       saved.balls += 2;
       get("monster-message").textContent = "SIEG! +1 KAMPF GEWONNEN";
       finish();
@@ -133,7 +184,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     }
     heroHp = Math.max(0, heroHp - (5 + Math.floor(Math.random() * 13)));
     if (heroHp === 0) { finish(); return; }
-    updateBattle("Treffer! Das wilde Monster schlägt zurück.");
+    updateBattle(`${special ? "SPEZIAL" : "ATTACKE"}: ${damage} Schaden! Das Monster schlägt zurück.`);
   }
   function capture() {
     if (!active || saved.balls <= 0) return;
@@ -142,6 +193,8 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     if (Math.random() < chance) {
       saved.captures++;
       saved.collection.push(active.species.name);
+      if (saved.team.length < 6) saved.team.push({ name: active.species.name, level: 1, xp: 0 });
+      awardXp(8);
       if (saved.captures === 3) saved.balls += 5;
       active.alive = false;
       active.mesh.visible = false;
@@ -155,7 +208,8 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     save();
   }
   encounterButton.addEventListener("click", start);
-  get("monster-attack").addEventListener("click", attack);
+  get("monster-attack").addEventListener("click", () => attack(false));
+  get("monster-special").addEventListener("click", () => attack(true));
   get("monster-catch").addEventListener("click", capture);
   get("monster-run").addEventListener("click", finish);
   get("monster-collection-toggle").addEventListener("click", () => { collection.hidden = !collection.hidden; });
