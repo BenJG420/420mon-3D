@@ -1,7 +1,11 @@
+import { DEX, DEX_ORDER, encountersFor, speciesById, dexNum } from "./data/dex";
+import { xpToNext, MAX_LEVEL } from "./data/progress";
+import { ELEMENT_COLOR, typeMod } from "./data/types";
+import { getMove } from "./data/moves";
 import * as THREE from "three";
 
-type Species = { name: string; color: number; glow: number; maxHp: number; catchRate: number };
-type WildMon = { species: Species; mesh: THREE.Group; hp: number; alive: boolean; phase: number };
+type Species = { id?: string; name: string; color: number; glow: number; maxHp: number; catchRate: number };
+type WildMon = { species: Species; mesh: THREE.Group; hp: number; alive: boolean; phase: number; level: number; respawn: number };
 const species: Species[] = [
   { name: "Neonix", color: 0x27efb7, glow: 0x00ffc8, maxHp: 35, catchRate: 0.55 },
   { name: "Voltling", color: 0xf9d44a, glow: 0xffc000, maxHp: 42, catchRate: 0.44 },
@@ -12,7 +16,7 @@ const positions: [number, number][] = [
   [11, -9], [-11, -10], [10, 11], [-12, 10], [22, 5], [-23, -4],
   [5, 23], [-7, -23], [28, 20], [-27, 22], [23, -27], [-25, -25],
 ];
-type TeamMon = { name: string; level: number; xp: number; hp: number };
+type TeamMon = { id?: string; name: string; level: number; xp: number; hp: number };
 const monsters: WildMon[] = [];
 const saved = (() => {
   try {
@@ -21,7 +25,7 @@ const saved = (() => {
       captures: Number.isFinite(data.captures) ? Math.max(0, data.captures) : 0,
       wins: Number.isFinite(data.wins) ? Math.max(0, data.wins) : 0,
       balls: Number.isFinite(data.balls) ? Math.max(0, data.balls) : 12,
-      team: Array.isArray(data.team) ? data.team.filter((m: TeamMon) => m && species.some(s => s.name === m.name)).slice(0, 6)  .map((m: TeamMon) => ({ ...m, hp: Number.isFinite(m.hp) ? Math.max(1, m.hp) : 35 })) as TeamMon[] : [] as TeamMon[],
+      team: Array.isArray(data.team) ? data.team.filter((m: TeamMon) => m && (!!m.id && !!DEX[m.id] || species.some(s => s.name === m.name))).slice(0, 6)  .map((m: TeamMon) => ({ ...m, hp: Number.isFinite(m.hp) ? Math.max(1, m.hp) : 35 })) as TeamMon[] : [] as TeamMon[],
       collection: Array.isArray(data.collection) ? data.collection.filter((x: unknown) => typeof x === "string").slice(0, 200) as string[] : [] as string[],
     };
   } catch { return { captures: 0, wins: 0, balls: 12, team: [] as TeamMon[], collection: [] as string[] }; }
@@ -36,7 +40,11 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   const white = new THREE.MeshStandardMaterial({ color: 0xf6fbff, emissive: 0x18202b });
   const dark = new THREE.MeshStandardMaterial({ color: 0x08101b });
   for (let i = 0; i < positions.length; i++) {
-    const kind = species[i % species.length];
+    const original = encountersFor("alley")[(i * 7 + 3) % encountersFor("alley").length];
+    const wildLevel = 2 + i % 5;
+    const mon = speciesById(original.id);
+    const tint = new THREE.Color(ELEMENT_COLOR[mon.types[0]]).getHex();
+    const kind: Species = { id: mon.id, name: mon.name, color: tint, glow: tint, maxHp: Math.max(15, Math.round(mon.base.hp * (0.45 + wildLevel * 0.035))), catchRate: mon.catch / 255 };
     const root = new THREE.Group();
     const mat = new THREE.MeshStandardMaterial({ color: kind.color, emissive: kind.glow, emissiveIntensity: 0.32, roughness: 0.45 });
     const body = new THREE.Mesh(sphere, mat);
@@ -73,14 +81,14 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     root.add(ring);
     root.position.set(positions[i][0], 0, positions[i][1]);
     monsterRoot.add(root);
-    monsters.push({ species: kind, mesh: root, hp: kind.maxHp, alive: true, phase: i * 0.9 });
+    monsters.push({ species: kind, mesh: root, hp: kind.maxHp, alive: true, phase: i * 0.9, level: wildLevel, respawn: 0 });
   }
 
   const ui = document.createElement("div");
   ui.className = "monster-ui";
   ui.innerHTML = `
     <div id="monster-toast" class="monster-toast" hidden></div>
-    <div class="monster-progress"><strong>420MON // WILD ZONE</strong><div id="monster-count"></div><div id="monster-quest"></div></div>
+    <div class="monster-progress"><strong>420MON // ORIGINAL DEX</strong><div id="monster-count"></div><div id="monster-quest"></div></div>
     <button type="button" class="monster-interact" id="monster-interact" hidden>⚡ BEGEGNEN</button>
     <div class="monster-battle" id="monster-battle" hidden>
       <div class="monster-battle-title">⚡ WILDE BEGEGNUNG</div>
@@ -121,14 +129,14 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     const mon = lead();
     if (!mon) return;
     mon.xp += amount;
-    while (mon.level < 50 && mon.xp >= mon.level * 20) {
-      mon.xp -= mon.level * 20;
+    while (mon.level < MAX_LEVEL && mon.xp >= xpToNext(mon.level)) {
+      mon.xp -= xpToNext(mon.level);
       mon.level++;
     }
   }
   const updateProgress = () => {
     get("monster-count").textContent = `GEFANGEN ${saved.captures} · SIEGE ${saved.wins} · KAPSELN ${saved.balls}`;
-    get("monster-quest").textContent = saved.captures >= 3 ? "✓ QUEST: 3 MONSTER GEFANGEN" : `QUEST: FANGE 3 MONSTER (${Math.min(3, saved.captures)}/3)`;
+    get("monster-quest").textContent = `DEX ${new Set(saved.collection).size}/${DEX_ORDER.length} · QUEST ${Math.min(3, saved.captures)}/3`;
     get("monster-list").textContent = saved.collection.length ? saved.collection.join(" · ") : "Noch keine Monster gefangen.";
     const teamList = get("monster-team-list");
     teamList.replaceChildren();
@@ -138,7 +146,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     saved.team.forEach((mon, index) => {
       const button = document.createElement("button");
       button.type = "button";
-      button.textContent = `${index === 0 ? "★ " : ""}${mon.name} · LV ${mon.level} · HP ${mon.hp} · ${mon.xp}/${mon.level * 20} EP`;
+      button.textContent = `${index === 0 ? "★ " : ""}${mon.name} · LV ${mon.level} · HP ${mon.hp} · ${mon.xp}/${xpToNext(mon.level)} EP`;
       button.addEventListener("click", () => {
         if (active) return;
         saved.team.splice(index, 1);
@@ -157,7 +165,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       : `KEIN KAMPFFÄHIGES MONSTER – NUR FANGEN`; 
     (get("monster-special") as HTMLButtonElement).disabled = energy < 2 || !ally;
     (get("monster-attack") as HTMLButtonElement).disabled = !ally;
-    get("monster-name").textContent = `${active.species.name} · HP ${active.hp}/${active.species.maxHp}`;
+    get("monster-name").textContent = `${active.species.id ? dexNum(active.species.id) : ""} ${active.species.name} · LV ${active.level} · HP ${active.hp}/${active.species.maxHp}`;
     get("monster-hp-bar").style.width = `${100 * active.hp / active.species.maxHp}%`;
     get("monster-message").textContent = message;
     (get("monster-catch") as HTMLButtonElement).disabled = saved.balls <= 0 || active.hp <= 0;
@@ -229,12 +237,12 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   function capture() {
     if (!active || saved.balls <= 0 || active.hp <= 0) return;
     saved.balls--;
-    const chance = Math.min(0.94, active.species.catchRate + (1 - active.hp / active.species.maxHp) * 0.55);
+    const chance = Math.min(0.95, Math.max(0.04, ((3 * active.species.maxHp - 2 * active.hp) * (active.species.catchRate * 255)) / (3 * active.species.maxHp * 255)));
     if (Math.random() < chance) {
       saved.captures++;
       saved.collection.push(active.species.name);
       // Capturing does not reduce HP to zero: preserve the actual remaining HP.
-      if (saved.team.length < 6) saved.team.push({ name: active.species.name, level: 1, xp: 0, hp: active.hp });
+      if (saved.team.length < 6) saved.team.push({ id: active.species.id, name: active.species.name, level: active.level, xp: 0, hp: active.hp });
       awardXp(8);
       if (saved.captures === 3) saved.balls += 5;
       notify(`✓ ${active.species.name} GEFANGEN! ${active.hp} HP verbleiben`);
@@ -276,7 +284,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       nearest = null;
       let best = 3.2 * 3.2;
       for (const mon of monsters) {
-        if (!mon.alive) continue;
+        if (!mon.alive) { mon.respawn += dt; if (mon.respawn >= 90) { mon.respawn = 0; mon.alive = true; mon.hp = mon.species.maxHp; mon.mesh.visible = true; } continue; }
         mon.mesh.children[0].position.y = 0.76 + Math.sin(time * 2.3 + mon.phase) * 0.13;
         mon.mesh.rotation.y += dt * 0.36;
         const distance = mon.mesh.position.distanceToSquared(player.position);
