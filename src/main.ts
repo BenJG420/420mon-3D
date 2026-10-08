@@ -74,12 +74,12 @@ function part(parent: THREE.Object3D, geometry: THREE.BufferGeometry, material: 
 const torso = part(character, new THREE.BoxGeometry(0.78, 0.88, 0.4), jacket, 0, 1.36, 0);
 part(character, new THREE.BoxGeometry(0.8, 0.09, 0.44), trim, 0, 1.76, 0);
 part(character, new THREE.CylinderGeometry(0.12, 0.12, 0.18, 10), skin, 0, 1.88, 0);
-part(character, new THREE.SphereGeometry(0.28, 16, 12), skin, 0, 2.15, 0);
+const face = part(character, new THREE.SphereGeometry(0.28, 16, 12), skin, 0, 2.15, 0);
 const hairMaterial = new THREE.MeshStandardMaterial({ color: 0x17121e, roughness: 0.9 });
 const hair = part(character, new THREE.SphereGeometry(0.295, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), hairMaterial, 0, 2.18, 0);
 const ponytail = part(character, new THREE.CapsuleGeometry(0.11, 0.34, 6, 10), hairMaterial, 0, 1.95, -0.29);
 
-part(character, new THREE.BoxGeometry(0.58, 0.14, 0.5), trousers, 0, 0.91, 0);
+const waist = part(character, new THREE.BoxGeometry(0.58, 0.14, 0.5), trousers, 0, 0.91, 0);
 const leftArm = new THREE.Group();
 const rightArm = new THREE.Group();
 leftArm.position.set(-0.51, 1.72, 0);
@@ -96,8 +96,8 @@ rightLeg.position.set(0.2, 0.9, 0);
 character.add(leftLeg, rightLeg);
 part(leftLeg, new THREE.BoxGeometry(0.28, 0.69, 0.3), trousers, 0, -0.36, 0);
 part(rightLeg, new THREE.BoxGeometry(0.28, 0.69, 0.3), trousers, 0, -0.36, 0);
-part(leftLeg, new THREE.BoxGeometry(0.32, 0.22, 0.47), boots, 0, -0.76, 0.07);
-part(rightLeg, new THREE.BoxGeometry(0.32, 0.22, 0.47), boots, 0, -0.76, 0.07);
+const leftBoot = part(leftLeg, new THREE.BoxGeometry(0.32, 0.22, 0.47), boots, 0, -0.76, 0.07);
+const rightBoot = part(rightLeg, new THREE.BoxGeometry(0.32, 0.22, 0.47), boots, 0, -0.76, 0.07);
 scene.add(player);
 type CharacterChoice = "man" | "woman";
 let characterChoice: CharacterChoice = localStorage.getItem("420mon-character") === "woman" ? "woman" : "man";
@@ -298,7 +298,7 @@ hud.innerHTML = `
   <div class="brand">420MON // 3D</div>
   <div class="status">FOUNDATION BUILD <span></span></div>
   <div class="hint">WASD / ARROWS · SHIFT SPRINT</div>
-  <div class="target">CHARACTER SELECT v6 · MANN / FRAU</div>
+  <div class="target">CHARACTER STUDIO v7 · EDITOR</div>
 `;
 app.appendChild(hud);
 const characterPicker = document.createElement("div");
@@ -319,6 +319,136 @@ characterPicker.querySelectorAll<HTMLButtonElement>("button").forEach(button => 
   });
 });
 updatePicker();
+
+// Full mobile-friendly character studio with persistent presets.
+type StudioOptions = {
+  choice: CharacterChoice;
+  skin: string;
+  hair: string;
+  hairStyle: "short" | "long" | "mohawk";
+  face: "classic" | "soft" | "sharp";
+  outfit: "street" | "runner" | "tech";
+  jacket: string;
+  pants: string;
+  shoes: string;
+  height: number;
+  build: number;
+};
+const studioDefaults: StudioOptions = {
+  choice: characterChoice, skin: "#c4a68d", hair: "#17121e",
+  hairStyle: "short", face: "classic", outfit: "street",
+  jacket: "#185d50", pants: "#171f2c", shoes: "#0a0e16",
+  height: 1, build: 1,
+};
+function loadStudio(): StudioOptions {
+  try {
+    const raw = localStorage.getItem("420mon-studio-v1");
+    if (raw) return { ...studioDefaults, ...JSON.parse(raw) } as StudioOptions;
+  } catch { /* corrupt or unavailable storage: use defaults */ }
+  return { ...studioDefaults };
+}
+let studio = loadStudio();
+const facialDetails = new THREE.Group();
+character.add(facialDetails);
+const eyeMaterial = new THREE.MeshStandardMaterial({ color: 0x111823, roughness: 0.4 });
+for (const x of [-0.1, 0.1]) {
+  const eye = part(facialDetails, new THREE.SphereGeometry(0.026, 8, 6), eyeMaterial, x, 2.17, 0.267);
+  eye.scale.z = 0.5;
+}
+const mouth = part(facialDetails, new THREE.BoxGeometry(0.12, 0.018, 0.012), eyeMaterial, 0, 2.03, 0.267);
+const nose = part(facialDetails, new THREE.SphereGeometry(0.045, 8, 6), skin, 0, 2.105, 0.282);
+const hairBack = part(character, new THREE.BoxGeometry(0.53, 0.68, 0.2), hairMaterial, 0, 1.92, -0.22);
+const mohawk = part(character, new THREE.BoxGeometry(0.14, 0.28, 0.49), hairMaterial, 0, 2.47, 0);
+const jacketAccent = part(character, new THREE.BoxGeometry(0.07, 0.7, 0.03), trim, 0, 1.37, 0.22);
+const belt = part(character, new THREE.BoxGeometry(0.61, 0.08, 0.46), trim, 0, 0.97, 0);
+function applyStudio() {
+  applyCharacterChoice(studio.choice);
+  skin.color.set(studio.skin);
+  hairMaterial.color.set(studio.hair);
+  jacket.color.set(studio.jacket);
+  trousers.color.set(studio.pants);
+  boots.color.set(studio.shoes);
+  hair.visible = studio.hairStyle !== "mohawk";
+  ponytail.visible = studio.hairStyle === "long";
+  hairBack.visible = studio.hairStyle === "long";
+  mohawk.visible = studio.hairStyle === "mohawk";
+  face.scale.x = studio.face === "soft" ? 1.08 : studio.face === "sharp" ? 0.88 : 1;
+  face.scale.y = studio.face === "sharp" ? 1.12 : 1;
+  nose.scale.setScalar(studio.face === "sharp" ? 1.25 : 1);
+  mouth.scale.x = studio.face === "soft" ? 1.2 : 1;
+  torso.scale.x = (studio.choice === "woman" ? 0.83 : 1) * studio.build;
+  waist.scale.x = studio.build;
+  character.scale.set((studio.choice === "woman" ? 0.94 : 1) * studio.build, (studio.choice === "woman" ? 0.96 : 1) * studio.height, studio.build);
+  jacketAccent.visible = studio.outfit !== "street";
+  belt.visible = studio.outfit === "tech";
+  trim.color.set(studio.outfit === "runner" ? "#00eaff" : studio.outfit === "tech" ? "#ff48b5" : "#4bffc0");
+  leftBoot.scale.z = studio.outfit === "tech" ? 1.2 : 1;
+  rightBoot.scale.z = studio.outfit === "tech" ? 1.2 : 1;
+  localStorage.setItem("420mon-studio-v1", JSON.stringify(studio));
+  updatePicker();
+}
+const studioPanel = document.createElement("section");
+studioPanel.className = "studio-panel";
+studioPanel.setAttribute("aria-label", "Charaktereditor");
+studioPanel.innerHTML = `
+  <div class="studio-heading"><strong>420MON // CHARACTER STUDIO</strong><button type="button" id="studio-close" aria-label="Editor schließen">✕</button></div>
+  <div class="studio-scroll">
+    <label>Charakter<select data-studio="choice"><option value="man">Mann</option><option value="woman">Frau</option></select></label>
+    <label>Frisur<select data-studio="hairStyle"><option value="short">Kurz</option><option value="long">Lang / Zopf</option><option value="mohawk">Irokesenschnitt</option></select></label>
+    <label>Gesichtsform<select data-studio="face"><option value="classic">Klassisch</option><option value="soft">Weich</option><option value="sharp">Markant</option></select></label>
+    <label>Kleidungsstil<select data-studio="outfit"><option value="street">Streetwear</option><option value="runner">Neon Runner</option><option value="tech">Techwear</option></select></label>
+    <label>Hautfarbe<input data-studio="skin" type="color"></label>
+    <label>Haarfarbe<input data-studio="hair" type="color"></label>
+    <label>Jackenfarbe<input data-studio="jacket" type="color"></label>
+    <label>Hosenfarbe<input data-studio="pants" type="color"></label>
+    <label>Schuhfarbe<input data-studio="shoes" type="color"></label>
+    <label>Größe<input data-studio="height" type="range" min="0.85" max="1.15" step="0.01"></label>
+    <label>Statur<input data-studio="build" type="range" min="0.8" max="1.2" step="0.01"></label>
+  </div>
+  <div class="studio-actions"><button type="button" id="studio-reset">Zurücksetzen</button><button type="button" id="studio-done">Fertig ✓</button></div>`;
+app.appendChild(studioPanel);
+const studioOpen = document.createElement("button");
+studioOpen.className = "studio-open";
+studioOpen.textContent = "✎ CHARAKTER";
+studioOpen.type = "button";
+app.appendChild(studioOpen);
+function toggleStudio(open: boolean) {
+  studioPanel.classList.toggle("is-open", open);
+  studioOpen.setAttribute("aria-expanded", String(open));
+  studioOpen.textContent = open ? "✎ EDITOR OFFEN" : "✎ CHARAKTER";
+  if (open) { state.forward = state.backward = state.left = state.right = state.sprint = false; }
+}
+studioOpen.addEventListener("click", () => toggleStudio(!studioPanel.classList.contains("is-open")));
+studioPanel.querySelector("#studio-close")!.addEventListener("click", () => toggleStudio(false));
+studioPanel.querySelector("#studio-done")!.addEventListener("click", () => toggleStudio(false));
+function syncStudioInputs() {
+  studioPanel.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[data-studio]").forEach(input => {
+    const key = input.dataset.studio as keyof StudioOptions;
+    input.value = String(studio[key]);
+  });
+}
+studioPanel.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[data-studio]").forEach(input => {
+  input.addEventListener("input", () => {
+    const key = input.dataset.studio as keyof StudioOptions;
+    (studio as unknown as Record<string, string | number>)[key] =
+      key === "height" || key === "build" ? Number(input.value) : input.value;
+    applyStudio();
+  });
+});
+studioPanel.querySelector("#studio-reset")!.addEventListener("click", () => {
+  studio = { ...studioDefaults };
+  syncStudioInputs();
+  applyStudio();
+});
+syncStudioInputs();
+applyStudio();
+characterPicker.querySelectorAll<HTMLButtonElement>("button").forEach(button => {
+  button.addEventListener("click", () => {
+    studio.choice = button.dataset.choice === "woman" ? "woman" : "man";
+    applyStudio();
+    syncStudioInputs();
+  });
+});
 
 // Mobile touch controls: joystick + sprint button.
 const touch = { x: 0, y: 0, sprint: false };
@@ -377,7 +507,7 @@ const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
 const cameraOffset = new THREE.Vector3(0, 12, 18);
 const cameraMinDistance = 10;
-const buildLabel = "CHARACTER SELECT v6";
+const buildLabel = "CHARACTER STUDIO v7";
 
 function resize() {
   const width = window.innerWidth;

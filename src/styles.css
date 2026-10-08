@@ -87,3 +87,19 @@ canvas {
 .character-picker button { background: #142c27; border: 1px solid #36634f; border-radius: 7px; color: #eafff5; font-size: 11px; font-weight: 700; padding: 9px 11px; cursor: pointer; }
 .character-picker button.active { background: #176344; border-color: #5dffb2; box-shadow: 0 0 9px #3bf39b55; }
 @media (max-width: 460px) { .character-picker { top: max(86px, env(safe-area-inset-top)); right: 10px; } .character-picker span { display: none; } }
+
+/* Full character customization overlay, optimized for landscape phones. */
+.studio-open { position: fixed; top: max(148px, env(safe-area-inset-top)); right: 16px; z-index: 30; border: 1px solid #66ffb8; border-radius: 10px; background: #0a3025e8; color: #d6ffea; font: 800 11px system-ui; letter-spacing: .07em; padding: 11px 15px; cursor: pointer; }
+.studio-panel { display: none; position: fixed; z-index: 40; top: 12px; right: 12px; bottom: 12px; width: min(370px, calc(100vw - 24px)); background: #08131aef; color: #effff6; border: 1px solid #4affab99; border-radius: 15px; box-shadow: 0 0 30px #000a; flex-direction: column; overflow: hidden; backdrop-filter: blur(14px); }
+.studio-panel.is-open { display: flex; }
+.studio-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px; border-bottom: 1px solid #66ffb844; font-size: 12px; letter-spacing: .05em; }
+.studio-heading button { border: 0; color: white; background: transparent; font-size: 19px; cursor: pointer; }
+.studio-scroll { overflow-y: auto; overscroll-behavior: contain; flex: 1; padding: 12px 16px; display: grid; gap: 11px; }
+.studio-scroll label { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; }
+.studio-scroll select, .studio-scroll input { min-width: 0; width: 52%; accent-color: #43fca5; }
+.studio-scroll select { background: #132f2b; color: #effff6; border: 1px solid #37755e; border-radius: 6px; padding: 9px 4px; }
+.studio-scroll input[type=color] { height: 33px; background: transparent; border: 0; }
+.studio-actions { display: flex; gap: 10px; padding: 12px; border-top: 1px solid #66ffb844; }
+.studio-actions button { flex: 1; background: #183c33; border: 1px solid #408d69; color: white; padding: 11px; border-radius: 8px; font-weight: 700; }
+.studio-actions #studio-done { background: #17804d; }
+@media (max-width: 460px) { .studio-open { top: max(139px, env(safe-area-inset-top)); right: 10px; } .studio-panel { top: 6px; bottom: 6px; right: 6px; width: min(340px, calc(100vw - 12px)); } }
