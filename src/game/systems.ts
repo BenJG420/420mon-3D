@@ -70,9 +70,15 @@ export function createGameSystems(world: DistrictTravel) {
           const owned = known.has(sp.name) || known.has(id);
           const image = document.createElement("img");
           image.className = "dex-original-sprite";
-          image.src = "https://raw.githubusercontent.com/BenJG420/420mon/main/public/game/sprites/" + encodeURIComponent(sp.sprite) + ".png";
+          image.src = import.meta.env.BASE_URL + "game/sprites/" + encodeURIComponent(sp.sprite) + (sp.sprite === "neonpunx" || sp.sprite === "puffpuff" ? ".png" : ".svg");
           image.alt = sp.name + " · Original 2D"; image.loading = "lazy";
-          image.onerror = () => { image.style.display = "none"; };
+          image.onerror = () => {
+            const fallback = document.createElement("span");
+            fallback.className = "dex-original-missing";
+            fallback.textContent = "◈";
+            fallback.title = "Original-Sprite nicht verfügbar: " + sp.sprite;
+            image.replaceWith(fallback);
+          };
           item.append(image);
           const details = document.createElement("span");
           details.textContent = index + " · " + (owned ? sp.name : "???") + " · " + sp.types.join("/");
