@@ -81,6 +81,17 @@ player.add(head);
 scene.add(player);
 
 const blocks: THREE.Mesh[] = [];
+const playerRadius = 0.42;
+const buildingHalfSize = 2.25;
+const collisionPadding = 0.03;
+function collidesWithBuilding(x: number, z: number): boolean {
+  return blocks.some(building => {
+    const dx = Math.max(Math.abs(x - building.position.x) - buildingHalfSize, 0);
+    const dz = Math.max(Math.abs(z - building.position.z) - buildingHalfSize, 0);
+    return dx * dx + dz * dz < (playerRadius + collisionPadding) ** 2;
+  });
+}
+
 for (let x = -18; x <= 18; x += 6) {
   for (let z = -18; z <= 18; z += 6) {
     if (Math.abs(x) < 5 && Math.abs(z) < 5) continue;
@@ -219,7 +230,16 @@ function animate() {
 
   const speed = (state.sprint || touch.sprint) ? 7.5 : 4.2;
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
-  player.position.addScaledVector(velocity, dt);
+  // Resolve X and Z separately so the player slides along building walls.
+  // Substeps prevent sprinting through thin collision boundaries on slow frames.
+  const movement = velocity.clone().multiplyScalar(dt);
+  const steps = Math.max(1, Math.ceil(movement.length() / 0.2));
+  for (let step = 0; step < steps; step++) {
+    const nextX = player.position.x + movement.x / steps;
+    if (!collidesWithBuilding(nextX, player.position.z)) player.position.x = nextX;
+    const nextZ = player.position.z + movement.z / steps;
+    if (!collidesWithBuilding(player.position.x, nextZ)) player.position.z = nextZ;
+  }
 
   if (velocity.lengthSq() > 0.01) {
     const angle = Math.atan2(velocity.x, velocity.z);
