@@ -12,6 +12,7 @@ const positions: [number, number][] = [
   [11, -9], [-11, -10], [10, 11], [-12, 10], [22, 5], [-23, -4],
   [5, 23], [-7, -23], [28, 20], [-27, 22], [23, -27], [-25, -25],
 ];
+type TeamMon = { name: string; level: number; xp: number };
 const monsters: WildMon[] = [];
 const saved = (() => {
   try {
@@ -20,9 +21,10 @@ const saved = (() => {
       captures: Number.isFinite(data.captures) ? Math.max(0, data.captures) : 0,
       wins: Number.isFinite(data.wins) ? Math.max(0, data.wins) : 0,
       balls: Number.isFinite(data.balls) ? Math.max(0, data.balls) : 12,
+      team: Array.isArray(data.team) ? data.team.filter((m: TeamMon) => m && species.some(s => s.name === m.name)).slice(0, 6) as TeamMon[] : [] as TeamMon[],
       collection: Array.isArray(data.collection) ? data.collection.filter((x: unknown) => typeof x === "string").slice(0, 200) as string[] : [] as string[],
     };
-  } catch { return { captures: 0, wins: 0, balls: 12, collection: [] as string[] }; }
+  } catch { return { captures: 0, wins: 0, balls: 12, team: [] as TeamMon[], collection: [] as string[] }; }
 })();
 function save() { localStorage.setItem("420mon-progress-v1", JSON.stringify(saved)); }
 const monsterRoot = new THREE.Group();
@@ -70,17 +72,17 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     <button type="button" class="monster-interact" id="monster-interact" hidden>⚡ BEGEGNEN</button>
     <div class="monster-battle" id="monster-battle" hidden>
       <div class="monster-battle-title">⚡ WILDE BEGEGNUNG</div>
-      <div id="monster-name"></div>
+      <div id="monster-name"></div><div id="monster-team-status"></div>
       <div class="monster-hp"><div id="monster-hp-bar"></div></div>
       <div id="monster-message" aria-live="polite"></div>
       <div class="monster-actions">
-        <button type="button" id="monster-attack">⚔ ANGRIFF</button>
+        <button type="button" id="monster-attack">⚔ ATTACKE</button><button type="button" id="monster-special">✦ SPEZIAL</button>
         <button type="button" id="monster-catch">◉ FANGEN</button>
         <button type="button" id="monster-run">↩ FLIEHEN</button>
       </div>
     </div>
     <button type="button" class="monster-collection-toggle" id="monster-collection-toggle">◈ SAMMLUNG</button>
-    <div class="monster-collection" id="monster-collection" hidden><strong>DEINE 420MON</strong><div id="monster-list"></div><button type="button" id="monster-collection-close">SCHLIESSEN</button></div>`;
+    <div class="monster-collection" id="monster-collection" hidden><strong>DEINE 420MON</strong><div id="monster-list"></div><div id="monster-team-list"></div><button type="button" id="monster-collection-close">SCHLIESSEN</button></div>`;
   document.querySelector("#app")!.appendChild(ui);
   const get = (id: string) => ui.querySelector<HTMLElement>("#" + id)!;
   const encounterButton = get("monster-interact") as HTMLButtonElement;
@@ -91,6 +93,17 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   let cooldown = 0;
   let time = 0;
   let heroHp = 100;
+  let energy = 3;
+  const lead = () => saved.team[0];
+  function awardXp(amount: number) {
+    const mon = lead();
+    if (!mon) return;
+    mon.xp += amount;
+    while (mon.level < 50 && mon.xp >= mon.level * 20) {
+      mon.xp -= mon.level * 20;
+      mon.level++;
+    }
+  }
   const updateProgress = () => {
     get("monster-count").textContent = `GEFANGEN ${saved.captures} · SIEGE ${saved.wins} · KAPSELN ${saved.balls}`;
     get("monster-quest").textContent = saved.captures >= 3 ? "✓ QUEST: 3 MONSTER GEFANGEN" : `QUEST: FANGE 3 MONSTER (${Math.min(3, saved.captures)}/3)`;
