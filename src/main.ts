@@ -6,7 +6,7 @@ if (!app) throw new Error("App root not found.");
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x07090d);
-scene.fog = new THREE.FogExp2(0x111923, 0.018);
+scene.fog = new THREE.FogExp2(0x111923, 0.009);
 
 const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 500);
 camera.position.set(8, 6, 10);
@@ -39,7 +39,7 @@ moon.shadow.camera.bottom = -35;
 scene.add(moon);
 
 const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(160, 160),
+  new THREE.PlaneGeometry(240, 240),
   new THREE.MeshStandardMaterial({
     color: 0x24272a,
     roughness: 0.58,
@@ -50,7 +50,7 @@ ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
 
-const grid = new THREE.GridHelper(160, 80, 0x29333b, 0x161b20);
+const grid = new THREE.GridHelper(240, 120, 0x29333b, 0x161b20);
 grid.position.y = 0.01;
 scene.add(grid);
 
@@ -135,16 +135,22 @@ function ensureValidSpawn() {
   }
 }
 
-for (let x = -18; x <= 18; x += 6) {
-  for (let z = -18; z <= 18; z += 6) {
-    if (Math.abs(x) < 5 && Math.abs(z) < 5) continue;
-    const h = 2 + Math.abs((x * 13 + z * 7) % 7);
+// A spacious city grid: wide avenues, walkable side streets and an open plaza.
+const citySpacing = 16;
+const buildingSize = 8;
+for (let gx = -4; gx <= 4; gx++) {
+  for (let gz = -4; gz <= 4; gz++) {
+    // Central plaza: leave a generous 48 x 48 metre open space.
+    if (Math.abs(gx) <= 1 && Math.abs(gz) <= 1) continue;
+    const x = gx * citySpacing;
+    const z = gz * citySpacing;
+    const h = 7 + ((Math.abs(gx * 13 + gz * 7) * 3) % 22);
     const building = new THREE.Mesh(
-      new THREE.BoxGeometry(4.5, h, 4.5),
+      new THREE.BoxGeometry(buildingSize, h, buildingSize),
       new THREE.MeshStandardMaterial({
-        color: 0x30363b,
-        roughness: 0.82,
-        metalness: 0.08,
+        color: (gx + gz) % 3 === 0 ? 0x343e50 : 0x30363b,
+        roughness: 0.78,
+        metalness: 0.15,
       }),
     );
     building.position.set(x, h / 2, z);
@@ -156,6 +162,13 @@ for (let x = -18; x <= 18; x += 6) {
     buildingColliders.push(new THREE.Box3().setFromObject(building));
   }
 }
+// Plaza landmark makes it easy to orient yourself without obstructing movement.
+const plazaMarker = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.22, 0.22, 3, 12),
+  new THREE.MeshStandardMaterial({ color: 0x34ff9a, emissive: 0x087b47, emissiveIntensity: 1.5 }),
+);
+plazaMarker.position.set(0, 1.5, -10);
+scene.add(plazaMarker);
 
 ensureValidSpawn();
 
@@ -194,7 +207,7 @@ hud.innerHTML = `
   <div class="brand">420MON // 3D</div>
   <div class="status">FOUNDATION BUILD <span></span></div>
   <div class="hint">WASD / ARROWS · SHIFT SPRINT</div>
-  <div class="target">WALL COLLISIONS v2 · RUN INTO A BUILDING</div>
+  <div class="target">OPEN CITY v3 · WIDE STREETS + PLAZA</div>
 `;
 app.appendChild(hud);
 
@@ -253,7 +266,7 @@ const desiredCamera = new THREE.Vector3();
 const up = new THREE.Vector3(0, 1, 0);
 const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
-const cameraOffset = new THREE.Vector3(7.5, 5.8, 9.5);
+const cameraOffset = new THREE.Vector3(0, 10, 15);
 
 function resize() {
   const width = window.innerWidth;
@@ -293,22 +306,24 @@ function animate() {
   cameraTarget.copy(player.position);
   cameraTarget.y += 1.0;
 
-  // Keep buildings between the player and camera from hiding the character.
+  // Keep a comfortable third-person view. Occluding buildings become
+  // translucent instead of forcing the camera into the character.
   desiredCamera.copy(player.position).add(cameraOffset);
-  cameraDirection.subVectors(desiredCamera, cameraTarget);
+  camera.position.lerp(desiredCamera, 1 - Math.pow(0.00001, dt));
+  camera.lookAt(cameraTarget);
+  cameraDirection.subVectors(camera.position, cameraTarget);
   const cameraDistance = cameraDirection.length();
   cameraDirection.normalize();
   cameraRaycaster.set(cameraTarget, cameraDirection);
   cameraRaycaster.far = cameraDistance;
-  const cameraHits = cameraRaycaster.intersectObjects(blocks, false);
-  if (cameraHits.length > 0) {
-    const safeDistance = Math.max(1.4, cameraHits[0].distance - 0.35);
-    desiredCamera.copy(cameraTarget).addScaledVector(cameraDirection, safeDistance);
+  const occluded = new Set(cameraRaycaster.intersectObjects(blocks, false).map(hit => hit.object));
+  for (const building of blocks) {
+    const material = building.material as THREE.MeshStandardMaterial;
+    const hidden = occluded.has(building);
+    material.transparent = hidden;
+    material.opacity = hidden ? 0.12 : 1;
+    material.depthWrite = !hidden;
   }
-  // Move inward immediately on obstruction, smooth out again afterward.
-  const followFactor = cameraHits.length > 0 ? 1 : 1 - Math.pow(0.00001, dt);
-  camera.position.lerp(desiredCamera, followFactor);
-  camera.lookAt(cameraTarget);
 
   moon.position.x = player.position.x - 20;
   moon.position.z = player.position.z + 12;
