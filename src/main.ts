@@ -207,7 +207,7 @@ hud.innerHTML = `
   <div class="brand">420MON // 3D</div>
   <div class="status">FOUNDATION BUILD <span></span></div>
   <div class="hint">WASD / ARROWS · SHIFT SPRINT</div>
-  <div class="target">OPEN CITY v3 · WIDE STREETS + PLAZA</div>
+  <div class="target">OPEN CITY v3.1 · WIDE STREETS + PLAZA</div>
 `;
 app.appendChild(hud);
 
@@ -266,7 +266,9 @@ const desiredCamera = new THREE.Vector3();
 const up = new THREE.Vector3(0, 1, 0);
 const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
-const cameraOffset = new THREE.Vector3(0, 10, 15);
+const cameraOffset = new THREE.Vector3(0, 12, 18);
+const cameraMinDistance = 10;
+const buildLabel = "OPEN CITY v3.1";
 
 function resize() {
   const width = window.innerWidth;
@@ -310,6 +312,11 @@ function animate() {
   // translucent instead of forcing the camera into the character.
   desiredCamera.copy(player.position).add(cameraOffset);
   camera.position.lerp(desiredCamera, 1 - Math.pow(0.00001, dt));
+  // Never allow the third-person camera to collapse into the player.
+  cameraDirection.subVectors(camera.position, cameraTarget);
+  if (cameraDirection.length() < cameraMinDistance) {
+    camera.position.copy(cameraTarget).add(cameraDirection.normalize().multiplyScalar(cameraMinDistance));
+  }
   camera.lookAt(cameraTarget);
   cameraDirection.subVectors(camera.position, cameraTarget);
   const cameraDistance = cameraDirection.length();
@@ -332,7 +339,7 @@ function animate() {
 
   const fps = Math.round(1 / Math.max(dt, 0.001));
   const status = hud.querySelector(".status");
-  if (status) status.innerHTML = `COLLISION TEST <span></span> ${fps} FPS · ${blockedThisFrame ? "🧱 WAND" : "FREI"} · BLOCKS ${collisionCount}`;
+  if (status) status.innerHTML = `${buildLabel} <span></span> ${fps} FPS · ${blockedThisFrame ? "🧱 WAND" : "FREI"} · BLOCKS ${collisionCount}`;
 }
 
 animate();
