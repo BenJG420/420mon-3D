@@ -300,7 +300,7 @@ hud.innerHTML = `
   <div class="brand">420MON // 3D</div>
   <div class="status">FOUNDATION BUILD <span></span></div>
   <div class="hint">WASD / ARROWS · SHIFT SPRINT</div>
-  <div class="target">MONSTER DUEL v11 · 420MON VS 420MON</div>
+  <div class="target">ORIGINAL DEX v13 · 420MON</div>
 `;
 app.appendChild(hud);
 const characterPicker = document.createElement("div");
@@ -509,7 +509,7 @@ const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
 const cameraOffset = new THREE.Vector3(0, 12, 18);
 const cameraMinDistance = 10;
-const buildLabel = "MONSTER DUEL v11";
+const buildLabel = "ORIGINAL DEX v13";
 
 function resize() {
   const width = window.innerWidth;
