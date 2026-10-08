@@ -25,7 +25,7 @@ const saved = (() => {
       captures: Number.isFinite(data.captures) ? Math.max(0, data.captures) : 0,
       wins: Number.isFinite(data.wins) ? Math.max(0, data.wins) : 0,
       balls: Number.isFinite(data.balls) ? Math.max(0, data.balls) : 12,
-      team: Array.isArray(data.team) ? data.team.filter((m: TeamMon) => m && (!!m.id && !!DEX[m.id] || species.some(s => s.name === m.name))).slice(0, 6)  .map((m: TeamMon) => ({ ...m, hp: Number.isFinite(m.hp) ? Math.max(1, m.hp) : 35 })) as TeamMon[] : [] as TeamMon[],
+      team: Array.isArray(data.team) ? data.team.filter((m: TeamMon) => m && (!!m.id && !!DEX[m.id] || species.some(s => s.name === m.name))).slice(0, 6)  .map((m: TeamMon) => ({ ...m, hp: Number.isFinite(m.hp) ? Math.max(0, m.hp) : 35 })) as TeamMon[] : [] as TeamMon[],
       collection: Array.isArray(data.collection) ? data.collection.filter((x: unknown) => typeof x === "string").slice(0, 420) as string[] : [] as string[],
       box: Array.isArray(data.box) ? data.box as TeamMon[] : [] as TeamMon[],
       gold: Number.isFinite(data.gold) ? data.gold as number : 150,
@@ -88,6 +88,31 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     monsters.push({ species: kind, mesh: root, hp: kind.maxHp, alive: true, phase: i * 0.9, level: wildLevel, respawn: 0 });
   }
 
+  window.addEventListener("420mon-district-change", (event: Event) => {
+    const id = (event as CustomEvent<string>).detail;
+    const pool = encountersFor(id);
+    if (!pool.length) return;
+    active = null;
+    if (allyModel) { monsterRoot.remove(allyModel); allyModel = null; }
+    for (let i = 0; i < monsters.length; i++) {
+      const wild = monsters[i];
+      const picked = pool[(i * 7 + 3) % pool.length];
+      const original = speciesById(picked.id);
+      const lv = Math.max(2, Math.min(420, (id === "alley" ? 2 : 7 + DISTRICT_LEVEL(id)) + i % 5));
+      const color = new THREE.Color(ELEMENT_COLOR[original.types[0]]).getHex();
+      wild.species = { id: original.id, name: original.name, color, glow: color, maxHp: Math.max(15, Math.round(original.base.hp * (0.45 + lv * 0.035))), catchRate: original.catch / 255 };
+      wild.level = lv; wild.hp = wild.species.maxHp; wild.alive = true; wild.respawn = 0;
+      wild.mesh.visible = true;
+      wild.mesh.position.set(player.position.x + positions[i][0], 0, player.position.z + positions[i][1]);
+      const body = wild.mesh.children[0] as THREE.Mesh;
+      (body.material as THREE.MeshStandardMaterial).color.setHex(color);
+      (body.material as THREE.MeshStandardMaterial).emissive.setHex(color);
+    }
+  });
+  function DISTRICT_LEVEL(id: string): number {
+    const rank = ["alley","yard","cable","ash","drain","chem","ring","labyrinth","nische","scrap"].indexOf(id);
+    return Math.max(0, rank) * 4;
+  }
   const ui = document.createElement("div");
   ui.className = "monster-ui";
   ui.innerHTML = `
