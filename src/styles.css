@@ -131,3 +131,7 @@ canvas {
 #monster-team-list button { text-align: left; border: 1px solid #6845a4; border-radius: 7px; background: #231b40; color: #e8dcff; padding: 9px; }
 .monster-actions { flex-wrap: wrap; }
 .monster-actions button { min-width: 40%; }
+
+.monster-toast { position: fixed; z-index: 90; top: 21%; left: 50%; transform: translateX(-50%); width: max-content; max-width: 90vw; text-align: center; border: 1px solid #6affb7; border-radius: 12px; padding: 13px 18px; background: #07291ef0; box-shadow: 0 0 28px #1afa9b55; color: white; font: 800 13px system-ui; }
+.monster-heal { position: fixed; top: 253px; right: 16px; z-index: 25; border: 1px solid #69fbc2; border-radius: 9px; background: #15483cdd; color: #dfffee; padding: 11px; font-size: 11px; font-weight: 800; }
+@media (max-width: 680px) { .monster-heal { top: 235px; right: 10px; } .monster-toast { top: 16%; font-size: 11px; } }

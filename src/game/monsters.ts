@@ -12,7 +12,7 @@ const positions: [number, number][] = [
   [11, -9], [-11, -10], [10, 11], [-12, 10], [22, 5], [-23, -4],
   [5, 23], [-7, -23], [28, 20], [-27, 22], [23, -27], [-25, -25],
 ];
-type TeamMon = { name: string; level: number; xp: number };
+type TeamMon = { name: string; level: number; xp: number; hp: number };
 const monsters: WildMon[] = [];
 const saved = (() => {
   try {
@@ -21,7 +21,7 @@ const saved = (() => {
       captures: Number.isFinite(data.captures) ? Math.max(0, data.captures) : 0,
       wins: Number.isFinite(data.wins) ? Math.max(0, data.wins) : 0,
       balls: Number.isFinite(data.balls) ? Math.max(0, data.balls) : 12,
-      team: Array.isArray(data.team) ? data.team.filter((m: TeamMon) => m && species.some(s => s.name === m.name)).slice(0, 6) as TeamMon[] : [] as TeamMon[],
+      team: Array.isArray(data.team) ? data.team.filter((m: TeamMon) => m && species.some(s => s.name === m.name)).slice(0, 6)  .map((m: TeamMon) => ({ ...m, hp: Number.isFinite(m.hp) ? Math.max(1, m.hp) : 35 })) as TeamMon[] : [] as TeamMon[],
       collection: Array.isArray(data.collection) ? data.collection.filter((x: unknown) => typeof x === "string").slice(0, 200) as string[] : [] as string[],
     };
   } catch { return { captures: 0, wins: 0, balls: 12, team: [] as TeamMon[], collection: [] as string[] }; }
@@ -79,6 +79,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   const ui = document.createElement("div");
   ui.className = "monster-ui";
   ui.innerHTML = `
+    <div id="monster-toast" class="monster-toast" hidden></div>
     <div class="monster-progress"><strong>420MON // WILD ZONE</strong><div id="monster-count"></div><div id="monster-quest"></div></div>
     <button type="button" class="monster-interact" id="monster-interact" hidden>⚡ BEGEGNEN</button>
     <div class="monster-battle" id="monster-battle" hidden>
@@ -92,6 +93,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
         <button type="button" id="monster-run">↩ FLIEHEN</button>
       </div>
     </div>
+    <button type="button" class="monster-heal" id="monster-heal">✚ TEAM HEILEN</button>
     <button type="button" class="monster-collection-toggle" id="monster-collection-toggle">◈ SAMMLUNG</button>
     <div class="monster-collection" id="monster-collection" hidden><strong>DEINE 420MON</strong><div id="monster-list"></div><div id="monster-team-list"></div><button type="button" id="monster-collection-close">SCHLIESSEN</button></div>`;
   document.querySelector("#app")!.appendChild(ui);
@@ -104,6 +106,14 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   let cooldown = 0;
   let time = 0;
   let heroHp = 100;
+  let messageTimer: ReturnType<typeof setTimeout> | undefined;
+  function notify(message: string) {
+    const toast = get("monster-toast");
+    toast.textContent = message;
+    toast.hidden = false;
+    if (messageTimer !== undefined) clearTimeout(messageTimer);
+    messageTimer = setTimeout(() => { toast.hidden = true; }, 2800);
+  }
   let energy = 3;
   const lead = () => saved.team[0];
   function awardXp(amount: number) {
@@ -127,7 +137,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     saved.team.forEach((mon, index) => {
       const button = document.createElement("button");
       button.type = "button";
-      button.textContent = `${index === 0 ? "★ " : ""}${mon.name} · LV ${mon.level} · ${mon.xp}/${mon.level * 20} EP`;
+      button.textContent = `${index === 0 ? "★ " : ""}${mon.name} · LV ${mon.level} · HP ${mon.hp} · ${mon.xp}/${mon.level * 20} EP`;
       button.addEventListener("click", () => {
         if (active) return;
         saved.team.splice(index, 1);
@@ -148,7 +158,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     get("monster-name").textContent = `${active.species.name} · HP ${active.hp}/${active.species.maxHp} · DEINE HP ${heroHp}/100`;
     get("monster-hp-bar").style.width = `${100 * active.hp / active.species.maxHp}%`;
     get("monster-message").textContent = message;
-    (get("monster-catch") as HTMLButtonElement).disabled = saved.balls <= 0;
+    (get("monster-catch") as HTMLButtonElement).disabled = saved.balls <= 0 || active.hp <= 0;
   };
   function finish() {
     active = null;
@@ -178,24 +188,26 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       saved.wins++;
       awardXp(15);
       saved.balls += 2;
-      get("monster-message").textContent = "SIEG! +1 KAMPF GEWONNEN";
+      notify("⚔ SIEG! +15 EP · +2 KAPSELN");
       finish();
       return;
     }
     heroHp = Math.max(0, heroHp - (5 + Math.floor(Math.random() * 13)));
-    if (heroHp === 0) { finish(); return; }
+    if (heroHp === 0) { notify("KAMPF VERLOREN – Versuch es erneut!"); finish(); return; }
     updateBattle(`${special ? "SPEZIAL" : "ATTACKE"}: ${damage} Schaden! Das Monster schlägt zurück.`);
   }
   function capture() {
-    if (!active || saved.balls <= 0) return;
+    if (!active || saved.balls <= 0 || active.hp <= 0) return;
     saved.balls--;
     const chance = Math.min(0.94, active.species.catchRate + (1 - active.hp / active.species.maxHp) * 0.55);
     if (Math.random() < chance) {
       saved.captures++;
       saved.collection.push(active.species.name);
-      if (saved.team.length < 6) saved.team.push({ name: active.species.name, level: 1, xp: 0 });
+      // Capturing does not reduce HP to zero: preserve the actual remaining HP.
+      if (saved.team.length < 6) saved.team.push({ name: active.species.name, level: 1, xp: 0, hp: active.hp });
       awardXp(8);
       if (saved.captures === 3) saved.balls += 5;
+      notify(`✓ ${active.species.name} GEFANGEN! ${active.hp} HP verbleiben`);
       active.alive = false;
       active.mesh.visible = false;
       finish();
@@ -212,6 +224,11 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   get("monster-special").addEventListener("click", () => attack(true));
   get("monster-catch").addEventListener("click", capture);
   get("monster-run").addEventListener("click", finish);
+  get("monster-heal").addEventListener("click", () => {
+    if (active) return;
+    saved.team.forEach(mon => { mon.hp = species.find(s => s.name === mon.name)?.maxHp ?? 35; });
+    save(); updateProgress(); notify("✚ DEIN TEAM IST GEHEILT!");
+  });
   get("monster-collection-toggle").addEventListener("click", () => { collection.hidden = !collection.hidden; });
   get("monster-collection-close").addEventListener("click", () => { collection.hidden = true; });
   window.addEventListener("keydown", e => { if (e.code === "KeyE" && !e.repeat && !active) start(); });
