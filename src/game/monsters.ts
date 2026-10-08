@@ -105,7 +105,8 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   let nearest: WildMon | null = null;
   let cooldown = 0;
   let time = 0;
-  let heroHp = 100;
+  let ally: TeamMon | null = null;
+  let allyModel: THREE.Group | null = null;
   let messageTimer: ReturnType<typeof setTimeout> | undefined;
   function notify(message: string) {
     const toast = get("monster-toast");
@@ -115,7 +116,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     messageTimer = setTimeout(() => { toast.hidden = true; }, 2800);
   }
   let energy = 3;
-  const lead = () => saved.team[0];
+  const lead = () => ally ?? saved.team[0];
   function awardXp(amount: number) {
     const mon = lead();
     if (!mon) return;
@@ -151,33 +152,56 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   updateProgress();
   const updateBattle = (message: string) => {
     if (!active) return;
-    get("monster-team-status").textContent = lead()
-      ? `DEIN ${lead()!.name} · LV ${lead()!.level} · ENERGIE ${energy}/3`
-      : `TRAINER · ENERGIE ${energy}/3`;
-    (get("monster-special") as HTMLButtonElement).disabled = energy < 2;
-    get("monster-name").textContent = `${active.species.name} · HP ${active.hp}/${active.species.maxHp} · DEINE HP ${heroHp}/100`;
+    get("monster-team-status").textContent = ally
+      ? `DEIN ${ally!.name} · LV ${ally!.level} · HP ${ally!.hp} · ENERGIE ${energy}/3`
+      : `KEIN KAMPFFÄHIGES MONSTER – NUR FANGEN`; 
+    (get("monster-special") as HTMLButtonElement).disabled = energy < 2 || !ally;
+    (get("monster-attack") as HTMLButtonElement).disabled = !ally;
+    get("monster-name").textContent = `${active.species.name} · HP ${active.hp}/${active.species.maxHp}`;
     get("monster-hp-bar").style.width = `${100 * active.hp / active.species.maxHp}%`;
     get("monster-message").textContent = message;
     (get("monster-catch") as HTMLButtonElement).disabled = saved.balls <= 0 || active.hp <= 0;
   };
   function finish() {
     active = null;
+    ally = null;
+    if (allyModel) { monsterRoot.remove(allyModel); allyModel = null; }
     battle.hidden = true;
     cooldown = 1.5;
     updateProgress();
     save();
   }
+  function spawnAlly() {
+    if (allyModel) monsterRoot.remove(allyModel);
+    allyModel = null;
+    if (!ally) return;
+    const kind = species.find(s => s.name === ally!.name) ?? species[0];
+    const root = new THREE.Group();
+    const mat = new THREE.MeshStandardMaterial({ color: kind.color, emissive: kind.glow, emissiveIntensity: 0.45 });
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), mat);
+    body.position.y = 0.75;
+    root.add(body);
+    for (const side of [-1, 1]) {
+      const horn = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.65, 7), mat);
+      horn.position.set(side * 0.34, 1.35, 0);
+      root.add(horn);
+    }
+    root.position.copy(player.position).add(new THREE.Vector3(1.5, 0, -1.5));
+    monsterRoot.add(root);
+    allyModel = root;
+  }
   function start() {
     if (!nearest || active || cooldown > 0) return;
     active = nearest;
-    heroHp = 100;
+    ally = saved.team.find(mon => mon.hp > 0) ?? null;
+    spawnAlly();
     energy = 3;
     battle.hidden = false;
     encounterButton.hidden = true;
-    updateBattle("Wähle ANGRIFF, FANGEN oder FLIEHEN.");
+    updateBattle(ally ? `${ally.name}, ich wähle dich!` : "Fange dein erstes Monster mit einer Kapsel!");
   }
   function attack(special = false) {
-    if (!active) return;
+    if (!active || !ally) return;
     if (special && energy < 2) return;
     energy = special ? energy - 2 : Math.min(3, energy + 1);
     const damage = (special ? 19 : 9) + Math.floor(Math.random() * 11) + (lead() ? Math.floor(lead()!.level * 1.8) : 0);
@@ -192,9 +216,15 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       finish();
       return;
     }
-    heroHp = Math.max(0, heroHp - (5 + Math.floor(Math.random() * 13)));
-    if (heroHp === 0) { notify("KAMPF VERLOREN – Versuch es erneut!"); finish(); return; }
-    updateBattle(`${special ? "SPEZIAL" : "ATTACKE"}: ${damage} Schaden! Das Monster schlägt zurück.`);
+    ally.hp = Math.max(0, ally.hp - (5 + Math.floor(Math.random() * 13)));
+    if (ally.hp === 0) {
+      ally = saved.team.find(mon => mon.hp > 0) ?? null;
+      if (!ally) { notify("DEIN TEAM IST K. O. – HEILE DEINE MONSTER!"); finish(); return; }
+      spawnAlly();
+      notify("MONSTERWECHSEL: " + ally.name);
+    }
+    save();
+    updateBattle(`${ally?.name ?? "420mon"} nutzt ${special ? "SPEZIAL" : "ATTACKE"}! ${damage} Schaden.`);
   }
   function capture() {
     if (!active || saved.balls <= 0 || active.hp <= 0) return;
@@ -213,8 +243,13 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       finish();
       return;
     }
-    heroHp = Math.max(0, heroHp - 8);
-    if (heroHp === 0) { finish(); return; }
+    if (ally) {
+      ally.hp = Math.max(0, ally.hp - 8);
+      if (ally.hp === 0) {
+        ally = saved.team.find(mon => mon.hp > 0) ?? null;
+        if (!ally) { notify("DEIN TEAM IST K. O."); finish(); return; }
+      }
+    }
     updateBattle("Ausgebrochen! Schwäche das Monster für bessere Fangchancen.");
     updateProgress();
     save();
@@ -236,6 +271,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     get inBattle() { return active !== null; },
     update(dt: number) {
       time += dt;
+      if (allyModel) allyModel.children[0].position.y = 0.75 + Math.sin(time * 3.5) * 0.09;
       cooldown = Math.max(0, cooldown - dt);
       nearest = null;
       let best = 3.2 * 3.2;
