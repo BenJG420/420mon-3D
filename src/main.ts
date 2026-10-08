@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { createMonsterGame } from "./game/monsters";
 import "./styles.css";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -262,6 +263,7 @@ plazaMarker.position.set(0, 1.5, -10);
 scene.add(plazaMarker);
 
 ensureValidSpawn();
+const monsterGame = createMonsterGame(scene, player);
 
 const state = {
   forward: false,
@@ -298,7 +300,7 @@ hud.innerHTML = `
   <div class="brand">420MON // 3D</div>
   <div class="status">FOUNDATION BUILD <span></span></div>
   <div class="hint">WASD / ARROWS · SHIFT SPRINT</div>
-  <div class="target">CHARACTER STUDIO v7 · EDITOR</div>
+  <div class="target">MONSTER WORLD v8 · CAPTURE + BATTLE</div>
 `;
 app.appendChild(hud);
 const characterPicker = document.createElement("div");
@@ -507,7 +509,7 @@ const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
 const cameraOffset = new THREE.Vector3(0, 12, 18);
 const cameraMinDistance = 10;
-const buildLabel = "CHARACTER STUDIO v7";
+const buildLabel = "MONSTER WORLD v8";
 
 function resize() {
   const width = window.innerWidth;
@@ -523,6 +525,7 @@ resize();
 function animate() {
   requestAnimationFrame(animate);
   const dt = Math.min(clock.getDelta(), 0.05);
+  monsterGame.update(dt);
 
   const input = new THREE.Vector3(
     Number(state.right) - Number(state.left) + touch.x,
@@ -532,7 +535,7 @@ function animate() {
 
   if (input.lengthSq() > 0) input.normalize();
 
-  const speed = (state.sprint || touch.sprint) ? 7.5 : 4.2;
+  const speed = monsterGame.inBattle ? 0 : (state.sprint || touch.sprint) ? 7.5 : 4.2;
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
   blockedThisFrame = false;
   movePlayer(velocity.x * dt, velocity.z * dt);
