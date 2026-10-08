@@ -342,7 +342,7 @@ const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
 const cameraOffset = new THREE.Vector3(0, 12, 18);
 const cameraMinDistance = 10;
-const buildLabel = "CHARACTER v5";
+const buildLabel = "CHARACTER v5.1";
 
 function resize() {
   const width = window.innerWidth;
@@ -375,7 +375,12 @@ function animate() {
 
   if (velocity.lengthSq() > 0.01) {
     const angle = Math.atan2(velocity.x, velocity.z);
-    player.rotation.y = THREE.MathUtils.lerp(player.rotation.y, angle, 1 - Math.pow(0.0001, dt));
+    // Turn by the shortest angular path across the -PI / +PI boundary.
+    const delta = Math.atan2(
+      Math.sin(angle - player.rotation.y),
+      Math.cos(angle - player.rotation.y),
+    );
+    player.rotation.y += delta * (1 - Math.exp(-12 * dt));
   }
   const moving = velocity.length() > 0.35;
   const gait = Math.min(1, velocity.length() / 4.2);
