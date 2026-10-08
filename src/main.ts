@@ -71,10 +71,14 @@ function part(parent: THREE.Object3D, geometry: THREE.BufferGeometry, material: 
   parent.add(mesh);
   return mesh;
 }
-part(character, new THREE.BoxGeometry(0.78, 0.88, 0.4), jacket, 0, 1.36, 0);
+const torso = part(character, new THREE.BoxGeometry(0.78, 0.88, 0.4), jacket, 0, 1.36, 0);
 part(character, new THREE.BoxGeometry(0.8, 0.09, 0.44), trim, 0, 1.76, 0);
 part(character, new THREE.CylinderGeometry(0.12, 0.12, 0.18, 10), skin, 0, 1.88, 0);
 part(character, new THREE.SphereGeometry(0.28, 16, 12), skin, 0, 2.15, 0);
+const hairMaterial = new THREE.MeshStandardMaterial({ color: 0x17121e, roughness: 0.9 });
+const hair = part(character, new THREE.SphereGeometry(0.295, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), hairMaterial, 0, 2.18, 0);
+const ponytail = part(character, new THREE.CapsuleGeometry(0.11, 0.34, 6, 10), hairMaterial, 0, 1.95, -0.29);
+
 part(character, new THREE.BoxGeometry(0.58, 0.14, 0.5), trousers, 0, 0.91, 0);
 const leftArm = new THREE.Group();
 const rightArm = new THREE.Group();
@@ -95,6 +99,19 @@ part(rightLeg, new THREE.BoxGeometry(0.28, 0.69, 0.3), trousers, 0, -0.36, 0);
 part(leftLeg, new THREE.BoxGeometry(0.32, 0.22, 0.47), boots, 0, -0.76, 0.07);
 part(rightLeg, new THREE.BoxGeometry(0.32, 0.22, 0.47), boots, 0, -0.76, 0.07);
 scene.add(player);
+type CharacterChoice = "man" | "woman";
+let characterChoice: CharacterChoice = localStorage.getItem("420mon-character") === "woman" ? "woman" : "man";
+function applyCharacterChoice(choice: CharacterChoice) {
+  characterChoice = choice;
+  localStorage.setItem("420mon-character", choice);
+  torso.scale.x = choice === "woman" ? 0.83 : 1;
+  character.scale.set(choice === "woman" ? 0.94 : 1, choice === "woman" ? 0.96 : 1, 1);
+  leftArm.position.x = choice === "woman" ? -0.46 : -0.51;
+  rightArm.position.x = choice === "woman" ? 0.46 : 0.51;
+  ponytail.visible = choice === "woman";
+  hair.scale.setScalar(choice === "woman" ? 1.06 : 1);
+}
+applyCharacterChoice(characterChoice);
 let walkCycle = 0;
 
 const blocks: THREE.Mesh[] = [];
@@ -281,9 +298,27 @@ hud.innerHTML = `
   <div class="brand">420MON // 3D</div>
   <div class="status">FOUNDATION BUILD <span></span></div>
   <div class="hint">WASD / ARROWS · SHIFT SPRINT</div>
-  <div class="target">CHARACTER v5 · WALK + SPRINT ANIMATION</div>
+  <div class="target">CHARACTER SELECT v6 · MANN / FRAU</div>
 `;
 app.appendChild(hud);
+const characterPicker = document.createElement("div");
+characterPicker.className = "character-picker";
+characterPicker.innerHTML = '<span>CHARAKTER</span><button type="button" data-choice="man">MANN</button><button type="button" data-choice="woman">FRAU</button>';
+app.appendChild(characterPicker);
+function updatePicker() {
+  characterPicker.querySelectorAll<HTMLButtonElement>("button").forEach(button => {
+    const active = button.dataset.choice === characterChoice;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+characterPicker.querySelectorAll<HTMLButtonElement>("button").forEach(button => {
+  button.addEventListener("click", () => {
+    applyCharacterChoice(button.dataset.choice === "woman" ? "woman" : "man");
+    updatePicker();
+  });
+});
+updatePicker();
 
 // Mobile touch controls: joystick + sprint button.
 const touch = { x: 0, y: 0, sprint: false };
@@ -342,7 +377,7 @@ const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
 const cameraOffset = new THREE.Vector3(0, 12, 18);
 const cameraMinDistance = 10;
-const buildLabel = "CHARACTER v5.1";
+const buildLabel = "CHARACTER SELECT v6";
 
 function resize() {
   const width = window.innerWidth;
