@@ -80,3 +80,10 @@ canvas {
 .sprint-button:active { background: #218e61; }
 @media (pointer: fine) { .touch-controls { display: none; } }
 @media (pointer: coarse) { .hint, .target { display: none; } .hud { padding: 14px; } }
+
+/* Character choice stays accessible above mobile movement controls. */
+.character-picker { position: fixed; top: max(92px, env(safe-area-inset-top)); right: 16px; display: flex; align-items: center; gap: 6px; padding: 7px; border: 1px solid #56f7ae66; border-radius: 10px; background: #071612dd; z-index: 10; }
+.character-picker span { font-size: 10px; letter-spacing: 0.08em; color: #a8e6c8; margin: 0 5px; }
+.character-picker button { background: #142c27; border: 1px solid #36634f; border-radius: 7px; color: #eafff5; font-size: 11px; font-weight: 700; padding: 9px 11px; cursor: pointer; }
+.character-picker button.active { background: #176344; border-color: #5dffb2; box-shadow: 0 0 9px #3bf39b55; }
+@media (max-width: 460px) { .character-picker { top: max(86px, env(safe-area-inset-top)); right: 10px; } .character-picker span { display: none; } }
