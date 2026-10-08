@@ -183,7 +183,9 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     if (allyModel) monsterRoot.remove(allyModel);
     allyModel = null;
     if (!ally) return;
-    const kind = species.find(s => s.name === ally!.name) ?? species[0];
+    const original = ally.id ? speciesById(ally.id) : null;
+    const originalColor = original ? new THREE.Color(ELEMENT_COLOR[original.types[0]]).getHex() : 0x27efb7;
+    const kind = original ? { id: original.id, name: original.name, color: originalColor, glow: originalColor, maxHp: 50, catchRate: original.catch / 255 } : species.find(s => s.name === ally!.name) ?? species[0];
     const root = new THREE.Group();
     const mat = new THREE.MeshStandardMaterial({ color: kind.color, emissive: kind.glow, emissiveIntensity: 0.45 });
     const body = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), mat);
@@ -212,7 +214,11 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     if (!active || !ally) return;
     if (special && energy < 2) return;
     energy = special ? energy - 2 : Math.min(3, energy + 1);
-    const damage = (special ? 19 : 9) + Math.floor(Math.random() * 11) + (lead() ? Math.floor(lead()!.level * 1.8) : 0);
+    const attacker = ally.id ? speciesById(ally.id) : null;
+    const move = getMove(attacker?.moves[special ? 1 : 0] ?? "move_tackle");
+    const modifier = typeMod(move.type, active.species.id ? speciesById(active.species.id).types : ["normal"]);
+    if (Math.random() * 100 >= move.acc) { updateBattle(move.name + " ging daneben!"); return; }
+    const damage = move.power === 0 ? 0 : Math.max(1, Math.floor((move.power / 8 + ally.level * 0.7 + (attacker?.base.atk ?? 45) / 16) * modifier * (0.85 + Math.random() * 0.3)));
     active.hp = Math.max(0, active.hp - damage);
     if (active.hp === 0) {
       active.alive = false;
@@ -232,7 +238,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       notify("MONSTERWECHSEL: " + ally.name);
     }
     save();
-    updateBattle(`${ally?.name ?? "420mon"} nutzt ${special ? "SPEZIAL" : "ATTACKE"}! ${damage} Schaden.`);
+    updateBattle(`${ally?.name ?? "420mon"} nutzt ${move.name}! ${damage} Schaden${modifier >= 2 ? " · SEHR EFFEKTIV!" : modifier < 1 ? " · wenig effektiv" : ""}.`);
   }
   function capture() {
     if (!active || saved.balls <= 0 || active.hp <= 0) return;
@@ -269,7 +275,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   get("monster-run").addEventListener("click", finish);
   get("monster-heal").addEventListener("click", () => {
     if (active) return;
-    saved.team.forEach(mon => { mon.hp = species.find(s => s.name === mon.name)?.maxHp ?? 35; });
+    saved.team.forEach(mon => { mon.hp = mon.id ? Math.max(15, Math.round(speciesById(mon.id).base.hp * (0.45 + mon.level * 0.035))) : species.find(s => s.name === mon.name)?.maxHp ?? 35; });
     save(); updateProgress(); notify("✚ DEIN TEAM IST GEHEILT!");
   });
   get("monster-collection-toggle").addEventListener("click", () => { collection.hidden = !collection.hidden; });
