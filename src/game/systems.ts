@@ -70,13 +70,13 @@ export function createGameSystems(world: DistrictTravel) {
           const owned = known.has(sp.name) || known.has(id);
           const image = document.createElement("img");
           image.className = "dex-original-sprite";
-          image.src = import.meta.env.BASE_URL + "game/sprites/" + encodeURIComponent(sp.sprite) + ".png";
+          image.src = import.meta.env.BASE_URL + "game/sprites/" + encodeURIComponent(sp.sprite) + (sp.sprite === "neonpunx" || sp.sprite === "puffpuff" ? ".png" : ".svg");
           image.alt = sp.name + " · Original 2D"; image.loading = "lazy";
           image.onerror = () => {
             const fallback = document.createElement("span");
             fallback.className = "dex-original-missing";
             fallback.textContent = "◈";
-            fallback.title = "Für dieses 420mon liegt noch keine Originalzeichnung vor";
+            fallback.title = "Original-Sprite nicht verfügbar: " + sp.sprite;
             image.replaceWith(fallback);
           };
           item.append(image);
