@@ -127,10 +127,19 @@ export function createGameSystems(world: DistrictTravel) {
         }, it.desc);
       }
     } else if (tab === "world") {
-      title("LOWTOWN · ORIGINAL-VIERTEL");
-      for (const d of DISTRICTS) row(d.name + " · LV " + d.minLv + "+", () => {
-        note(d.hint + " · " + d.mons.length + " wilde Arten · 3D-Gebiet noch nicht freigeschaltet");
-      }, d.look);
+      title("LOWTOWN · INTERAKTIVER STADTPLAN");
+      const map = document.createElement("div"); map.className = "district-map";
+      for (const d of DISTRICTS) {
+        const btn = document.createElement("button"); btn.className = "district-map-pin";
+        if (world.current() === d.id) btn.classList.add("active");
+        btn.textContent = d.name + " · LV " + d.minLv + "+";
+        btn.title = d.hint;
+        btn.onclick = () => { world.travel(d.id); panel.hidden = true; };
+        map.append(btn);
+      }
+      body.append(map);
+      row("↩ ZURÜCK NACH LOWTOWN / GASSE A", () => { world.travel("alley"); panel.hidden = true; }, "Zurück zum Stadtzentrum und Eddis Shop");
+      row("Aktueller Bezirk: " + (DISTRICTS.find(d => d.id === world.current())?.name ?? "Gasse A"), undefined, "Wähle ein Gebiet auf der Karte, um in seine 3D-Umgebung zu reisen.");
     } else if (tab === "quest") {
       title("AUFTRÄGE & FORTSCHRITT");
       const goals = [
