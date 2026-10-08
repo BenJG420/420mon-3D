@@ -1,3 +1,4 @@
+import type { DistrictTravel } from "./world";
 import { DEX, DEX_ORDER, dexNum, speciesById } from "./data/dex";
 import { DISTRICTS } from "./data/zones";
 import { ITEMS } from "./data/items";
@@ -13,7 +14,7 @@ const load = (): Save => {
   } catch { return { captures: 0, wins: 0, balls: 12, collection: [], team: [], box: [], gold: 150, inventory: {}, quest: {} }; }
 };
 const maxHp = (m: Partner) => m.id ? Math.max(15, Math.round(speciesById(m.id).base.hp * (0.45 + m.level * 0.035))) : 35;
-export function createGameSystems() {
+export function createGameSystems(world: DistrictTravel) {
   const host = document.createElement("div");
   host.className = "systems-root";
   host.innerHTML = `<button class="systems-toggle" id="systems-open">☰ 420MON MENÜ</button>
@@ -28,7 +29,8 @@ export function createGameSystems() {
   const panel = q("systems-panel");
   let tab = "dex";
   let selected = "";
-  const tabs = [["dex","📖 DEX"],["team","⚔ TEAM"],["box","▦ BOX"],["bag","🎒 INVENTAR"],["shop","💰 SHOP"],["world","🌆 VIERTEL"],["quest","★ QUESTS"]] as const;
+  world.openShop(() => { tab = "shop"; panel.hidden = false; render(); });
+  const tabs = [["dex","📖 DEX"],["team","⚔ TEAM"],["box","▦ BOX"],["bag","🎒 INVENTAR"],["world","🗺 KARTE"],["quest","★ QUESTS"]] as const;
   const escape = (v: string) => v.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c]!);
   const save = (v: Save) => { localStorage.setItem(KEY, JSON.stringify(v)); window.dispatchEvent(new Event("420mon-save-changed")); };
   const note = (msg: string) => { q("systems-footer").textContent = msg; };
@@ -66,7 +68,15 @@ export function createGameSystems() {
           if (query && !(sp.name.toLowerCase().includes(query) || index.toLowerCase().includes(query))) continue;
           const item = document.createElement("button"); item.className = "systems-row";
           const owned = known.has(sp.name) || known.has(id);
-          item.textContent = index + " · " + (owned ? sp.name : "???") + " · " + sp.types.join("/");
+          const image = document.createElement("img");
+          image.className = "dex-original-sprite";
+          image.src = "https://raw.githubusercontent.com/BenJG420/420mon/main/public/game/sprites/" + encodeURIComponent(sp.sprite) + ".png";
+          image.alt = sp.name + " · Original 2D"; image.loading = "lazy";
+          image.onerror = () => { image.style.display = "none"; };
+          item.append(image);
+          const details = document.createElement("span");
+          details.textContent = index + " · " + (owned ? sp.name : "???") + " · " + sp.types.join("/");
+          item.append(details);
           item.onclick = () => note(owned ? sp.blurb + " · " + sp.where : "Noch nicht gefangen · Fundort: " + sp.where);
           list.append(item);
         }
@@ -103,7 +113,7 @@ export function createGameSystems() {
         } : undefined, it.desc);
       }
     } else if (tab === "shop") {
-      title("LOWTOWN SHOP · " + s.gold + " ₲");
+      title("EDDIS SHOP · " + s.gold + " ₲");
       row("◉ FANGKAPSEL ×1 · 25 ₲", () => {
         if (s.gold! < 25) { note("Nicht genug Geld."); return; }
         s.gold! -= 25; s.balls++; save(s); render(); note("Fangkapsel gekauft.");
@@ -117,10 +127,19 @@ export function createGameSystems() {
         }, it.desc);
       }
     } else if (tab === "world") {
-      title("LOWTOWN · ORIGINAL-VIERTEL");
-      for (const d of DISTRICTS) row(d.name + " · LV " + d.minLv + "+", () => {
-        note(d.hint + " · " + d.mons.length + " wilde Arten · 3D-Gebiet noch nicht freigeschaltet");
-      }, d.look);
+      title("LOWTOWN · INTERAKTIVER STADTPLAN");
+      const map = document.createElement("div"); map.className = "district-map";
+      for (const d of DISTRICTS) {
+        const btn = document.createElement("button"); btn.className = "district-map-pin";
+        if (world.current() === d.id) btn.classList.add("active");
+        btn.textContent = d.name + " · LV " + d.minLv + "+";
+        btn.title = d.hint;
+        btn.onclick = () => { world.travel(d.id); panel.hidden = true; };
+        map.append(btn);
+      }
+      body.append(map);
+      row("↩ ZURÜCK NACH LOWTOWN / GASSE A", () => { world.travel("alley"); panel.hidden = true; }, "Zurück zum Stadtzentrum und Eddis Shop");
+      row("Aktueller Bezirk: " + (DISTRICTS.find(d => d.id === world.current())?.name ?? "Gasse A"), undefined, "Wähle ein Gebiet auf der Karte, um in seine 3D-Umgebung zu reisen.");
     } else if (tab === "quest") {
       title("AUFTRÄGE & FORTSCHRITT");
       const goals = [
@@ -134,7 +153,7 @@ export function createGameSystems() {
       row("Original-Story", undefined, "NPC-Dialoge und Original-Quests werden noch in die 3D-Welt portiert.");
     }
   }
-  q("systems-open").onclick = () => { panel.hidden = false; render(); };
+  q("systems-open").onclick = () => { if (tab === "shop") tab = "world"; panel.hidden = false; render(); };
   q("systems-close").onclick = () => { panel.hidden = true; };
   window.addEventListener("420mon-save-changed", () => { if (!panel.hidden) render(); });
   render();
