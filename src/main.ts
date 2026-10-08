@@ -162,6 +162,63 @@ for (let gx = -4; gx <= 4; gx++) {
     buildingColliders.push(new THREE.Box3().setFromObject(building));
   }
 }
+// Low-cost cyberpunk detailing: shared geometry/materials and emissive strips.
+const cyanNeon = new THREE.MeshStandardMaterial({ color: 0x00bcd4, emissive: 0x00d9ff, emissiveIntensity: 2.5, roughness: 0.25 });
+const pinkNeon = new THREE.MeshStandardMaterial({ color: 0xee44cc, emissive: 0xff22a8, emissiveIntensity: 2.3, roughness: 0.3 });
+const greenNeon = new THREE.MeshStandardMaterial({ color: 0x44ff99, emissive: 0x00ff88, emissiveIntensity: 2, roughness: 0.3 });
+const facadeDark = new THREE.MeshStandardMaterial({ color: 0x131d2c, metalness: 0.5, roughness: 0.5 });
+const windowGeometry = new THREE.BoxGeometry(0.12, 0.65, 0.8);
+const roadGeometry = new THREE.PlaneGeometry(240, 8);
+const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x151a22, roughness: 0.9 });
+for (let lane = -4; lane <= 4; lane++) {
+  const roadX = new THREE.Mesh(roadGeometry, roadMaterial);
+  roadX.rotation.x = -Math.PI / 2;
+  roadX.position.set(0, 0.025, lane * citySpacing + citySpacing / 2);
+  roadX.receiveShadow = true;
+  scene.add(roadX);
+  const roadZ = new THREE.Mesh(roadGeometry, roadMaterial);
+  roadZ.rotation.set(-Math.PI / 2, 0, Math.PI / 2);
+  roadZ.position.set(lane * citySpacing + citySpacing / 2, 0.026, 0);
+  roadZ.receiveShadow = true;
+  scene.add(roadZ);
+}
+for (let i = 0; i < blocks.length; i++) {
+  const building = blocks[i];
+  const h = (building.geometry as THREE.BoxGeometry).parameters.height as number;
+  const material = i % 3 === 0 ? cyanNeon : i % 3 === 1 ? pinkNeon : greenNeon;
+  const front = building.position.z + buildingSize / 2 + 0.07;
+  // Front vertical light strips and a bright rooftop rim.
+  for (const side of [-1, 1]) {
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(0.12, h * 0.85, 0.12), material);
+    strip.position.set(building.position.x + side * (buildingSize / 2 - 0.3), h * 0.5, front);
+    scene.add(strip);
+  }
+  const rim = new THREE.Mesh(new THREE.BoxGeometry(buildingSize + 0.3, 0.12, 0.12), material);
+  rim.position.set(building.position.x, h - 0.25, front);
+  scene.add(rim);
+  // Inset dark window panels with occasional glowing panes.
+  for (let floor = 2; floor < h - 1; floor += 2.5) {
+    for (const offset of [-2.4, -0.8, 0.8, 2.4]) {
+      const lit = (Math.floor(floor * 3) + Math.floor(offset * 5) + i) % 4 === 0;
+      const pane = new THREE.Mesh(windowGeometry, lit ? material : facadeDark);
+      pane.position.set(building.position.x + offset, floor, front + 0.035);
+      scene.add(pane);
+    }
+  }
+}
+// Small neon posts around the plaza; decorative only, leaving paths clear.
+const postGeometry = new THREE.CylinderGeometry(0.08, 0.12, 3.4, 8);
+for (const x of [-19, 19]) {
+  for (const z of [-19, 19]) {
+    const post = new THREE.Mesh(postGeometry, facadeDark);
+    post.position.set(x, 1.7, z);
+    scene.add(post);
+    const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 8), cyanNeon);
+    beacon.position.set(x, 3.5, z);
+    scene.add(beacon);
+  }
+}
+
 // Plaza landmark makes it easy to orient yourself without obstructing movement.
 const plazaMarker = new THREE.Mesh(
   new THREE.CylinderGeometry(0.22, 0.22, 3, 12),
@@ -207,7 +264,7 @@ hud.innerHTML = `
   <div class="brand">420MON // 3D</div>
   <div class="status">FOUNDATION BUILD <span></span></div>
   <div class="hint">WASD / ARROWS · SHIFT SPRINT</div>
-  <div class="target">OPEN CITY v3.1 · WIDE STREETS + PLAZA</div>
+  <div class="target">NEON DISTRICT v4 · EXPLORE THE CITY</div>
 `;
 app.appendChild(hud);
 
@@ -268,7 +325,7 @@ const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
 const cameraOffset = new THREE.Vector3(0, 12, 18);
 const cameraMinDistance = 10;
-const buildLabel = "OPEN CITY v3.1";
+const buildLabel = "NEON DISTRICT v4";
 
 function resize() {
   const width = window.innerWidth;
