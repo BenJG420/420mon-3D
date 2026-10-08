@@ -387,9 +387,6 @@ function animate() {
   rightArm.rotation.x = swing * 0.75;
   character.position.y = moving ? Math.abs(Math.sin(walkCycle)) * 0.045 * gait : 0;
   character.rotation.z = moving ? Math.sin(walkCycle) * 0.025 : 0;
-  if (false) {
-  }
-
   cameraTarget.copy(player.position);
   cameraTarget.y += 1.0;
 
