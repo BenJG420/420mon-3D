@@ -126,6 +126,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       active.alive = false;
       active.mesh.visible = false;
       saved.wins++;
+      saved.balls += 2;
       get("monster-message").textContent = "SIEG! +1 KAMPF GEWONNEN";
       finish();
       return;
@@ -141,6 +142,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     if (Math.random() < chance) {
       saved.captures++;
       saved.collection.push(active.species.name);
+      if (saved.captures === 3) saved.balls += 5;
       active.alive = false;
       active.mesh.visible = false;
       finish();
