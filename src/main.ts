@@ -54,31 +54,48 @@ const grid = new THREE.GridHelper(240, 120, 0x29333b, 0x161b20);
 grid.position.y = 0.01;
 scene.add(grid);
 
+// Modular low-poly humanoid. Individual limb pivots can later be replaced
+// with rigged meshes, clothing and equipment without changing movement code.
 const player = new THREE.Group();
-const body = new THREE.Mesh(
-  new THREE.CapsuleGeometry(0.42, 1.0, 8, 16),
-  new THREE.MeshStandardMaterial({
-    color: 0x6fd17c,
-    roughness: 0.7,
-    metalness: 0.05,
-  }),
-);
-body.position.y = 1.0;
-body.castShadow = true;
-player.add(body);
-
-const head = new THREE.Mesh(
-  new THREE.SphereGeometry(0.36, 20, 14),
-  new THREE.MeshStandardMaterial({
-    color: 0xb8e3b2,
-    roughness: 0.8,
-  }),
-);
-head.position.y = 1.85;
-head.castShadow = true;
-player.add(head);
-
+const character = new THREE.Group();
+player.add(character);
+const jacket = new THREE.MeshStandardMaterial({ color: 0x185d50, roughness: 0.68, metalness: 0.18 });
+const trim = new THREE.MeshStandardMaterial({ color: 0x4bffc0, emissive: 0x087b50, emissiveIntensity: 0.7 });
+const skin = new THREE.MeshStandardMaterial({ color: 0xc4a68d, roughness: 0.88 });
+const trousers = new THREE.MeshStandardMaterial({ color: 0x171f2c, roughness: 0.84 });
+const boots = new THREE.MeshStandardMaterial({ color: 0x0a0e16, roughness: 0.75 });
+function part(parent: THREE.Object3D, geometry: THREE.BufferGeometry, material: THREE.Material, x: number, y: number, z: number) {
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  mesh.castShadow = true;
+  parent.add(mesh);
+  return mesh;
+}
+part(character, new THREE.BoxGeometry(0.78, 0.88, 0.4), jacket, 0, 1.36, 0);
+part(character, new THREE.BoxGeometry(0.8, 0.09, 0.44), trim, 0, 1.76, 0);
+part(character, new THREE.CylinderGeometry(0.12, 0.12, 0.18, 10), skin, 0, 1.88, 0);
+part(character, new THREE.SphereGeometry(0.28, 16, 12), skin, 0, 2.15, 0);
+part(character, new THREE.BoxGeometry(0.58, 0.14, 0.5), trousers, 0, 0.91, 0);
+const leftArm = new THREE.Group();
+const rightArm = new THREE.Group();
+leftArm.position.set(-0.51, 1.72, 0);
+rightArm.position.set(0.51, 1.72, 0);
+character.add(leftArm, rightArm);
+part(leftArm, new THREE.BoxGeometry(0.23, 0.7, 0.28), jacket, 0, -0.35, 0);
+part(rightArm, new THREE.BoxGeometry(0.23, 0.7, 0.28), jacket, 0, -0.35, 0);
+part(leftArm, new THREE.BoxGeometry(0.2, 0.18, 0.23), skin, 0, -0.77, 0);
+part(rightArm, new THREE.BoxGeometry(0.2, 0.18, 0.23), skin, 0, -0.77, 0);
+const leftLeg = new THREE.Group();
+const rightLeg = new THREE.Group();
+leftLeg.position.set(-0.2, 0.9, 0);
+rightLeg.position.set(0.2, 0.9, 0);
+character.add(leftLeg, rightLeg);
+part(leftLeg, new THREE.BoxGeometry(0.28, 0.69, 0.3), trousers, 0, -0.36, 0);
+part(rightLeg, new THREE.BoxGeometry(0.28, 0.69, 0.3), trousers, 0, -0.36, 0);
+part(leftLeg, new THREE.BoxGeometry(0.32, 0.22, 0.47), boots, 0, -0.76, 0.07);
+part(rightLeg, new THREE.BoxGeometry(0.32, 0.22, 0.47), boots, 0, -0.76, 0.07);
 scene.add(player);
+let walkCycle = 0;
 
 const blocks: THREE.Mesh[] = [];
 const buildingColliders: THREE.Box3[] = [];
@@ -264,7 +281,7 @@ hud.innerHTML = `
   <div class="brand">420MON // 3D</div>
   <div class="status">FOUNDATION BUILD <span></span></div>
   <div class="hint">WASD / ARROWS · SHIFT SPRINT</div>
-  <div class="target">NEON DISTRICT v4 · EXPLORE THE CITY</div>
+  <div class="target">CHARACTER v5 · WALK + SPRINT ANIMATION</div>
 `;
 app.appendChild(hud);
 
@@ -325,7 +342,7 @@ const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
 const cameraOffset = new THREE.Vector3(0, 12, 18);
 const cameraMinDistance = 10;
-const buildLabel = "NEON DISTRICT v4";
+const buildLabel = "CHARACTER v5";
 
 function resize() {
   const width = window.innerWidth;
@@ -359,9 +376,17 @@ function animate() {
   if (velocity.lengthSq() > 0.01) {
     const angle = Math.atan2(velocity.x, velocity.z);
     player.rotation.y = THREE.MathUtils.lerp(player.rotation.y, angle, 1 - Math.pow(0.0001, dt));
-    body.rotation.z = Math.sin(performance.now() * 0.012) * 0.025;
   }
-
+  const moving = velocity.length() > 0.35;
+  const gait = Math.min(1, velocity.length() / 4.2);
+  if (moving) walkCycle += dt * (state.sprint || touch.sprint ? 13 : 9);
+  const swing = moving ? Math.sin(walkCycle) * 0.62 * gait : 0;
+  leftLeg.rotation.x = swing;
+  rightLeg.rotation.x = -swing;
+  leftArm.rotation.x = -swing * 0.75;
+  rightArm.rotation.x = swing * 0.75;
+  character.position.y = moving ? Math.abs(Math.sin(walkCycle)) * 0.045 * gait : 0;
+  character.rotation.z = moving ? Math.sin(walkCycle) * 0.025 : 0;
   cameraTarget.copy(player.position);
   cameraTarget.y += 1.0;
 
