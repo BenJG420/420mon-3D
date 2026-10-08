@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { createMonsterGame } from "./game/monsters";
 import { createGameSystems } from "./game/systems";
+import { createDistrictWorld } from "./game/world";
 import "./styles.css";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -265,7 +266,9 @@ scene.add(plazaMarker);
 
 ensureValidSpawn();
 const monsterGame = createMonsterGame(scene, player);
-createGameSystems();
+const districtWorld = createDistrictWorld(scene, player);
+createGameSystems(districtWorld);
+window.dispatchEvent(new CustomEvent("420mon-district-change", { detail: districtWorld.current() }));
 
 const state = {
   forward: false,
@@ -511,7 +514,7 @@ const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
 const cameraOffset = new THREE.Vector3(0, 12, 18);
 const cameraMinDistance = 10;
-const buildLabel = "LOWTOWN SYSTEMS v14";
+const buildLabel = "LOWTOWN DISTRICTS v15";
 
 function resize() {
   const width = window.innerWidth;
@@ -528,6 +531,7 @@ function animate() {
   requestAnimationFrame(animate);
   const dt = Math.min(clock.getDelta(), 0.05);
   monsterGame.update(dt);
+  districtWorld.update();
 
   const input = new THREE.Vector3(
     Number(state.right) - Number(state.left) + touch.x,
