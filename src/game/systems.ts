@@ -68,18 +68,26 @@ export function createGameSystems(world: DistrictTravel) {
           if (query && !(sp.name.toLowerCase().includes(query) || index.toLowerCase().includes(query))) continue;
           const item = document.createElement("button"); item.className = "systems-row";
           const owned = known.has(sp.name) || known.has(id);
+          // Original 2D assets are 256 × 256 sprite sheets containing four 128 × 128 frames.
+          // Crop to the first (top-left) frame for a proper single-monster portrait.
+          // Keep the original sheet unchanged on disk for future 3D modelling.
+          const portrait = document.createElement("span");
+          portrait.className = "dex-sprite-frame";
           const image = document.createElement("img");
           image.className = "dex-original-sprite";
-          image.src = import.meta.env.BASE_URL + "game/sprites/" + encodeURIComponent(sp.sprite) + (sp.sprite === "neonpunx" || sp.sprite === "puffpuff" ? ".png" : ".svg");
-          image.alt = sp.name + " · Original 2D"; image.loading = "lazy";
+          image.src = import.meta.env.BASE_URL + "game/sprites/" + encodeURIComponent(sp.sprite) + (["neonpunx", "puffpuff", "budling"].includes(sp.sprite) ? ".png" : ".svg");
+          image.alt = sp.name + " · Original 2D";
+          image.loading = "lazy";
+          image.decoding = "async";
           image.onerror = () => {
             const fallback = document.createElement("span");
             fallback.className = "dex-original-missing";
             fallback.textContent = "◈";
-            fallback.title = "Original-Sprite nicht verfügbar: " + sp.sprite;
-            image.replaceWith(fallback);
+            fallback.title = "Original-Sprite noch nicht verfügbar: " + sp.sprite;
+            portrait.replaceChildren(fallback);
           };
-          item.append(image);
+          portrait.append(image);
+          item.append(portrait);
           const details = document.createElement("span");
           details.textContent = index + " · " + (owned ? sp.name : "???") + " · " + sp.types.join("/");
           item.append(details);
