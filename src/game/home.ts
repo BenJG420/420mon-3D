@@ -1,8 +1,9 @@
 import type { DistrictTravel } from "./world";
 import type { MapObj } from "./data/maps";
 import { DEX, STARTERS } from "./data/dex";
-import { getSave, saveProgress, healLiving } from "./save";
+import { getSave, saveProgress } from "./save";
 import { createPartner } from "./save";
+import { restTeam } from "./rest";
 import { spriteUrl } from "./sprites";
 
 type GrowActions = { open: (id: number) => void; sleep: () => void };
@@ -70,9 +71,13 @@ export function createHomeInteractions(world: DistrictTravel, grow: GrowActions)
   function interact(obj: MapObj) {
     if (obj.kind === "pot") { grow.open(obj.pot ?? 0); return; }
     if (obj.kind === "starter") { starter(); return; }
-    if (obj.kind === "bed") {
-      const n = healLiving(getSave().team); grow.sleep(); saveProgress();
-      show("Eine Pause auf der Matte", ["Deine Pflanzen rücken um dreißig Minuten vor.", n ? "Deine lebenden Partner sind ausgeruht." : "Der Raum wird ruhig. Besiegte Partner bleiben bei 0 HP."]); return;
+    if (obj.kind === "bed" || obj.kind === "mattress") {
+      const { revived, healed } = restTeam(getSave().team); grow.sleep(); saveProgress();
+      const lines = ["Deine Pflanzen rücken um dreißig Minuten vor."];
+      if (revived) lines.push(`${revived} besiegte${revived === 1 ? "r Partner ist" : " Partner sind"} wieder auf den Beinen. HP vollständig aufgefüllt.`);
+      if (healed) lines.push(`${healed} verletzte${healed === 1 ? "r Partner ist" : " Partner sind"} vollständig geheilt.`);
+      if (!revived && !healed) lines.push(getSave().team.length ? "Deine Partner sind bereits ausgeruht." : "Der Raum wird ruhig. Zeit für einen neuen Anfang.");
+      show("Ausgeruht auf der Matratze", lines); return;
     }
     if (obj.id === "term") {
       close(); document.querySelector<HTMLButtonElement>("#systems-open")?.click(); return;

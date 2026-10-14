@@ -158,7 +158,7 @@ test("sleep removes exactly 1800 conceptual seconds and neither sleep nor grow X
   assert.equal(dead.hp, 0); assert.equal(dead.xp, 99);
 });
 
-test("care best score is cosmetic, cannot regress and survives a shared save reload alongside Grow progress", async () => {
+test("earned care bonus cannot stack or regress and survives a shared save reload alongside Grow progress", async () => {
   const slots = new Map();
   globalThis.localStorage = { getItem: key => slots.get(key) ?? null, setItem: (key, value) => slots.set(key, value) };
   globalThis.window = new EventTarget();
@@ -169,7 +169,9 @@ test("care best score is cosmetic, cannot regress and survives a shared save rel
   assert.equal(grow.recordGrowCare(s, 0, 3), true);
   assert.equal(grow.recordGrowCare(s, 0, 1), true);
   assert.equal(s.pots[0].careBest, 3);
-  assert.equal(s.pots[0].timeLeft, before.pots[0].timeLeft);
+  assert.equal(s.pots[0].timeLeft, before.pots[0].timeLeft * .7);
+  assert.equal(s.pots[0].total, before.pots[0].total * .7);
+  assert.equal(s.pots[0].careRewardHits, 3);
   assert.deepEqual(s.inventory, before.inventory);
   assert.equal(s.trainerXp, before.trainerXp);
   const ref = s.pots[0]; grow.ensureGrowState(s, 1000);
@@ -181,7 +183,11 @@ test("care best score is cosmetic, cannot regress and survives a shared save rel
   assert.equal(restored.inventory.seed_ordinary, 0);
   assert.equal(restored.map, "capsule");
   grow.advanceGrow(restored, 61000);
-  assert.equal(restored.pots[0].timeLeft, before.pots[0].timeLeft - 60);
+  assert.equal(restored.pots[0].timeLeft, before.pots[0].timeLeft * .7 - 60);
+  assert.equal(restored.pots[0].careRewardHits, 3);
+  const afterReload = restored.pots[0].timeLeft;
+  grow.recordGrowCare(restored, 0, 3);
+  assert.equal(restored.pots[0].timeLeft, afterReload, "reload cannot reapply a paid bonus");
   assert.equal(grow.recordGrowCare(restored, 1, 3), false, "an empty pot cannot be cared for");
 });
 
@@ -215,4 +221,83 @@ test("Grow initialization grants starter supplies once and preserves an imported
   assert.equal(s.inventory.seed_ordinary, 0); assert.equal(s.inventory.seed_eddi, 0);
   const original = state({ inventory: {}, growInitialized: undefined, migratedFrom: "420mon_save_v1" });
   assert.equal(original.inventory.seed_ordinary, undefined);
+});
+
+
+test("every earned hit shortens the current clock and increases the exact harvest preview", () => {
+  for (let hits = 1; hits <= 3; hits++) {
+    const s = state(); grow.plantPot(s, 0, "seed_ordinary");
+    const p = s.pots[0]; p.timeLeft = 150;
+    const base = grow.previewGrowHarvest(s, 0).buds;
+    grow.recordGrowCare(s, 0, hits);
+    assert.equal(p.total, 300 * (10 - hits) / 10);
+    assert.equal(p.timeLeft, 150 * (10 - hits) / 10);
+    assert.equal(p.timeLeft / p.total, .5, "care preserves the visible growth phase");
+    const preview = grow.previewGrowHarvest(s, 0);
+    assert.equal(preview.careBonusPercent, hits * 10);
+    assert.equal(preview.buds, base + Math.ceil(base * hits / 10));
+    assert.ok(preview.buds > base);
+    ready(s); const result = grow.harvestPot(s, 0, () => 1);
+    assert.equal(result.buds, preview.buds);
+    assert.equal(s.inventory.bud_ordinary, preview.buds);
+    assert.equal(s.pots[0].careRewardHits, undefined);
+    grow.plantPot(s, 0, "seed_ordinary");
+    assert.equal(s.pots[0].total, 300, "a new planting must earn its own care bonus");
+  }
+});
+
+test("better care upgrades only the difference; identical and weaker repeats award no extra reduction", () => {
+  const s = state(); grow.plantPot(s, 0, "seed_ordinary");
+  const p = s.pots[0];
+  grow.recordGrowCare(s, 0, 1); assert.equal(p.timeLeft, 270);
+  grow.advanceGrow(s, s.lastGrowAt + 10000); assert.equal(p.timeLeft, 260);
+  grow.recordGrowCare(s, 0, 3);
+  assert.equal(p.total, 210);
+  assert.ok(Math.abs(p.timeLeft - 260 * 7 / 9) < 1e-10);
+  const best = structuredClone(p);
+  for (const hits of [3, 3, 1, 2, 0]) grow.recordGrowCare(s, 0, hits);
+  assert.deepEqual(p, best);
+});
+
+test("legacy cosmetic scores require a new run and invalid, empty, locked or ready plants award no bonus", () => {
+  const s = state(); grow.plantPot(s, 0, "seed_ordinary");
+  const p = s.pots[0]; p.careBest = 3;
+  grow.ensureGrowState(s, 1000);
+  assert.equal(p.timeLeft, 300);
+  assert.equal(grow.growCareBonus(p), 0);
+  for (const hits of [NaN, Infinity, -1]) {
+    grow.recordGrowCare(s, 0, hits);
+    assert.equal(p.timeLeft, 300);
+  }
+  grow.recordGrowCare(s, 0, 1); assert.equal(p.timeLeft, 270);
+  assert.equal(p.careBest, 3); assert.equal(p.careRewardHits, 1);
+  assert.equal(grow.recordGrowCare(s, 1, 3), false);
+  assert.equal(grow.recordGrowCare(s, 2, 3), false);
+  const preview = grow.previewGrowHarvest(s, 0).buds;
+  ready(s);
+  assert.equal(grow.recordGrowCare(s, 0, 3), false);
+  assert.equal(grow.harvestPot(s, 0, () => 1).buds, preview);
+});
+
+test("care composes with fertilizer, growboxes, Eddi and original rewards, with preview equal to actual yield", () => {
+  const s = state({ boxesUnlocked: 1, outfit: "nude", flagLowtown: true });
+  grow.plantPot(s, 6, "seed_ordinary", "fert_normal"); s.pots[6].eddiBoost = true;
+  const base = grow.previewGrowHarvest(s, 6).buds;
+  grow.recordGrowCare(s, 6, 3);
+  assert.equal(grow.growRemaining(s, s.pots[6]), 210 / 1.1);
+  const preview = grow.previewGrowHarvest(s, 6);
+  assert.equal(preview.baseBuds, base);
+  assert.equal(preview.buds, base + Math.ceil(base * .3));
+  grow.sleepGrow(s); assert.equal(s.pots[6].phase, "ready");
+  assert.equal(grow.harvestPot(s, 6, () => .99).buds, preview.buds);
+});
+
+test("a started care run keeps its earned harvest bonus if the plant matures before the final tap", () => {
+  const s = state(); grow.plantPot(s, 0, 'seed_ordinary');
+  ready(s);
+  assert.equal(grow.recordGrowCare(s, 0, 3), false, 'new runs cannot start on ready plants');
+  assert.equal(grow.recordGrowCare(s, 0, 3, true), true, 'an already started run can finish');
+  assert.equal(s.pots[0].timeLeft, 0);
+  assert.equal(s.pots[0].phase, 'ready');
+  assert.equal(grow.harvestPot(s, 0, () => 1).buds, 6);
 });

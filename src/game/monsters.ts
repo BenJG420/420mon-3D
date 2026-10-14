@@ -226,7 +226,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
     ally.hp = Math.max(0, ally.hp - (5 + Math.floor(Math.random() * 13)));
     if (ally.hp === 0) {
       ally = saved.team.find(mon => mon.hp > 0) ?? null;
-      if (!ally) { notify("DEIN TEAM IST BESIEGT – HOLE EIN LEBENDES MONSTER AUS DER BOX ODER FANGE EINES!"); finish(); return; }
+      if (!ally) { notify("DEIN TEAM IST BESIEGT – RUH DICH AUF EINER MATRATZE AUS!"); finish(); return; }
       spawnAlly();
       notify("MONSTERWECHSEL: " + ally.name);
     }
@@ -255,7 +255,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
       ally.hp = Math.max(0, ally.hp - 8);
       if (ally.hp === 0) {
         ally = saved.team.find(mon => mon.hp > 0) ?? null;
-        if (!ally) { notify("DEIN TEAM IST BESIEGT. 0 HP BLEIBEN BESIEGT."); finish(); return; }
+        if (!ally) { notify("DEIN TEAM IST BESIEGT – DIE MATRATZE STELLT DEIN TEAM WIEDER HER."); finish(); return; }
         spawnAlly();
       }
     }
@@ -271,7 +271,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
   get("monster-heal").addEventListener("click", () => {
     if (active) return;
     const healed = healLiving(saved.team);
-    save(); updateProgress(); notify(healed ? "✚ LEBENDE TEAMMONSTER GEHEILT. 0 HP BLEIBEN BESIEGT." : "KEIN LEBENDES MONSTER BENÖTIGT HEILUNG.");
+    save(); updateProgress(); notify(healed ? "✚ LEBENDE PARTNER GEHEILT. BESIEGTE PARTNER BRAUCHEN EINE MATRATZE." : "KEIN LEBENDES MONSTER BENÖTIGT HEILUNG.");
   });
   get("monster-collection-toggle").addEventListener("click", () => { collection.hidden = !collection.hidden; });
   get("monster-collection-close").addEventListener("click", () => { collection.hidden = true; });

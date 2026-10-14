@@ -23,6 +23,7 @@ async function compile(relative) {
   for (const match of imports) await compile(path.join(path.dirname(relative), `${match[1]}.ts`));
 }
 await compile("src/game/save.ts");
+await compile("src/game/rest.ts");
 after(() => rm(output, { recursive: true, force: true }));
 
 let serial = 0;
@@ -159,4 +160,36 @@ test("the published test channel uses a separate save while the stable release k
   assert.equal(api.saveKeyForBase('/420mon-3D/test/'), '420mon-test-progress-v1');
   assert.equal(api.saveKeyForBase('/420mon-3D/'), '420mon-progress-v1');
   assert.equal(api.saveKeyForBase('/'), '420mon-progress-v1');
+});
+
+
+test("a mattress revives and heals only the party, preserves identity and stats, and survives reload", async () => {
+  const api = await fixture({ "420mon-progress-v1": { team: [{ ...living, uid: "living", hpMax: 80, ivs: { hp: 94 } }, { ...defeated, uid: "defeated", hpMax: 97 }], box: [{ ...defeated, uid: "box" }], inventory: {}, gold: 400 } });
+  const { restTeam } = await import(pathToFileURL(path.join(output, "src/game/rest.mjs")));
+  const save = api.getSave();
+  const identities = save.team.map(mon => mon.uid);
+  const experience = save.team.map(mon => mon.xp);
+  const result = restTeam(save.team);
+  assert.deepEqual(result, { revived: 1, healed: 1 });
+  assert.deepEqual(save.team.map(mon => mon.hp), [80, 97]);
+  assert.deepEqual(save.team.map(mon => mon.uid), identities);
+  assert.deepEqual(save.team.map(mon => mon.xp), experience);
+  assert.equal(save.team[0].ivs.hp, 94);
+  assert.equal(save.box[0].hp, 0);
+  assert.deepEqual(restTeam(save.team), { revived: 0, healed: 0 }, "resting again adds no stats or reward");
+  assert.deepEqual(restTeam([]), { revived: 0, healed: 0 });
+  api.saveProgress();
+  const reload = await fixture({ "420mon-progress-v1": api.slots.get(api.SAVE_KEY) });
+  assert.deepEqual(reload.getSave().team.map(mon => mon.hp), [80, 97]);
+  assert.equal(reload.getSave().box[0].hp, 0);
+});
+
+test("ordinary healing continues to skip 0HP until physical mattress rest revives it", async () => {
+  const api = await fixture({ "420mon-progress-v1": { team: [defeated], inventory: {}, gold: 0 } });
+  const { restTeam } = await import(pathToFileURL(path.join(output, "src/game/rest.mjs")));
+  const team = api.getSave().team;
+  assert.equal(api.healLiving(team), 0);
+  assert.equal(team[0].hp, 0);
+  assert.equal(restTeam(team).revived, 1);
+  assert.equal(team[0].hp, api.maxHp(team[0]));
 });

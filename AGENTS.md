@@ -10,7 +10,7 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 ## Non-negotiable behavior
 1. Prefer integrated, end-to-end working feature packages instead of one-line demos, plans, or repeated user questions. Implement, test, and present concrete changes.
 2. Preserve existing player saves; provide migration and regression checks. Check `420mon-progress-v1` and original `420mon_save_v1`.
-3. Gameplay requirement specified by the user: **a monster with 0 HP is dead/defeated and cannot be captured or resurrected by healing**. A future wearable ring may prevent fatal damage by leaving 1 HP. Fix currently inconsistent "heal-all" behavior rather than silently violating this.
+3. Latest user rule (2026-10-14): **0 HP means defeated and not catchable; resting on a physical bed/mattress revives owned team monsters to full HP**. Healing items and ordinary team healing still skip 0 HP. Preserve this deliberate mattress exception. The Grow minigame now awards shorter growth and extra harvest per best score, capped at 30% per planting.
 4. Copy and use original 2D monster artwork as the design reference for eventual distinct 3D models, and render **one frame only** in Dex portraits; original sprites often contain 2×2 frames. Preserve full source spritesheets. Avoid external references to the private repo at runtime.
 5. Shop should be triggered by **talking to its NPC in the world**, never freely from an ordinary menu tab.
 6. 10 original districts must become meaningful, enterable/explorable 3D spaces matching 2D geography, encounters and progression; not just metadata cards or disconnected placeholder boxes.
