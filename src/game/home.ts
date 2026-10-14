@@ -4,6 +4,13 @@ import { DEX, STARTERS } from "./data/dex";
 import { getSave, saveProgress } from "./save";
 import { createPartner } from "./save";
 import { restTeam } from "./rest";
+import { NPC_DIALOGUES } from "./data/npc-dialogues";
+import { lootKind } from "./data/items";
+import { searchContainer, searchLamp } from "./loot";
+import { talkBolt, talkStatic, giveSilkStick, mattressQuest, acknowledgeBen } from "./npc-actions";
+import { setQuestState } from "./quests";
+import { liveWindow, staticRumor } from "./data/legend";
+import { speciesById } from "./data/dex";
 import { spriteUrl } from "./sprites";
 
 type GrowActions = { open: (id: number) => void; sleep: () => void };
@@ -53,45 +60,51 @@ export function createHomeInteractions(world: DistrictTravel, grow: GrowActions)
       }
     })));
   }
-  function bolt() {
-    const s = getSave();
-    if (s.quests.q1_bolt === "done") {
-      show("Bolt", ["Bolt: Markt, Hinterhof, Keller — und der Rest. Schilder in der Gasse. Jeder Typ eine Straße.", "Bolt: Gulli kennt sie alle, falls du faul bist."]); return;
-    }
-    if (s.quests.q1_bolt === "active") {
-      if ((s.inventory.chip_junk ?? 0) > 0) {
-        s.inventory.chip_junk--; s.quests.q1_bolt = "done"; saveProgress();
-        show("Bolt", ["Bolt schnappt den Junk-Chip.", "Bolt: Durchlass frei. Schilder an. Gulli auch."]);
-      } else show("Bolt", ["Bolt: Immer noch keinen Junk-Chip? Mülltonnen, Kind."]);
-      return;
-    }
-    s.quests.q1_bolt = "active"; saveProgress();
-    show("Bolt", ["Bolt mustert deine Taschen.", "Bolt: Willst durch zum Markt, zahl mit einem Junk-Chip. Ich schließ den Riegel.", "Bolt: Und bleib weg von den Gullis. Da unten kommt keiner sauber wieder raus."]);
+  const openQuests = () => { close(); window.dispatchEvent(new Event("420mon-open-quests")); };
+  function npc(title: string, lines: string[], actions: { label: string; run: () => void }[] = []) {
+    show(title, lines, [...actions, { label: "Aufträge ansehen", run: openQuests }, { label: "Gehen", run: close }]);
   }
-  function interact(obj: MapObj) {
+  function silk(obj: MapObj) {
+    const s = getSave(); setQuestState(s, "q5_silk", "active"); saveProgress();
+    const calibrated = typeof s.catchPerm === "number" && s.catchPerm >= 1.08;
+    const lines = ["Silk lächelt zu breit. Goldzahn.", calibrated ? "Silk: Stick ist drin. Deine Chips beißen dauerhaft härter. Buds kauf ich weiter. Kiez-Kram auch." : "Silk: Mein Stick. Markt — Kisten, Fässer, Stände. Bring ihn. Dann kalibrier ich deine Chips. Für immer. Oder verkauf Bud, der nicht Ordinary heißt."];
+    const actions = [{ label: "Shop öffnen", run: () => { close(); world.shopAt(obj); } }];
+    if (!calibrated && s.inventory.key_silkstick >= 1) actions.unshift({ label: "Stick geben", run: () => { const result = giveSilkStick(getSave()); saveProgress(); npc("Silk", result, [{ label: "Shop öffnen", run: () => { close(); world.shopAt(obj); } }]); } });
+    npc("Silk", lines, actions);
+  }
+  function interact(obj: MapObj, mapId: string): boolean | void {
     if (obj.kind === "pot") { grow.open(obj.pot ?? 0); return; }
     if (obj.kind === "starter") { starter(); return; }
     if (obj.kind === "bed" || obj.kind === "mattress") {
+      const story = mattressQuest(getSave(), obj, mapId);
       const { revived, healed } = restTeam(getSave().team); grow.sleep(); saveProgress();
       const lines = ["Deine Pflanzen rücken um dreißig Minuten vor."];
       if (revived) lines.push(`${revived} besiegte${revived === 1 ? "r Partner ist" : " Partner sind"} wieder auf den Beinen. HP vollständig aufgefüllt.`);
       if (healed) lines.push(`${healed} verletzte${healed === 1 ? "r Partner ist" : " Partner sind"} vollständig geheilt.`);
       if (!revived && !healed) lines.push(getSave().team.length ? "Deine Partner sind bereits ausgeruht." : "Der Raum wird ruhig. Zeit für einen neuen Anfang.");
+      lines.push(...story);
       show("Ausgeruht auf der Matratze", lines); return;
     }
     if (obj.id === "term") {
       close(); document.querySelector<HTMLButtonElement>("#systems-open")?.click(); return;
     }
-    if (obj.id === "bolt") { bolt(); return; }
-    if (obj.id === "rajko") {
-      show("Rajko", ["Rajko dreht am Filter. Der Bass aus den Türmen frisst die Kapselwand.", "Rajko: Neuer Takt läuft draußen. Lowtown liegt auf dem anderen Kanal — wenn du den alten willst."]); return;
-    }
-    if (obj.id === "can") {
-      show("Can", ["Can lehnt am Regal. Die Krone sitzt schief, das Buch nicht.", "Can: Ich bin der Erfolge-König. Vierhundertzwanzig Seiten. Ich kenn jede.", "Can: Hinweis umsonst. Der Weg kostet Softcash. Keine versteckten Spielereien. Nur Sachen, die du in Lowtown wirklich tun kannst."]); return;
+    if (obj.id === "silk" && obj.kind === "shop") { silk(obj); return true; }
+    if (obj.kind === "shop" || obj.kind === "stall") return false;
+    if (obj.id === "bolt") { const lines = talkBolt(getSave()); saveProgress(); npc("Bolt", lines); return; }
+    if (obj.id === "static") {
+      const s = getSave(), lines = talkStatic(s), now = Math.floor(Date.now() / 1000);
+      const rumors = staticRumor(liveWindow(), typeof s.legendCoordsId === "string" ? s.legendCoordsId : "", Math.max(0, Number(s.legendCoordsUntil ?? 0) - now), id => id, id => speciesById(id).name);
+      if (rumors.grant) { s.legendCoordsId = rumors.grant.id; s.legendCoordsUntil = now + 86400; }
+      saveProgress(); npc("Static", [...lines, ...rumors.pages]); return;
     }
     if (obj.id === "ben") {
-      show("Ben", ["Ben steht in Rajkos Keller.", "Bens Kasse öffnet sich ab Stufe 10."]); return;
+      const s = getSave();
+      npc("Ben", [...NPC_DIALOGUES.ben.lines, "Ab Trainerstufe 10. Ben steht in Rajkos Keller. Von der Kapsel durch die Tür Keller."], Number(s.trainerLv ?? 1) >= 10 && !s.benRead ? [{ label: "Gelesen. Ich weiß, wo Ben steht.", run: () => { acknowledgeBen(getSave()); saveProgress(); npc("Ben", ["Ben: Keller, von der Kapsel aus."]); } }] : []); return;
     }
+    if (lootKind(obj) === "lamp") { const result = searchLamp(getSave(), obj, mapId); saveProgress(); show(obj.label, result.lines); return; }
+    if (lootKind(obj) && lootKind(obj) !== "mattress") { const result = searchContainer(getSave(), obj, mapId); saveProgress(); show(obj.label, result.lines); return; }
+    const original = NPC_DIALOGUES[obj.id];
+    if (original && obj.kind === "npc") { npc(original.name ?? obj.label, original.lines); return; }
     if (obj.kind === "npc" || obj.kind === "sign" || obj.kind === "prop") show(obj.label, [obj.label + " · " + world.getMapInfo().name]);
   }
   world.setInteractionHandler(interact);

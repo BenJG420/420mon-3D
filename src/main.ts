@@ -154,7 +154,7 @@ hud.innerHTML = `
   <div class="brand">420MON <span>LOWTOWN</span></div>
   <div class="status">DEIN ZUHAUSE IN 3D</div>
   <div class="hint">WASD / PFEILE · E INTERAGIEREN · SHIFT LAUFEN</div>
-  <div class="target">KAPSEL & KELLER · TESTVERSION 21</div>
+  <div class="target">KAPSEL & KELLER · TESTVERSION 22</div>
   <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);

@@ -74,7 +74,8 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
       const spot = `${id}:${obj.id}`;
       if (saved.deadWild.includes(spot) || saved.deadWild.includes(obj.id)) continue;
       const legendary = legendByMon(obj.mon);
-      if (legendary && !windowOpen(legendary)) continue;
+      const override = saved.legendCoordsId === obj.mon && typeof saved.legendCoordsUntil === "number" && saved.legendCoordsUntil > Date.now() / 1000;
+      if (legendary && !windowOpen(legendary) && !override) continue;
       const point = world.toWorld(obj.x + obj.w / 2, obj.y + obj.h / 2);
       spawn([{ id: obj.mon, lvl: [obj.lvl ?? 1, obj.lvl ?? 1], w: 1 }], point.x, point.z, spot, obj.lvl);
     }
@@ -212,6 +213,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
     });
   };
   updateProgress();
+  window.addEventListener("420mon-save-changed", updateProgress);
   function portrait(host: HTMLElement, id: string) {
     const image = document.createElement("img");
     image.className = "dex-original-sprite"; image.src = spriteUrl(speciesById(id).sprite); image.alt = speciesById(id).name;

@@ -19,6 +19,17 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 9. Do not overwrite or delete the original 2D repository. Preserve source attribution and be mindful that its content is private; access requires authorization.
 10. Report what is implemented, tested, missing, and deployed factually in German. Do not repeatedly ask what to work on next when the goal is clear.
 
+## Package order (latest user instruction, 2026-10-15)
+Read only AGENTS.md, CODEX_HANDOFF.md and docs/TEST_BUILD.md before choosing the
+next package; then read only its required files. No full repository scan or
+questions. Record unclear choices in one handoff line. Keep existing systems.
+Deliver one playable package per PR and update Remaining work in TEST_BUILD.md:
+quest/NPC actions, fishing (42 fish/seed bait/timing wheel/failed cast seed),
+trainer battles, Can's 420 achievements/rewards, visible clothing, radio/story
+economy, original-sprite-based 3D monster models. Verification is limited to
+three focused checks: test+build, short smoke, deployment. After three failures,
+record the problem and continue instead of repeated troubleshooting loops.
+
 ## Current unfinished integration
 PR #25 merged v18 on 2026-10-13. The v19 checkout completes local artwork for all
 420 runtime species, shared saves and Grow, and renders original MAPS in 3D.
