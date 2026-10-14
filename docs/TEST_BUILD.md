@@ -1,4 +1,4 @@
-# Original-world test build v20
+# Original-world test build v21
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -51,6 +51,26 @@ origin's localStorage.
   the authentic original pose as a billboard; these are not finished individual
   3D creature meshes. See ASSET_ATTRIBUTION.md for source hashes.
 
+- Original wild battle engine: up to four saved move choices, physical/special
+  defenses, STAB and elemental immunity, initiative, six IVs, bounded stat stages,
+  sleep/high/glitch/lust/poison, draining moves and legendary modifiers. Team
+  switching spends the player action; misses still allow the opponent to act.
+  Inventory chips use original multipliers, type matching and status bonuses.
+  Legacy capsules remain independent. Caught HP, status, moves and IVs persist;
+  overflow goes to storage. HP0 wild creatures cannot be caught, even with a
+  guaranteed chip.
+- Original victory XP, half XP for other living partners, trainer XP, level cap
+  420 and source evolutions with updated names/moves/art. Grow XP now uses the
+  same level/evolution rules. Defeated partners receive no shared XP or healing.
+  Victory completes q4_fight. Fight/catch counters and original achievement flags
+  persist. The battle result remains visible until the player chooses Continue.
+- A responsive battle overlay shows both original portraits, HP, statuses, move
+  categories, matchup hints and the selected chip's capture chance. Team/box
+  entries show IV score and calculated combat stats. Healing items work during
+  combat without spending a turn, as in the original, and choose the most injured
+  living partner. Physical rest also clears combat status. Clothes can be equipped
+  from the bag and apply the original combat reward/fang bonuses.
+
 ## How to try it
 
 1. Start in Kapsel. Walk toward the case and press E or the on-screen interaction
@@ -64,21 +84,35 @@ origin's localStorage.
    Gasse. The town map also contains home shortcuts for this test build.
 5. Talk to Bolt twice with a Junk-Chip to clear his original gate quest. Higher
    districts still require their original levels; manholes remain a side route.
-6. Reload to verify team HP, plants, inventory, care score and position persist.
+6. Find a wild monster in a district, then try each of your four attacks. Use
+   Team to switch, Items to heal, and choose a purchased chip in the Fangmittel
+   selector. Read the result and choose Weiter to return to the world.
+7. Train Budling, Glitchbitch or Neonpunx to its source evolution level. Grow XP
+   also develops living partners. Reload to verify team stats, moves, plants,
+   inventory and position persist.
 
 ## Validation and remaining work
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 40 regression tests covering 420 assets, restored source hashes, battle save
+suite has 48 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
-interaction/resource ownership. `npm run build` performs TypeScript and Vite
+interaction/resource ownership, source combat formulas/status/evolution and
+inventory chip/healing integration. `npm run build` performs TypeScript and Vite
 production checks. CI runs both commands.
 
-This is a testable feature package, not the completed 2D-to-3D port. The full
-original battle engine (four move choices, all status/IV/evolution rules), all
-quest/NPC actions, trainer systems, achievements, clothing effects, fishing,
+This is a testable feature package, not the completed 2D-to-3D port. Trainer duels, multiplayer sparring, all quest/NPC actions, full achievement
+progression/rewards, clothing visuals, fishing,
 radio, story economics and individual 3D monster models still need deliberate
 integration. Quest definitions and scene objects alone do not imply those
 mechanics are complete. Physical Android performance and native 4K verification
 remain device tests; desktop Chromium and touch emulation do not replace them.
+
+
+This release follows the user's request to limit technical verification to at
+most three focused passes: automated regression/build, desktop/touch browser
+smoke, and deployment verification. The Grow minigame has no new attempt limit.
+The original engine was read from revision
+010807da77df8468a297adf33eaf1fb5c9a61c8b. Deliberate bug fixes make positive stat
+boosts target the user, bound stat stages and prevent HP0 actions/capture/revival
+through level gains. No original private runtime URLs or credentials are shipped.

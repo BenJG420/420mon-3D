@@ -6,7 +6,7 @@ import * as THREE from "three";
 class Element {
   hidden = false;
   disabled = false;
-  style = {};
+  style = { setProperty(key, value) { this[key] = value; } };
   children = [];
   nodes = new Map();
   listeners = new Map();
@@ -20,8 +20,8 @@ class Element {
   click() { this.listeners.get("click")?.(); }
 }
 
-async function gameFixture(team) {
-  const slots = new Map([["420mon-progress-v1", JSON.stringify({ team, balls: 20, inventory: {}, collection: [], box: [], captures: 0, wins: 0 })]]);
+async function gameFixture(team, inventory = {}) {
+  const slots = new Map([["420mon-progress-v1", JSON.stringify({ team, balls: 20, inventory, collection: [], box: [], captures: 0, wins: 0 })]]);
   globalThis.localStorage = { getItem: key => slots.get(key) ?? null, setItem: (key, value) => slots.set(key, value) };
   globalThis.window = new EventTarget();
   const app = new Element();
@@ -51,7 +51,7 @@ async function gameFixture(team) {
   const player = new THREE.Group();
   const world = {
     current: () => "alley",
-    getMapInfo: () => ({ map: { objs: [{ kind: "wild", id: "fixture", mon: "mon_puffpuff", lvl: 50, x: 0, y: 0, w: 0, h: 0 }], zones: [] } }),
+    getMapInfo: () => ({ map: { objs: [{ kind: "wild", id: "fixture", mon: "mon_puffpuff", lvl: 10, x: 0, y: 0, w: 0, h: 0 }], zones: [] } }),
     toWorld: (x, y) => ({ x, z: y }), collides: () => false,
   };
   const game = module.createMonsterGame(scene, player, world);
@@ -72,9 +72,10 @@ test("consecutive turns save actual partner HP after save-change events, and hea
     fixture.get("monster-interact").click();
     assert.equal(fixture.game.inBattle, true);
     fixture.get("monster-attack").click();
-    assert.equal(fixture.disk().team[0].hp, 90);
+    const afterFirst = fixture.disk().team[0].hp;
+    assert.ok(afterFirst < 100 && afterFirst > 0);
     fixture.get("monster-attack").click();
-    assert.equal(fixture.disk().team[0].hp, 80, "second turn must update the stored partner, not a stale detached object");
+    assert.ok(fixture.disk().team[0].hp < afterFirst, "second turn must update the stored partner, not a stale detached object");
     fixture.get("monster-run").click();
     fixture.get("monster-heal").click();
     assert.equal(fixture.disk().team[0].hp, 100);
@@ -97,6 +98,8 @@ test("full-team capture enters storage with positive actual HP and records one s
     assert.deepEqual(saved.collection.sort(), ["mon_budling", "mon_puffpuff"].sort());
     assert.equal(saved.captures, 1);
     assert.equal(saved.balls, 19);
+    assert.equal(fixture.get("monster-battle-title").textContent, "GEFANGEN");
+    fixture.get("monster-run").click();
     assert.equal(fixture.game.inBattle, false);
     assert.ok(saved.deadWild.includes("alley:fixture"));
   } finally { Math.random = random; await fixture.server.close(); }
@@ -109,14 +112,17 @@ test("defeated wild cannot be captured after victory", async () => {
   try {
     fixture.get("monster-interact").click();
     fixture.get("monster-attack").click();
-    assert.equal(fixture.game.inBattle, false);
+    assert.equal(fixture.get("monster-battle-title").textContent, "SIEG");
+    assert.equal(fixture.get("monster-catch").disabled, true);
     fixture.get("monster-catch").click();
     const saved = fixture.disk();
     assert.equal(saved.wins, 1);
     assert.equal(saved.captures, 0);
     assert.equal(saved.box.length, 0);
     assert.equal(saved.team.length, 1);
-    assert.equal(saved.team[0].xp, 15);
+    assert.equal(saved.team[0].xp, 0, "original level cap has no excess XP");
+    fixture.get("monster-run").click();
+    assert.equal(fixture.game.inBattle, false);
   } finally { Math.random = random; await fixture.server.close(); }
 });
 
@@ -131,4 +137,42 @@ test("original encounter weights and inclusive district level bands are honored"
     assert.equal(fixture.module.encounterLevel(pool[1], () => 1), 72);
     assert.equal(fixture.module.pickEncounter([], () => 0), undefined);
   } finally { await fixture.server.close(); }
+});
+
+
+test("original inventory chips preserve the wild IVs, moves and remaining HP without granting capture XP", async () => {
+  const random = Math.random;
+  Math.random = () => 0;
+  const fixture = await gameFixture([mon(100)], { chip_street: 2 });
+  try {
+    fixture.get("monster-interact").click();
+    fixture.get("monster-chip").value = "chip_street";
+    fixture.get("monster-catch").click();
+    const saved = fixture.disk();
+    assert.equal(saved.inventory.chip_street, 1);
+    assert.equal(saved.balls, 20, "source chips and legacy capsules remain independent");
+    assert.equal(saved.stats.chipsUsed, 1);
+    assert.equal(saved.team[0].xp, 0);
+    assert.equal(saved.team[1].ivs.atk, 90);
+    assert.equal(saved.team[1].moves.length, 4);
+    assert.ok(saved.team[1].hp > 0);
+    fixture.get("monster-catch").click();
+    assert.equal(fixture.disk().captures, 1, "result actions cannot capture twice");
+  } finally { Math.random = random; await fixture.server.close(); }
+});
+
+test("original battle potions heal a living injured partner without reviving or taking an enemy turn", async () => {
+  const random = Math.random;
+  Math.random = () => 0.4;
+  const fixture = await gameFixture([mon(10), mon(0, 1)], { potion_vial: 1 });
+  try {
+    fixture.get("monster-interact").click();
+    fixture.get("monster-items").click();
+    fixture.get("monster-item-list").children[0].click();
+    const saved = fixture.disk();
+    assert.equal(saved.inventory.potion_vial, 0);
+    assert.equal(saved.team[0].hp, 100);
+    assert.equal(saved.team[1].hp, 0);
+    assert.equal(fixture.get("monster-turn").textContent, "RUNDE 1");
+  } finally { Math.random = random; await fixture.server.close(); }
 });

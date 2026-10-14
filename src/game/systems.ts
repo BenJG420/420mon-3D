@@ -6,6 +6,8 @@ import { xpToNext } from "./data/progress";
 import { QUEST_DEFS } from "./data/quests";
 
 import { getSave, saveProgress, maxHp, healLiving, type Save } from "./save";
+import { ensureIvs, ivScore, statsFor, statusName } from "./battle";
+import { getMove } from "./data/moves";
 import { spriteUrl } from "./sprites";
 const load = getSave;
 export function createGameSystems(world: DistrictTravel, openGrowShop?: () => void) {
@@ -111,7 +113,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
             s.team.push(...s.box!.splice(index, 1));
           }
           save(s); render(); note("Monster übertragen.");
-        }, team ? "Antippen: in Lagerbox verschieben · EP " + m.xp + "/" + xpToNext(m.level) : "Antippen: ins Team holen");
+        }, [team ? "Antippen: in Lagerbox verschieben" : "Antippen: ins Team holen", `EP ${m.xp}/${xpToNext(m.level)}`, ...(m.id && DEX[m.id] ? (() => { const ivs = ensureIvs(m.ivs), st = statsFor(m.id!, m.level, ivs); return [`Wert ${ivScore(ivs)} · ATK ${st.atk} · DEF ${st.def} · SP.A ${st.spa} · SP.D ${st.spd} · TEMPO ${st.spe}`, (m.moves?.length ? m.moves : DEX[m.id!].moves).map(id => getMove(id).name).join(" · ")]; })() : []), ...(m.status ? [statusName(m.status)] : [])].join(" · "));
       });
       if (team) row("✚ TEAM HEILEN", () => { if (document.querySelector(".monster-battle:not([hidden])")) { note("Nicht während eines Kampfes."); return; } const n = healLiving(s.team); save(s); render(); note(n ? "Lebende Teammonster geheilt." : "Kein verletztes lebendes Monster im Team."); }, "Heilstation · außerhalb des Kampfes");
     } else if (tab === "bag") {
@@ -122,11 +124,19 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
         const it = ITEMS[id]; if (!it) continue;
         row(it.name + " ×" + amount, it.use === "heal" || it.use === "heal_all" ? () => {
           if (document.querySelector(".monster-battle:not([hidden])")) { note("Im Kampf nicht verfügbar."); return; }
-          const targets = it.use === "heal_all" ? s.team : s.team.slice(0, 1);
+          const living = s.team.filter(mon => mon.hp > 0 && mon.hp < maxHp(mon));
+          const targets = it.use === "heal_all" ? living : living.sort((a, b) => (maxHp(b) - b.hp) - (maxHp(a) - a.hp)).slice(0, 1);
           const n = healLiving(targets, it.healPct ?? 0.5);
           if (!n) { note("Kein verletztes lebendes Monster. Item bleibt erhalten."); return; }
           s.inventory![id]--; save(s); render(); note(it.name + " verwendet.");
-        } : undefined, it.desc);
+        } : it.use === "wear" ? () => {
+          if (document.querySelector(".monster-battle:not([hidden])")) { note("Nach dem Kampf verfügbar."); return; }
+          s.outfit = s.outfit === id ? "nude" : id;
+          const worn = Array.isArray(s.worn) ? s.worn as string[] : [];
+          if (s.outfit !== "nude" && !worn.includes(id)) worn.push(id);
+          s.worn = worn;
+          save(s); render(); note(s.outfit === "nude" ? "Tanktop angezogen." : it.name + " angezogen. Originale Boni aktiv.");
+        } : undefined, it.desc + (it.use === "wear" ? (s.outfit === id ? " · Angelegt · Antippen: ablegen" : " · Antippen: anziehen") : ""));
       }
     } else if (tab === "shop") {
       title(merchant.toUpperCase() + " · " + s.gold + " ₲");

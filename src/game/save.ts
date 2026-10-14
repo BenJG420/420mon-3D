@@ -1,5 +1,6 @@
 import { DEX } from "./data/dex";
 import { clampLevel } from "./data/progress";
+import { makeInst, rollIvs } from "./battle";
 import { GROW_SLOTS, POT_START, POT_MAX, BOX_MAX } from "./data/items";
 
 const LEGACY_3D_KEY = "420mon-progress-v1";
@@ -102,8 +103,9 @@ export function partnerUid(): string {
 export function createPartner(id: string, level = 1, hp?: number): Partner {
   const original = DEX[id];
   if (!original) throw new Error(`Unbekanntes Original-Monster: ${id}`);
-  const mon: Partner = { uid: partnerUid(), id, name: original.name, level: clampLevel(level), xp: 0, hp: 1, moves: original.moves.slice(0, 4), status: "" };
-  mon.hp = hp === undefined ? maxHp(mon) : Math.min(maxHp(mon), nonnegative(hp));
+  const inst = makeInst(id, level, rollIvs("starter"));
+  const mon: Partner = { ...inst, uid: partnerUid(), name: original.name };
+  if (hp !== undefined) mon.hp = Math.min(inst.hpMax, nonnegative(hp));
   return mon;
 }
 

@@ -1,3 +1,4 @@
+import { normalizePartnerForBattle, tryLevel } from "./battle";
 import { DEX } from "./data/dex";
 import { BOX_MAX, BOX_UNLOCK, GROW_SLOTS, ITEMS, POT_MAX, POT_START, POT_UNLOCK, STALL_GROW, isGrowBox } from "./data/items";
 import { OFFLINE_CAP, growTickSpeed, potYieldRaw, strainGrowBase, wallLeft } from "./data/grow";
@@ -112,15 +113,14 @@ function grantXp(s: GrowState, amount: number): number {
   s.trainerLv = trainerLevel; s.trainerXp = trainerXp;
   for (const mon of s.team) {
     if (mon.hp <= 0) continue;
-    mon.xp += xp;
-    while (mon.level < MAX_LEVEL && mon.xp >= xpToNext(mon.level)) {
-      mon.xp -= xpToNext(mon.level);
-      const hpBase = mon.id && DEX[mon.id] ? DEX[mon.id].base.hp : 35;
-      const before = Math.max(15, Math.round(hpBase * (.45 + mon.level * .035)));
-      mon.level++;
-      const addedHp = Math.max(15, Math.round(hpBase * (.45 + mon.level * .035))) - before;
-      mon.hp += addedHp;
-      if (mon.hpMax !== undefined) mon.hpMax += addedHp;
+    if (mon.id && DEX[mon.id]) {
+      const inst = normalizePartnerForBattle(mon);
+      inst.xp += xp; tryLevel(inst);
+      Object.assign(mon, inst, { name: DEX[inst.id].name });
+    } else {
+      // Preserve unrelated legacy prototype records without assigning a new species.
+      mon.xp += xp;
+      while (mon.level < MAX_LEVEL && mon.xp >= xpToNext(mon.level)) { mon.xp -= xpToNext(mon.level); mon.level++; }
     }
   }
   return xp;

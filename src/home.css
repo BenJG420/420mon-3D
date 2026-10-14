@@ -59,3 +59,52 @@
  .home-dialog-card { padding:20px; }
  .home-dialog h2 { font-size:23px; }
 }
+
+/* Original turn combat, with room for touch choices and both fighters. */
+.monster-battle { inset:0; z-index:190; transform:none; width:auto; padding:16px; display:flex; align-items:center; justify-content:center; background:#07131699; border:0; border-radius:0; box-shadow:none; }
+.monster-battle-card { width:min(610px,100%); max-height:calc(100dvh - 32px); overflow:auto; overscroll-behavior:contain; border:1px solid #9aaf8980; border-radius:12px; background:linear-gradient(145deg,#263d3d,#13272e); box-shadow:0 20px 80px #0008; padding:22px; }
+.monster-battle-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:1px solid #bac79b30; padding-bottom:15px; margin-bottom:15px; }
+.monster-battle-heading div { display:grid; gap:5px; }
+.monster-battle-heading span { color:#d9c499; font-size:9px; letter-spacing:.14em; }
+.monster-battle-heading strong { color:#e9edd6; font-size:18px; letter-spacing:.04em; }
+.battle-fighters { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.battle-fighter { display:flex; align-items:center; gap:10px; background:#0d1e235c; border:1px solid #91a58230; border-radius:8px; padding:10px; min-width:0; }
+.battle-fighter > div:last-child { flex:1; min-width:0; }
+.battle-fighter #monster-team-status,.battle-fighter #monster-name { color:#e4ebd6; font-size:12px; font-weight:650; line-height:1.5; margin:0; }
+.battle-fighter small { display:block; color:#afc2ad; font-size:10px; line-height:1.5; }
+.battle-portrait { position:relative; flex:0 0 62px; width:62px; height:62px; border-radius:8px; overflow:hidden; border:1px solid #96b17050; background:#283e35; }
+.battle-enemy .battle-portrait { background:#443a31; }
+.battle-fighter .monster-hp { margin:7px 0; height:5px; background:#733c3c; }
+#monster-ally-hp-bar { height:100%; background:linear-gradient(90deg,#75ae80,#cad989); transition:width .25s; }
+#monster-hp-bar { background:linear-gradient(90deg,#c89a65,#e2cd97); }
+#monster-message.battle-log { min-height:62px; max-height:108px; overflow:auto; white-space:pre-line; font-size:12px; line-height:1.55; color:#d0d9c6; padding:12px 0; margin:6px 0; }
+.battle-moves { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+.battle-moves button { min-width:0; text-align:left; display:grid; gap:5px; min-height:83px; color:#eaf0db; background:#233c3c; border:1px solid #9dab7970; border-left:3px solid var(--move-color); border-radius:7px; padding:10px 12px; cursor:pointer; }
+.battle-moves strong { font-size:14px; }
+.battle-moves small { font-size:10px; color:#b8c9b8; }
+.battle-moves span { font-size:10px; color:#dbc997; line-height:1.4; }
+.battle-moves button:hover { background:#3a5149; }
+.monster-battle .monster-actions { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+.monster-battle .monster-actions button { min-width:0; min-height:42px; border:1px solid #a2b58b70; color:#e5e9d1; background:#324c43; padding:10px 5px; cursor:pointer; }
+.monster-battle button:disabled { opacity:.4; cursor:default; }
+.monster-battle button:focus-visible,.monster-battle select:focus-visible { outline:2px solid #e8d199; outline-offset:2px; }
+.battle-catch-choice { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:12px 0 8px; color:#b9c9b8; font-size:10px; }
+.battle-catch-choice select { flex:1; min-width:140px; max-width:100%; min-height:38px; color:#e4e8d2; background:#203337; border:1px solid #9cad7b60; border-radius:5px; padding:6px; }
+.battle-catch-choice span { color:#dfc595; }
+.battle-submenu { display:grid; gap:7px; padding:8px 0; max-height:170px; overflow:auto; }
+.battle-submenu button { min-height:44px; padding:9px 12px; border-radius:5px; border:1px solid #a1b48760; background:#2c4542; color:#e4e7d1; text-align:left; cursor:pointer; }
+.battle-submenu p { color:#c4cbbb; font-size:12px; }
+.battle-help { display:block; padding-top:9px; color:#aebda7; font-size:10px; line-height:1.5; }
+@media(max-width:680px) {
+ .monster-battle { padding:8px; }
+ .monster-battle-card { padding:13px; max-height:calc(100dvh - 16px); }
+ .monster-battle-heading { padding-bottom:10px; margin-bottom:10px; }
+ .monster-battle-heading strong { font-size:16px; }
+ .battle-fighters { grid-template-columns:1fr; gap:6px; }
+ .battle-fighter { padding:7px; }
+ .battle-portrait { width:42px; height:42px; flex-basis:42px; }
+ .battle-moves button { min-height:76px; padding:9px; }
+ .battle-moves strong { font-size:13px; }
+ .monster-battle .monster-actions button { font-size:10px; }
+ #monster-message.battle-log { max-height:83px; font-size:11px; }
+}
