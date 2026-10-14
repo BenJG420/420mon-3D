@@ -32,6 +32,8 @@ export type GrowPot = {
   byFelix?: boolean;
   eddiBoost?: boolean;
   careBest?: number;
+  /** Earned bonus for this planting; legacy cosmetic scores do not award it. */
+  careRewardHits?: number;
 };
 
 export type Save = {

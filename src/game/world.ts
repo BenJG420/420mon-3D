@@ -590,7 +590,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const overlay = overlayOpen();
     prompt.hidden = !nearby || overlay;
     if (nearby) {
-      const action = nearby.door ? "BETRETEN" : nearby.kind === "pot" ? "PFLEGEN" : nearby.kind === "npc" || nearby.kind === "shop" || nearby.kind === "stall" ? "ANSPRECHEN" : "BENUTZEN";
+      const action = nearby.door ? "BETRETEN" : nearby.kind === "pot" ? "PFLEGEN" : nearby.kind === "bed" || nearby.kind === "mattress" ? "AUSRUHEN" : nearby.kind === "npc" || nearby.kind === "shop" || nearby.kind === "stall" ? "ANSPRECHEN" : "BENUTZEN";
       const reason = lockMessage(nearby);
       prompt.textContent = interactionMessage?.id === nearby.id && time < interactionMessage.until ? interactionMessage.text
         : `${reason ? "🔒 " : ""}${nearby.label.toUpperCase()} · ${action} [E]`;

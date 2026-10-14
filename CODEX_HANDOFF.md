@@ -1,5 +1,7 @@
 # 420mon → 420mon-3D — Codex handoff (2026-10-12)
 
+> Latest user update (2026-10-14): mattresses revive defeated team partners, and Grow care gives real time/yield bonuses. These override the historical 0-HP and cosmetic-only rules below.
+>
 > Historical handoff below. v18 was merged through PR #25 on 2026-10-13. The
 > current v19 implementation and remaining work are documented in
 > [docs/TEST_BUILD.md](docs/TEST_BUILD.md). Its runtime Dex has 420 local original

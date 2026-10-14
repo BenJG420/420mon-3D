@@ -29,6 +29,8 @@ export function ensureGrowState(s: GrowState, now = Date.now()): void {
     // Retain live pot references when another system saves or opens a menu.
     Object.assign(p, { id, total, timeLeft: clamp(finite(p.timeLeft, total), 0, total), fert: ITEMS[p.fert]?.cat === "fert" ? p.fert : "" });
     if (p.careBest !== undefined) p.careBest = Math.floor(clamp(finite(p.careBest, 0), 0, 3));
+    // Existing cosmetic best scores do not grant a reward until care is played again.
+    if (p.careRewardHits !== undefined) p.careRewardHits = careHits(p.careRewardHits);
     refreshPot(p);
     return p;
   });
@@ -66,6 +68,25 @@ export function refreshPot(p: GrowPot): void {
 
 export const slotOpen = (s: GrowState, index: number): boolean => Number.isInteger(index) && index >= 0 && index < GROW_SLOTS && (isGrowBox(index) ? index - POT_MAX < s.boxesUnlocked : index < s.potsUnlocked);
 export const growRemaining = (s: GrowState, p: GrowPot): number => wallLeft(p.timeLeft, p.fert, !!p.byFelix, s.schnittTitle, s.eddiIn);
+const careHits = (value: unknown): number => Math.floor(clamp(finite(value, 0), 0, 3));
+/** Each earned hit gives this planting 10% shorter growth and 10% more buds. */
+export const growCareBonus = (p: GrowPot): number => careHits(p.careRewardHits) / 10;
+
+/** Shared by the plant preview and actual harvest, including original loot bonuses. */
+export function previewGrowHarvest(s: GrowState, index: number) {
+  const p = s.pots[index];
+  if (!p || !slotOpen(s, index) || !p.seed || ITEMS[p.seed]?.cat !== "seed") return undefined;
+  const yielded = potYieldRaw(p, isGrowBox(index));
+  let bonus = 1 + (s.outfit === "nude" ? .1 : 0) + (s.flagLowtown ? .05 : 0);
+  const clothing = typeof s.outfit === "string" ? ITEMS[s.outfit]?.goldMul : 0;
+  if (clothing && clothing > 1) bonus *= clothing;
+  if (finite(s.highGoldUntil, 0) > finite(s.playtime, 0)) bonus *= Math.max(1, finite(s.highGold, 1));
+  const baseBuds = Math.max(1, Math.round(yielded.buds * bonus));
+  const hits = careHits(p.careRewardHits);
+  // Round the extra buds up so even a small harvest earns a real reward.
+  const buds = baseBuds + Math.ceil(baseBuds * hits / 10);
+  return { ...yielded, buds, baseBuds, careBonusPercent: hits * 10 };
+}
 
 /** Real elapsed time, including closed tabs; original offline cap is 72 hours. */
 export function advanceGrow(s: GrowState, now = Date.now()): number {
@@ -117,6 +138,8 @@ export function plantPot(s: GrowState, index: number, seed: string, fert = ""): 
   if (fert) s.inventory[fert]--;
   const total = strainGrowBase(seed);
   Object.assign(p, emptyPot(index), { seed, fert, total, timeLeft: total, phase: "sprout" });
+  delete p.careBest;
+  delete p.careRewardHits;
   quest(s, "q7_grow");
   return { ok: true, xp: grantXp(s, .08) };
 }
@@ -124,13 +147,9 @@ export function plantPot(s: GrowState, index: number, seed: string, fert = ""): 
 export function harvestPot(s: GrowState, index: number, random = Math.random): { ok: boolean; buds?: number; budId?: string; seedReturned?: boolean; xp?: number } {
   const p = s.pots[index];
   if (!p || !slotOpen(s, index) || p.phase !== "ready") return { ok: false };
-  const yielded = potYieldRaw(p, isGrowBox(index));
-  // Original global loot bonuses also apply to harvesting.
-  let bonus = 1 + (s.outfit === "nude" ? .1 : 0) + (s.flagLowtown ? .05 : 0);
-  const clothing = typeof s.outfit === "string" ? ITEMS[s.outfit]?.goldMul : 0;
-  if (clothing && clothing > 1) bonus *= clothing;
-  if (finite(s.highGoldUntil, 0) > finite(s.playtime, 0)) bonus *= Math.max(1, finite(s.highGold, 1));
-  const buds = Math.max(1, Math.round(yielded.buds * bonus));
+  const yielded = previewGrowHarvest(s, index);
+  if (!yielded) return { ok: false };
+  const buds = yielded.buds;
   addItem(s, yielded.budId, buds);
   const seedReturned = random() < .35;
   if (seedReturned) addItem(s, p.seed, 1);
@@ -148,11 +167,23 @@ export function sleepGrow(s: GrowState): void {
   for (const p of s.pots) if (p.phase !== "empty" && p.phase !== "ready") { p.timeLeft = Math.max(0, p.timeLeft - 1800); refreshPot(p); }
 }
 
-/** Cosmetic only: care never changes the original Grow clock or harvest reward. */
-export function recordGrowCare(s: GrowState, index: number, hits: number): boolean {
+/** Only improvements to this plant's earned score shorten its clock again. */
+export function recordGrowCare(s: GrowState, index: number, hits: number, finishedGrowingRun = false): boolean {
   const p = s.pots[index];
-  if (!p || !slotOpen(s, index) || p.phase === "empty" || !Number.isFinite(hits)) return false;
-  p.careBest = Math.max(p.careBest ?? 0, Math.floor(clamp(hits, 0, 3)));
+  if (!p || !slotOpen(s, index) || p.phase === "empty" || (p.phase === "ready" && !finishedGrowingRun) || ITEMS[p.seed]?.cat !== "seed" || !Number.isFinite(hits)
+    || !Number.isFinite(p.timeLeft) || p.timeLeft < 0 || !Number.isFinite(p.total) || p.total <= 0) return false;
+  const score = careHits(hits);
+  const previous = careHits(p.careRewardHits);
+  p.careBest = Math.max(careHits(p.careBest), score);
+  if (score > previous) {
+    // Preserve the current growth fraction, including previous care reductions.
+    // Persist both adjusted clocks and the earned score; normalization never reapplies it.
+    const factor = (10 - score) / (10 - previous);
+    p.total *= factor;
+    p.timeLeft *= factor;
+    p.careRewardHits = score;
+    refreshPot(p);
+  }
   return true;
 }
 

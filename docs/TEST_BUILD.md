@@ -1,4 +1,4 @@
-# Original-world test build v19
+# Original-world test build v20
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -29,17 +29,21 @@ origin's localStorage.
   disposed on travel while reusable plant resources survive.
 - Original three starter choices at level five, starter seed reward, Bolt's
   Junk-Chip dialogue and gate quest, Rajko/Can introductions, 24 original quest
-  definitions in the menu. The bed heals living partners only and advances Grow
-  by the original 1,800 conceptual seconds.
+  definitions in the menu. Physical beds and mattresses restore the party to full HP, including defeated
+  partners, and advance Grow by the original 1,800 conceptual seconds.
 - Original Grow seeds, tiers, fertilizer speed/yield/XP multipliers, 12 slots and
   unlock prices, 33%/66% phases, box yield, seed return, original harvest rewards,
   saved progress and 72-hour offline cap. Instanced 3D leaves/buds visibly grow.
   The Grow merchant supplies seeds, fertilizer and expansions at original prices.
   Shops open from physical merchants, not a universal menu tab.
-- Optional three-tap watering rhythm game. Its saved best score and water effect
-  are cosmetic; original growth times and yields remain intact.
-- Shared persistent state fixes stale battle partner references. Healing skips
-  0-HP partners; full-team captures enter the box; species records are deduplicated.
+- Optional three-tap watering rhythm game. Each earned hit awards 10% shorter
+  remaining growth and 10% extra harvest, capped at 30% per planting. Only an
+  improved best score upgrades the bonus, so replaying cannot stack it. Additional
+  buds are rounded up. Bonuses persist and reset on the next planting. Original
+  fertilizer, box and economy rules remain the foundation. Legacy cosmetic
+  scores need a new completed run to earn a reward.
+- Shared persistent state fixes stale battle partner references. Ordinary healing
+  skips 0-HP partners; physical mattress rest revives them; full-team captures enter the box; species records are deduplicated.
   Encounters use original habitat weights and level ranges. Original fixed wild
   spots and legendary time windows are used where supplied by the map.
 - All 420 Dex entries have local original sheets, including ten restored
@@ -53,7 +57,9 @@ origin's localStorage.
    button to select Budling, Glitchbitch or Neonpunx.
 2. Use Grow or approach a pot. Plant an owned seed and optionally play the
    watering game. Close the panel to watch the plant in the room.
-3. Use the bed to advance plants by 30 minutes. Return to a ready pot to harvest.
+3. Use the bed to revive and heal your party and advance plants by 30 minutes.
+   A perfect Grow round grants 30% less remaining time and 30% more yield. Return
+   to a ready pot to harvest.
 4. Use the left door to enter Rajko's cellar; the right door leads to the original
    Gasse. The town map also contains home shortcuts for this test build.
 5. Talk to Bolt twice with a Junk-Chip to clear his original gate quest. Higher
@@ -62,8 +68,8 @@ origin's localStorage.
 
 ## Validation and remaining work
 
-`npm test` runs real TypeScript modules through Node's test runner. The initial
-v19 suite has 32 tests covering 420 assets, restored source hashes, battle save
+`npm test` runs real TypeScript modules through Node's test runner. The current
+suite has 40 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership. `npm run build` performs TypeScript and Vite

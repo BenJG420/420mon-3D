@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { BOX_UNLOCK, GROW_SLOTS, ITEMS, POT_UNLOCK, STALL_GROW, STRAIN_LABEL, isGrowBox, strainOfItem } from "./data/items";
 import { formatGrowLeft, potYieldRaw, strainGrowBase, wallLeft } from "./data/grow";
-import { advanceGrow, buyGrowItem, buyNextSlot, ensureGrowState, growRemaining, harvestPot, plantPot, recordGrowCare, sellGrowBud, sleepGrow, slotOpen } from "./grow-state";
+import { advanceGrow, buyGrowItem, buyNextSlot, ensureGrowState, growRemaining, harvestPot, plantPot, recordGrowCare, growCareBonus, previewGrowHarvest, sellGrowBud, sleepGrow, slotOpen } from "./grow-state";
 import { getSave, saveProgress, type GrowPot } from "./save";
 import "./grow.css";
 
@@ -38,7 +38,7 @@ export function createGrowSystem(world: GrowWorld) {
   let selected = 0, tab = "plants", shopAccess = false, lastTick = Date.now(), lastSave = Date.now(), ownSave = false;
   let lastFocus: HTMLElement | null = null;
   let seedSelection = "", fertSelection = "";
-  let care: { round: number; hits: number; started: number; target: number } | null = null;
+  let care: { round: number; hits: number; started: number; target: number; position: number } | null = null;
   let splashIndex = -1, splashUntil = 0;
   const plants = new THREE.Group(); plants.name = "original-grow-plants";
   const visuals: PlantVisual[] = [];
@@ -113,7 +113,10 @@ export function createGrowSystem(world: GrowWorld) {
     if (!available.includes(seedSelection)) seedSelection = available[0] ?? "";
     if (!(state.inventory[fertSelection] > 0)) fertSelection = "";
     const strain = strainOfItem(pot.seed || seedSelection);
-    const result = potYieldRaw(pot.phase === "empty" ? { seed: seedSelection, fert: fertSelection } : pot, isGrowBox(selected));
+    const rawYield = potYieldRaw(pot.phase === "empty" ? { seed: seedSelection, fert: fertSelection } : pot, isGrowBox(selected));
+    const result = previewGrowHarvest(state, selected) ?? { ...rawYield, baseBuds: rawYield.buds, careBonusPercent: 0 };
+    const bonus = Math.round(growCareBonus(pot) * 100);
+    const extraBuds = result.buds - result.baseBuds;
     const unlocked = slotOpen(state, selected);
     content.innerHTML = `<div class="grow-summary"><span><b>${state.potsUnlocked}</b>/6 Töpfe · <b>${state.boxesUnlocked}</b>/6 Boxen</span><span>${state.gold} <small>SOFTCASH</small></span></div>
       <div class="grow-layout"><div class="grow-pot-grid" aria-label="Pflanzplätze">${state.pots.map((p, i) => `<button class="grow-pot ${i === selected ? "selected" : ""} ${p.phase === "ready" ? "ready" : ""} ${!slotOpen(state, i) ? "locked" : ""}" data-pot="${i}" aria-pressed="${i === selected}"><span class="grow-pot-icon">${!slotOpen(state, i) ? "♧" : p.phase === "empty" ? "♧" : p.phase === "ready" ? "✦" : "❧"}</span><b>${potName(i)}</b><small>${!slotOpen(state, i) ? "Gesperrt" : phaseLabel[p.phase]}</small><span class="grow-mini-progress"><i style="width:${progress(p) * 100}%" data-progress="${i}"></i></span></button>`).join("")}</div>
@@ -121,10 +124,11 @@ export function createGrowSystem(world: GrowWorld) {
       <div class="grow-plant-art ${pot.phase}"><div class="grow-illustrated-plant"><span>❧</span><span>❧</span><span>❧</span></div><div class="grow-illustrated-pot"></div><span class="grow-stage-tag">${unlocked ? phaseLabel[pot.phase] : "Noch verschlossen"}</span></div>
       ${!unlocked ? `<p>Mehr Platz für deine nächsten Cuts. Neue Plätze schaltest du beim Grow-Händler auf dem Markt frei.</p>${shopAccess ? '<button class="grow-primary" data-action="shop">Plätze freischalten</button>' : ''}` : pot.phase === "empty" ? `<label class="grow-field">Samen<select id="grow-seed" ${!available.length ? "disabled" : ""}>${available.length ? available.map(id => `<option value="${safe(id)}" ${id === seedSelection ? "selected" : ""}>${safe(ITEMS[id].name)} · ${state.inventory[id]}×</option>`).join("") : '<option>Keine Samen im Inventar</option>'}</select></label>
       <label class="grow-field">Dünger <small>optional</small><select id="grow-fert"><option value="">Ohne Dünger</option>${Object.keys(state.inventory).filter(id => ITEMS[id]?.cat === "fert" && state.inventory[id] > 0).map(id => `<option value="${safe(id)}" ${id === fertSelection ? "selected" : ""}>${safe(ITEMS[id].name)} · ${state.inventory[id]}×</option>`).join("")}</select></label>
-      <div class="grow-facts"><span>${strain ? STRAIN_LABEL[strain.kind] : "—"}</span><span>${seedSelection ? formatGrowLeft(wallLeft(strainGrowBase(seedSelection), fertSelection, false, state.schnittTitle, state.eddiIn)) : "—"}</span><span>${result.buds} Buds</span></div><button class="grow-primary" data-action="plant" ${!available.length ? "disabled" : ""}>Samen einpflanzen</button>${shopAccess ? '<button class="grow-secondary" data-action="shop">Samen & Dünger kaufen</button>' : '<small class="grow-care-info">Samen und Dünger bekommst du beim Grow-Händler auf dem Markt.</small>'}` : `<h4>${safe(strain?.seedName ?? ITEMS[pot.seed]?.name ?? "Pflanze")}</h4><div class="grow-facts"><span>${strain ? STRAIN_LABEL[strain.kind] : "Hybrid"}</span><span>${result.buds} Buds</span><span>${pot.fert ? safe(ITEMS[pot.fert].name) : "Ohne Dünger"}</span></div>
+      <div class="grow-facts"><span>${strain ? STRAIN_LABEL[strain.kind] : "—"}</span><span>${seedSelection ? formatGrowLeft(wallLeft(strainGrowBase(seedSelection), fertSelection, false, state.schnittTitle, state.eddiIn)) : "—"}</span><span>${result.buds} Buds${extraBuds ? ` · +${extraBuds} Pflege` : ""}</span></div><button class="grow-primary" data-action="plant" ${!available.length ? "disabled" : ""}>Samen einpflanzen</button>${shopAccess ? '<button class="grow-secondary" data-action="shop">Samen & Dünger kaufen</button>' : '<small class="grow-care-info">Samen und Dünger bekommst du beim Grow-Händler auf dem Markt.</small>'}` : `<h4>${safe(strain?.seedName ?? ITEMS[pot.seed]?.name ?? "Pflanze")}</h4><div class="grow-facts"><span>${strain ? STRAIN_LABEL[strain.kind] : "Hybrid"}</span><span>${result.buds} Buds${extraBuds ? ` · +${extraBuds} Pflege` : ""}</span><span>${pot.fert ? safe(ITEMS[pot.fert].name) : "Ohne Dünger"}</span></div>
+      <div class="grow-bonus-card" data-care-bonus><span class="grow-eyebrow">PFLEGE LOHNT SICH</span><b>${bonus ? `−${bonus}% Restzeit · +${bonus}% Ertrag` : "Guter Rhythmus, größere Ernte"}</b><div class="grow-bonus-levels">${[1,2,3].map(n => `<span class="${(pot.careRewardHits ?? 0) >= n ? "earned" : ""}"><strong>${n}/3</strong> −${n * 10}% Zeit<br>+${n * 10}% Ertrag</span>`).join("")}</div><small>Dein bester Durchgang zählt für diese Pflanze. Bonus-Buds werden aufgerundet. Ein besseres Ergebnis verbessert den Bonus.</small></div>
       <div class="grow-progress"><i data-progress="${selected}" style="width:${progress(pot) * 100}%"></i></div><p class="grow-countdown" data-timer="${selected}">${pot.phase === "ready" ? "Die Schere wartet. Deine Pflanze ist reif." : `Noch ${formatGrowLeft(growRemaining(state, pot))} bis zur Ernte.`}</p>
-      ${pot.phase === "ready" ? '<button class="grow-primary" data-action="harvest">✂ Jetzt ernten</button>' : `<button class="grow-primary" data-action="care">◉ Gieß-Rhythmus spielen</button><small class="grow-care-info">Freiwillige Pflege · ${pot.careBest ? `Bestwert: ${pot.careBest}/3 · ` : ""}Wachstum läuft auch ohne Minispiel weiter.</small>`}`}
-      </article></div><p class="grow-original-note">Keimling → Wachstum → Blüte → Ernte. Deine Pflanzen wachsen auch offline. Eine Nacht auf der Matte zieht 30 Minuten Grow-Zeit ab.</p>`;
+      ${pot.phase === "ready" ? '<button class="grow-primary" data-action="harvest">✂ Jetzt ernten</button>' : `<button class="grow-primary" data-action="care">◉ Gieß-Rhythmus spielen</button><small class="grow-care-info">Freiwillige Pflege · ${pot.careRewardHits ? `Bonus: ${pot.careRewardHits}/3 Treffer · ` : ""}Wachstum läuft auch ohne Minispiel weiter.</small>`}`}
+      </article></div><p class="grow-original-note">Keimling → Wachstum → Blüte → Ernte. Deine Pflanzen wachsen auch offline. Eine Pause auf der Matratze zieht 30 Minuten Grow-Zeit ab und stellt dein Team wieder her.</p>`;
     content.querySelectorAll<HTMLButtonElement>("[data-pot]").forEach(b => b.onclick = () => { selected = Number(b.dataset.pot); care = null; render(); });
     content.querySelector<HTMLSelectElement>("#grow-seed")?.addEventListener("change", e => { seedSelection = (e.target as HTMLSelectElement).value; render(); });
     content.querySelector<HTMLSelectElement>("#grow-fert")?.addEventListener("change", e => { fertSelection = (e.target as HTMLSelectElement).value; render(); });
@@ -155,22 +159,37 @@ export function createGrowSystem(world: GrowWorld) {
     content.querySelectorAll<HTMLButtonElement>("[data-unlock]").forEach(b => b.onclick = () => { const box = b.dataset.unlock === "true"; if (buyNextSlot(state, box)) { persist(); render(); note(`${box ? "Growbox" : "Topf"} freigeschaltet. Der neue Platz wartet in der Kapsel.`); } });
   }
 
-  function startCare() { care = { round: 0, hits: 0, started: performance.now(), target: .35 + Math.random() * .3 }; render(); }
+  function startCare() {
+    sync();
+    if (["empty", "ready"].includes(state.pots[selected].phase)) { render(); return; }
+    care = { round: 0, hits: 0, started: performance.now(), target: .35 + Math.random() * .3, position: 1 }; render();
+  }
   const markerPosition = (now: number) => care ? Math.abs(1 - ((now - care.started) / 950) % 2) : 0;
   function tapWater() {
     if (!care) return;
-    if (Math.abs(markerPosition(performance.now()) - care.target) <= .12) care.hits++;
+    // Score the position actually shown to the player, even on a slow device.
+    if (Math.abs(care.position - care.target) <= .12) care.hits++;
     splashIndex = selected; splashUntil = performance.now() + 3200;
     care.round++;
     if (care.round >= 3) {
-      const hits = care.hits; recordGrowCare(state, selected, hits);
-      care = null; persist(); render(); note(hits === 3 ? "Perfekter Rhythmus! 3/3 · Die Blätter glänzen." : `${hits}/3 Treffer · Die Pflanze ist frisch gegossen. Versuch es jederzeit wieder.`);
-    } else { care.started = performance.now(); care.target = .3 + Math.random() * .4; render(); }
+      const hits = care.hits;
+      sync();
+      const pot = state.pots[selected], previous = growCareBonus(pot), before = growRemaining(state, pot);
+      const applied = recordGrowCare(state, selected, hits, true);
+      const bonus = Math.round(growCareBonus(pot) * 100);
+      const saved = Math.max(0, before - growRemaining(state, pot));
+      care = null; persist(); render();
+      if (!applied) note("Deine Pflanze ist bereits erntereif. Der bisherige Bonus bleibt erhalten.");
+      else if (growCareBonus(pot) > previous) note(`${hits}/3 Treffer! +${bonus}% Ertrag.${saved > 0 ? ` ${formatGrowLeft(saved)} Zeit gespart (−${bonus}% Restzeit).` : " Deine Pflanze ist inzwischen erntereif; dein Ertragsbonus zählt."}`);
+      else if (bonus) note(`${hits}/3 Treffer · Dein bester Bonus bleibt: −${bonus}% Restzeit und +${bonus}% Ertrag.`);
+      else note("0/3 Treffer · Versuch es noch einmal: Jeder Treffer verkürzt die Zeit und bringt mehr Ertrag.");
+    } else { care.started = performance.now(); care.target = .3 + Math.random() * .4; care.position = 1; render(); }
   }
   function renderCare() {
     if (!care) return;
-    content.innerHTML = `<div class="grow-minigame"><span class="grow-eyebrow">PFLEGE · ${potName(selected).toUpperCase()}</span><h3>Ein Tropfen im richtigen Takt.</h3><p>Triff das helle Feld mit dem Zeiger. Tippen, Leertaste oder Enter.</p><div class="grow-care-plant">❧<span class="grow-care-drop">●</span></div><div class="grow-rhythm" role="progressbar" aria-label="Gieß-Rhythmus"><div class="grow-target" style="left:${(care.target - .12) * 100}%;width:24%"></div><div class="grow-marker"></div></div><div class="grow-rounds">${[0, 1, 2].map(i => `<i class="${i < care!.round ? "done" : ""}">${i < care!.round ? "✓" : "○"}</i>`).join("")}<span>${care.hits} Treffer</span></div><button class="grow-primary grow-water" data-water>◉ Jetzt gießen</button><button class="grow-secondary" data-back>Zur Pflanze</button><small>Ein freiwilliges Minispiel für deinen Pflege-Bestwert. Grow-Zeit und Ertrag folgen den Regeln des Originals.</small></div>`;
+    content.innerHTML = `<div class="grow-minigame"><span class="grow-eyebrow">PFLEGE · ${potName(selected).toUpperCase()}</span><h3>Ein Tropfen im richtigen Takt.</h3><p>Triff das helle Feld mit dem Zeiger. Tippen, Leertaste oder Enter.</p><div class="grow-care-plant">❧<span class="grow-care-drop">●</span></div><div class="grow-rhythm" role="progressbar" aria-label="Gieß-Rhythmus"><div class="grow-target" style="left:${(care.target - .12) * 100}%;width:24%"></div><div class="grow-marker"></div></div><div class="grow-rounds">${[0, 1, 2].map(i => `<i class="${i < care!.round ? "done" : ""}">${i < care!.round ? "✓" : "○"}</i>`).join("")}<span>${care.hits} Treffer</span></div><button class="grow-primary grow-water" data-water>◉ Jetzt gießen</button><button class="grow-secondary" data-back>Zur Pflanze</button><small>Jeder Treffer: 10% kürzere Restzeit und 10% mehr Ertrag. Maximal 30% pro Pflanze. Wiederholen verbessert nur deinen besten Bonus.</small></div>`;
     content.querySelector<HTMLButtonElement>("[data-water]")!.onclick = tapWater;
+    content.querySelector<HTMLElement>(".grow-marker")!.style.left = `${care.position * 100}%`;
     content.querySelector<HTMLButtonElement>("[data-back]")!.onclick = () => { care = null; render(); };
     content.querySelector<HTMLButtonElement>("[data-water]")!.focus();
   }
@@ -229,7 +248,10 @@ export function createGrowSystem(world: GrowWorld) {
         }
         if (now - lastSave >= 10000) persist();
       }
-      if (care) content.querySelector<HTMLElement>(".grow-marker")!.style.left = `${markerPosition(performance.now()) * 100}%`;
+      if (care) {
+        care.position = markerPosition(performance.now());
+        content.querySelector<HTMLElement>(".grow-marker")!.style.left = `${care.position * 100}%`;
+      }
       for (const v of visuals) {
         const p = state.pots[v.index], fraction = progress(p);
         v.group.visible = slotOpen(state, v.index) && p.phase !== "empty";
