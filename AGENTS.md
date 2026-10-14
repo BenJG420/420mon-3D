@@ -15,7 +15,7 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 5. Shop should be triggered by **talking to its NPC in the world**, never freely from an ordinary menu tab.
 6. 10 original districts must become meaningful, enterable/explorable 3D spaces matching 2D geography, encounters and progression; not just metadata cards or disconnected placeholder boxes.
 7. Keep desktop and Android/touch controls working. Use responsive UI and good performance; don't force excessive resolution on phones.
-8. Run `npm install && npm run build` and relevant tests, inspect errors, and verify GitHub Actions/Pages deployments after merges. Don't claim deployment or mobile browser verification without evidence.
+8. Run `npm install && npm run build` and relevant tests, inspect errors, and verify GitHub Actions/Pages deployments after merges. Latest user preference (2026-10-14): limit technical verification to at most three focused passes per development batch; the user will investigate further gameplay bugs. This is not a limit on Grow minigame attempts. Don't claim deployment or mobile browser verification without evidence.
 9. Do not overwrite or delete the original 2D repository. Preserve source attribution and be mindful that its content is private; access requires authorization.
 10. Report what is implemented, tested, missing, and deployed factually in German. Do not repeatedly ask what to work on next when the goal is clear.
 

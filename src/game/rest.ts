@@ -5,6 +5,7 @@ export function restTeam(team: Partner[]): { revived: number; healed: number } {
   let revived = 0, healed = 0;
   for (const mon of team) {
     const maximum = maxHp(mon);
+    mon.status = "";
     if (mon.hp === maximum) continue;
     if (mon.hp <= 0) revived++;
     else healed++;
