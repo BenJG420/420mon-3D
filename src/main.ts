@@ -472,9 +472,8 @@ function animate() {
 
   renderer.render(scene, camera);
 
-  const fps = Math.round(1 / Math.max(dt, 0.001));
   const status = hud.querySelector(".status");
-  if (status) status.textContent = `${districtWorld.getMapInfo().name} · ${fps} FPS`;
+  if (status) status.textContent = districtWorld.getMapInfo().name;
 }
 
 animate();
