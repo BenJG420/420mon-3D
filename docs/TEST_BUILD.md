@@ -1,4 +1,4 @@
-# Original-world test build v21
+# Original-world test build v22
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -71,6 +71,23 @@ origin's localStorage.
   living partner. Physical rest also clears combat status. Clothes can be equipped
   from the bag and apply the original combat reward/fang bonuses.
 
+- Quest/NPC package: all 24 source quest states now synchronize across saved
+  booleans/string states, visits, owned species, Grow, victory, container searches
+  and mattress actions. Board quests pay the original one-time reward and the
+  nine introductory threads finish Lowtown. Existing completions remain done.
+  The journal displays giver, location, recommended level and actual counts.
+- Original NPC guide dialogue, Bolt's two-talk toll, Silk's stick/calibration,
+  Static's data-stick/Neon-Chip reward and source legend rumor/24-hour override,
+  and Ben's read acknowledgement at trainer level ten. Physical Silk interaction
+  opens his dialogue before his shop. Selling remains attached to the physical
+  merchant and uses source-specific sell multipliers.
+- Real container/lamp searches with source loot, unique district finds, quest
+  sticks, 75/90-second playtime cooldowns and persistent search history. Outdoor
+  mattresses award the source story reward with its 110-second cooldown; healing
+  and 0-HP revival remain available regardless of that reward timer. Leaving
+  Kapsel in the tanktop records the original secret thread. No older game system
+  or save slot is rebuilt.
+
 ## How to try it
 
 1. Start in Kapsel. Walk toward the case and press E or the on-screen interaction
@@ -91,22 +108,46 @@ origin's localStorage.
    also develops living partners. Reload to verify team stats, moves, plants,
    inventory and position persist.
 
-## Validation and remaining work
+8. Search three different containers. Take the warm data stick to Static and
+   the market's Silk-Stick to Silk. Talk to Silk, give his stick, then open his
+   physical shop to buy or sell. Use Aufträge ansehen in an NPC dialogue to check
+   saved progress.
+
+## Validation
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 48 regression tests covering 420 assets, restored source hashes, battle save
+suite has 56 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
-inventory chip/healing integration. `npm run build` performs TypeScript and Vite
-production checks. CI runs both commands.
+inventory chip/healing integration, quest reward idempotence, turn-ins,
+container cooldowns and story mattress/merchant actions. `npm run build` performs TypeScript and Vite
+production checks. CI runs both commands. The single touch smoke exercised Silk's stick hand-in,
+physical merchant opening and a sale successfully. Its subsequent Static fixture
+relocation timed out because pagehide persistence restored the in-memory position;
+no extra smoke loop was added. Static's actual quest mutation is covered by the
+module tests; his browser interaction remains a user-check item.
 
-This is a testable feature package, not the completed 2D-to-3D port. Trainer duels, multiplayer sparring, all quest/NPC actions, full achievement
-progression/rewards, clothing visuals, fishing,
-radio, story economics and individual 3D monster models still need deliberate
-integration. Quest definitions and scene objects alone do not imply those
-mechanics are complete. Physical Android performance and native 4K verification
-remain device tests; desktop Chromium and touch emulation do not replace them.
+## Remaining work — continue in this order
+
+Quest/NPC package 1 is playable: source dialogue, turn-ins, loot, journal counters,
+board rewards and the Lowtown thread chain are connected. This does not imply the
+following separate mechanics are implemented. As recorded in CODEX_HANDOFF.md,
+Felix/Eddi automation and the operational Ko-fi support economy belong to package
+6; Can, trainer challenges and Rajko's radio are reserved for their listed packages.
+
+1. Next: original fishing — 42 fish, Weed seeds as bait, timing wheel, and one seed
+   on a failed cast instead of trash.
+2. Trainer battles; multiplayer sparring remains a separate source feature.
+3. Can in the cellar — all 420 achievements and actual reward claiming.
+4. Equipped clothes visibly rendered on the character.
+5. Radio and story economy, including Felix/Eddi automation and Ben's support
+   backend. Ben's quest acknowledgement alone does not implement payments.
+6. Individual 3D monster models following the retained source sprites.
+
+Physical Android performance and native 4K verification remain device tests;
+Chromium touch emulation does not replace those. The stable root release and the
+same `/test/` channel remain in place.
 
 
 This release follows the user's request to limit technical verification to at

@@ -945,9 +945,9 @@ const GENERIC: GenericDrop[] = [
   { id: "chip_street", w: 1, line: "Street-Chip. Selten im Dreck." },
 ];
 
-export function pickGeneric(): GenericDrop {
+export function pickGeneric(random = Math.random): GenericDrop {
   const sum = GENERIC.reduce((a, b) => a + b.w, 0);
-  let r = Math.random() * sum;
+  let r = random() * sum;
   for (const g of GENERIC) {
     r -= g.w;
     if (r <= 0) return g;

@@ -3,6 +3,8 @@ import { DEX, DEX_ORDER, dexNum, speciesById } from "./data/dex";
 import { DISTRICTS } from "./data/zones";
 import { ITEMS, SHOP, STALL_CHIPS, STALL_THREADS, STALL_FENCE } from "./data/items";
 import { xpToNext } from "./data/progress";
+import { questProgress } from "./quests";
+import { salePrice, sellMerchantItem } from "./merchant-state";
 import { QUEST_DEFS } from "./data/quests";
 
 import { getSave, saveProgress, maxHp, healLiving, type Save } from "./save";
@@ -27,9 +29,11 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
   let selected = "";
   let merchant = "LOWTOWN · SHOP";
   let merchantItems: string[] = SHOP;
+  let merchantSellMultiplier = 1;
   world.openShop(obj => {
     if (obj?.stall === "grow" && openGrowShop) { openGrowShop(); return; }
     merchant = obj?.label ?? "LOWTOWN · SHOP";
+    merchantSellMultiplier = obj?.stall === "chips" ? .9 : obj?.stall === "threads" ? .85 : obj?.stall === "fence" ? 1.15 : 1;
     merchantItems = obj?.stall === "chips" ? STALL_CHIPS : obj?.stall === "threads" ? STALL_THREADS : obj?.stall === "fence" ? STALL_FENCE : SHOP;
     tab = "shop"; panel.hidden = false; render();
   });
@@ -154,6 +158,15 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
           save(s); render(); note(it.name + " gekauft.");
         }, it.desc);
       }
+      title("VERKAUFEN · DEIN INVENTAR");
+      for (const [id, count] of Object.entries(s.inventory)) {
+        const price = salePrice(s, id, merchantSellMultiplier); if (count < 1 || !price) continue;
+        row(`${ITEMS[id].name} ×${count} · +${price} ₲`, () => {
+          if (!world.shopNearby()) { panel.hidden = true; return; }
+          const earned = sellMerchantItem(s, id, merchantSellMultiplier);
+          if (earned) { save(s); render(); note(`${ITEMS[id].name} verkauft · +${earned} Softcash.`); }
+        }, "Ein Stück verkaufen");
+      }
     } else if (tab === "world") {
       title("LOWTOWN · STADTPLAN");
       row("⌂ KAPSEL · DEIN ZUHAUSE", () => { world.travel("capsule"); panel.hidden = true; }, "Töpfe, Schlafplatz und dein erster Partner");
@@ -176,12 +189,13 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
       row("↩ ZURÜCK NACH LOWTOWN / GASSE A", () => { world.travel("alley"); panel.hidden = true; }, "Zurück in die ursprüngliche Gasse");
       row("Aktueller Ort: " + world.getMapInfo().name, undefined, "Türen, Luken und Stadtplan verbinden Lowtown.");
     } else if (tab === "quest") {
-      title("AUFTRÄGE & FORTSCHRITT");
+      const completed = QUEST_DEFS.filter(quest => s.quests[quest.id] === "done").length;
+      title(`AUFTRÄGE · ${completed}/${QUEST_DEFS.length} ABGESCHLOSSEN`);
       for (const quest of QUEST_DEFS) {
         const state = s.quests[quest.id] ?? "inactive";
-        const done = state === "done";
+        const progress = questProgress(s, quest), done = progress.done;
         row((done ? "✓ " : state === "active" ? "● " : "○ ") + quest.name, undefined,
-          (quest.place ? quest.place + " · " : "") + quest.hint);
+          `${progress.current}/${progress.target} · ${quest.giver ? quest.giver + " · " : ""}${quest.place ?? "Lowtown"}${!progress.eligible && !done ? ` · Ab Stufe ${quest.minLv}` : ""} · ${quest.hint}`);
       }
 
     }
@@ -190,5 +204,6 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
   q("world-map-open").onclick = () => { tab = "world"; panel.hidden = false; render(); };
   q("systems-close").onclick = () => { panel.hidden = true; };
   window.addEventListener("420mon-save-changed", () => { if (!panel.hidden) render(); });
+  window.addEventListener("420mon-open-quests", () => { tab = "quest"; panel.hidden = false; render(); });
   render();
 }

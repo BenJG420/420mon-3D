@@ -108,3 +108,5 @@
  .monster-battle .monster-actions button { font-size:10px; }
  #monster-message.battle-log { max-height:83px; font-size:11px; }
 }
+
+.home-actions button { min-height:44px; }

@@ -1,9 +1,13 @@
 # 420mon → 420mon-3D — Codex handoff (2026-10-12)
 
+> Annahme (2026-10-15): Paket 1 verbindet Questfortschritt, Dialoge, Abgaben und Beute; Felix/Eddi-Automation und Bens Kasse gehören zur Story-Wirtschaft in Paket 6, Can/Radio/Trainer zu ihren ausdrücklich folgenden Paketen. Board-Aufträge werden ab der empfohlenen Stufe aktiv angezeigt; originale Erfüllung und Belohnung bleiben davon unabhängig.
+>
+> Prüfnotiz v22 (2026-10-15): 56 Tests und Build bestanden; Touch-Smoke bestätigt Silk-Abgabe und NPC-Shop-Verkauf. Der anschließende Static-Standortwechsel per Test-localStorage wurde beim Reload durch den bestehenden pagehide-Save überschrieben und lief in einen Timeout; kein zusätzlicher Smoke-Lauf. Static ist durch die echten Modulprüfungen abgedeckt, seine Browserbedienung bleibt zur Nutzerprüfung offen.
+>
 > Latest user update (2026-10-14): mattresses revive defeated team partners, and Grow care gives real time/yield bonuses. These override the historical 0-HP and cosmetic-only rules below.
 >
 > Historical handoff below. v18 was merged through PR #25 on 2026-10-13. The
-> current v19 implementation and remaining work are documented in
+> current v22 implementation and remaining work are documented in
 > [docs/TEST_BUILD.md](docs/TEST_BUILD.md). Its runtime Dex has 420 local original
 > sheets; its world uses the original MAPS. Old branch/count statements below
 > are preserved as history and must not drive new merge decisions.

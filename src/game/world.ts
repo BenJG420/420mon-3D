@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { MAPS, mapSketch, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y, type MapDef, type MapObj, type Rect } from "./data/maps";
 import { WORLD_SCALE, mapToWorld, worldToMap, collidesOnMap, safeSpawn } from "./worldGeometry";
 import { getSave, saveProgress } from "./save";
+import { recordVisit, setQuestState } from "./quests";
 import { stageOf } from "./data/progress";
 
 /** Geometry, object positions and routes come from the original 2D game. */
@@ -14,6 +15,7 @@ export type DistrictTravel = {
   travel: (id: string, x?: number, y?: number) => void;
   current: () => string;
   shopNearby: () => boolean;
+  shopAt: (obj: MapObj) => boolean;
   openShop: (fn: (obj?: MapObj) => void) => void;
   update: () => void;
   collides: (x: number, z: number, radius?: number) => boolean;
@@ -21,7 +23,7 @@ export type DistrictTravel = {
   getMapInfo: () => MapInfo;
   getRoot: () => THREE.Group;
   toWorld: (x: number, y: number) => THREE.Vector3;
-  setInteractionHandler: (fn: (obj: MapObj, mapId: string) => void) => void;
+  setInteractionHandler: (fn: (obj: MapObj, mapId: string) => boolean | void) => void;
 };
 
 const palette = {
@@ -86,7 +88,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   let id = "capsule";
   let active = MAPS[id];
   let occluders: THREE.Mesh[] = [];
-  let interaction: ((obj: MapObj, mapId: string) => void) | undefined;
+  let interaction: ((obj: MapObj, mapId: string) => boolean | void) | undefined;
   let shopFn: ((obj?: MapObj) => void) | undefined;
   let nearby: MapObj | undefined;
   let interactionMessage: { id: string; text: string; until: number } | undefined;
@@ -518,7 +520,16 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
   function travel(next: string, x?: number, y?: number) {
     if (!MAPS[next]) return;
+    const previous = id;
     saveLocation(); id = next; active = MAPS[id];
+    const progress = getSave();
+    if (previous === "capsule" && next !== "capsule") {
+      const ach = progress.ach && typeof progress.ach === "object" ? progress.ach as Record<string, string> : {};
+      ach.first_step = "done";
+      if (progress.outfit === "nude") { progress.leftCapsuleNude = true; ach.nude_start = "done"; setQuestState(progress, "q6_nude", "done"); }
+      progress.ach = ach;
+    }
+    progress.map = next; recordVisit(progress, next);
     disposeMap(); buildFloor(); buildWalls(); active.objs.forEach(renderObject); mapDetails();
     const desired = x !== undefined && y !== undefined ? { x, y }
       : id === "capsule" ? { x: CAPSULE_SPAWN_X, y: CAPSULE_SPAWN_Y }
@@ -566,8 +577,9 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       prompt.textContent = reason; return true;
     }
     if (obj.door) { travel(obj.door, obj.dx, obj.dy); return true; }
-    if ((obj.kind === "shop" || obj.kind === "stall") && shopFn) shopFn(obj);
-    else if (interaction) interaction(obj, id);
+    if (obj.kind === "shop" || obj.kind === "stall") {
+      if (interaction?.(obj, id) !== true) shopFn?.(obj);
+    } else interaction?.(obj, id);
     window.dispatchEvent(new CustomEvent("420mon-world-interaction", { detail: { obj, mapId: id } }));
     return true;
   }
@@ -608,6 +620,10 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   return {
     travel, current: () => id,
     shopNearby: () => active.objs.some(o => (o.kind === "shop" || o.kind === "stall") && distance(o) < 1.9),
+    shopAt: obj => {
+      if (!shopFn || !(obj.kind === "shop" || obj.kind === "stall") || !active.objs.some(item => item.id === obj.id) || distance(obj) >= 1.9) return false;
+      shopFn(obj); return true;
+    },
     openShop: fn => { shopFn = fn; }, update,
     collides: (x, z, radius = .48) => collidesOnMap(active, x, z, radius),
     getOccluders: () => occluders,

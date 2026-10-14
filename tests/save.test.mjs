@@ -122,7 +122,7 @@ test("original 2D save imports party, IVs, inventory, quests, growth and map wit
 });
 
 test("corrupt primary recovers backup; current 3D save takes priority over original", async () => {
-  const recovery = await fixture({ "420mon-progress-v1": "{broken", "420mon-progress-v1_bak": { team: [defeated], gold: 555 }, "420mon_save_v1": { party: [living], gold: 999 } });
+  const recovery = await fixture({ "420mon-progress-v1": "{broken", "420mon-progress-v1_bak": { team: [defeated], gold: 555, quests: { q_k_alley: "done" } }, "420mon_save_v1": { party: [living], gold: 999 } });
   assert.equal(recovery.getSave().gold, 555);
   assert.equal(recovery.getSave().team[0].hp, 0);
   recovery.saveProgress();
