@@ -2,7 +2,9 @@ import { DEX } from "./data/dex";
 import { clampLevel } from "./data/progress";
 import { GROW_SLOTS, POT_START, POT_MAX, BOX_MAX } from "./data/items";
 
-export const SAVE_KEY = "420mon-progress-v1";
+const LEGACY_3D_KEY = "420mon-progress-v1";
+export const saveKeyForBase = (base = "") => base.endsWith("/test/") ? "420mon-test-progress-v1" : LEGACY_3D_KEY;
+export const SAVE_KEY = saveKeyForBase(import.meta.env?.BASE_URL);
 const ORIGINAL_KEY = "420mon_save_v1";
 const LEGACY_HP: Record<string, number> = { Neonix: 35, Voltling: 42, Noctra: 50, Pyrox: 47 };
 
@@ -185,7 +187,8 @@ let current: Save | undefined;
 /** One shared object keeps active battle references alive when menus save. */
 export function getSave(): Save {
   if (!current) {
-    const legacy = readSlot(SAVE_KEY) ?? readSlot(`${SAVE_KEY}_bak`);
+    const legacy = readSlot(SAVE_KEY) ?? readSlot(`${SAVE_KEY}_bak`)
+      ?? (SAVE_KEY !== LEGACY_3D_KEY ? readSlot(LEGACY_3D_KEY) ?? readSlot(`${LEGACY_3D_KEY}_bak`) : null);
     const original = legacy ? null : readSlot(ORIGINAL_KEY) ?? readSlot(`${ORIGINAL_KEY}_bak`);
     current = normalize(legacy ?? original ?? {}, !legacy && !original, !!original);
   }

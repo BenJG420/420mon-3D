@@ -153,3 +153,10 @@ test("fresh save uses original inventory once and creates only known original pa
   assert.equal(api.getSave().inventory.seed_ordinary, 1);
   assert.throws(() => api.createPartner("fake_species"), /Unbekanntes/);
 });
+
+test("the published test channel uses a separate save while the stable release keeps its original key", async () => {
+  const api = await fixture();
+  assert.equal(api.saveKeyForBase('/420mon-3D/test/'), '420mon-test-progress-v1');
+  assert.equal(api.saveKeyForBase('/420mon-3D/'), '420mon-progress-v1');
+  assert.equal(api.saveKeyForBase('/'), '420mon-progress-v1');
+});

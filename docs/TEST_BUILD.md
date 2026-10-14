@@ -7,8 +7,10 @@ weathered floors and detailed furnishings.
 
 The Pages workflow retains the audited v18 release at `/420mon-3D/` and builds
 this source at `/420mon-3D/test/`. A workflow success must be checked before
-describing the test URL as published. Browser storage belongs to the origin, so
-both paths use the compatible `420mon-progress-v1` save. The new loader preserves
+describing the test URL as published. The test build uses its own
+`420mon-test-progress-v1` save. It copies an existing `420mon-progress-v1` into
+the test channel on first use and then leaves the stable release's slot alone.
+The new loader preserves
 legacy fields and monsters, backs up the previous save and can import an existing
 `420mon_save_v1` without modifying that original slot. Cross-origin original
 2D saves must be transferred by the player; browsers cannot read another
