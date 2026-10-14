@@ -1,25 +1,19 @@
 import type { DistrictTravel } from "./world";
 import { DEX, DEX_ORDER, dexNum, speciesById } from "./data/dex";
 import { DISTRICTS } from "./data/zones";
-import { ITEMS } from "./data/items";
+import { ITEMS, SHOP, STALL_CHIPS, STALL_THREADS, STALL_FENCE } from "./data/items";
 import { xpToNext } from "./data/progress";
+import { QUEST_DEFS } from "./data/quests";
 
-type Partner = { id?: string; name: string; level: number; xp: number; hp: number };
-type Save = { captures: number; wins: number; balls: number; collection: string[]; team: Partner[]; box?: Partner[]; gold?: number; inventory?: Record<string, number>; quest?: Record<string, boolean> };
-const KEY = "420mon-progress-v1";
-const load = (): Save => {
-  try {
-    const raw = JSON.parse(localStorage.getItem(KEY) || "{}");
-    return { captures: raw.captures ?? 0, wins: raw.wins ?? 0, balls: raw.balls ?? 12, collection: raw.collection ?? [], team: raw.team ?? [], box: raw.box ?? [], gold: raw.gold ?? 150, inventory: raw.inventory ?? {}, quest: raw.quest ?? {} };
-  } catch { return { captures: 0, wins: 0, balls: 12, collection: [], team: [], box: [], gold: 150, inventory: {}, quest: {} }; }
-};
-const maxHp = (m: Partner) => m.id ? Math.max(15, Math.round(speciesById(m.id).base.hp * (0.45 + m.level * 0.035))) : 35;
-export function createGameSystems(world: DistrictTravel) {
+import { getSave, saveProgress, maxHp, healLiving, type Save } from "./save";
+import { spriteUrl } from "./sprites";
+const load = getSave;
+export function createGameSystems(world: DistrictTravel, openGrowShop?: () => void) {
   const host = document.createElement("div");
   host.className = "systems-root";
-  host.innerHTML = `<button class="systems-toggle" id="systems-open">☰ 420MON MENÜ</button><button class="world-map-shortcut" id="world-map-open">🗺 KARTE · 10 BEZIRKE</button>
+  host.innerHTML = `<button class="systems-toggle" id="systems-open">☰ 420MON MENÜ</button><button class="world-map-shortcut" id="world-map-open">🗺 STADTPLAN</button>
   <section class="systems-panel" id="systems-panel" hidden>
-    <header><strong>420MON // LOWTOWN</strong><button id="systems-close">✕</button></header>
+    <header><strong>420MON · LOWTOWN</strong><button id="systems-close">✕</button></header>
     <nav id="systems-tabs"></nav>
     <div id="systems-content" class="systems-content"></div>
     <footer id="systems-footer"></footer>
@@ -29,10 +23,17 @@ export function createGameSystems(world: DistrictTravel) {
   const panel = q("systems-panel");
   let tab = "dex";
   let selected = "";
-  world.openShop(() => { tab = "shop"; panel.hidden = false; render(); });
+  let merchant = "LOWTOWN · SHOP";
+  let merchantItems: string[] = SHOP;
+  world.openShop(obj => {
+    if (obj?.stall === "grow" && openGrowShop) { openGrowShop(); return; }
+    merchant = obj?.label ?? "LOWTOWN · SHOP";
+    merchantItems = obj?.stall === "chips" ? STALL_CHIPS : obj?.stall === "threads" ? STALL_THREADS : obj?.stall === "fence" ? STALL_FENCE : SHOP;
+    tab = "shop"; panel.hidden = false; render();
+  });
   const tabs = [["dex","📖 DEX"],["team","⚔ TEAM"],["box","▦ BOX"],["bag","🎒 INVENTAR"],["world","🗺 KARTE"],["quest","★ QUESTS"]] as const;
   const escape = (v: string) => v.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c]!);
-  const save = (v: Save) => { localStorage.setItem(KEY, JSON.stringify(v)); window.dispatchEvent(new Event("420mon-save-changed")); };
+  const save = (v: Save) => { saveProgress(v); };
   const note = (msg: string) => { q("systems-footer").textContent = msg; };
   function render() {
     const s = load();
@@ -75,7 +76,7 @@ export function createGameSystems(world: DistrictTravel) {
           portrait.className = "dex-sprite-frame";
           const image = document.createElement("img");
           image.className = "dex-original-sprite";
-          image.src = import.meta.env.BASE_URL + "game/sprites/" + encodeURIComponent(sp.sprite) + (["neonpunx", "puffpuff", "budling"].includes(sp.sprite) ? ".png" : ".svg");
+          image.src = spriteUrl(sp.sprite);
           image.alt = sp.name + " · Original 2D";
           image.loading = "lazy";
           image.decoding = "async";
@@ -112,7 +113,7 @@ export function createGameSystems(world: DistrictTravel) {
           save(s); render(); note("Monster übertragen.");
         }, team ? "Antippen: in Lagerbox verschieben · EP " + m.xp + "/" + xpToNext(m.level) : "Antippen: ins Team holen");
       });
-      if (team) row("✚ TEAM HEILEN", () => { s.team.forEach(m => m.hp = maxHp(m)); save(s); render(); note("Alle Teammonster geheilt."); }, "Heilstation · außerhalb des Kampfes");
+      if (team) row("✚ TEAM HEILEN", () => { if (document.querySelector(".monster-battle:not([hidden])")) { note("Nicht während eines Kampfes."); return; } const n = healLiving(s.team); save(s); render(); note(n ? "Lebende Teammonster geheilt." : "Kein verletztes lebendes Monster im Team."); }, "Heilstation · außerhalb des Kampfes");
     } else if (tab === "bag") {
       title("INVENTAR · " + s.gold + " ₲");
       row("◉ STANDARD-KAPSEL ×" + s.balls, undefined, "Fangversuche im Kampf");
@@ -122,49 +123,57 @@ export function createGameSystems(world: DistrictTravel) {
         row(it.name + " ×" + amount, it.use === "heal" || it.use === "heal_all" ? () => {
           if (document.querySelector(".monster-battle:not([hidden])")) { note("Im Kampf nicht verfügbar."); return; }
           const targets = it.use === "heal_all" ? s.team : s.team.slice(0, 1);
-          targets.forEach(m => m.hp = Math.min(maxHp(m), m.hp + Math.max(1, Math.floor(maxHp(m) * (it.healPct ?? 0.5)))));
+          const n = healLiving(targets, it.healPct ?? 0.5);
+          if (!n) { note("Kein verletztes lebendes Monster. Item bleibt erhalten."); return; }
           s.inventory![id]--; save(s); render(); note(it.name + " verwendet.");
         } : undefined, it.desc);
       }
     } else if (tab === "shop") {
-      title("EDDIS SHOP · " + s.gold + " ₲");
+      title(merchant.toUpperCase() + " · " + s.gold + " ₲");
       row("◉ FANGKAPSEL ×1 · 25 ₲", () => {
+        if (!world.shopNearby()) { panel.hidden = true; return; }
         if (s.gold! < 25) { note("Nicht genug Geld."); return; }
         s.gold! -= 25; s.balls++; save(s); render(); note("Fangkapsel gekauft.");
       });
-      for (const id of Object.keys(ITEMS)) {
+      for (const id of merchantItems) {
         const it = ITEMS[id]; if (!it.buy || it.cat === "key") continue;
         row(it.name + " · " + it.buy + " ₲", () => {
+          if (!world.shopNearby()) { panel.hidden = true; return; }
           if (s.gold! < it.buy!) { note("Nicht genug Geld."); return; }
           s.gold! -= it.buy!; s.inventory![id] = (s.inventory![id] ?? 0) + 1;
           save(s); render(); note(it.name + " gekauft.");
         }, it.desc);
       }
     } else if (tab === "world") {
-      title("LOWTOWN · INTERAKTIVER STADTPLAN");
+      title("LOWTOWN · STADTPLAN");
+      row("⌂ KAPSEL · DEIN ZUHAUSE", () => { world.travel("capsule"); panel.hidden = true; }, "Töpfe, Schlafplatz und dein erster Partner");
+      row("↓ KELLER · RAJKOS STUDIO", () => { world.travel("studio"); panel.hidden = true; }, "Growboxen und das ursprüngliche Studio");
       const map = document.createElement("div"); map.className = "district-map";
       for (const d of DISTRICTS) {
         const btn = document.createElement("button"); btn.className = "district-map-pin";
         if (world.current() === d.id) btn.classList.add("active");
         btn.textContent = d.name + " · LV " + d.minLv + "+";
         btn.title = d.hint;
-        btn.onclick = () => { world.travel(d.id); panel.hidden = true; };
+        btn.onclick = () => {
+          const level = Math.max(Number(s.trainerLv) || 1, ...s.team.map(mon => mon.level));
+          if (d.id !== "alley" && s.quests.q1_bolt !== "done") { note("Bolt in der Gasse zuerst helfen. Kanal-Luken bleiben als ursprünglicher Nebenweg offen."); return; }
+          if (level < d.minLv) { note("Für dieses Gebiet brauchst du Stufe " + d.minLv + "."); return; }
+          world.travel(d.id); panel.hidden = true;
+        };
         map.append(btn);
       }
       body.append(map);
-      row("↩ ZURÜCK NACH LOWTOWN / GASSE A", () => { world.travel("alley"); panel.hidden = true; }, "Zurück zum Stadtzentrum und Eddis Shop");
-      row("Aktueller Bezirk: " + (DISTRICTS.find(d => d.id === world.current())?.name ?? "Gasse A"), undefined, "Wähle ein Gebiet auf der Karte, um in seine 3D-Umgebung zu reisen.");
+      row("↩ ZURÜCK NACH LOWTOWN / GASSE A", () => { world.travel("alley"); panel.hidden = true; }, "Zurück in die ursprüngliche Gasse");
+      row("Aktueller Ort: " + world.getMapInfo().name, undefined, "Türen, Luken und Stadtplan verbinden Lowtown.");
     } else if (tab === "quest") {
       title("AUFTRÄGE & FORTSCHRITT");
-      const goals = [
-        ["Erste Begegnung", s.captures >= 1, s.captures + "/1 gefangen"],
-        ["Drei wilde 420mon", s.captures >= 3, Math.min(s.captures,3) + "/3 gefangen"],
-        ["Kampferfahrung", s.wins >= 5, Math.min(s.wins,5) + "/5 Siege"],
-        ["Sammler", known.size >= 10, Math.min(known.size,10) + "/10 Arten"],
-        ["420mon-Meister", known.size >= 420, known.size + "/420 Arten"]
-      ] as const;
-      for (const [name, done, progress] of goals) row((done ? "✓ " : "○ ") + name, undefined, progress);
-      row("Original-Story", undefined, "NPC-Dialoge und Original-Quests werden noch in die 3D-Welt portiert.");
+      for (const quest of QUEST_DEFS) {
+        const state = s.quests[quest.id] ?? "inactive";
+        const done = state === "done";
+        row((done ? "✓ " : state === "active" ? "● " : "○ ") + quest.name, undefined,
+          (quest.place ? quest.place + " · " : "") + quest.hint);
+      }
+
     }
   }
   q("systems-open").onclick = () => { if (tab === "shop") tab = "world"; panel.hidden = false; render(); };

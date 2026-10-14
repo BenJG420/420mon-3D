@@ -1,0 +1,7 @@
+node_modules/
+dist/
+dist-test/
+deploy/
+stable-source/
+*.tsbuildinfo
+.openai/

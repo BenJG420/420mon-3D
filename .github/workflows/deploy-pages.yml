@@ -30,7 +30,22 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build
-        run: npm run build
+        run: npm run build -- --base=/420mon-3D/test/ --outDir=dist-test
+      # Keep the audited v18 release at the root while the original-world port
+      # is tested under /test/. Promote the port in a later explicit release.
+      - name: Checkout stable release
+        uses: actions/checkout@v4
+        with:
+          ref: 0eeb2e8a8ed8690bedff4012354437c33e9ce90e
+          path: stable-source
+      - name: Build stable release
+        working-directory: stable-source
+        run: npm install && npm run build
+      - name: Assemble stable and test channels
+        run: |
+          mkdir -p deploy/test
+          cp -a stable-source/dist/. deploy/
+          cp -a dist-test/. deploy/test/
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
@@ -38,7 +53,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: deploy
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

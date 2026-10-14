@@ -1,118 +1,86 @@
-import { DEX, DEX_ORDER, encountersFor, speciesById, dexNum } from "./data/dex";
+import { DEX_ORDER, encountersFor, speciesById, dexNum, type EncMon } from "./data/dex";
 import { xpToNext, MAX_LEVEL } from "./data/progress";
 import { ELEMENT_COLOR, typeMod } from "./data/types";
 import { getMove } from "./data/moves";
 import * as THREE from "three";
+import { getSave, saveProgress, healLiving, partnerUid, type Partner } from "./save";
+import { createMonsterArt, setMonsterArt, disposeMonsterArt } from "./monster-art";
+import type { DistrictTravel } from "./world";
+import { legendByMon, windowOpen } from "./data/legend";
 
 type Species = { id?: string; name: string; color: number; glow: number; maxHp: number; catchRate: number };
-type WildMon = { species: Species; mesh: THREE.Group; hp: number; alive: boolean; phase: number; level: number; respawn: number };
-const species: Species[] = [
-  { name: "Neonix", color: 0x27efb7, glow: 0x00ffc8, maxHp: 35, catchRate: 0.55 },
-  { name: "Voltling", color: 0xf9d44a, glow: 0xffc000, maxHp: 42, catchRate: 0.44 },
-  { name: "Noctra", color: 0xb96bff, glow: 0x9944ff, maxHp: 50, catchRate: 0.35 },
-  { name: "Pyrox", color: 0xff6e57, glow: 0xff4224, maxHp: 47, catchRate: 0.39 },
-];
+type WildMon = { species: Species; mesh: THREE.Group; hp: number; alive: boolean; phase: number; level: number; respawn: number; pool: EncMon[]; spot?: string; respawnAllowed: boolean };
 const positions: [number, number][] = [
   [11, -9], [-11, -10], [10, 11], [-12, 10], [22, 5], [-23, -4],
   [5, 23], [-7, -23], [28, 20], [-27, 22], [23, -27], [-25, -25],
 ];
-type TeamMon = { id?: string; name: string; level: number; xp: number; hp: number };
+type TeamMon = Partner;
 const monsters: WildMon[] = [];
-const saved = (() => {
-  try {
-    const data = JSON.parse(localStorage.getItem("420mon-progress-v1") || "{}");
-    return {
-      captures: Number.isFinite(data.captures) ? Math.max(0, data.captures) : 0,
-      wins: Number.isFinite(data.wins) ? Math.max(0, data.wins) : 0,
-      balls: Number.isFinite(data.balls) ? Math.max(0, data.balls) : 12,
-      team: Array.isArray(data.team) ? data.team.filter((m: TeamMon) => m && (!!m.id && !!DEX[m.id] || species.some(s => s.name === m.name))).slice(0, 6)  .map((m: TeamMon) => ({ ...m, hp: Number.isFinite(m.hp) ? Math.max(0, m.hp) : 35 })) as TeamMon[] : [] as TeamMon[],
-      collection: Array.isArray(data.collection) ? data.collection.filter((x: unknown) => typeof x === "string").slice(0, 420) as string[] : [] as string[],
-      box: Array.isArray(data.box) ? data.box as TeamMon[] : [] as TeamMon[],
-      gold: Number.isFinite(data.gold) ? data.gold as number : 150,
-      inventory: data.inventory && typeof data.inventory === "object" ? data.inventory as Record<string, number> : {} as Record<string, number>,
-    };
-  } catch { return { captures: 0, wins: 0, balls: 12, team: [] as TeamMon[], collection: [] as string[], box: [] as TeamMon[], gold: 150, inventory: {} as Record<string, number> }; }
-})();
-function save() { const current = JSON.parse(localStorage.getItem("420mon-progress-v1") || "{}"); localStorage.setItem("420mon-progress-v1", JSON.stringify({ ...current, ...saved })); window.dispatchEvent(new Event("420mon-save-changed")); }
-const monsterRoot = new THREE.Group();
-export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
-  scene.add(monsterRoot);
-  window.addEventListener("420mon-save-changed", () => { try { Object.assign(saved, JSON.parse(localStorage.getItem("420mon-progress-v1") || "{}")); } catch { /* Keep active save. */ } });
-  const sphere = new THREE.SphereGeometry(0.54, 14, 12);
-  const ear = new THREE.ConeGeometry(0.24, 0.65, 6);
-  const eye = new THREE.SphereGeometry(0.085, 8, 6);
-  const white = new THREE.MeshStandardMaterial({ color: 0xf6fbff, emissive: 0x18202b });
-  const dark = new THREE.MeshStandardMaterial({ color: 0x08101b });
-  for (let i = 0; i < positions.length; i++) {
-    const original = encountersFor("alley")[(i * 7 + 3) % encountersFor("alley").length];
-    const wildLevel = 2 + i % 5;
-    const mon = speciesById(original.id);
-    const tint = new THREE.Color(ELEMENT_COLOR[mon.types[0]]).getHex();
-    const kind: Species = { id: mon.id, name: mon.name, color: tint, glow: tint, maxHp: Math.max(15, Math.round(mon.base.hp * (0.45 + wildLevel * 0.035))), catchRate: mon.catch / 255 };
-    const root = new THREE.Group();
-    const mat = new THREE.MeshStandardMaterial({ color: kind.color, emissive: kind.glow, emissiveIntensity: 0.32, roughness: 0.45 });
-    const body = new THREE.Mesh(sphere, mat);
-    body.position.y = 0.76;
-    body.scale.set(kind.name === "Noctra" ? 0.86 : 1, kind.name === "Voltling" ? 0.8 : 1.15, kind.name === "Pyrox" ? 1.24 : 1);
-    body.castShadow = true;
-    root.add(body);
-    for (const side of [-1, 1]) {
-      const horn = new THREE.Mesh(ear, mat);
-      horn.position.set(side * 0.32, 1.36, 0);
-      horn.rotation.z = side * -0.24;
-      horn.castShadow = true;
-      root.add(horn);
-      const pupil = new THREE.Mesh(eye, white);
-      pupil.position.set(side * 0.2, 0.85, 0.47);
-      root.add(pupil);
-      const iris = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), dark);
-      iris.position.set(side * 0.2, 0.85, 0.546);
-      root.add(iris);
-    }
-    const tail = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.85, 7), mat);
-    tail.position.set(0, 0.7, -0.65);
-    tail.rotation.x = -Math.PI / 2.8;
-    tail.castShadow = true;
-    root.add(tail);
-    if (kind.name === "Noctra") {
-      const wings = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.07, 0.52), mat);
-      wings.position.set(0, 0.88, -0.2);
-      root.add(wings);
-    }
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.035, 6, 28), new THREE.MeshBasicMaterial({ color: kind.glow }));
-    ring.rotation.x = -Math.PI / 2;
-    ring.position.y = 0.06;
-    root.add(ring);
-    root.position.set(positions[i][0], 0, positions[i][1]);
-    monsterRoot.add(root);
-    monsters.push({ species: kind, mesh: root, hp: kind.maxHp, alive: true, phase: i * 0.9, level: wildLevel, respawn: 0 });
-  }
+const saved = getSave();
+const save = saveProgress;
 
-  window.addEventListener("420mon-district-change", (event: Event) => {
-    const id = (event as CustomEvent<string>).detail;
-    const pool = encountersFor(id);
-    if (!pool.length) return;
-    active = null;
-    if (allyModel) { monsterRoot.remove(allyModel); allyModel = null; }
-    for (let i = 0; i < monsters.length; i++) {
-      const wild = monsters[i];
-      const picked = pool[(i * 7 + 3) % pool.length];
-      const original = speciesById(picked.id);
-      const lv = Math.max(2, Math.min(420, (id === "alley" ? 2 : 7 + DISTRICT_LEVEL(id)) + i % 5));
-      const color = new THREE.Color(ELEMENT_COLOR[original.types[0]]).getHex();
-      wild.species = { id: original.id, name: original.name, color, glow: color, maxHp: Math.max(15, Math.round(original.base.hp * (0.45 + lv * 0.035))), catchRate: original.catch / 255 };
-      wild.level = lv; wild.hp = wild.species.maxHp; wild.alive = true; wild.respawn = 0;
-      wild.mesh.visible = true;
-      wild.mesh.position.set(player.position.x + positions[i][0], 0, player.position.z + positions[i][1]);
-      const body = wild.mesh.children[0] as THREE.Mesh;
-      (body.material as THREE.MeshStandardMaterial).color.setHex(color);
-      (body.material as THREE.MeshStandardMaterial).emissive.setHex(color);
-    }
-  });
-  function DISTRICT_LEVEL(id: string): number {
-    const rank = ["alley","yard","cable","ash","drain","chem","ring","labyrinth","nische","scrap"].indexOf(id);
-    return Math.max(0, rank) * 4;
+/** The original game weights each entry, then rolls inside its level band. */
+export function pickEncounter(pool: EncMon[], random = Math.random): EncMon | undefined {
+  const total = pool.reduce((sum, mon) => sum + Math.max(0, mon.w), 0);
+  if (!pool.length || total <= 0) return undefined;
+  let roll = Math.max(0, Math.min(1 - Number.EPSILON, random())) * total;
+  for (const mon of pool) {
+    roll -= Math.max(0, mon.w);
+    if (roll < 0) return mon;
   }
+  return pool[pool.length - 1];
+}
+
+export function encounterLevel(mon: EncMon, random = Math.random): number {
+  const [low, high] = mon.lvl;
+  return Math.max(1, Math.min(MAX_LEVEL, low + Math.floor(Math.max(0, Math.min(1 - Number.EPSILON, random())) * (high - low + 1))));
+}
+const monsterRoot = new THREE.Group();
+export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world?: DistrictTravel) {
+  scene.add(monsterRoot);
+  function spawn(pool: EncMon[], x: number, z: number, spot?: string, fixedLevel?: number) {
+    const picked = pickEncounter(pool);
+    if (!picked) return;
+    const original = speciesById(picked.id);
+    const wildLevel = fixedLevel ?? encounterLevel(picked);
+    const tint = new THREE.Color(ELEMENT_COLOR[original.types[0]]).getHex();
+    const kind: Species = { id: original.id, name: original.name, color: tint, glow: tint, maxHp: Math.max(15, Math.round(original.base.hp * (0.45 + wildLevel * 0.035))), catchRate: original.catch / 255 };
+    const root = createMonsterArt(original.id, tint);
+    root.position.set(x, 0, z);
+    monsterRoot.add(root);
+    monsters.push({ species: kind, mesh: root, hp: kind.maxHp, alive: true, phase: monsters.length * 0.9, level: wildLevel, respawn: 0, pool, spot, respawnAllowed: !spot });
+  }
+  function changeMap(id: string) {
+    finish();
+    nearest = null;
+    encounterButton.hidden = true;
+    for (const mon of monsters) disposeMonsterArt(mon.mesh);
+    monsters.length = 0;
+    if (!world) {
+      if (["capsule", "studio", "kino"].includes(id)) return;
+      for (const [x, z] of positions) spawn(encountersFor(id), player.position.x + x, player.position.z + z);
+      return;
+    }
+    const { map } = world.getMapInfo();
+    if (["capsule", "studio", "kino"].includes(id)) return;
+    for (const obj of map.objs) {
+      if (obj.kind !== "wild" || !obj.mon) continue;
+      const spot = `${id}:${obj.id}`;
+      if (saved.deadWild.includes(spot) || saved.deadWild.includes(obj.id)) continue;
+      const legendary = legendByMon(obj.mon);
+      if (legendary && !windowOpen(legendary)) continue;
+      const point = world.toWorld(obj.x + obj.w / 2, obj.y + obj.h / 2);
+      spawn([{ id: obj.mon, lvl: [obj.lvl ?? 1, obj.lvl ?? 1], w: 1 }], point.x, point.z, spot, obj.lvl);
+    }
+    // Each habitat uses its own original weighted encounter list and level range.
+    for (const zone of map.zones) {
+      for (const fraction of [0.32, 0.68]) {
+        const point = world.toWorld(zone.x + zone.w * fraction, zone.y + zone.h * 0.5);
+        if (!world.collides(point.x, point.z, 0.3)) spawn(zone.mons, point.x, point.z);
+      }
+    }
+  }
+  window.addEventListener("420mon-district-change", (event: Event) => changeMap((event as CustomEvent<string>).detail));
   const ui = document.createElement("div");
   ui.className = "monster-ui";
   ui.innerHTML = `
@@ -153,10 +121,10 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     messageTimer = setTimeout(() => { toast.hidden = true; }, 2800);
   }
   let energy = 3;
-  const lead = () => ally ?? saved.team[0];
+  const lead = () => ally ?? saved.team.find(mon => mon.hp > 0);
   function awardXp(amount: number) {
     const mon = lead();
-    if (!mon) return;
+    if (!mon || mon.hp <= 0) return;
     mon.xp += amount;
     while (mon.level < MAX_LEVEL && mon.xp >= xpToNext(mon.level)) {
       mon.xp -= xpToNext(mon.level);
@@ -166,7 +134,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   const updateProgress = () => {
     get("monster-count").textContent = `GEFANGEN ${saved.captures} · SIEGE ${saved.wins} · KAPSELN ${saved.balls}`;
     get("monster-quest").textContent = `DEX ${new Set(saved.collection).size}/${DEX_ORDER.length} · QUEST ${Math.min(3, saved.captures)}/3`;
-    get("monster-list").textContent = saved.collection.length ? saved.collection.join(" · ") : "Noch keine Monster gefangen.";
+    get("monster-list").textContent = saved.collection.length ? saved.collection.map(id => id.startsWith("mon_") ? speciesById(id).name : id).join(" · ") : "Noch keine Monster gefangen.";
     const teamList = get("monster-team-list");
     teamList.replaceChildren();
     const heading = document.createElement("h4");
@@ -202,29 +170,19 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   function finish() {
     active = null;
     ally = null;
-    if (allyModel) { monsterRoot.remove(allyModel); allyModel = null; }
+    if (allyModel) { monsterRoot.remove(allyModel); disposeMonsterArt(allyModel); allyModel = null; }
     battle.hidden = true;
     cooldown = 1.5;
     updateProgress();
     save();
   }
   function spawnAlly() {
-    if (allyModel) monsterRoot.remove(allyModel);
+    if (allyModel) { monsterRoot.remove(allyModel); disposeMonsterArt(allyModel); }
     allyModel = null;
     if (!ally) return;
-    const original = ally.id ? speciesById(ally.id) : null;
-    const originalColor = original ? new THREE.Color(ELEMENT_COLOR[original.types[0]]).getHex() : 0x27efb7;
-    const kind = original ? { id: original.id, name: original.name, color: originalColor, glow: originalColor, maxHp: 50, catchRate: original.catch / 255 } : species.find(s => s.name === ally!.name) ?? species[0];
-    const root = new THREE.Group();
-    const mat = new THREE.MeshStandardMaterial({ color: kind.color, emissive: kind.glow, emissiveIntensity: 0.45 });
-    const body = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), mat);
-    body.position.y = 0.75;
-    root.add(body);
-    for (const side of [-1, 1]) {
-      const horn = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.65, 7), mat);
-      horn.position.set(side * 0.34, 1.35, 0);
-      root.add(horn);
-    }
+    const original = speciesById(ally.id ?? "mon_puffpuff");
+    const color = new THREE.Color(ELEMENT_COLOR[original.types[0]]).getHex();
+    const root = createMonsterArt(original.id, color);
     root.position.copy(player.position).add(new THREE.Vector3(1.5, 0, -1.5));
     monsterRoot.add(root);
     allyModel = root;
@@ -239,6 +197,12 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     encounterButton.hidden = true;
     updateBattle(ally ? `${ally.name}, ich wähle dich!` : "Fange dein erstes Monster mit einer Kapsel!");
   }
+  function retireWild(mon: WildMon) {
+    mon.alive = false;
+    mon.mesh.visible = false;
+    mon.respawn = 0;
+    if (mon.spot && !saved.deadWild.includes(mon.spot)) saved.deadWild.push(mon.spot);
+  }
   function attack(special = false) {
     if (!active || !ally) return;
     if (special && energy < 2) return;
@@ -250,8 +214,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     const damage = move.power === 0 ? 0 : Math.max(1, Math.floor((move.power / 8 + ally.level * 0.7 + (attacker?.base.atk ?? 45) / 16) * modifier * (0.85 + Math.random() * 0.3)));
     active.hp = Math.max(0, active.hp - damage);
     if (active.hp === 0) {
-      active.alive = false;
-      active.mesh.visible = false;
+      retireWild(active);
       saved.wins++;
       saved.gold += 15 + active.level * 2;
       awardXp(15);
@@ -263,7 +226,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     ally.hp = Math.max(0, ally.hp - (5 + Math.floor(Math.random() * 13)));
     if (ally.hp === 0) {
       ally = saved.team.find(mon => mon.hp > 0) ?? null;
-      if (!ally) { notify("DEIN TEAM IST K. O. – HEILE DEINE MONSTER!"); finish(); return; }
+      if (!ally) { notify("DEIN TEAM IST BESIEGT – HOLE EIN LEBENDES MONSTER AUS DER BOX ODER FANGE EINES!"); finish(); return; }
       spawnAlly();
       notify("MONSTERWECHSEL: " + ally.name);
     }
@@ -276,15 +239,15 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
     const chance = Math.min(0.95, Math.max(0.04, ((3 * active.species.maxHp - 2 * active.hp) * (active.species.catchRate * 255)) / (3 * active.species.maxHp * 255)));
     if (Math.random() < chance) {
       saved.captures++;
-      saved.collection.push(active.species.name);
+      const speciesKey = active.species.id ?? active.species.name;
+      if (!saved.collection.includes(speciesKey)) saved.collection.push(speciesKey);
       // Capturing does not reduce HP to zero: preserve the actual remaining HP.
-      const caught: TeamMon = { id: active.species.id, name: active.species.name, level: active.level, xp: 0, hp: active.hp };
+      const caught: TeamMon = { uid: partnerUid(), id: active.species.id, name: active.species.name, level: active.level, xp: 0, hp: active.hp, hpMax: active.species.maxHp, moves: active.species.id ? speciesById(active.species.id).moves.slice(0, 4) : [] };
       if (saved.team.length < 6) saved.team.push(caught); else saved.box.push(caught);
       awardXp(8);
       if (saved.captures === 3) saved.balls += 5;
       notify(`✓ ${active.species.name} GEFANGEN! ${active.hp} HP verbleiben`);
-      active.alive = false;
-      active.mesh.visible = false;
+      retireWild(active);
       finish();
       return;
     }
@@ -292,7 +255,8 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
       ally.hp = Math.max(0, ally.hp - 8);
       if (ally.hp === 0) {
         ally = saved.team.find(mon => mon.hp > 0) ?? null;
-        if (!ally) { notify("DEIN TEAM IST K. O."); finish(); return; }
+        if (!ally) { notify("DEIN TEAM IST BESIEGT. 0 HP BLEIBEN BESIEGT."); finish(); return; }
+        spawnAlly();
       }
     }
     updateBattle("Ausgebrochen! Schwäche das Monster für bessere Fangchancen.");
@@ -306,24 +270,45 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group) {
   get("monster-run").addEventListener("click", finish);
   get("monster-heal").addEventListener("click", () => {
     if (active) return;
-    saved.team.forEach(mon => { mon.hp = mon.id ? Math.max(15, Math.round(speciesById(mon.id).base.hp * (0.45 + mon.level * 0.035))) : species.find(s => s.name === mon.name)?.maxHp ?? 35; });
-    save(); updateProgress(); notify("✚ DEIN TEAM IST GEHEILT!");
+    const healed = healLiving(saved.team);
+    save(); updateProgress(); notify(healed ? "✚ LEBENDE TEAMMONSTER GEHEILT. 0 HP BLEIBEN BESIEGT." : "KEIN LEBENDES MONSTER BENÖTIGT HEILUNG.");
   });
   get("monster-collection-toggle").addEventListener("click", () => { collection.hidden = !collection.hidden; });
   get("monster-collection-close").addEventListener("click", () => { collection.hidden = true; });
-  window.addEventListener("keydown", e => { if (e.code === "KeyE" && !e.repeat && !active) start(); });
+  window.addEventListener("keydown", e => {
+    const target = e.target as HTMLElement | null;
+    if (e.defaultPrevented || target?.closest("input,textarea,select,[contenteditable=true]")) return;
+    if (document.querySelector(".systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.studio-panel.is-open")) return;
+    if (e.code === "KeyE" && !e.repeat && !active) start();
+  });
   return {
     get inBattle() { return active !== null; },
+    refreshMap: () => changeMap(world?.current() ?? "alley"),
     update(dt: number) {
       time += dt;
-      if (allyModel) allyModel.children[0].position.y = 0.75 + Math.sin(time * 3.5) * 0.09;
+      if (allyModel) allyModel.children[0].position.y = 0.82 + Math.sin(time * 3.5) * 0.09;
       cooldown = Math.max(0, cooldown - dt);
       nearest = null;
       let best = 3.2 * 3.2;
       for (const mon of monsters) {
-        if (!mon.alive) { mon.respawn += dt; if (mon.respawn >= 90) { mon.respawn = 0; mon.alive = true; mon.hp = mon.species.maxHp; mon.mesh.visible = true; } continue; }
-        mon.mesh.children[0].position.y = 0.76 + Math.sin(time * 2.3 + mon.phase) * 0.13;
-        mon.mesh.rotation.y += dt * 0.36;
+        if (!mon.alive) {
+          if (!mon.respawnAllowed) continue;
+          mon.respawn += dt;
+          if (mon.respawn >= 90) {
+            // A fresh wild individual enters the habitat; defeated team HP stays zero.
+            const picked = pickEncounter(mon.pool);
+            if (picked) {
+              const original = speciesById(picked.id);
+              const level = encounterLevel(picked);
+              const color = new THREE.Color(ELEMENT_COLOR[original.types[0]]).getHex();
+              mon.species = { id: original.id, name: original.name, color, glow: color, maxHp: Math.max(15, Math.round(original.base.hp * (0.45 + level * 0.035))), catchRate: original.catch / 255 };
+              mon.level = level; mon.respawn = 0; mon.alive = true; mon.hp = mon.species.maxHp; mon.mesh.visible = true;
+              setMonsterArt(mon.mesh, original.id, color);
+            }
+          }
+          continue;
+        }
+        mon.mesh.children[0].position.y = 0.82 + Math.sin(time * 2.3 + mon.phase) * 0.13;
         const distance = mon.mesh.position.distanceToSquared(player.position);
         if (distance < best) { best = distance; nearest = mon; }
       }

@@ -2,7 +2,11 @@ import * as THREE from "three";
 import { createMonsterGame } from "./game/monsters";
 import { createGameSystems } from "./game/systems";
 import { createDistrictWorld } from "./game/world";
+import { createEnvironment } from "./game/environment";
+import { createGrowSystem } from "./game/grow";
+import { createHomeInteractions } from "./game/home";
 import "./styles.css";
+import "./home.css";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root not found.");
@@ -26,36 +30,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 app.appendChild(renderer.domElement);
 
-const hemi = new THREE.HemisphereLight(0x9bbcff, 0x11100e, 1.8);
-scene.add(hemi);
-
-const moon = new THREE.DirectionalLight(0xb8c7ff, 3.2);
-moon.position.set(-20, 30, 12);
-moon.castShadow = true;
-moon.shadow.mapSize.set(2048, 2048);
-moon.shadow.camera.near = 1;
-moon.shadow.camera.far = 100;
-moon.shadow.camera.left = -35;
-moon.shadow.camera.right = 35;
-moon.shadow.camera.top = 35;
-moon.shadow.camera.bottom = -35;
-scene.add(moon);
-
-const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(240, 240),
-  new THREE.MeshStandardMaterial({
-    color: 0x24272a,
-    roughness: 0.58,
-    metalness: 0.18,
-  }),
-);
-ground.rotation.x = -Math.PI / 2;
-ground.receiveShadow = true;
-scene.add(ground);
-
-const grid = new THREE.GridHelper(240, 120, 0x29333b, 0x161b20);
-grid.position.y = 0.01;
-scene.add(grid);
+const environment = createEnvironment(scene, renderer);
 
 // Modular low-poly humanoid. Individual limb pivots can later be replaced
 // with rigged meshes, clothing and equipment without changing movement code.
@@ -117,157 +92,26 @@ function applyCharacterChoice(choice: CharacterChoice) {
 applyCharacterChoice(characterChoice);
 let walkCycle = 0;
 
-const blocks: THREE.Mesh[] = [];
-const buildingColliders: THREE.Box3[] = [];
-const playerRadius = 0.48;
-const collisionPadding = 0.05;
+const playerRadius = 0.4;
 let collisionCount = 0;
 let blockedThisFrame = false;
-
-// Horizontal circle-vs-box collision using actual building world bounds.
-// Unlike a point check, this also catches the player's body at corners.
-function collidesWithBuilding(x: number, z: number): boolean {
-  const radius = playerRadius + collisionPadding;
-  for (const box of buildingColliders) {
-    const nearestX = THREE.MathUtils.clamp(x, box.min.x, box.max.x);
-    const nearestZ = THREE.MathUtils.clamp(z, box.min.z, box.max.z);
-    const dx = x - nearestX;
-    const dz = z - nearestZ;
-    if (dx * dx + dz * dz < radius * radius) return true;
-  }
-  return false;
-}
+const districtWorld = createDistrictWorld(scene, player);
+const monsterGame = createMonsterGame(scene, player, districtWorld);
+const grow = createGrowSystem(districtWorld);
+createHomeInteractions(districtWorld, grow);
+createGameSystems(districtWorld, () => grow.openShop());
 
 function movePlayer(dx: number, dz: number) {
-  // Sweep in small increments; resolve each axis separately for wall sliding.
   const steps = Math.max(1, Math.ceil(Math.hypot(dx, dz) / 0.08));
   for (let i = 0; i < steps; i++) {
     const nextX = player.position.x + dx / steps;
-    if (!collidesWithBuilding(nextX, player.position.z)) {
-      player.position.x = nextX;
-    } else {
-      blockedThisFrame = true;
-    }
+    if (!districtWorld.collides(nextX, player.position.z, playerRadius)) player.position.x = nextX;
+    else blockedThisFrame = true;
     const nextZ = player.position.z + dz / steps;
-    if (!collidesWithBuilding(player.position.x, nextZ)) {
-      player.position.z = nextZ;
-    } else {
-      blockedThisFrame = true;
-    }
+    if (!districtWorld.collides(player.position.x, nextZ, playerRadius)) player.position.z = nextZ;
+    else blockedThisFrame = true;
   }
 }
-
-// Ensure the character can never start inside a solid building.
-function ensureValidSpawn() {
-  if (!collidesWithBuilding(player.position.x, player.position.z)) return;
-  for (let radius = 0; radius <= 40; radius += 1) {
-    for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
-      const x = Math.cos(angle) * radius;
-      const z = Math.sin(angle) * radius;
-      if (!collidesWithBuilding(x, z)) {
-        player.position.set(x, 0, z);
-        return;
-      }
-    }
-  }
-}
-
-// A spacious city grid: wide avenues, walkable side streets and an open plaza.
-const citySpacing = 16;
-const buildingSize = 8;
-for (let gx = -4; gx <= 4; gx++) {
-  for (let gz = -4; gz <= 4; gz++) {
-    // Central plaza: leave a generous 48 x 48 metre open space.
-    if (Math.abs(gx) <= 1 && Math.abs(gz) <= 1) continue;
-    const x = gx * citySpacing;
-    const z = gz * citySpacing;
-    const h = 7 + ((Math.abs(gx * 13 + gz * 7) * 3) % 22);
-    const building = new THREE.Mesh(
-      new THREE.BoxGeometry(buildingSize, h, buildingSize),
-      new THREE.MeshStandardMaterial({
-        color: (gx + gz) % 3 === 0 ? 0x343e50 : 0x30363b,
-        roughness: 0.78,
-        metalness: 0.15,
-      }),
-    );
-    building.position.set(x, h / 2, z);
-    building.castShadow = true;
-    building.receiveShadow = true;
-    scene.add(building);
-    blocks.push(building);
-    building.updateMatrixWorld(true);
-    buildingColliders.push(new THREE.Box3().setFromObject(building));
-  }
-}
-// Low-cost cyberpunk detailing: shared geometry/materials and emissive strips.
-const cyanNeon = new THREE.MeshStandardMaterial({ color: 0x00bcd4, emissive: 0x00d9ff, emissiveIntensity: 2.5, roughness: 0.25 });
-const pinkNeon = new THREE.MeshStandardMaterial({ color: 0xee44cc, emissive: 0xff22a8, emissiveIntensity: 2.3, roughness: 0.3 });
-const greenNeon = new THREE.MeshStandardMaterial({ color: 0x44ff99, emissive: 0x00ff88, emissiveIntensity: 2, roughness: 0.3 });
-const facadeDark = new THREE.MeshStandardMaterial({ color: 0x131d2c, metalness: 0.5, roughness: 0.5 });
-const windowGeometry = new THREE.BoxGeometry(0.12, 0.65, 0.8);
-const roadGeometry = new THREE.PlaneGeometry(240, 8);
-const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x151a22, roughness: 0.9 });
-for (let lane = -4; lane <= 4; lane++) {
-  const roadX = new THREE.Mesh(roadGeometry, roadMaterial);
-  roadX.rotation.x = -Math.PI / 2;
-  roadX.position.set(0, 0.025, lane * citySpacing + citySpacing / 2);
-  roadX.receiveShadow = true;
-  scene.add(roadX);
-  const roadZ = new THREE.Mesh(roadGeometry, roadMaterial);
-  roadZ.rotation.set(-Math.PI / 2, 0, Math.PI / 2);
-  roadZ.position.set(lane * citySpacing + citySpacing / 2, 0.026, 0);
-  roadZ.receiveShadow = true;
-  scene.add(roadZ);
-}
-for (let i = 0; i < blocks.length; i++) {
-  const building = blocks[i];
-  const h = (building.geometry as THREE.BoxGeometry).parameters.height as number;
-  const material = i % 3 === 0 ? cyanNeon : i % 3 === 1 ? pinkNeon : greenNeon;
-  const front = building.position.z + buildingSize / 2 + 0.07;
-  // Front vertical light strips and a bright rooftop rim.
-  for (const side of [-1, 1]) {
-    const strip = new THREE.Mesh(new THREE.BoxGeometry(0.12, h * 0.85, 0.12), material);
-    strip.position.set(building.position.x + side * (buildingSize / 2 - 0.3), h * 0.5, front);
-    scene.add(strip);
-  }
-  const rim = new THREE.Mesh(new THREE.BoxGeometry(buildingSize + 0.3, 0.12, 0.12), material);
-  rim.position.set(building.position.x, h - 0.25, front);
-  scene.add(rim);
-  // Inset dark window panels with occasional glowing panes.
-  for (let floor = 2; floor < h - 1; floor += 2.5) {
-    for (const offset of [-2.4, -0.8, 0.8, 2.4]) {
-      const lit = (Math.floor(floor * 3) + Math.floor(offset * 5) + i) % 4 === 0;
-      const pane = new THREE.Mesh(windowGeometry, lit ? material : facadeDark);
-      pane.position.set(building.position.x + offset, floor, front + 0.035);
-      scene.add(pane);
-    }
-  }
-}
-// Small neon posts around the plaza; decorative only, leaving paths clear.
-const postGeometry = new THREE.CylinderGeometry(0.08, 0.12, 3.4, 8);
-for (const x of [-19, 19]) {
-  for (const z of [-19, 19]) {
-    const post = new THREE.Mesh(postGeometry, facadeDark);
-    post.position.set(x, 1.7, z);
-    scene.add(post);
-    const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 8), cyanNeon);
-    beacon.position.set(x, 3.5, z);
-    scene.add(beacon);
-  }
-}
-
-// Plaza landmark makes it easy to orient yourself without obstructing movement.
-const plazaMarker = new THREE.Mesh(
-  new THREE.CylinderGeometry(0.22, 0.22, 3, 12),
-  new THREE.MeshStandardMaterial({ color: 0x34ff9a, emissive: 0x087b47, emissiveIntensity: 1.5 }),
-);
-plazaMarker.position.set(0, 1.5, -10);
-scene.add(plazaMarker);
-
-ensureValidSpawn();
-const monsterGame = createMonsterGame(scene, player);
-const districtWorld = createDistrictWorld(scene, player);
-createGameSystems(districtWorld);
 window.dispatchEvent(new CustomEvent("420mon-district-change", { detail: districtWorld.current() }));
 
 const state = {
@@ -296,16 +140,22 @@ function setKey(code: string, value: boolean) {
   if (action) state[action] = value;
 }
 
-window.addEventListener("keydown", (event) => setKey(event.code, true));
+window.addEventListener("keydown", (event) => {
+  if ((event.target as HTMLElement)?.matches("input,select,textarea")) return;
+  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) event.preventDefault();
+  setKey(event.code, true);
+});
+window.addEventListener("blur", () => { for (const key of Object.keys(state)) state[key as keyof typeof state] = false; });
 window.addEventListener("keyup", (event) => setKey(event.code, false));
 
 const hud = document.createElement("div");
 hud.className = "hud";
 hud.innerHTML = `
-  <div class="brand">420MON // 3D</div>
-  <div class="status">FOUNDATION BUILD <span></span></div>
-  <div class="hint">WASD / ARROWS · SHIFT SPRINT</div>
-  <div class="target">ORIGINAL DEX v13 · 420MON</div>
+  <div class="brand">420MON <span>LOWTOWN</span></div>
+  <div class="status">DEIN ZUHAUSE IN 3D</div>
+  <div class="hint">WASD / PFEILE · E INTERAGIEREN · SHIFT LAUFEN</div>
+  <div class="target">KAPSEL & KELLER · TESTVERSION 19</div>
+  <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
 const characterPicker = document.createElement("div");
@@ -512,9 +362,27 @@ const desiredCamera = new THREE.Vector3();
 const up = new THREE.Vector3(0, 1, 0);
 const cameraRaycaster = new THREE.Raycaster();
 const cameraDirection = new THREE.Vector3();
-const cameraOffset = new THREE.Vector3(0, 12, 18);
-const cameraMinDistance = 10;
-const buildLabel = "LOWTOWN DISTRICTS v15";
+const cameraOffset = new THREE.Vector3(8, 13, 12);
+const cameraMinDistance = 8;
+const mapCanvas = hud.querySelector<HTMLCanvasElement>("#local-map-canvas")!;
+const mapContext = mapCanvas.getContext("2d")!;
+let mapClock = 0;
+function drawLocalMap() {
+  const info = districtWorld.getMapInfo();
+  const m = info.map;
+  mapContext.clearRect(0, 0, 240, 160);
+  mapContext.fillStyle = "#112020"; mapContext.fillRect(0, 0, 240, 160);
+  const scale = Math.min(224 / m.w, 140 / m.h);
+  const ox = (240 - m.w * scale) / 2, oy = (160 - m.h * scale) / 2;
+  mapContext.fillStyle = "#71857b";
+  for (const wall of m.walls) mapContext.fillRect(ox + wall.x * scale, oy + wall.y * scale, Math.max(1, wall.w * scale), Math.max(1, wall.h * scale));
+  for (const obj of m.objs) {
+    mapContext.fillStyle = obj.kind === "door" || obj.kind === "manhole" ? "#ecc782" : obj.kind === "pot" ? "#81b478" : "#829aaa";
+    mapContext.fillRect(ox + obj.x * scale, oy + obj.y * scale, Math.max(3, obj.w * scale), Math.max(3, obj.h * scale));
+  }
+  mapContext.fillStyle = "#ecf5e1"; mapContext.beginPath(); mapContext.arc(ox + info.player.x * scale, oy + info.player.y * scale, 3.5, 0, Math.PI * 2); mapContext.fill();
+  hud.querySelector("#local-map-name")!.textContent = info.name;
+}
 
 function resize() {
   const width = window.innerWidth;
@@ -532,6 +400,11 @@ function animate() {
   const dt = Math.min(clock.getDelta(), 0.05);
   monsterGame.update(dt);
   districtWorld.update();
+  grow.update(dt);
+  environment.setIndoor(!!districtWorld.getMapInfo().map.indoor);
+  environment.update(player, dt);
+  mapClock += dt;
+  if (mapClock > 0.15) { mapClock = 0; drawLocalMap(); }
 
   const input = new THREE.Vector3(
     Number(state.right) - Number(state.left) + touch.x,
@@ -541,7 +414,8 @@ function animate() {
 
   if (input.lengthSq() > 0) input.normalize();
 
-  const speed = monsterGame.inBattle ? 0 : (state.sprint || touch.sprint) ? 7.5 : 4.2;
+  const overlayOpen = !!document.querySelector(".systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden])");
+  const speed = monsterGame.inBattle || overlayOpen ? 0 : (state.sprint || touch.sprint) ? 7.5 : 4.2;
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
   blockedThisFrame = false;
   movePlayer(velocity.x * dt, velocity.z * dt);
@@ -571,7 +445,9 @@ function animate() {
 
   // Keep a comfortable third-person view. Occluding buildings become
   // translucent instead of forcing the camera into the character.
-  desiredCamera.copy(player.position).add(cameraOffset);
+  const indoor = !!districtWorld.getMapInfo().map.indoor;
+  const desiredOffset = indoor ? cameraOffset.clone().multiplyScalar(0.66) : cameraOffset;
+  desiredCamera.copy(player.position).add(desiredOffset);
   camera.position.lerp(desiredCamera, 1 - Math.pow(0.00001, dt));
   // Never allow the third-person camera to collapse into the player.
   cameraDirection.subVectors(camera.position, cameraTarget);
@@ -584,6 +460,7 @@ function animate() {
   cameraDirection.normalize();
   cameraRaycaster.set(cameraTarget, cameraDirection);
   cameraRaycaster.far = cameraDistance;
+  const blocks = districtWorld.getOccluders();
   const occluded = new Set(cameraRaycaster.intersectObjects(blocks, false).map(hit => hit.object));
   for (const building of blocks) {
     const material = building.material as THREE.MeshStandardMaterial;
@@ -593,14 +470,11 @@ function animate() {
     material.depthWrite = !hidden;
   }
 
-  moon.position.x = player.position.x - 20;
-  moon.position.z = player.position.z + 12;
-
   renderer.render(scene, camera);
 
   const fps = Math.round(1 / Math.max(dt, 0.001));
   const status = hud.querySelector(".status");
-  if (status) status.innerHTML = `${buildLabel} <span></span> ${fps} FPS · ${blockedThisFrame ? "🧱 WAND" : "FREI"} · BLOCKS ${collisionCount}`;
+  if (status) status.textContent = `${districtWorld.getMapInfo().name} · ${fps} FPS`;
 }
 
 animate();
