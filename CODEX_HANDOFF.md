@@ -1,5 +1,11 @@
 # 420mon → 420mon-3D — Codex handoff (2026-10-12)
 
+> Historical handoff below. v18 was merged through PR #25 on 2026-10-13. The
+> current v19 implementation and remaining work are documented in
+> [docs/TEST_BUILD.md](docs/TEST_BUILD.md). Its runtime Dex has 420 local original
+> sheets; its world uses the original MAPS. Old branch/count statements below
+> are preserved as history and must not drive new merge decisions.
+
 ## User's goal (must not reinterpret)
 German original: **"eine komplette Kopie nur auf 3d und 4k mit Verbesserungen nicht alles von anfang"** and **"Bau jetzt soweit alles fertig das wir eine richtige Lösung haben und nicht 100 mal das der nächste Punkt der ist"**.
 The existing 2D game is the specification. Reuse all authentic data and gameplay; port the game systems to a polished **3D, 4K-capable, touch-friendly** experience for Android and desktop. Do not rebuild from scratch, substitute fake monsters, or claim completion while important features are missing. The user wants larger integrated implementations, functioning deploys, and less repetitive planning.

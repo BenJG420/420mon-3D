@@ -20,9 +20,11 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 10. Report what is implemented, tested, missing, and deployed factually in German. Do not repeatedly ask what to work on next when the goal is clear.
 
 ## Current unfinished integration
-There are two older unmerged branches:
-- `fix/dex-single-frame-v18` (**preferred asset/cropping work**) contains 362/410 original monster sprite references and Dex single-frame cropping; **not merged nor build-tested**.
-- `fix/local-original-sprites-v17` contains an earlier partial sprite import (~281/410). V18 is further along; do not restart from v17.
-Start from updated `main` and integrate v18's non-duplicate changes carefully; then finish missing sprites. Inspect both branches before making merge decisions.
+PR #25 merged v18 on 2026-10-13. The v19 checkout completes local artwork for all
+420 runtime species, shared saves and Grow, and renders original MAPS in 3D.
+Do not re-merge the old v17/v18 branches or rely on historical sprite counts.
+Read [docs/TEST_BUILD.md](docs/TEST_BUILD.md) for current implementation, test
+channel, validation and explicit remaining gaps. The deployment workflow keeps
+the audited v18 release at the root and serves this evolving port under `/test/`.
 
 Full details, file map, acceptance criteria and project context: [CODEX_HANDOFF.md](CODEX_HANDOFF.md).
