@@ -43,3 +43,16 @@ from original `src/game/data/fish.ts` at revision
 original procedural four-pose canvas artwork. UI portraits and aquarium sprites
 select one pose. The fish are a separate catalogue, not additions to the 420 Dex
 or completed individual 3D monster meshes. No private runtime image URLs are used.
+
+
+## v26 visible clothing
+
+The procedural garment meshes in `src/game/clothing-visuals.ts` follow the
+original `public/game/sprites/player_{nude,bag,collar,jacket,vest,coat,hoodie,track,rain,overalls,lack}.png`
+sheets from BenJG420/420mon revision
+`010807da77df8468a297adf33eaf1fb5c9a61c8b`. Each reference sheet contains 4×4
+352-pixel poses. The original silhouettes and palettes guide the 3D forms,
+including the torn charcoal trashbag and cyan lacquer jacket. These are newly
+authored geometry fitted to the retained avatar, not embedded source textures.
+The inspected full sheets remain unchanged in the development reference cache;
+no additional PNG downloads or private URLs are required at runtime.

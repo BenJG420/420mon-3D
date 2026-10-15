@@ -12,6 +12,7 @@ import { getSave, saveProgress, maxHp, healLiving, type Save } from "./save";
 import { ensureIvs, ivScore, statsFor, statusName } from "./battle";
 import { getMove } from "./data/moves";
 import { spriteUrl } from "./sprites";
+import { clothingId, clothingLabel, toggleClothing } from "./clothing-state";
 const load = getSave;
 export function createGameSystems(world: DistrictTravel, openGrowShop?: () => void, achievements?: { openJournal: () => void }) {
   const host = document.createElement("div");
@@ -126,6 +127,10 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
       if (team) row("✚ TEAM HEILEN", () => { if (document.querySelector(".monster-battle:not([hidden])")) { note("Nicht während eines Kampfes."); return; } const n = healLiving(s.team); save(s); render(); note(n ? "Lebende Teammonster geheilt." : "Kein verletztes lebendes Monster im Team."); }, "Heilstation · außerhalb des Kampfes");
     } else if (tab === "bag") {
       title("INVENTAR · " + s.gold + " ₲");
+      row("ANGELEGT · " + clothingLabel(s.outfit), () => {
+        if (document.querySelector(".monster-battle:not([hidden])")) { note("Nach dem Kampf verfügbar."); return; }
+        panel.hidden = true; window.dispatchEvent(new Event("420mon-preview-clothes"));
+      }, "Charakter ansehen und vorhandene Kleidung wechseln");
       const buffs = activeFishEffects(s);
       if (buffs.length) row(buffs.map(effect => effect.label).join(" · "));
       row("◉ STANDARD-KAPSEL ×" + s.balls, undefined, "Fangversuche im Kampf");
@@ -144,12 +149,10 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
           s.inventory![id]--; save(s); render(); note(it.name + " verwendet.");
         } : it.use === "wear" ? () => {
           if (document.querySelector(".monster-battle:not([hidden])")) { note("Nach dem Kampf verfügbar."); return; }
-          s.outfit = s.outfit === id ? "nude" : id;
-          const worn = Array.isArray(s.worn) ? s.worn as string[] : [];
-          if (s.outfit !== "nude" && !worn.includes(id)) worn.push(id);
-          s.worn = worn;
-          save(s); render(); note(s.outfit === "nude" ? "Tanktop angezogen." : it.name + " angezogen. Originale Boni aktiv.");
-        } : undefined, it.desc + (it.use === "wear" ? (s.outfit === id ? " · Angelegt · Antippen: ablegen" : " · Antippen: anziehen") : ""));
+          const result = toggleClothing(s, id);
+          if (result.ok) { save(s); render(); }
+          note(result.lines.join(" "));
+        } : undefined, it.desc + (it.use === "wear" ? (clothingId(s.outfit) === id ? " · Angelegt · Antippen: ablegen" : " · Antippen: anziehen") : ""));
       }
     } else if (tab === "shop") {
       title(merchant.toUpperCase() + " · " + s.gold + " ₲");

@@ -54,7 +54,7 @@ test("the warm data stick reaches Static and his source reward cannot repeat",()
 });
 
 test("Silk calibration consumes the correct stick once, while Bolt preserves the original two-talk route",()=>{
-  const s=state({inventory:{key_silkstick:2,chip_junk:2}});
+  const s=state({outfit:"wear_trashbag",inventory:{key_silkstick:2,chip_junk:2}});
   npc.talkBolt(s);assert.equal(s.inventory.chip_junk,2);npc.talkBolt(s);assert.equal(s.inventory.chip_junk,1);assert.equal(s.quests.q1_bolt,"done");
   npc.giveSilkStick(s);assert.equal(s.catchPerm,1.08);assert.equal(s.inventory.key_silkstick,1);assert.equal(s.gold,28);
   npc.giveSilkStick(s);assert.equal(s.gold,28);assert.equal(s.inventory.key_silkstick,1);

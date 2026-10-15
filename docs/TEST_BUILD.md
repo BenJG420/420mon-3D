@@ -1,4 +1,4 @@
-# Original-world test build v25
+# Original-world test build v26
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -152,6 +152,24 @@ origin's localStorage.
   remain unearned until their own listed package or an existing imported flag;
   achievement synchronization does not pretend those mechanics are implemented.
 
+- Visible clothing package: all ten original wearable items and the Tanktop
+  base now have distinct lightweight 3D forms on the existing animated character.
+  Torn charcoal bag panels, collar/ring, lime jacket, leather vest, split long
+  coat, folded hoodie, striped tracksuit, yellow raincoat, brown work overalls
+  and cyan lacquer jacket follow the original player sheets. Source images take
+  priority where their colors differ from item prose. Sleeves and trouser details
+  follow the existing walking pivots; models are reused when changing clothes.
+- Inventory equipment changes update the world character immediately. The same
+  original ownership/toggle rules apply without consuming clothes; T removes an
+  outfit or puts on an owned trashbag. Legacy bag/clothed names are normalized,
+  valid equipped items survive a zero inventory balance, and worn history persists.
+  Existing catch/gold bonuses and all other gameplay systems remain in place.
+- The retained character editor includes owned-clothing selection, an equipped
+  label and a rotatable close-up using the existing scene/camera. On phones the
+  preview stays above the controls. Studio body, face, hair and base-color presets
+  remain saved; they do not repaint equipped original clothing. Inventory also
+  links to this preview. Shops still require their physical NPC.
+
 ## How to try it
 
 1. Start in Kapsel. Walk toward the case and press E or the on-screen interaction
@@ -205,10 +223,18 @@ origin's localStorage.
     reward status but cannot buy or pay remotely. Walking, capturing, winning,
     growing and selling continue to earn the original pages through existing systems.
 
+16. Buy an outfit from a physical clothing merchant, then equip it from Inventar.
+    The character changes immediately. Tap the equipped item again to return to
+    Tanktop, or press T to switch the original trashbag shortcut.
+17. Use Charakter or the equipped-clothing row in Inventar. Select an owned
+    outfit and rotate the close-up; on a phone the figure stays above the editor.
+    Change body/hair or base colors, then close and reload. The equipped piece,
+    its source colors, existing presets and gameplay bonuses remain consistent.
+
 ## Validation
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 100 regression tests covering 420 assets, restored source hashes, battle save
+suite has 114 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
@@ -218,14 +244,25 @@ cast settlement/refunds/recovery, fish-food buffs, the full aquarium Grow bonus,
 trainer roster/daily settlement/one-time bonuses/gates and source save compatibility,
 Nim team generation, movement, playtime cooldowns and HP0 preservation, all 420
 original achievement predicates and save adapters, paid tips, exact-once single/
-batch rewards, earning thresholds, movement/time counters and Moss-find history. `npm run build` performs TypeScript and Vite
-production checks. CI runs both commands. For v25, the first pass completed all
+batch rewards, earning thresholds, movement/time counters and Moss-find history,
+clothing ownership/legacy saves/bonuses and distinct reusable 3D garment layers,
+walking pivots and GPU resource ownership. `npm run build` performs TypeScript and Vite
+production checks. CI runs both commands. For v26, the first pass had 112/114
+successful cases; two fixture currency expectations missed legitimate Tanktop or
+quest rewards. Both were corrected, and their 17 targeted tests plus build passed
+in pass two. Its one touch smoke verified all eleven appearances, original T,
+inventory equipment, editor preview and saved HP0/XP/inventory/gold. The subsequent
+simulated walk did not record a step; closing the editor now releases hidden
+control focus explicitly. No full smoke was repeated. Pass three checks CI/Pages
+and the targeted live focus/walk plus desktop preview.
+
+Historical v25 check: the first pass completed all
 100 tests and the production build. One Chromium touch smoke confirmed Can's
 physical book, all 420 entries, pagination, hidden-secret search, a source-priced
 75-Softcash tip, a 10-Softcash single claim and batch collection, persistence
 without duplicate payment, and a read-only remote journal. HP0, XP and inventory
 were unchanged; no page errors or horizontal overflow occurred. CI/Pages and
-exact live artifact verification form the third and final pass.
+exact live artifact verification also succeeded for PR #32.
 
 Historical v24 check: the single Chromium touch smoke
 confirmed a physical daily trainer dialogue, victory, once-only bonus and same-day
@@ -261,12 +298,13 @@ implemented in v24: seven daily Kiez trainers, three one-time gate trainers and
 Nim’s roaming multi-monster duels. Multiplayer sparring remains a separate source
 network feature and is not claimed as implemented. Can package 4 is implemented
 in v25: 420 original achievement pages, paid tips, durable individual/batch reward
-claiming and a read-only menu journal. Continue with:
+claiming and a read-only menu journal. Clothing package 5 is implemented in v26:
+all ten source wearables visibly equip on the existing character and remain
+consistent with the retained editor, walking and saves. Continue with:
 
-1. Next: equipped clothes visibly rendered on the character.
-2. Radio and story economy, including Felix/Eddi automation and Ben's support
-   backend. Ben's quest acknowledgement alone does not implement payments.
-3. Individual 3D monster models following the retained source sprites.
+1. Next: radio and story economy, including Felix/Eddi automation and Ben's
+   support backend. Ben's quest acknowledgement alone does not implement payments.
+2. Individual 3D monster models following the retained source sprites.
 
 Physical Android performance and native 4K verification remain device tests;
 Chromium touch emulation does not replace those. The stable root release and the
