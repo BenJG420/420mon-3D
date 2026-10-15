@@ -148,9 +148,9 @@ origin's localStorage.
   unwrapped/tanktop play frames count the original nudeSeconds timer including
   menus and indoors, and worn clothes remain remembered. Moss harvests now
   record the original unique-find history. Synchronization occurs on load/save
-  and at the source eight-second interval. Future Felix/Eddi economy conditions
-  remain unearned until their own listed package or an existing imported flag;
-  achievement synchronization does not pretend those mechanics are implemented.
+  and at the source eight-second interval. Felix/Eddi economy conditions
+  now follow their real v27 worker/visitor actions or valid imported history;
+  achievement synchronization never invents worker activity or paid support.
 
 - Visible clothing package: all ten original wearable items and the Tanktop
   base now have distinct lightweight 3D forms on the existing animated character.
@@ -297,7 +297,19 @@ hire/puff and offline harvest, crate deposits/withdrawals and reload, Eddi's
 half-price seed/title/double-base sale, HP0/XP preservation and the closed Ben
 counter. No browser exceptions or horizontal touch overflow were observed.
 External YouTube/Spotify availability and physical Android audio/performance
-remain user/device checks. Pass 3 is CI/Pages and the live artifact check.
+remain user/device checks. Pass 3: PR CI run 38806914272 and main CI run
+38807097995 passed all 148 tests/build; Pages run 38807097955 published PR #34
+at `c4c1ab20dd91cb3cb991e2981e099c86bbeb2b90`. The live test JS is
+`index-CDtlnkfY.js` (SHA-256
+`2ef5a0a558d7a26198149b17e12a55c2fdd3d5ddcb13235ac0d5136bbb0c87a2`),
+CSS `index-DyhZO3Kd.css`. The first filename assertion expected the local
+`index-COP-fW4Z.js`; Pages supplies the public support build variable and emits
+its own filename. The targeted live check then confirmed the actual CI artifact
+names, v27 contents and both original MP3 hashes. No build or browser smoke was
+repeated. The stable root still serves `index-DWZ4yP_E.js`.
+
+The final deployment note is documentation only and uses `[skip ci]`; published
+source remains the above merge. Payment operation is still not live.
 
 Historical v26: the first pass had 112/114
 successful cases; two fixture currency expectations missed legitimate Tanktop or
@@ -367,8 +379,11 @@ but its operational payment deployment is still open. Continue with:
    set the GitHub repository variable `SUPPORT_API_URL`. The included Pages
    workflow passes this public URL to the test build. Do not call payments live
    or move this blocker to done before actual backend setup and a real receipt
-   check. No backend credentials or hosting capabilities were available in v27.
-2. Individual 3D monster models following the retained source sprites.
+   check. No backend credentials or hosting capabilities were available in v27. If they
+   remain unavailable, keep this marked blocked and proceed with the next
+   implementable package; do not rebuild the already delivered client/service.
+2. Next implementable package: individual 3D monster models following the
+   retained source sprites.
 
 Physical Android performance and native 4K verification remain device tests;
 Chromium touch emulation does not replace those. The stable root release and the
