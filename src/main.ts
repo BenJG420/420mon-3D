@@ -7,9 +7,12 @@ import { createGrowSystem } from "./game/grow";
 import { createFishingSystem } from "./game/fishing";
 import { createFishingWorld } from "./game/fish-art";
 import { fishEffectMultiplier } from "./game/fish-consumption";
-import { getSave } from "./game/save";
+import { getSave, saveProgress } from "./game/save";
 import { createHomeInteractions } from "./game/home";
 import { createRivalSystem } from "./game/rival";
+import { createAchievementBook } from "./game/achievement-book";
+import { syncAchievements } from "./game/achievements";
+import { recordAchievementActivity } from "./game/achievement-activity";
 import "./styles.css";
 import "./home.css";
 
@@ -105,9 +108,10 @@ const monsterGame = createMonsterGame(scene, player, districtWorld);
 const grow = createGrowSystem(districtWorld);
 const fishing = createFishingSystem(districtWorld);
 const fishingWorld = createFishingWorld(districtWorld);
-const home = createHomeInteractions(districtWorld, grow, fishing, monsterGame);
+const achievements = createAchievementBook(districtWorld);
+const home = createHomeInteractions(districtWorld, grow, fishing, monsterGame, achievements);
 const rival = createRivalSystem(districtWorld, home.openNim);
-createGameSystems(districtWorld, () => grow.openShop());
+createGameSystems(districtWorld, () => grow.openShop(), achievements);
 
 function movePlayer(dx: number, dz: number) {
   const steps = Math.max(1, Math.ceil(Math.hypot(dx, dz) / 0.08));
@@ -162,7 +166,7 @@ hud.innerHTML = `
   <div class="brand">420MON <span>LOWTOWN</span></div>
   <div class="status">DEIN ZUHAUSE IN 3D</div>
   <div class="hint">WASD / PFEILE · E INTERAGIEREN · SHIFT LAUFEN</div>
-  <div class="target">KAPSEL & KELLER · TESTVERSION 24</div>
+  <div class="target">KAPSEL & KELLER · TESTVERSION 25</div>
   <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
@@ -403,6 +407,7 @@ function resize() {
 window.addEventListener("resize", resize);
 resize();
 
+let achievementClock = 0;
 function animate() {
   requestAnimationFrame(animate);
   const dt = Math.min(clock.getDelta(), 0.05);
@@ -412,6 +417,7 @@ function animate() {
   grow.update(dt);
   fishing.update(dt);
   fishingWorld.update(dt);
+  achievements.update(dt);
   environment.setIndoor(!!districtWorld.getMapInfo().map.indoor);
   environment.update(player, dt);
   mapClock += dt;
@@ -425,11 +431,18 @@ function animate() {
 
   if (input.lengthSq() > 0) input.normalize();
 
-  const overlayOpen = !!document.querySelector(".systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden])");
+  const overlayOpen = !!document.querySelector(".systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden])");
   const speed = monsterGame.inBattle || overlayOpen ? 0 : ((state.sprint || touch.sprint) ? 7.5 : 4.2) * fishEffectMultiplier(getSave(), "speed");
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
   blockedThisFrame = false;
+  const beforeMove = { x: player.position.x, z: player.position.z };
   movePlayer(velocity.x * dt, velocity.z * dt);
+  recordAchievementActivity(getSave(), dt, Math.hypot(player.position.x - beforeMove.x, player.position.z - beforeMove.z) / districtWorld.getMapInfo().scale);
+  achievementClock += dt;
+  if (achievementClock >= 8) {
+    achievementClock = 0;
+    if (syncAchievements(getSave()).length) saveProgress();
+  }
   if (blockedThisFrame) collisionCount++;
 
   if (velocity.lengthSq() > 0.01) {

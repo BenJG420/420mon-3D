@@ -2,6 +2,7 @@ import { DEX } from "./data/dex";
 import { clampLevel } from "./data/progress";
 import { ensureFishState } from "./fishing-state";
 import { syncQuests } from "./quests";
+import { syncAchievements } from "./achievements";
 import { makeInst, rollIvs } from "./battle";
 import { GROW_SLOTS, POT_START, POT_MAX, BOX_MAX } from "./data/items";
 
@@ -201,6 +202,7 @@ export function getSave(): Save {
     current = normalize(legacy ?? original ?? {}, !legacy && !original, !!original);
     ensureFishState(current);
     syncQuests(current);
+    syncAchievements(current);
   }
   return current;
 }
@@ -212,6 +214,7 @@ export function saveProgress(next?: Partial<Save>): boolean {
   const unique = collection(save.collection, [...save.team, ...save.box]);
   save.collection.splice(0, save.collection.length, ...unique);
   syncQuests(save);
+  syncAchievements(save);
   try {
     const json = JSON.stringify(save);
     const previous = localStorage.getItem(SAVE_KEY);

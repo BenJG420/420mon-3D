@@ -1,7 +1,7 @@
 import { normalizePartnerForBattle, tryLevel } from "./battle";
 import { tankGrowMul } from "./data/fish";
 import { DEX } from "./data/dex";
-import { BOX_MAX, BOX_UNLOCK, GROW_SLOTS, ITEMS, POT_MAX, POT_START, POT_UNLOCK, STALL_GROW, isGrowBox } from "./data/items";
+import { BOX_MAX, BOX_UNLOCK, GROW_SLOTS, ITEMS, POT_MAX, POT_START, POT_UNLOCK, STALL_GROW, UNIQUE_FIND, isGrowBox } from "./data/items";
 import { OFFLINE_CAP, growTickSpeed, potYieldRaw, strainGrowBase, wallLeft } from "./data/grow";
 import { MAX_LEVEL, xpToNext } from "./data/progress";
 import type { GrowPot } from "./save";
@@ -19,7 +19,14 @@ export const emptyPot = (id: number): GrowPot => ({ id, seed: "", fert: "", phas
 const finite = (value: unknown, fallback: number) => typeof value === "number" && Number.isFinite(value) ? value : fallback;
 const clamp = (value: number, low: number, high: number) => Math.min(high, Math.max(low, value));
 const hasItem = (s: GrowState, id: string): boolean => typeof s.inventory[id] === "number" && Number.isFinite(s.inventory[id]) && s.inventory[id] >= 1;
-const addItem = (s: GrowState, id: string, count: number): void => { s.inventory[id] = Math.max(0, finite(s.inventory[id], 0)) + count; };
+const addItem = (s: GrowState, id: string, count: number): void => {
+  s.inventory[id] = Math.max(0, finite(s.inventory[id], 0)) + count;
+  if (count > 0 && UNIQUE_FIND.includes(id)) {
+    const found = Array.isArray(s.foundLoot) ? s.foundLoot.filter((entry): entry is string => typeof entry === "string") : [];
+    if (!found.includes(id)) found.push(id);
+    s.foundLoot = found;
+  }
+};
 
 /** Accept both the original save's pot IDs and old 3D saves without Grow fields. */
 export function ensureGrowState(s: GrowState, now = Date.now()): void {
