@@ -1,6 +1,10 @@
 # 420mon → 420mon-3D — Codex handoff (2026-10-12)
 
-> Prüfnotiz v25 (2026-10-15): Prüflauf 1 mit 100 Tests und Build bestanden; ein Chromium-Touch-Smoke bestätigt Can im Keller, 420 Seiten, Filter/Blättern, Geheimnis-Suche, 75-Softcash-Tipp, 10-Softcash-Einzel- und Sammelabholung, Reload ohne doppelte Auszahlung sowie das nur lesbare Journal außerhalb des Kellers. HP0, XP und Inventar bleiben unverändert. Dritter Prüflauf: CI/Pages und Live-Artefakte.
+> Prüfnotiz v26 (2026-10-15): Pass 1 hatte 112/114 grüne Tests; zwei Geld-Erwartungen in Fixtures ignorierten Tanktop-/Questbelohnungen und wurden berichtigt. Pass 2: beide betroffenen Dateien mit 17 Tests und Build grün; ein Touch-Smoke bestätigt alle elf Erscheinungen, T, Inventar, sichtbare Vorschau sowie HP0/XP/Inventar/Gold nach Reload. Der anschließende simulierte Lauf lieferte keinen gespeicherten Schritt; Editor-Fokus wird beim Schließen explizit freigegeben. Kein voller Smoke-Neulauf; Pass 3 prüft CI/Pages sowie gezielt Fokus/Laufen und Desktop-Vorschau live.
+>
+> Annahme Kleidung (2026-10-15): Fehlende oder unbekannte Outfit-IDs werden zur Original-Tanktop-Basis normalisiert; gültig angelegte Stücke bleiben auch ohne Restbestand erhalten. Original-Spritefarben und -Schnitte bestimmen die Kleidung, bestehende Editorfarben gelten für die Basis darunter und bleiben gespeichert.
+>
+> Prüfnotiz v25 (2026-10-15): Prüflauf 1 mit 100 Tests und Build bestanden; ein Chromium-Touch-Smoke bestätigt Can im Keller, 420 Seiten, Filter/Blättern, Geheimnis-Suche, 75-Softcash-Tipp, 10-Softcash-Einzel- und Sammelabholung, Reload ohne doppelte Auszahlung sowie das nur lesbare Journal außerhalb des Kellers. HP0, XP und Inventar bleiben unverändert. Dritter Prüflauf erfolgreich: CI/Pages und Live-Artefakte bestätigt, PR #32 veröffentlicht (bdaa013).
 >
 > Annahme Can (2026-10-15): Das Original kennt 420 Erfolge und kostenpflichtige Tipps, aber keine Auszahlung; gemäß Nutzerwunsch zahlt Can zusätzlich jeden erfüllten Erfolg einmalig mit 10 Softcash bzw. 25 bei geheimen Erfolgen aus, auch übernommene fertige Erfolge, getrennt in achClaimed gespeichert und nur persönlich im Keller abholbar.
 >
@@ -19,7 +23,7 @@
 > Latest user update (2026-10-14): mattresses revive defeated team partners, and Grow care gives real time/yield bonuses. These override the historical 0-HP and cosmetic-only rules below.
 >
 > Historical handoff below. v18 was merged through PR #25 on 2026-10-13. The
-> current v25 implementation and remaining work are documented in
+> current v26 implementation and remaining work are documented in
 > [docs/TEST_BUILD.md](docs/TEST_BUILD.md). Its runtime Dex has 420 local original
 > sheets; its world uses the original MAPS. Old branch/count statements below
 > are preserved as history and must not drive new merge decisions.

@@ -13,8 +13,11 @@ import { createRivalSystem } from "./game/rival";
 import { createAchievementBook } from "./game/achievement-book";
 import { syncAchievements } from "./game/achievements";
 import { recordAchievementActivity } from "./game/achievement-activity";
+import { clothingId, clothingLabel, CLOTHING_IDS, toggleClothing, toggleBag } from "./game/clothing-state";
+import { createClothingVisuals } from "./game/clothing-visuals";
 import "./styles.css";
 import "./home.css";
+import "./clothing.css";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root not found.");
@@ -58,7 +61,7 @@ function part(parent: THREE.Object3D, geometry: THREE.BufferGeometry, material: 
   return mesh;
 }
 const torso = part(character, new THREE.BoxGeometry(0.78, 0.88, 0.4), jacket, 0, 1.36, 0);
-part(character, new THREE.BoxGeometry(0.8, 0.09, 0.44), trim, 0, 1.76, 0);
+const shoulderTrim = part(character, new THREE.BoxGeometry(0.8, 0.09, 0.44), trim, 0, 1.76, 0);
 part(character, new THREE.CylinderGeometry(0.12, 0.12, 0.18, 10), skin, 0, 1.88, 0);
 const face = part(character, new THREE.SphereGeometry(0.28, 16, 12), skin, 0, 2.15, 0);
 const hairMaterial = new THREE.MeshStandardMaterial({ color: 0x17121e, roughness: 0.9 });
@@ -71,8 +74,8 @@ const rightArm = new THREE.Group();
 leftArm.position.set(-0.51, 1.72, 0);
 rightArm.position.set(0.51, 1.72, 0);
 character.add(leftArm, rightArm);
-part(leftArm, new THREE.BoxGeometry(0.23, 0.7, 0.28), jacket, 0, -0.35, 0);
-part(rightArm, new THREE.BoxGeometry(0.23, 0.7, 0.28), jacket, 0, -0.35, 0);
+const leftArmMesh = part(leftArm, new THREE.BoxGeometry(0.23, 0.7, 0.28), jacket, 0, -0.35, 0);
+const rightArmMesh = part(rightArm, new THREE.BoxGeometry(0.23, 0.7, 0.28), jacket, 0, -0.35, 0);
 part(leftArm, new THREE.BoxGeometry(0.2, 0.18, 0.23), skin, 0, -0.77, 0);
 part(rightArm, new THREE.BoxGeometry(0.2, 0.18, 0.23), skin, 0, -0.77, 0);
 const leftLeg = new THREE.Group();
@@ -80,13 +83,14 @@ const rightLeg = new THREE.Group();
 leftLeg.position.set(-0.2, 0.9, 0);
 rightLeg.position.set(0.2, 0.9, 0);
 character.add(leftLeg, rightLeg);
-part(leftLeg, new THREE.BoxGeometry(0.28, 0.69, 0.3), trousers, 0, -0.36, 0);
-part(rightLeg, new THREE.BoxGeometry(0.28, 0.69, 0.3), trousers, 0, -0.36, 0);
+const leftLegMesh = part(leftLeg, new THREE.BoxGeometry(0.28, 0.69, 0.3), trousers, 0, -0.36, 0);
+const rightLegMesh = part(rightLeg, new THREE.BoxGeometry(0.28, 0.69, 0.3), trousers, 0, -0.36, 0);
 const leftBoot = part(leftLeg, new THREE.BoxGeometry(0.32, 0.22, 0.47), boots, 0, -0.76, 0.07);
 const rightBoot = part(rightLeg, new THREE.BoxGeometry(0.32, 0.22, 0.47), boots, 0, -0.76, 0.07);
 scene.add(player);
 type CharacterChoice = "man" | "woman";
-let characterChoice: CharacterChoice = localStorage.getItem("420mon-character") === "woman" ? "woman" : "man";
+const storedChoice = localStorage.getItem("420mon-character");
+let characterChoice: CharacterChoice = storedChoice ? storedChoice === "woman" ? "woman" : "man" : getSave().playerGender === "f" ? "woman" : "man";
 function applyCharacterChoice(choice: CharacterChoice) {
   characterChoice = choice;
   localStorage.setItem("420mon-character", choice);
@@ -165,8 +169,8 @@ hud.className = "hud";
 hud.innerHTML = `
   <div class="brand">420MON <span>LOWTOWN</span></div>
   <div class="status">DEIN ZUHAUSE IN 3D</div>
-  <div class="hint">WASD / PFEILE · E INTERAGIEREN · SHIFT LAUFEN</div>
-  <div class="target">KAPSEL & KELLER · TESTVERSION 25</div>
+  <div class="hint">WASD / PFEILE · E INTERAGIEREN · T KLEIDUNG · SHIFT LAUFEN</div>
+  <div class="target">KAPSEL & KELLER · TESTVERSION 26</div>
   <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
@@ -206,7 +210,7 @@ type StudioOptions = {
 const studioDefaults: StudioOptions = {
   choice: characterChoice, skin: "#c4a68d", hair: "#17121e",
   hairStyle: "short", face: "classic", outfit: "street",
-  jacket: "#185d50", pants: "#171f2c", shoes: "#0a0e16",
+  jacket: "#536742", pants: "#171f2c", shoes: "#0a0e16",
   height: 1, build: 1,
 };
 function loadStudio(): StudioOptions {
@@ -230,6 +234,11 @@ const hairBack = part(character, new THREE.BoxGeometry(0.53, 0.68, 0.2), hairMat
 const mohawk = part(character, new THREE.BoxGeometry(0.14, 0.28, 0.49), hairMaterial, 0, 2.47, 0);
 const jacketAccent = part(character, new THREE.BoxGeometry(0.07, 0.7, 0.03), trim, 0, 1.37, 0.22);
 const belt = part(character, new THREE.BoxGeometry(0.61, 0.08, 0.46), trim, 0, 0.97, 0);
+const clothes = createClothingVisuals({ character, torso, leftArm, rightArm, leftLeg, rightLeg, leftArmMesh, rightArmMesh, leftLegMesh, rightLegMesh, skin, shoulderTrim, jacketAccent, belt });
+function syncClothes() {
+  clothes.apply(clothingId(getSave().outfit), studio.choice === "woman" ? .83 : 1);
+  renderer.domElement.dataset.outfit = clothes.current();
+}
 function applyStudio() {
   applyCharacterChoice(studio.choice);
   skin.color.set(studio.skin);
@@ -253,6 +262,7 @@ function applyStudio() {
   trim.color.set(studio.outfit === "runner" ? "#00eaff" : studio.outfit === "tech" ? "#ff48b5" : "#4bffc0");
   leftBoot.scale.z = studio.outfit === "tech" ? 1.2 : 1;
   rightBoot.scale.z = studio.outfit === "tech" ? 1.2 : 1;
+  syncClothes();
   localStorage.setItem("420mon-studio-v1", JSON.stringify(studio));
   updatePicker();
 }
@@ -260,15 +270,16 @@ const studioPanel = document.createElement("section");
 studioPanel.className = "studio-panel";
 studioPanel.setAttribute("aria-label", "Charaktereditor");
 studioPanel.innerHTML = `
-  <div class="studio-heading"><strong>420MON // CHARACTER STUDIO</strong><button type="button" id="studio-close" aria-label="Editor schließen">✕</button></div>
+  <div class="studio-heading"><strong>CHARAKTER & KLEIDUNG</strong><button type="button" id="studio-close" aria-label="Editor schließen">✕</button></div>
+  <div class="studio-wardrobe"><label for="wardrobe-outfit">Angelegte Kleidung</label><select id="wardrobe-outfit" aria-label="Angelegte Kleidung"></select><div><button type="button" id="wardrobe-turn">Ansicht drehen ↻</button><span id="wardrobe-status" role="status"></span></div></div>
   <div class="studio-scroll">
     <label>Charakter<select data-studio="choice"><option value="man">Mann</option><option value="woman">Frau</option></select></label>
     <label>Frisur<select data-studio="hairStyle"><option value="short">Kurz</option><option value="long">Lang / Zopf</option><option value="mohawk">Irokesenschnitt</option></select></label>
     <label>Gesichtsform<select data-studio="face"><option value="classic">Klassisch</option><option value="soft">Weich</option><option value="sharp">Markant</option></select></label>
-    <label>Kleidungsstil<select data-studio="outfit"><option value="street">Streetwear</option><option value="runner">Neon Runner</option><option value="tech">Techwear</option></select></label>
+    <label>Grundstil<select data-studio="outfit"><option value="street">Streetwear</option><option value="runner">Neon Runner</option><option value="tech">Techwear</option></select></label>
     <label>Hautfarbe<input data-studio="skin" type="color"></label>
     <label>Haarfarbe<input data-studio="hair" type="color"></label>
-    <label>Jackenfarbe<input data-studio="jacket" type="color"></label>
+    <label>Tanktopfarbe<input data-studio="jacket" type="color"></label>
     <label>Hosenfarbe<input data-studio="pants" type="color"></label>
     <label>Schuhfarbe<input data-studio="shoes" type="color"></label>
     <label>Größe<input data-studio="height" type="range" min="0.85" max="1.15" step="0.01"></label>
@@ -276,17 +287,52 @@ studioPanel.innerHTML = `
   </div>
   <div class="studio-actions"><button type="button" id="studio-reset">Zurücksetzen</button><button type="button" id="studio-done">Fertig ✓</button></div>`;
 app.appendChild(studioPanel);
+let previewTurn = 0;
+let wardrobeSignature = "";
+const wardrobeSelect = studioPanel.querySelector<HTMLSelectElement>("#wardrobe-outfit")!;
+function syncWardrobe() {
+  const s = getSave(), current = clothingId(s.outfit);
+  const ids = ["nude", ...CLOTHING_IDS.filter(id => s.inventory[id] >= 1 || current === id)];
+  const signature = [current, ...ids].join("|");
+  if (signature === wardrobeSignature) return;
+  wardrobeSignature = signature;
+  wardrobeSelect.replaceChildren();
+  for (const id of ids) {
+    const option = document.createElement("option"); option.value = id; option.textContent = clothingLabel(id); wardrobeSelect.append(option);
+  }
+  wardrobeSelect.value = current;
+  studioPanel.querySelector("#wardrobe-status")!.textContent = clothingLabel(current);
+}
+wardrobeSelect.addEventListener("change", () => {
+  if (wardrobeSelect.value === clothingId(getSave().outfit)) return;
+  const result = toggleClothing(getSave(), wardrobeSelect.value);
+  if (result.ok) saveProgress();
+  syncWardrobe(); studioPanel.querySelector("#wardrobe-status")!.textContent = result.lines.join(" ");
+});
+studioPanel.querySelector("#wardrobe-turn")!.addEventListener("click", () => { previewTurn += Math.PI / 2; });
+window.addEventListener("420mon-save-changed", () => { syncClothes(); syncWardrobe(); });
+syncWardrobe();
 const studioOpen = document.createElement("button");
 studioOpen.className = "studio-open";
 studioOpen.textContent = "✎ CHARAKTER";
 studioOpen.type = "button";
 app.appendChild(studioOpen);
 function toggleStudio(open: boolean) {
+  if (open && document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden])")) return;
   studioPanel.classList.toggle("is-open", open);
+  document.body.classList.toggle("wardrobe-preview", open);
+  if (!open && studioPanel.contains(document.activeElement)) (document.activeElement as HTMLElement)?.blur();
   studioOpen.setAttribute("aria-expanded", String(open));
   studioOpen.textContent = open ? "✎ EDITOR OFFEN" : "✎ CHARAKTER";
-  if (open) { state.forward = state.backward = state.left = state.right = state.sprint = false; }
+  if (open) { state.forward = state.backward = state.left = state.right = state.sprint = false; previewTurn = 0; syncWardrobe(); }
+  updateStudioView();
 }
+window.addEventListener("420mon-preview-clothes", () => toggleStudio(true));
+window.addEventListener("keydown", event => {
+  if (event.code === "Escape" && studioPanel.classList.contains("is-open")) toggleStudio(false);
+  if (event.code !== "KeyT" || event.repeat || event.defaultPrevented || (event.target as HTMLElement)?.closest("input,select,textarea,[contenteditable=true]") || document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden])")) return;
+  const result = toggleBag(getSave()); if (result.ok) saveProgress();
+});
 studioOpen.addEventListener("click", () => toggleStudio(!studioPanel.classList.contains("is-open")));
 studioPanel.querySelector("#studio-close")!.addEventListener("click", () => toggleStudio(false));
 studioPanel.querySelector("#studio-done")!.addEventListener("click", () => toggleStudio(false));
@@ -403,6 +449,13 @@ function resize() {
   camera.updateProjectionMatrix();
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(width, height, false);
+  updateStudioView();
+}
+function updateStudioView() {
+  if (!studioPanel.classList.contains("is-open")) { camera.clearViewOffset(); return; }
+  const width = window.innerWidth, height = window.innerHeight;
+  const mobile = width <= 680;
+  camera.setViewOffset(width, height, mobile ? 0 : studioPanel.getBoundingClientRect().width / 2, mobile ? height * .265 : 0, width, height);
 }
 window.addEventListener("resize", resize);
 resize();
@@ -470,13 +523,15 @@ function animate() {
   // Keep a comfortable third-person view. Occluding buildings become
   // translucent instead of forcing the camera into the character.
   const indoor = !!districtWorld.getMapInfo().map.indoor;
-  const desiredOffset = indoor ? cameraOffset.clone().multiplyScalar(0.66) : cameraOffset;
+  const editing = studioPanel.classList.contains("is-open");
+  const desiredOffset = editing ? new THREE.Vector3(3, 2.4, 5).applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y + previewTurn) : indoor ? cameraOffset.clone().multiplyScalar(0.66) : cameraOffset;
   desiredCamera.copy(player.position).add(desiredOffset);
   camera.position.lerp(desiredCamera, 1 - Math.pow(0.00001, dt));
   // Never allow the third-person camera to collapse into the player.
   cameraDirection.subVectors(camera.position, cameraTarget);
-  if (cameraDirection.length() < cameraMinDistance) {
-    camera.position.copy(cameraTarget).add(cameraDirection.normalize().multiplyScalar(cameraMinDistance));
+  const minCameraDistance = editing ? 4.5 : cameraMinDistance;
+  if (cameraDirection.length() < minCameraDistance) {
+    camera.position.copy(cameraTarget).add(cameraDirection.normalize().multiplyScalar(minCameraDistance));
   }
   camera.lookAt(cameraTarget);
   cameraDirection.subVectors(camera.position, cameraTarget);

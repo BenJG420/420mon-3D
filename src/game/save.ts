@@ -3,6 +3,7 @@ import { clampLevel } from "./data/progress";
 import { ensureFishState } from "./fishing-state";
 import { syncQuests } from "./quests";
 import { syncAchievements } from "./achievements";
+import { normalizeClothing } from "./clothing-state";
 import { makeInst, rollIvs } from "./battle";
 import { GROW_SLOTS, POT_START, POT_MAX, BOX_MAX } from "./data/items";
 
@@ -200,6 +201,7 @@ export function getSave(): Save {
       ?? (SAVE_KEY !== LEGACY_3D_KEY ? readSlot(LEGACY_3D_KEY) ?? readSlot(`${LEGACY_3D_KEY}_bak`) : null);
     const original = legacy ? null : readSlot(ORIGINAL_KEY) ?? readSlot(`${ORIGINAL_KEY}_bak`);
     current = normalize(legacy ?? original ?? {}, !legacy && !original, !!original);
+    normalizeClothing(current);
     ensureFishState(current);
     syncQuests(current);
     syncAchievements(current);
@@ -211,6 +213,7 @@ export function getSave(): Save {
 export function saveProgress(next?: Partial<Save>): boolean {
   const save = getSave();
   if (next && next !== save) Object.assign(save, next);
+  normalizeClothing(save);
   const unique = collection(save.collection, [...save.team, ...save.box]);
   save.collection.splice(0, save.collection.length, ...unique);
   syncQuests(save);
