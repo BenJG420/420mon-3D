@@ -21,9 +21,13 @@ type FishingActions = { openFishing: (obj: MapObj) => void; openTank: (obj: MapO
 type GrowActions = { open: (id: number) => void; sleep: () => void };
 type TrainerActions = { startTrainer: (mapId: string, id: string) => boolean; startNim: () => boolean };
 type AchievementActions = { openCan: (obj: MapObj) => void };
+type StoryActions = {
+  openFelix(obj: MapObj): void; openCrate(obj: MapObj): void; openCage(obj: MapObj): void;
+  openEddi(obj: MapObj): void; openRadio(): void; openBen(obj: MapObj): void;
+};
 
 /** Original Kapsel starter and Bolt route; all mutations use the shared save. */
-export function createHomeInteractions(world: DistrictTravel, grow: GrowActions, fishing?: FishingActions, combat?: TrainerActions, achievements?: AchievementActions) {
+export function createHomeInteractions(world: DistrictTravel, grow: GrowActions, fishing?: FishingActions, combat?: TrainerActions, achievements?: AchievementActions, story?: StoryActions) {
   const dialog = document.createElement("section");
   dialog.className = "home-dialog"; dialog.hidden = true;
   dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true");
@@ -106,6 +110,13 @@ export function createHomeInteractions(world: DistrictTravel, grow: GrowActions,
     ]);
   }
   function interact(obj: MapObj, mapId: string): boolean | void {
+    if (story) {
+      if (obj.id === "felix" || obj.id === "felix_body") { close(); story.openFelix(obj); return true; }
+      if (obj.id === "felix_crate") { close(); story.openCrate(obj); return true; }
+      if (obj.id === "felix_cage_box") { close(); story.openCage(obj); return true; }
+      if (obj.id === "eddi_body") { close(); story.openEddi(obj); return true; }
+      if (obj.id === "rajko" || obj.id === "st_desk") { close(); story.openRadio(); return true; }
+    }
     if (obj.id === "can" && achievements) {
       saveProgress(); const counts = achievementCounts(getSave());
       show("Can · Erfolge-König", [
@@ -146,7 +157,10 @@ export function createHomeInteractions(world: DistrictTravel, grow: GrowActions,
     }
     if (obj.id === "ben") {
       const s = getSave();
-      npc("Ben", [...NPC_DIALOGUES.ben.lines, "Ab Trainerstufe 10. Ben steht in Rajkos Keller. Von der Kapsel durch die Tür Keller."], Number(s.trainerLv ?? 1) >= 10 && !s.benRead ? [{ label: "Gelesen. Ich weiß, wo Ben steht.", run: () => { acknowledgeBen(getSave()); saveProgress(); npc("Ben", ["Ben: Keller, von der Kapsel aus."]); } }] : []); return;
+      npc("Ben", [...NPC_DIALOGUES.ben.lines, "Ab Trainerstufe 10. Ben steht in Rajkos Keller. Von der Kapsel durch die Tür Keller."], [
+        ...(story ? [{ label: "Kasse auf", run: () => { close(); story.openBen(obj); } }] : []),
+        ...(Number(s.trainerLv ?? 1) >= 10 && !s.benRead ? [{ label: "Gelesen. Ich weiß, wo Ben steht.", run: () => { acknowledgeBen(getSave()); saveProgress(); npc("Ben", ["Ben: Keller, von der Kapsel aus."]); } }] : []),
+      ]); return;
     }
     if (lootKind(obj) === "lamp") { const result = searchLamp(getSave(), obj, mapId); saveProgress(); show(obj.label, result.lines); return; }
     if (lootKind(obj) && lootKind(obj) !== "mattress") { const result = searchContainer(getSave(), obj, mapId); saveProgress(); show(obj.label, result.lines); return; }

@@ -25,6 +25,7 @@ export type DistrictTravel = {
   toWorld: (x: number, y: number) => THREE.Vector3;
   setInteractionHandler: (fn: (obj: MapObj, mapId: string) => boolean | void) => void;
   setRoamingNpc: (obj?: MapObj) => void;
+  setStoryNpcs: (objects: MapObj[]) => void;
 };
 
 const palette = {
@@ -100,6 +101,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   const glowing: { mesh: THREE.Mesh; phase: number }[] = [];
   const mapObjects = new Map<string, THREE.Group>();
   let roamingNpc: MapObj | undefined;
+  const storyNpcs = new Map<string, MapObj>();
 
   function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, parent: THREE.Object3D, x: number, y: number, z: number, shadow = true) {
     const m = new THREE.Mesh(geometry, material); m.position.set(x, y, z); m.castShadow = shadow; m.receiveShadow = true;
@@ -500,7 +502,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
   function disposeMap() {
     disposeOwnedObjects(root);
-    root.clear(); mapObjects.clear(); roamingNpc = undefined; occluders = []; lamps = 0; glowing.length = 0;
+    root.clear(); mapObjects.clear(); roamingNpc = undefined; storyNpcs.clear(); occluders = []; lamps = 0; glowing.length = 0;
   }
   function removeMapObject(objectId: string) {
     const group = mapObjects.get(objectId);
@@ -526,6 +528,18 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       group.userData.object = obj;
       group.position.copy(at(obj.x + obj.w / 2, obj.y + obj.h / 2));
     }
+  }
+  function setStoryNpcs(objects: MapObj[]) {
+    const present = new Set(objects.map(object => object.id));
+    for (const objectId of storyNpcs.keys()) if (!present.has(objectId)) { removeMapObject(objectId); storyNpcs.delete(objectId); }
+    for (const obj of objects) {
+      storyNpcs.set(obj.id, obj);
+      const group = mapObjects.get(obj.id);
+      if (!group) renderObject(obj);
+      else { group.userData.object = obj; group.position.copy(at(obj.x + obj.w / 2, obj.y + obj.h / 2)); }
+    }
+    // The original Gasse Felix leaves after hiring; his capsule body is separate.
+    if (getSave().felixHired && id === "alley") removeMapObject("felix");
   }
   function syncDefeatedGates() {
     const defeatedIds = getSave().deadWild;
@@ -592,7 +606,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   document.querySelector("#app")!.append(prompt);
   function overlayOpen() {
     return document.body.classList.contains("menu-open") || !!document.querySelector(
-      ".systems-panel:not([hidden]), .grow-backdrop:not([hidden]), .monster-battle:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]), .studio-panel.is-open"
+      ".systems-panel:not([hidden]), .grow-backdrop:not([hidden]), .monster-battle:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]), .story-overlay:not([hidden]), .radio-overlay:not([hidden]), .support-overlay:not([hidden]), .studio-panel.is-open"
     );
   }
   function closestInteraction() {
@@ -601,10 +615,14 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const defeatedIds = getSave().deadWild;
     for (const object of active.objs) {
       if (object.kind === "wild" || object.kind === "sign" || isDefeatedGate(object, defeatedIds)) continue;
+      if (object.id === "felix" && getSave().felixHired) continue;
       const d = distance(object, p);
       if (d < closest) { closest = d; best = object; }
     }
-    if (roamingNpc && distance(roamingNpc, p) < closest) best = roamingNpc;
+    for (const object of [...storyNpcs.values(), ...(roamingNpc ? [roamingNpc] : [])]) {
+      const d = distance(object, p);
+      if (d < closest) { closest = d; best = object; }
+    }
     return best;
   }
   function interact() {
@@ -685,6 +703,6 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       bounds: { minX: -active.w * WORLD_SCALE / 2, maxX: active.w * WORLD_SCALE / 2, minZ: -active.h * WORLD_SCALE / 2, maxZ: active.h * WORLD_SCALE / 2 }, player: sourcePosition() }),
     getRoot: () => root, toWorld: at,
     setInteractionHandler: fn => { interaction = fn; },
-    setRoamingNpc,
+    setRoamingNpc, setStoryNpcs,
   };
 }

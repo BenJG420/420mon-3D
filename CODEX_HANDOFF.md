@@ -1,5 +1,12 @@
 # 420mon → 420mon-3D — Codex handoff (2026-10-12)
 
+> v27 (2026-10-15): Radio mit beiden lokalen Original-MP3s, Felix-Kiste/Automation/Offline-Produktion und Eddis Besuche, Sterne, Handel/Titel sind integriert. Bens sichere Node/SQLite-Kasse ist geliefert, aber ohne HTTPS-Backend/Ko-fi-Zugang geschlossen; dieser Betrieb bleibt der nächste offene Punkt vor Monster-Modellen. Einrichtung: [server/support-README.md](server/support-README.md).
+>
+> Annahme v27 (2026-10-15): Die statische Testseite nutzt einen separat konfigurierbaren Zahlungsserver mit neuen ausschließlich serverseitigen Geheimnissen; der private 2D-Server, seine Schlüssel und alte Signatur-Codes werden nicht in das öffentliche 3D-Spiel übernommen.
+>
+> Prüfnotiz v27: Prüflauf 1 bestanden (148 Tests plus Test-Build). Ein Touch-Smoke bestätigt echte MP3-Wiedergabe, Sender/Stumm/Reload, URL-Schutz, Felix-Anheuern/Offline-Ernte/Kistentransfers, Eddi-Preise/Titel/Verkauf und die ohne Backend geschlossene Ben-Kasse; HP0/XP bleiben erhalten, keine Browserfehler. Prüflauf 3 ist CI/Pages samt Live-Artefakten. Kein weiterer Smoke-Lauf.
+>
+
 > Prüfnotiz v26 (2026-10-15): Pass 1 hatte 112/114 grüne Tests; zwei Geld-Erwartungen in Fixtures ignorierten Tanktop-/Questbelohnungen und wurden berichtigt. Pass 2: beide betroffenen Dateien mit 17 Tests und Build grün; ein Touch-Smoke bestätigt alle elf Erscheinungen, T, Inventar, sichtbare Vorschau sowie HP0/XP/Inventar/Gold nach Reload. Der anschließende simulierte Lauf lieferte keinen gespeicherten Schritt; Editor-Fokus wird beim Schließen explizit freigegeben. Kein voller Smoke-Neulauf. Pass 3: CI mit 114/114 Tests, Build und Pages grün, PR #33 veröffentlicht (4c450bd). Live-Fokusfreigabe und Laufen/Schrittzuwachs bestätigt; danach stoppte eine Inventar-Erwartung am legitimen Grow-Startbonus seed_ordinary:1. Desktop-Vorschau wurde nicht mehr erreicht und bleibt Nutzerprüfung. Keine vierte Prüfung; abschließende Notiz ist eine reine Dokumentationsänderung.
 >
 > Annahme Kleidung (2026-10-15): Fehlende oder unbekannte Outfit-IDs werden zur Original-Tanktop-Basis normalisiert; gültig angelegte Stücke bleiben auch ohne Restbestand erhalten. Original-Spritefarben und -Schnitte bestimmen die Kleidung, bestehende Editorfarben gelten für die Basis darunter und bleiben gespeichert.
@@ -23,7 +30,7 @@
 > Latest user update (2026-10-14): mattresses revive defeated team partners, and Grow care gives real time/yield bonuses. These override the historical 0-HP and cosmetic-only rules below.
 >
 > Historical handoff below. v18 was merged through PR #25 on 2026-10-13. The
-> current v26 implementation and remaining work are documented in
+> current v27 implementation and remaining work are documented in
 > [docs/TEST_BUILD.md](docs/TEST_BUILD.md). Its runtime Dex has 420 local original
 > sheets; its world uses the original MAPS. Old branch/count statements below
 > are preserved as history and must not drive new merge decisions.

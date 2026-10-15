@@ -30,6 +30,8 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build
+        env:
+          VITE_SUPPORT_API_URL: ${{ vars.SUPPORT_API_URL }}
         run: npm run build -- --base=/420mon-3D/test/ --outDir=dist-test
       # Keep the audited v18 release at the root while the original-world port
       # is tested under /test/. Promote the port in a later explicit release.

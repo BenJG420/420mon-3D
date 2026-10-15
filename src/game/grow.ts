@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import { BOX_UNLOCK, GROW_SLOTS, ITEMS, POT_UNLOCK, STALL_GROW, STRAIN_LABEL, isGrowBox, strainOfItem } from "./data/items";
 import { formatGrowLeft, potYieldRaw, strainGrowBase, wallLeft } from "./data/grow";
-import { advanceGrow, buyGrowItem, buyNextSlot, ensureGrowState, growRemaining, harvestPot, plantPot, recordGrowCare, growCareBonus, previewGrowHarvest, sellGrowBud, sleepGrow, slotOpen } from "./grow-state";
+import { buyGrowItem, buyNextSlot, ensureGrowState, growRemaining, harvestPot, plantPot, recordGrowCare, growCareBonus, previewGrowHarvest, sellGrowBud, sleepGrow, slotOpen } from "./grow-state";
+import { advanceStoryGrow as advanceGrow } from "./story-grow";
 import { getSave, saveProgress, type GrowPot } from "./save";
 import "./grow.css";
 
@@ -38,8 +39,9 @@ export function createGrowSystem(world: GrowWorld) {
   let selected = 0, tab = "plants", shopAccess = false, lastTick = Date.now(), lastSave = Date.now(), ownSave = false;
   let lastFocus: HTMLElement | null = null;
   let seedSelection = "", fertSelection = "";
-  let care: { round: number; hits: number; started: number; target: number; position: number } | null = null;
+  let care: { round: number; hits: number; started: number; target: number; position: number; plant: GrowPot } | null = null;
   let splashIndex = -1, splashUntil = 0;
+  let lastPhases = state.pots.map(p => `${p.phase}:${p.seed}:${p.byFelix}:${p.eddiBoost}`).join();
   const plants = new THREE.Group(); plants.name = "original-grow-plants";
   const visuals: PlantVisual[] = [];
   const leafMat = new THREE.MeshStandardMaterial({ color: 0x43a259, roughness: .65, side: THREE.DoubleSide });
@@ -124,7 +126,7 @@ export function createGrowSystem(world: GrowWorld) {
       <div class="grow-plant-art ${pot.phase}"><div class="grow-illustrated-plant"><span>❧</span><span>❧</span><span>❧</span></div><div class="grow-illustrated-pot"></div><span class="grow-stage-tag">${unlocked ? phaseLabel[pot.phase] : "Noch verschlossen"}</span></div>
       ${!unlocked ? `<p>Mehr Platz für deine nächsten Cuts. Neue Plätze schaltest du beim Grow-Händler auf dem Markt frei.</p>${shopAccess ? '<button class="grow-primary" data-action="shop">Plätze freischalten</button>' : ''}` : pot.phase === "empty" ? `<label class="grow-field">Samen<select id="grow-seed" ${!available.length ? "disabled" : ""}>${available.length ? available.map(id => `<option value="${safe(id)}" ${id === seedSelection ? "selected" : ""}>${safe(ITEMS[id].name)} · ${state.inventory[id]}×</option>`).join("") : '<option>Keine Samen im Inventar</option>'}</select></label>
       <label class="grow-field">Dünger <small>optional</small><select id="grow-fert"><option value="">Ohne Dünger</option>${Object.keys(state.inventory).filter(id => ITEMS[id]?.cat === "fert" && state.inventory[id] > 0).map(id => `<option value="${safe(id)}" ${id === fertSelection ? "selected" : ""}>${safe(ITEMS[id].name)} · ${state.inventory[id]}×</option>`).join("")}</select></label>
-      <div class="grow-facts"><span>${strain ? STRAIN_LABEL[strain.kind] : "—"}</span><span>${seedSelection ? formatGrowLeft(wallLeft(strainGrowBase(seedSelection), fertSelection, false, state.schnittTitle, state.eddiIn)) : "—"}</span><span>${result.buds} Buds${extraBuds ? ` · +${extraBuds} Pflege` : ""}</span></div><button class="grow-primary" data-action="plant" ${!available.length ? "disabled" : ""}>Samen einpflanzen</button>${shopAccess ? '<button class="grow-secondary" data-action="shop">Samen & Dünger kaufen</button>' : '<small class="grow-care-info">Samen und Dünger bekommst du beim Grow-Händler auf dem Markt.</small>'}` : `<h4>${safe(strain?.seedName ?? ITEMS[pot.seed]?.name ?? "Pflanze")}</h4><div class="grow-facts"><span>${strain ? STRAIN_LABEL[strain.kind] : "Hybrid"}</span><span>${result.buds} Buds${extraBuds ? ` · +${extraBuds} Pflege` : ""}</span><span>${pot.fert ? safe(ITEMS[pot.fert].name) : "Ohne Dünger"}</span></div>
+      <div class="grow-facts"><span>${strain ? STRAIN_LABEL[strain.kind] : "—"}</span><span>${seedSelection ? formatGrowLeft(wallLeft(strainGrowBase(seedSelection), fertSelection, false, state.schnittTitle, state.eddiIn)) : "—"}</span><span>${result.buds} Buds${extraBuds ? ` · +${extraBuds} Pflege` : ""}</span></div><button class="grow-primary" data-action="plant" ${!available.length ? "disabled" : ""}>Samen einpflanzen</button>${shopAccess ? '<button class="grow-secondary" data-action="shop">Samen & Dünger kaufen</button>' : '<small class="grow-care-info">Samen und Dünger bekommst du beim Grow-Händler auf dem Markt.</small>'}` : `<small class="grow-care-info">${pot.byFelix ? "Felix kümmert sich um diese Pflanze. " : ""}${pot.eddiBoost ? "★ Eddis Blick: dreifacher Grundertrag." : ""}</small><h4>${safe(strain?.seedName ?? ITEMS[pot.seed]?.name ?? "Pflanze")}</h4><div class="grow-facts"><span>${strain ? STRAIN_LABEL[strain.kind] : "Hybrid"}</span><span>${result.buds} Buds${extraBuds ? ` · +${extraBuds} Pflege` : ""}</span><span>${pot.fert ? safe(ITEMS[pot.fert].name) : "Ohne Dünger"}</span></div>
       <div class="grow-bonus-card" data-care-bonus><span class="grow-eyebrow">PFLEGE LOHNT SICH</span><b>${bonus ? `−${bonus}% Restzeit · +${bonus}% Ertrag` : "Guter Rhythmus, größere Ernte"}</b><div class="grow-bonus-levels">${[1,2,3].map(n => `<span class="${(pot.careRewardHits ?? 0) >= n ? "earned" : ""}"><strong>${n}/3</strong> −${n * 10}% Zeit<br>+${n * 10}% Ertrag</span>`).join("")}</div><small>Dein bester Durchgang zählt für diese Pflanze. Bonus-Buds werden aufgerundet. Ein besseres Ergebnis verbessert den Bonus.</small></div>
       <div class="grow-progress"><i data-progress="${selected}" style="width:${progress(pot) * 100}%"></i></div><p class="grow-countdown" data-timer="${selected}">${pot.phase === "ready" ? "Die Schere wartet. Deine Pflanze ist reif." : `Noch ${formatGrowLeft(growRemaining(state, pot))} bis zur Ernte.`}</p>
       ${pot.phase === "ready" ? '<button class="grow-primary" data-action="harvest">✂ Jetzt ernten</button>' : `<button class="grow-primary" data-action="care">◉ Gieß-Rhythmus spielen</button><small class="grow-care-info">Freiwillige Pflege · ${pot.careRewardHits ? `Bonus: ${pot.careRewardHits}/3 Treffer · ` : ""}Wachstum läuft auch ohne Minispiel weiter.</small>`}`}
@@ -162,11 +164,13 @@ export function createGrowSystem(world: GrowWorld) {
   function startCare() {
     sync();
     if (["empty", "ready"].includes(state.pots[selected].phase)) { render(); return; }
-    care = { round: 0, hits: 0, started: performance.now(), target: .35 + Math.random() * .3, position: 1 }; render();
+    care = { round: 0, hits: 0, started: performance.now(), target: .35 + Math.random() * .3, position: 1, plant: state.pots[selected] }; render();
   }
   const markerPosition = (now: number) => care ? Math.abs(1 - ((now - care.started) / 950) % 2) : 0;
   function tapWater() {
     if (!care) return;
+    sync();
+    if (state.pots[selected] !== care.plant) { care = null; render(); note("Felix hat diese Pflanze bereits geerntet. Die nächste Runde pflegt eine neue Pflanze."); return; }
     // Score the position actually shown to the player, even on a slow device.
     if (Math.abs(care.position - care.target) <= .12) care.hits++;
     splashIndex = selected; splashUntil = performance.now() + 3200;
@@ -239,9 +243,11 @@ export function createGrowSystem(world: GrowWorld) {
     isOpen: () => !backdrop.hidden,
     update(_dt: number, time = performance.now() / 1000) {
       const now = Date.now();
+      advanceGrow(state, now);
+      if (care && state.pots[selected] !== care.plant) { care = null; render(); note("Felix hat diese Pflanze bereits geerntet. Ihr bisheriger Pflegebonus wurde bei der Ernte berücksichtigt."); }
       if (now - lastTick >= 500) {
-        const oldPhases = state.pots.map(p => p.phase).join(); advanceGrow(state); lastTick = now;
-        if (state.pots.map(p => p.phase).join() !== oldPhases && !backdrop.hidden && !care) render();
+        const oldPhases = lastPhases; lastPhases = state.pots.map(p => `${p.phase}:${p.seed}:${p.byFelix}:${p.eddiBoost}`).join(); lastTick = now;
+        if (state.pots.map(p => `${p.phase}:${p.seed}:${p.byFelix}:${p.eddiBoost}`).join() !== oldPhases && !backdrop.hidden && !care) render();
         if (!backdrop.hidden && !care && tab === "plants") {
           content.querySelectorAll<HTMLElement>("[data-progress]").forEach(el => { el.style.width = `${progress(state.pots[Number(el.dataset.progress)]) * 100}%`; });
           content.querySelectorAll<HTMLElement>("[data-timer]").forEach(el => { const p = state.pots[Number(el.dataset.timer)]; el.textContent = p.phase === "ready" ? "Die Schere wartet. Deine Pflanze ist reif." : `Noch ${formatGrowLeft(growRemaining(state, p))} bis zur Ernte.`; });
@@ -258,7 +264,7 @@ export function createGrowSystem(world: GrowWorld) {
         const scale = (.17 + fraction * .83) * (isGrowBox(v.index) ? 1.18 : 1);
         v.crown.scale.setScalar(scale); v.crown.rotation.z = Math.sin(time * 1.3 + v.index) * .025;
         v.crown.children.forEach(c => { if (c.userData.bud) c.visible = p.phase === "bloom" || p.phase === "ready"; });
-        v.halo.visible = p.phase === "ready"; if (v.halo.visible) v.halo.scale.setScalar(1 + Math.sin(time * 2 + v.index) * .06);
+        v.halo.visible = p.phase === "ready" || !!p.eddiBoost; if (v.halo.visible) v.halo.scale.setScalar(1 + Math.sin(time * 2 + v.index) * .06);
         v.drop.visible = splashIndex === v.index && performance.now() < splashUntil;
         if (v.drop.visible) v.drop.children.forEach(c => { const t = (time * .8 + c.userData.phase) % 1; c.position.set(Math.sin(c.userData.phase * 80) * .4, 1.9 - t * 1.7, Math.cos(c.userData.phase * 80) * .4); });
       }

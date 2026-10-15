@@ -9,7 +9,7 @@ export function createRivalSystem(world: DistrictTravel, talk: () => void) {
     update(dt: number) {
       const p = world.getMapInfo().player;
       const paused = document.body.classList.contains("menu-open") || !!document.querySelector(
-        ".systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.monster-battle:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.studio-panel.is-open"
+        ".systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.monster-battle:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.studio-panel.is-open"
       );
       const challenge = tickNim(saved, roam, dt, {
         paused, playerX: p.x, playerY: p.y,
