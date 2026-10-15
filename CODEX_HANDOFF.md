@@ -1,6 +1,10 @@
 # 420mon → 420mon-3D — Codex handoff (2026-10-12)
 
-> Prüfnotiz v23 (2026-10-15): Automatik 65 Tests + Build bestanden; ein Touch-Smoke bestätigt Angelstelle, Timing-Fang, Essen, Fehlwurf-/Abbruch-Erstattung und Reload. Die Becken-Testposition (251,72) wählte das nähere originale pad_kai; das Aquarium von rechts bei (280,68) ansprechen. Keine Wiederholung des ganzen Smoke-Laufs; Becken wird im dritten Deploy-Check geprüft.
+> Prüfnotiz v24 (2026-10-15): Prüflauf 1 mit 83 Tests und Build bestanden; ein Touch-Smoke bestätigt Tagestrainer/Sieg/Bonus/Sperre, Tor-Trainer-Fang und Reload, Nims drei Gegner ohne Fang sowie Niederlage mit −8/Kapsel und HP0 bis zur physischen Matratze. Dritter Prüflauf: CI/Pages-Veröffentlichung.
+>
+> Annahme Trainer (2026-10-15): Die fangbaren Standard-Trainer und Nims fanggesperrte Team-Duelle folgen dem 2D-Laufzeitcode; eine Trainer-Niederlage kostet wie dort 8 Softcash und führt zur Kapsel, belebt aber gemäß Nutzerregel niemanden automatisch wieder.
+>
+> Prüfnotiz v23 (2026-10-15): Automatik 65 Tests + Build bestanden; ein Touch-Smoke bestätigt Angelstelle, Timing-Fang, Essen, Fehlwurf-/Abbruch-Erstattung und Reload. Die Becken-Testposition (251,72) wählte das nähere originale pad_kai; das Aquarium von rechts bei (280,68) ansprechen. Keine Wiederholung des ganzen Smoke-Laufs; der abschließende Live-Deploy-Check bestätigte das physische Becken, 42 Arten und Touch-Layout ohne Browserfehler (PR #30).
 >
 > Annahme Angeln (2026-10-15): Fehlwurf, ursprüngliches Müll-Ergebnis, Abbruch und unterbrochener Wurf erstatten genau denselben verbrauchten Samen einmalig; Original-Ködergewichte, 2–8 s Wartezeit und ein erfolgreicher Haken pro Fisch bleiben erhalten (die ungenutzte Mehrtreffer-Tabelle wird nicht aktiviert).
 >
@@ -11,7 +15,7 @@
 > Latest user update (2026-10-14): mattresses revive defeated team partners, and Grow care gives real time/yield bonuses. These override the historical 0-HP and cosmetic-only rules below.
 >
 > Historical handoff below. v18 was merged through PR #25 on 2026-10-13. The
-> current v23 implementation and remaining work are documented in
+> current v24 implementation and remaining work are documented in
 > [docs/TEST_BUILD.md](docs/TEST_BUILD.md). Its runtime Dex has 420 local original
 > sheets; its world uses the original MAPS. Old branch/count statements below
 > are preserved as history and must not drive new merge decisions.

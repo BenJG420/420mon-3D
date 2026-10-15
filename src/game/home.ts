@@ -12,19 +12,26 @@ import { setQuestState } from "./quests";
 import { liveWindow, staticRumor } from "./data/legend";
 import { speciesById } from "./data/dex";
 import { spriteUrl } from "./sprites";
+import { trainerById, trainerPages, trainerStatus } from "./trainers";
+import { nimDialogue, declineNim } from "./nim";
 
 type FishingActions = { openFishing: (obj: MapObj) => void; openTank: (obj: MapObj) => void };
 
 type GrowActions = { open: (id: number) => void; sleep: () => void };
+type TrainerActions = { startTrainer: (mapId: string, id: string) => boolean; startNim: () => boolean };
 
 /** Original Kapsel starter and Bolt route; all mutations use the shared save. */
-export function createHomeInteractions(world: DistrictTravel, grow: GrowActions, fishing?: FishingActions) {
+export function createHomeInteractions(world: DistrictTravel, grow: GrowActions, fishing?: FishingActions, combat?: TrainerActions) {
   const dialog = document.createElement("section");
   dialog.className = "home-dialog"; dialog.hidden = true;
   dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true");
   dialog.innerHTML = `<div class="home-dialog-card"><header><span class="home-eyebrow">LOWTOWN</span><button class="home-close" aria-label="Schließen">✕</button></header><h2></h2><div class="home-copy"></div><div class="home-actions"></div></div>`;
   document.querySelector("#app")!.append(dialog);
-  const close = () => { dialog.hidden = true; };
+  let nimTalking = false;
+  const close = () => {
+    dialog.hidden = true;
+    if (nimTalking) { nimTalking = false; declineNim(getSave()); saveProgress(); }
+  };
   dialog.querySelector(".home-close")!.addEventListener("click", close);
   window.addEventListener("keydown", event => { if (event.code === "Escape") close(); });
   function show(title: string, lines: string[], actions: { label: string; run: () => void; image?: string }[] = []) {
@@ -74,7 +81,31 @@ export function createHomeInteractions(world: DistrictTravel, grow: GrowActions,
     if (!calibrated && s.inventory.key_silkstick >= 1) actions.unshift({ label: "Stick geben", run: () => { const result = giveSilkStick(getSave()); saveProgress(); npc("Silk", result, [{ label: "Shop öffnen", run: () => { close(); world.shopAt(obj); } }]); } });
     npc("Silk", lines, actions);
   }
+  function trainer(obj: MapObj, mapId: string) {
+    const definition = trainerById(mapId, obj.id);
+    if (!definition || !combat) return;
+    const s = getSave(), ready = trainerStatus(s, definition) === "ready";
+    const standing = s.team.some(mon => mon.id && DEX[mon.id] && mon.hp > 0);
+    const lines = [...trainerPages(s, definition)];
+    if (ready) lines.push(`${speciesById(definition.mon).name} · Lv.${definition.level} · ${definition.daily ? "Jeden Tag erneut herausforderbar." : "Einmalige Herausforderung."}`, "Sieg oder Fang: zusätzlicher Trainer-Bonus. Fliehen bleibt möglich.");
+    if (ready && !standing) lines.push("Dein Team steht nicht mehr. Benutze eine Matratze, bevor du kämpfst.");
+    show(definition.label, lines, [
+      ...(ready && standing ? [{ label: "Kämpfen", image: spriteUrl(speciesById(definition.mon).sprite), run: () => { close(); combat.startTrainer(mapId, obj.id); } }] : []),
+      { label: "Gehen", run: close },
+    ]);
+  }
+  function openNim() {
+    if (!combat || world.current() !== getSave().rivalMap || !dialog.hidden) return;
+    const s = getSave(); nimTalking = true;
+    const standing = s.team.some(mon => mon.id && DEX[mon.id] && mon.hp > 0);
+    show("Nim · Rivale", nimDialogue(s), [
+      ...(standing ? [{ label: "Duell", run: () => { nimTalking = false; close(); combat.startNim(); } }] : []),
+      { label: "Später", run: close },
+    ]);
+  }
   function interact(obj: MapObj, mapId: string): boolean | void {
+    if (obj.id === "nim_body") { openNim(); return; }
+    if (obj.kind === "npc" && obj.mon) { trainer(obj, mapId); return; }
     if (obj.id.startsWith("kai_cast") && fishing) { close(); fishing.openFishing(obj); return; }
     if (obj.id === "tank" && fishing) { close(); fishing.openTank(obj); return; }
     if (obj.kind === "pot") { grow.open(obj.pot ?? 0); return; }
@@ -112,5 +143,5 @@ export function createHomeInteractions(world: DistrictTravel, grow: GrowActions,
     if (obj.kind === "npc" || obj.kind === "sign" || obj.kind === "prop") show(obj.label, [obj.label + " · " + world.getMapInfo().name]);
   }
   world.setInteractionHandler(interact);
-  return { show, close };
+  return { show, close, openNim };
 }

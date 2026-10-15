@@ -9,6 +9,7 @@ import { createFishingWorld } from "./game/fish-art";
 import { fishEffectMultiplier } from "./game/fish-consumption";
 import { getSave } from "./game/save";
 import { createHomeInteractions } from "./game/home";
+import { createRivalSystem } from "./game/rival";
 import "./styles.css";
 import "./home.css";
 
@@ -104,7 +105,8 @@ const monsterGame = createMonsterGame(scene, player, districtWorld);
 const grow = createGrowSystem(districtWorld);
 const fishing = createFishingSystem(districtWorld);
 const fishingWorld = createFishingWorld(districtWorld);
-createHomeInteractions(districtWorld, grow, fishing);
+const home = createHomeInteractions(districtWorld, grow, fishing, monsterGame);
+const rival = createRivalSystem(districtWorld, home.openNim);
 createGameSystems(districtWorld, () => grow.openShop());
 
 function movePlayer(dx: number, dz: number) {
@@ -160,7 +162,7 @@ hud.innerHTML = `
   <div class="brand">420MON <span>LOWTOWN</span></div>
   <div class="status">DEIN ZUHAUSE IN 3D</div>
   <div class="hint">WASD / PFEILE · E INTERAGIEREN · SHIFT LAUFEN</div>
-  <div class="target">KAPSEL & KELLER · TESTVERSION 23</div>
+  <div class="target">KAPSEL & KELLER · TESTVERSION 24</div>
   <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
@@ -405,6 +407,7 @@ function animate() {
   requestAnimationFrame(animate);
   const dt = Math.min(clock.getDelta(), 0.05);
   monsterGame.update(dt);
+  rival.update(dt);
   districtWorld.update();
   grow.update(dt);
   fishing.update(dt);

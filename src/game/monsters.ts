@@ -12,6 +12,8 @@ import { spriteUrl } from "./sprites";
 import { makeInst, toFighter, turnSpe, execMove, tickStatus, pickEnemyMove, xpFor, tryLevel, tryTrainerLevel, catchChance, statusName, ivScore, type Fighter } from "./battle";
 import { battleXpBoost, battleCatchBoost, battleGoldReward } from "./battle-rewards";
 import { normalizePartnerForBattle, type BattleInstance } from "./battle-instance";
+import { createTrainerAttempt, settleTrainer, type TrainerAttempt } from "./trainers";
+import { beginNimDuel } from "./nim";
 
 type Species = { id?: string; name: string; color: number; glow: number; maxHp: number; catchRate: number };
 type WildMon = { inst: BattleInstance; species: Species; mesh: THREE.Group; hp: number; alive: boolean; phase: number; level: number; respawn: number; pool: EncMon[]; spot?: string; respawnAllowed: boolean };
@@ -96,7 +98,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
     <button type="button" class="monster-interact" id="monster-interact" hidden>⚡ BEGEGNEN</button>
     <div class="monster-battle" id="monster-battle" role="dialog" aria-modal="true" aria-labelledby="monster-battle-title" hidden>
       <section class="monster-battle-card">
-        <header class="monster-battle-heading"><div><span>LOWTOWN · WILDE BEGEGNUNG</span><strong id="monster-battle-title">DEIN NÄCHSTER ZUG</strong></div><span id="monster-turn">RUNDE 1</span></header>
+        <header class="monster-battle-heading"><div><span id="monster-battle-kind">LOWTOWN · WILDE BEGEGNUNG</span><strong id="monster-battle-title">DEIN NÄCHSTER ZUG</strong></div><span id="monster-turn">RUNDE 1</span></header>
         <div class="battle-fighters">
           <div class="battle-fighter battle-ally"><div class="battle-portrait dex-sprite-frame" id="monster-ally-art"></div><div><div id="monster-team-status"></div><div class="monster-hp"><div id="monster-ally-hp-bar"></div></div><small id="monster-ally-detail"></small></div></div>
           <div class="battle-fighter battle-enemy"><div class="battle-portrait dex-sprite-frame" id="monster-enemy-art"></div><div><div id="monster-name"></div><div class="monster-hp"><div id="monster-hp-bar"></div></div><small id="monster-enemy-detail"></small></div></div>
@@ -143,6 +145,11 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
   let phase: "choose" | "win" | "caught" | "lose" = "choose";
   let turn = 1;
   let selectedChip = "legacy_capsule";
+  let trainerAttempt: TrainerAttempt | null = null;
+  let challenge: "trainer" | "nim" | null = null;
+  let challengeMon: WildMon | null = null;
+  let enemyQueue: BattleInstance[] = [];
+  let duelCount = 0;
   const log: string[] = [];
   const moveButtons = ["monster-attack", "monster-special", "monster-move-2", "monster-move-3"];
   const escape = (value: string) => value.replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[c]!);
@@ -182,12 +189,37 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
     saved.wins++; saved.gold += gold;
     saved.stats.battlesWon = Math.max(saved.wins, finite(saved.stats.battlesWon) + 1);
     saved.stats.goldEarned = finite(saved.stats.goldEarned) + gold;
+    if (saved.stats.goldEarned >= 1000) grant("gold_1000");
     saved.quests.q4_fight = "done"; saved.quest.q4_fight = true;
     grant("first_fight"); if (saved.stats.battlesWon >= 10) grant("fight_10");
     for (const lv of [50, 100, 420]) if (Math.max(finite(saved.trainerLv), ...saved.team.map(mon => mon.level)) >= lv) grant(`lv_${lv}`);
     retireWild(active); phase = "win";
     addLog(`${active.species.name} besiegt. +${amount} EP · +${gold} Softcash.`, ...levels);
+    if (trainerAttempt) addLog(...settleTrainer(saved, trainerAttempt, "win").lines);
     if (levels.length) spawnAlly();
+  }
+  function advanceDuel() {
+    if (challenge !== "nim" || !enemyQueue.length || !active || !enemy || !fighter) return false;
+    const amount = Math.max(1, Math.round(xpFor(enemy, fighter.inst.level) * battleXpBoost(saved)));
+    const gone = active.species.name, levels: string[] = [];
+    if (fighter.inst.hp > 0) { fighter.inst.xp += amount; levels.push(...tryLevel(fighter.inst)); }
+    syncFighters();
+    const trainer = tryTrainerLevel(finite(saved.trainerLv, 1), finite(saved.trainerXp) + amount);
+    saved.trainerLv = trainer.lv; saved.trainerXp = trainer.xp; levels.push(...trainer.lines);
+    const next = enemyQueue.shift()!;
+    enemy = toFighter(next, false);
+    const sp = speciesById(next.id), tint = new THREE.Color(ELEMENT_COLOR[sp.types[0]]).getHex();
+    active.inst = next; active.hp = next.hp; active.level = next.level;
+    active.species = { id: sp.id, name: sp.name, color: tint, glow: tint, maxHp: next.hpMax, catchRate: sp.catch / 255 };
+    setMonsterArt(active.mesh, sp.id, tint);
+    addLog(`${gone} k.o. +${amount} EP.`, `Nim: ${sp.name} (Lv.${next.level}) kommt rein. Noch ${enemyQueue.length + 1}.`, ...levels);
+    if (fighter.inst.hp <= 0) {
+      const replacement = saved.team.find(available);
+      if (replacement) { ally = replacement; fighter = toFighter(normalizePartnerForBattle(replacement), false); }
+      else { phase = "lose"; addLog("Dein Team ist am Ende. Besiegte Partner brauchen eine Matratze."); }
+    }
+    spawnAlly();
+    return true;
   }
   const updateProgress = () => {
     get("monster-count").textContent = `GEFANGEN ${saved.captures} · SIEGE ${saved.wins} · TRAINER LV ${finite(saved.trainerLv, 1)}`;
@@ -224,6 +256,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
   function updateBattle() {
     if (!active || !enemy || !fighter) return;
     const choosing = phase === "choose";
+    get("monster-battle-kind").textContent = challenge === "nim" ? `NIM · DUELL ${duelCount - enemyQueue.length}/${duelCount}` : trainerAttempt ? `${trainerAttempt.trainer.label.toUpperCase()} · TRAINERKAMPF` : "LOWTOWN · WILDE BEGEGNUNG";
     get("monster-battle-title").textContent = choosing ? "DEIN NÄCHSTER ZUG" : phase === "win" ? "SIEG" : phase === "caught" ? "GEFANGEN" : "TEAM BESIEGT";
     get("monster-turn").textContent = `RUNDE ${turn}`;
     const mine = fighter.inst, foe = enemy.inst;
@@ -252,21 +285,31 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
     chipSelect.value = selectedChip; chipSelect.disabled = !choosing || !options.length;
     const chance = selectedChip ? catchChance(enemy, selectedChip === "legacy_capsule" ? "chip_junk" : selectedChip, battleCatchBoost(saved)) : 0;
     get("monster-chance").textContent = `${Math.round(chance * 100)}% Fangchance`;
-    (get("monster-catch") as HTMLButtonElement).disabled = !choosing || !options.length || foe.hp <= 0;
+    (get("monster-catch") as HTMLButtonElement).disabled = challenge === "nim" || !choosing || !options.length || foe.hp <= 0;
+    get("monster-catch").textContent = challenge === "nim" ? "◉ KEIN FANG" : "◉ FANGEN";
     (get("monster-party") as HTMLButtonElement).disabled = !choosing || !saved.team.some(mon => mon !== ally && available(mon));
     (get("monster-items") as HTMLButtonElement).disabled = !choosing;
     get("monster-run").textContent = choosing ? "↩ FLIEHEN" : "✓ WEITER";
-    get("monster-moves").hidden = !choosing; get("monster-catch-choice").hidden = !choosing;
-    get("monster-battle-help").textContent = choosing ? "Tempo bestimmt die Reihenfolge · Teamwechsel kostet einen Zug" : phase === "lose" ? "Besiegte Partner brauchen eine Matratze. Deine Pflanzen wachsen während des Kampfes weiter." : "Fortschritt gespeichert · Weiter zurück nach Lowtown";
+    get("monster-moves").hidden = !choosing; get("monster-catch-choice").hidden = !choosing || challenge === "nim";
+    get("monster-battle-help").textContent = choosing ? challenge === "nim" ? "Nims Team bleibt bei Nim · Teamwechsel kostet einen Zug" : "Tempo bestimmt die Reihenfolge · Teamwechsel kostet einen Zug" : phase === "lose" ? challenge ? "Weiter: zurück zur Kapsel · −8 Softcash · Matratze zum Wiederbeleben benutzen." : "Besiegte Partner brauchen eine Matratze. Deine Pflanzen wachsen während des Kampfes weiter." : "Fortschritt gespeichert · Weiter zurück nach Lowtown";
   }
   function finish() {
+    const lostChallenge = !!challenge && phase === "lose";
+    if (trainerAttempt) settleTrainer(saved, trainerAttempt, phase === "choose" ? "flee" : phase);
     syncFighters();
     active = null;
     ally = null; fighter = null; enemy = null;
+    trainerAttempt = null; challenge = null; enemyQueue = []; duelCount = 0;
+    if (challengeMon) { monsterRoot.remove(challengeMon.mesh); disposeMonsterArt(challengeMon.mesh); challengeMon = null; }
     if (allyModel) { monsterRoot.remove(allyModel); disposeMonsterArt(allyModel); allyModel = null; }
     battle.hidden = true;
     cooldown = 1.5;
     updateProgress();
+    if (lostChallenge) {
+      saved.gold = Math.max(0, saved.gold - 8);
+      world?.travel("capsule");
+      notify("ZURÜCK AUF DER MATTE · −8 SOFTCASH. BENUTZE DIE MATRATZE ZUM WIEDERBELEBEN.");
+    }
     save();
   }
   function spawnAlly() {
@@ -280,17 +323,47 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
     monsterRoot.add(root);
     allyModel = root;
   }
-  function start() {
-    if (!nearest || active || cooldown > 0 || nearest.hp <= 0) return;
+  function begin(mon: WildMon, opening: string, wild = true) {
     ally = saved.team.find(available) ?? null;
-    if (!ally) { notify("WÄHLE DEINEN STARTER ODER RUH DEIN TEAM AUF EINER MATRATZE AUS."); return; }
-    active = nearest; fighter = toFighter(normalizePartnerForBattle(ally), false); enemy = toFighter(active.inst, true);
+    if (!ally) { notify("WÄHLE DEINEN STARTER ODER RUH DEIN TEAM AUF EINER MATRATZE AUS."); return false; }
+    active = mon; fighter = toFighter(normalizePartnerForBattle(ally), false); enemy = toFighter(active.inst, wild);
     phase = "choose"; turn = 1; log.length = 0;
-    addLog(`Ein wildes ${active.species.name} taucht auf! ${ally.name}, du bist dran.`);
+    addLog(opening, `${ally.name}, du bist dran.`);
     const seen = Array.isArray(saved.seen) ? saved.seen as string[] : []; if (!seen.includes(active.inst.id)) seen.push(active.inst.id); saved.seen = seen;
     collection.hidden = true; get("monster-party-list").hidden = true; get("monster-item-list").hidden = true;
     spawnAlly(); battle.hidden = false; encounterButton.hidden = true;
     save(); updateBattle(); get("monster-attack").focus?.();
+    return true;
+  }
+  function start() {
+    if (!nearest || active || cooldown > 0 || nearest.hp <= 0) return;
+    begin(nearest, `Ein wildes ${nearest.species.name} taucht auf!`);
+  }
+  function challengeCreature(inst: BattleInstance) {
+    const sp = speciesById(inst.id), tint = new THREE.Color(ELEMENT_COLOR[sp.types[0]]).getHex();
+    const mesh = createMonsterArt(sp.id, tint);
+    mesh.position.copy(player.position).add(new THREE.Vector3(-1.5, 0, -1.5)); monsterRoot.add(mesh);
+    challengeMon = { inst, species: { id: sp.id, name: sp.name, color: tint, glow: tint, maxHp: inst.hpMax, catchRate: sp.catch / 255 }, mesh, hp: inst.hp, alive: true, phase: 0, level: inst.level, respawn: 0, pool: [], respawnAllowed: false };
+    return challengeMon;
+  }
+  function startTrainer(mapId: string, id: string) {
+    if (active || !world || world.current() !== mapId) return false;
+    const attempt = createTrainerAttempt(saved, mapId, id);
+    if (!attempt) { notify("HEUTE SCHON BESIEGT ODER KEIN STEHENDES TEAM. EINE MATRATZE HILFT."); return false; }
+    const p = world.getMapInfo().player, o = attempt.trainer.obj;
+    if (Math.hypot(Math.max(o.x-p.x,0,p.x-o.x-o.w),Math.max(o.y-p.y,0,p.y-o.y-o.h)) * world.getMapInfo().scale >= 1.9) return false;
+    trainerAttempt = attempt; challenge = "trainer";
+    return begin(challengeCreature(makeInst(attempt.trainer.mon, attempt.trainer.level)), `${attempt.trainer.label}: ${speciesById(attempt.trainer.mon).name} (Lv.${attempt.trainer.level}).`);
+  }
+  function startNim() {
+    if (active || !world || world.current() !== saved.rivalMap) return false;
+    const p = world.getMapInfo().player;
+    if (Math.hypot(p.x - finite(saved.rivalX), p.y - finite(saved.rivalY)) >= 38) return false;
+    const team = beginNimDuel(saved);
+    if (!team.length) return false;
+    challenge = "nim"; duelCount = team.length; enemyQueue = team.slice(1);
+    const first = team[0];
+    return begin(challengeCreature(first), `Nim: ${speciesById(first.id).name} (Lv.${first.level}). ${team.length} gegen dich.`, false);
   }
   function retireWild(mon: WildMon) {
     mon.alive = false;
@@ -302,7 +375,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
     if (!enemy || !fighter || !active) return true;
     syncFighters();
     // A simultaneous poison KO rewards the victory without reviving the defeated partner.
-    if (enemy.inst.hp <= 0) { awardVictory(); return true; }
+    if (enemy.inst.hp <= 0) { if (!advanceDuel()) awardVictory(); return true; }
     if (fighter.inst.hp <= 0) {
       addLog(`${ally?.name ?? "Dein Partner"} ist besiegt.`);
       ally = saved.team.find(available) ?? null;
@@ -342,7 +415,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
     commitTurn();
   }
   function capture() {
-    if (!active || !enemy || phase !== "choose" || enemy.inst.hp <= 0) return;
+    if (!active || !enemy || challenge === "nim" || phase !== "choose" || enemy.inst.hp <= 0) return;
     const selected = (get("monster-chip") as HTMLSelectElement).value || selectedChip;
     if (!chipsAvailable().includes(selected)) return;
     closeSubmenus();
@@ -359,6 +432,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
       saved.stats.monsCaught = Math.max(saved.captures, finite(saved.stats.monsCaught) + 1); grant("catch_1");
       retireWild(active); phase = "caught";
       addLog(`${caught.name} gefangen! Wert ${ivScore(enemy.inst.ivs)} · ${caught.hp} HP. ${intoTeam ? "Ins Team." : "Team voll – in die Box."}`);
+      if (trainerAttempt) addLog(...settleTrainer(saved, trainerAttempt, "caught").lines);
     } else { addLog(`${chipName}: ausgebrochen!`); enemyTurn(); }
     commitTurn();
   }
@@ -420,12 +494,14 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
     if (e.code === "KeyE" && !e.repeat && !active) start();
   });
   return {
+    startTrainer, startNim,
     get inBattle() { return active !== null; },
     refreshMap: () => changeMap(world?.current() ?? "alley"),
     update(dt: number) {
       time += dt;
       saved.playtime = Math.max(0, finite(saved.playtime)) + Math.max(0, dt);
       if (allyModel) allyModel.children[0].position.y = 0.82 + Math.sin(time * 3.5) * 0.09;
+      if (challengeMon) challengeMon.mesh.children[0].position.y = 0.82 + Math.sin(time * 2.3) * 0.13;
       cooldown = Math.max(0, cooldown - dt);
       nearest = null;
       let best = 3.2 * 3.2;
