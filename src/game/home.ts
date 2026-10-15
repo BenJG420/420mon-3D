@@ -13,10 +13,12 @@ import { liveWindow, staticRumor } from "./data/legend";
 import { speciesById } from "./data/dex";
 import { spriteUrl } from "./sprites";
 
+type FishingActions = { openFishing: (obj: MapObj) => void; openTank: (obj: MapObj) => void };
+
 type GrowActions = { open: (id: number) => void; sleep: () => void };
 
 /** Original Kapsel starter and Bolt route; all mutations use the shared save. */
-export function createHomeInteractions(world: DistrictTravel, grow: GrowActions) {
+export function createHomeInteractions(world: DistrictTravel, grow: GrowActions, fishing?: FishingActions) {
   const dialog = document.createElement("section");
   dialog.className = "home-dialog"; dialog.hidden = true;
   dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true");
@@ -73,6 +75,8 @@ export function createHomeInteractions(world: DistrictTravel, grow: GrowActions)
     npc("Silk", lines, actions);
   }
   function interact(obj: MapObj, mapId: string): boolean | void {
+    if (obj.id.startsWith("kai_cast") && fishing) { close(); fishing.openFishing(obj); return; }
+    if (obj.id === "tank" && fishing) { close(); fishing.openTank(obj); return; }
     if (obj.kind === "pot") { grow.open(obj.pot ?? 0); return; }
     if (obj.kind === "starter") { starter(); return; }
     if (obj.kind === "bed" || obj.kind === "mattress") {

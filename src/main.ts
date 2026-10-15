@@ -4,6 +4,10 @@ import { createGameSystems } from "./game/systems";
 import { createDistrictWorld } from "./game/world";
 import { createEnvironment } from "./game/environment";
 import { createGrowSystem } from "./game/grow";
+import { createFishingSystem } from "./game/fishing";
+import { createFishingWorld } from "./game/fish-art";
+import { fishEffectMultiplier } from "./game/fish-consumption";
+import { getSave } from "./game/save";
 import { createHomeInteractions } from "./game/home";
 import "./styles.css";
 import "./home.css";
@@ -98,7 +102,9 @@ let blockedThisFrame = false;
 const districtWorld = createDistrictWorld(scene, player);
 const monsterGame = createMonsterGame(scene, player, districtWorld);
 const grow = createGrowSystem(districtWorld);
-createHomeInteractions(districtWorld, grow);
+const fishing = createFishingSystem(districtWorld);
+const fishingWorld = createFishingWorld(districtWorld);
+createHomeInteractions(districtWorld, grow, fishing);
 createGameSystems(districtWorld, () => grow.openShop());
 
 function movePlayer(dx: number, dz: number) {
@@ -154,7 +160,7 @@ hud.innerHTML = `
   <div class="brand">420MON <span>LOWTOWN</span></div>
   <div class="status">DEIN ZUHAUSE IN 3D</div>
   <div class="hint">WASD / PFEILE · E INTERAGIEREN · SHIFT LAUFEN</div>
-  <div class="target">KAPSEL & KELLER · TESTVERSION 22</div>
+  <div class="target">KAPSEL & KELLER · TESTVERSION 23</div>
   <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
@@ -401,6 +407,8 @@ function animate() {
   monsterGame.update(dt);
   districtWorld.update();
   grow.update(dt);
+  fishing.update(dt);
+  fishingWorld.update(dt);
   environment.setIndoor(!!districtWorld.getMapInfo().map.indoor);
   environment.update(player, dt);
   mapClock += dt;
@@ -414,8 +422,8 @@ function animate() {
 
   if (input.lengthSq() > 0) input.normalize();
 
-  const overlayOpen = !!document.querySelector(".systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden])");
-  const speed = monsterGame.inBattle || overlayOpen ? 0 : (state.sprint || touch.sprint) ? 7.5 : 4.2;
+  const overlayOpen = !!document.querySelector(".systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden])");
+  const speed = monsterGame.inBattle || overlayOpen ? 0 : ((state.sprint || touch.sprint) ? 7.5 : 4.2) * fishEffectMultiplier(getSave(), "speed");
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
   blockedThisFrame = false;
   movePlayer(velocity.x * dt, velocity.z * dt);

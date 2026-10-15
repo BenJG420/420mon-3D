@@ -1,5 +1,6 @@
 import { DEX } from "./data/dex";
 import { clampLevel } from "./data/progress";
+import { ensureFishState } from "./fishing-state";
 import { syncQuests } from "./quests";
 import { makeInst, rollIvs } from "./battle";
 import { GROW_SLOTS, POT_START, POT_MAX, BOX_MAX } from "./data/items";
@@ -64,6 +65,8 @@ export type Save = {
   outfit?: string;
   flagLowtown?: boolean;
   deadWild: string[];
+  fishCaught?: Record<string, number>;
+  fishStocked?: boolean;
   map?: string;
   x?: number;
   y?: number;
@@ -196,6 +199,7 @@ export function getSave(): Save {
       ?? (SAVE_KEY !== LEGACY_3D_KEY ? readSlot(LEGACY_3D_KEY) ?? readSlot(`${LEGACY_3D_KEY}_bak`) : null);
     const original = legacy ? null : readSlot(ORIGINAL_KEY) ?? readSlot(`${ORIGINAL_KEY}_bak`);
     current = normalize(legacy ?? original ?? {}, !legacy && !original, !!original);
+    ensureFishState(current);
     syncQuests(current);
   }
   return current;

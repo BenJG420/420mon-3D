@@ -553,7 +553,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   document.querySelector("#app")!.append(prompt);
   function overlayOpen() {
     return document.body.classList.contains("menu-open") || !!document.querySelector(
-      ".systems-panel:not([hidden]), .grow-backdrop:not([hidden]), .monster-battle:not([hidden]), .home-dialog:not([hidden]), .studio-panel.is-open"
+      ".systems-panel:not([hidden]), .grow-backdrop:not([hidden]), .monster-battle:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]), .studio-panel.is-open"
     );
   }
   function closestInteraction() {
@@ -602,7 +602,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const overlay = overlayOpen();
     prompt.hidden = !nearby || overlay;
     if (nearby) {
-      const action = nearby.door ? "BETRETEN" : nearby.kind === "pot" ? "PFLEGEN" : nearby.kind === "bed" || nearby.kind === "mattress" ? "AUSRUHEN" : nearby.kind === "npc" || nearby.kind === "shop" || nearby.kind === "stall" ? "ANSPRECHEN" : "BENUTZEN";
+      const action = nearby.id.startsWith("kai_cast") ? "ANGELN" : nearby.id === "tank" ? "BECKEN" : nearby.door ? "BETRETEN" : nearby.kind === "pot" ? "PFLEGEN" : nearby.kind === "bed" || nearby.kind === "mattress" ? "AUSRUHEN" : nearby.kind === "npc" || nearby.kind === "shop" || nearby.kind === "stall" ? "ANSPRECHEN" : "BENUTZEN";
       const reason = lockMessage(nearby);
       prompt.textContent = interactionMessage?.id === nearby.id && time < interactionMessage.until ? interactionMessage.text
         : `${reason ? "🔒 " : ""}${nearby.label.toUpperCase()} · ${action} [E]`;
