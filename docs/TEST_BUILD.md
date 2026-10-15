@@ -1,4 +1,4 @@
-# Original-world test build v23
+# Original-world test build v24
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -108,6 +108,26 @@ origin's localStorage.
   the original +20% Grow speed while in Kapsel; previews and actual Grow ticking
   use the same bonus. Original fish-stock migration runs once.
 
+- Original trainer package: the seven Kiez trainers (Cinder, Tide, Vial, Knuckle,
+  Hush, Glow and Coil) and the three one-time gate trainers (Soot, Sluice and Dose)
+  use their existing source NPCs, monsters, levels and dialogue. Daily rematches
+  follow the player’s local calendar. A win or capture records the source history
+  and separately rounded 18-base-Softcash bonus once; all seven historical Kiez
+  victories grant trainer_7. Standard trainer monsters remain catchable as in
+  the actual source runtime. Completed gate NPCs disappear immediately and on reload.
+- Nim now wanders through the ten source outdoor maps, changes district after
+  80–150 seconds, walks at the original speed and approaches for a duel. His team
+  counters the first living partner with up to three distinct nonlegendary species
+  at the highest living team level. His monsters cannot be caught. Intermediate
+  opponents grant active-partner/trainer XP; the last grants the normal victory
+  rewards and living-team shared XP. The source 50/75-second playtime cooldowns,
+  saved location and seen-species history persist.
+- Trainer fights reuse the existing four-move combat, statuses, items and team
+  switching. Flight grants no trainer reward or completion. Defeat returns to
+  Kapsel and costs up to eight Softcash after Continue; HP0 remains HP0 until
+  physical mattress rest. Other battles, Grow, fishing, NPC shops and save slots
+  continue through their existing systems. Multiplayer sparring remains separate.
+
 ## How to try it
 
 1. Start in Kapsel. Walk toward the case and press E or the on-screen interaction
@@ -140,21 +160,43 @@ origin's localStorage.
     cast to get its seed back. Return to the physical aquarium in Kapsel to inspect
     the 42-species catalogue and your swimming collection.
 
+11. Find Soot in the Aschegang (Lv.33), Sluice in Abfluss (Lv.26) or Dose in
+    Chemie (Lv.46). Talk and choose Kämpfen; flee, defeat or catch their monster.
+    A win/capture removes the one-time gate NPC and persists its bonus.
+12. Challenge a Kiez trainer: Tide/Abfluss Lv.31, Cinder/Aschegang Lv.39,
+    Vial/Chemie Lv.54, Knuckle/Ring Lv.89, Glow/Nischen Lv.109,
+    Hush/Labyrinth Lv.146, Coil/Schrotttor Lv.259. After a win/capture they say
+    Heute reicht. Morgen wieder.; the next local day allows a rematch.
+13. Meet wandering Nim in an outdoor district. Choose Duell to fight his team,
+    or Später to defer his automatic challenge. Chips stay unavailable in his
+    duel. A trainer loss leaves defeated partners at zero HP; use the physical
+    Kapsel mattress to revive them.
+
 ## Validation
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 65 regression tests covering 420 assets, restored source hashes, battle save
+suite has 83 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
 inventory chip/healing integration, quest reward idempotence, turn-ins,
 container cooldowns and story mattress/merchant actions, original fish schools,
-cast settlement/refunds/recovery, fish-food buffs and the full aquarium Grow bonus. `npm run build` performs TypeScript and Vite
-production checks. CI runs both commands. For v23, one touch smoke confirmed the physical rod,
+cast settlement/refunds/recovery, fish-food buffs, the full aquarium Grow bonus,
+trainer roster/daily settlement/one-time bonuses/gates and source save compatibility,
+Nim team generation, movement, playtime cooldowns and HP0 preservation. `npm run build` performs TypeScript and Vite
+production checks. CI runs both commands. For v24, the single Chromium touch smoke
+confirmed a physical daily trainer dialogue, victory, once-only bonus and same-day
+lock; gate-trainer capture/removal/reload; Nim’s complete three-enemy queue and
+capture ban; and the source loss penalty/capsule return with HP0 preserved until
+physical mattress rest. No browser errors or horizontal overflow were found.
+CI/Pages and artifact verification form the third and final pass.
+
+Historical v23 check: one touch smoke confirmed the physical rod,
 wheel catch, fish food, timing-miss/close seed refunds and saved collection after
 reload. The final aquarium step selected the preserved nearby fishing pad at the
-fixture position; the third deployment check approaches the tank from its right
-side. No full smoke loop was repeated.
+fixture position; the third deployment check successfully opened the live tank
+from its right side and verified all 42 catalogue entries without browser errors.
+No full smoke loop was repeated.
 
 Historical v22 check: the single touch smoke exercised Silk's stick hand-in,
 physical merchant opening and a sale successfully. Its subsequent Static fixture
@@ -168,17 +210,19 @@ Quest/NPC package 1 is playable: source dialogue, turn-ins, loot, journal counte
 board rewards and the Lowtown thread chain are connected. This does not imply the
 following separate mechanics are implemented. As recorded in CODEX_HANDOFF.md,
 Felix/Eddi automation and the operational Ko-fi support economy belong to package
-6; Can, trainer challenges and Rajko's radio are reserved for their listed packages.
+6; Can and Rajko's radio are reserved for their listed packages.
 
 Fishing package 2 is implemented in v23; its successful catches, failed casts,
-food and aquarium collection share the existing save. Continue with:
+food and aquarium collection share the existing save. Trainer package 3 is
+implemented in v24: seven daily Kiez trainers, three one-time gate trainers and
+Nim’s roaming multi-monster duels. Multiplayer sparring remains a separate source
+network feature and is not claimed as implemented. Continue with:
 
-1. Next: trainer battles; multiplayer sparring remains a separate source feature.
-2. Can in the cellar — all 420 achievements and actual reward claiming.
-3. Equipped clothes visibly rendered on the character.
-4. Radio and story economy, including Felix/Eddi automation and Ben's support
+1. Next: Can in the cellar — all 420 achievements and actual reward claiming.
+2. Equipped clothes visibly rendered on the character.
+3. Radio and story economy, including Felix/Eddi automation and Ben's support
    backend. Ben's quest acknowledgement alone does not implement payments.
-5. Individual 3D monster models following the retained source sprites.
+4. Individual 3D monster models following the retained source sprites.
 
 Physical Android performance and native 4K verification remain device tests;
 Chromium touch emulation does not replace those. The stable root release and the

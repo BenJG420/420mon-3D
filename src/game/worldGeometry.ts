@@ -1,4 +1,4 @@
-import type { MapDef, Rect } from "./data/maps";
+import type { MapDef, MapObj, Rect } from "./data/maps";
 import { lootKind } from "./data/items";
 
 /** One original map pixel occupies six centimetres in the 3D world. */
@@ -21,10 +21,15 @@ const PASSABLE_OBJECTS = new Set(["door", "manhole", "sign", "wild", "npc", "sho
 const EPSILON = 1e-9;
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
-function blockers(map: MapDef): Rect[] {
+/** Original one-time gate trainers vanish after their recorded victory. */
+export function isDefeatedGate(object: Pick<MapObj, "id">, defeatedIds: readonly string[] = []): boolean {
+  return object.id.startsWith("gate_") && defeatedIds.includes(object.id);
+}
+
+function blockers(map: MapDef, defeatedIds: readonly string[]): Rect[] {
   return [
     ...map.walls,
-    ...map.objs.filter(object => object.block && !PASSABLE_OBJECTS.has(object.kind) && !(object.kind === "prop" && lootKind(object))),
+    ...map.objs.filter(object => object.block && !isDefeatedGate(object, defeatedIds) && !PASSABLE_OBJECTS.has(object.kind) && !(object.kind === "prop" && lootKind(object))),
   ].filter(rect => rect.w > 0 && rect.h > 0);
 }
 
@@ -42,9 +47,9 @@ function blocked(map: MapSize, solids: Rect[], x: number, y: number, radius: num
 }
 
 /** Collides with the original map geometry, using a world-space player radius. */
-export function collidesOnMap(map: MapDef, x: number, z: number, r = 0.45): boolean {
+export function collidesOnMap(map: MapDef, x: number, z: number, r = 0.45, defeatedIds: readonly string[] = []): boolean {
   const point = worldToMap(map, x, z);
-  return blocked(map, blockers(map), point.x, point.y, Math.max(0, r) / WORLD_SCALE);
+  return blocked(map, blockers(map, defeatedIds), point.x, point.y, Math.max(0, r) / WORLD_SCALE);
 }
 
 /**
@@ -53,10 +58,10 @@ export function collidesOnMap(map: MapDef, x: number, z: number, r = 0.45): bool
  * Candidate positions follow those exact blockers rather than a coarse grid,
  * so a narrow original doorway remains usable.
  */
-export function safeSpawn(map: MapDef, desiredX: number, desiredY: number, r = 0.48): { x: number; y: number } {
+export function safeSpawn(map: MapDef, desiredX: number, desiredY: number, r = 0.48, defeatedIds: readonly string[] = []): { x: number; y: number } {
   const radius = Math.max(0, Number.isFinite(r) ? r : 0.48) / WORLD_SCALE;
   if (map.w < radius * 2 || map.h < radius * 2) throw new Error(`Map ${map.id} has no room for this player radius`);
-  const solids = blockers(map);
+  const solids = blockers(map, defeatedIds);
   const desired = {
     x: clamp(Number.isFinite(desiredX) ? desiredX : map.w / 2, radius, map.w - radius),
     y: clamp(Number.isFinite(desiredY) ? desiredY : map.h / 2, radius, map.h - radius),

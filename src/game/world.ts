@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { MAPS, mapSketch, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y, type MapDef, type MapObj, type Rect } from "./data/maps";
-import { WORLD_SCALE, mapToWorld, worldToMap, collidesOnMap, safeSpawn } from "./worldGeometry";
+import { WORLD_SCALE, mapToWorld, worldToMap, collidesOnMap, safeSpawn, isDefeatedGate } from "./worldGeometry";
 import { getSave, saveProgress } from "./save";
 import { recordVisit, setQuestState } from "./quests";
 import { stageOf } from "./data/progress";
@@ -24,6 +24,7 @@ export type DistrictTravel = {
   getRoot: () => THREE.Group;
   toWorld: (x: number, y: number) => THREE.Vector3;
   setInteractionHandler: (fn: (obj: MapObj, mapId: string) => boolean | void) => void;
+  setRoamingNpc: (obj?: MapObj) => void;
 };
 
 const palette = {
@@ -32,6 +33,7 @@ const palette = {
   green: 0x507462, glow: 0xd7a459, blue: 0x638b96,
 };
 const seeded = (i: number) => { const n = Math.sin(i * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
+const DAILY_TRAINERS = new Set(["cinder", "tide", "vial", "knuckle", "hush", "glow", "coil"]);
 
 /** Canvas textures stay local, so a public build has no private asset requests. */
 function wornTexture(kind: "stone" | "wood" | "plaster" | "metal"): THREE.CanvasTexture {
@@ -96,6 +98,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   let lastSave = 0;
   let lastPosition = { x: NaN, y: NaN };
   const glowing: { mesh: THREE.Mesh; phase: number }[] = [];
+  const mapObjects = new Map<string, THREE.Group>();
+  let roamingNpc: MapObj | undefined;
 
   function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, parent: THREE.Object3D, x: number, y: number, z: number, shadow = true) {
     const m = new THREE.Mesh(geometry, material); m.position.set(x, y, z); m.castShadow = shadow; m.receiveShadow = true;
@@ -141,7 +145,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
   function objectGroup(obj: MapObj) {
     const g = new THREE.Group(); g.name = `map-object:${obj.id}`; g.userData.object = obj;
-    g.position.copy(at(obj.x + obj.w / 2, obj.y + obj.h / 2)); root.add(g); return g;
+    g.position.copy(at(obj.x + obj.w / 2, obj.y + obj.h / 2)); root.add(g); mapObjects.set(obj.id, g); return g;
   }
 
   function planter(obj: MapObj, g: THREE.Group) {
@@ -275,7 +279,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
 
   function renderObject(obj: MapObj) {
-    if (obj.kind === "wild") return; // Monster renderer uses authentic species and these coordinates.
+    if (obj.kind === "wild" || isDefeatedGate(obj, getSave().deadWild)) return; // Encounters own wild meshes; defeated gate trainers vanish.
     const g = objectGroup(obj);
     if (obj.kind === "pot") planter(obj, g);
     else if (obj.kind === "bed" || obj.kind === "mattress") bed(obj, g);
@@ -478,8 +482,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     if (id !== "alley" && id !== "kino") tag(sign, active.name.toUpperCase(), Math.min(9, active.w * WORLD_SCALE * .55), 3.25);
   }
 
-  function disposeMap() {
-    root.traverse(object => {
+  function disposeOwnedObjects(parent: THREE.Object3D) {
+    parent.traverse(object => {
       // Grow and encounter systems attach their own reusable meshes to root.
       // They retain ownership of their geometry and materials across maps.
       if (object instanceof THREE.Mesh && object.userData.worldOwned) {
@@ -493,7 +497,42 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       }
       if (object instanceof THREE.Light) object.dispose();
     });
-    root.clear(); occluders = []; lamps = 0; glowing.length = 0;
+  }
+  function disposeMap() {
+    disposeOwnedObjects(root);
+    root.clear(); mapObjects.clear(); roamingNpc = undefined; occluders = []; lamps = 0; glowing.length = 0;
+  }
+  function removeMapObject(objectId: string) {
+    const group = mapObjects.get(objectId);
+    if (group) {
+      // Remove only this map-owned group. Rebuilding root would also detach
+      // the encounter, Grow and aquarium systems' independently owned meshes.
+      const removed = new Set<THREE.Object3D>();
+      group.traverse(object => removed.add(object));
+      occluders = occluders.filter(object => !removed.has(object));
+      for (let i = glowing.length - 1; i >= 0; i--) if (removed.has(glowing[i].mesh)) glowing.splice(i, 1);
+      disposeOwnedObjects(group); group.removeFromParent(); mapObjects.delete(objectId);
+    }
+    if (nearby?.id === objectId) { nearby = undefined; prompt.hidden = true; }
+    if (interactionMessage?.id === objectId) interactionMessage = undefined;
+  }
+  function setRoamingNpc(obj?: MapObj) {
+    if (roamingNpc && roamingNpc.id !== obj?.id) removeMapObject(roamingNpc.id);
+    roamingNpc = obj;
+    if (!obj) return;
+    const group = mapObjects.get(obj.id);
+    if (!group) renderObject(obj);
+    else {
+      group.userData.object = obj;
+      group.position.copy(at(obj.x + obj.w / 2, obj.y + obj.h / 2));
+    }
+  }
+  function syncDefeatedGates() {
+    const defeatedIds = getSave().deadWild;
+    for (const obj of active.objs) {
+      if (!isDefeatedGate(obj, defeatedIds)) continue;
+      removeMapObject(obj.id);
+    }
   }
   function unlocked(lock: string) {
     const save = getSave();
@@ -539,7 +578,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         const exit = active.objs.find(o => o.kind === "door" || o.kind === "manhole");
         return exit ? { x: exit.x + exit.w / 2, y: exit.y + exit.h / 2 } : { x: active.w / 2, y: active.h / 2 };
       })();
-    const spawn = safeSpawn(active, desired.x, desired.y, .48);
+    const spawn = safeSpawn(active, desired.x, desired.y, .48, progress.deadWild);
     player.position.copy(at(spawn.x, spawn.y)); player.rotation.y = 0;
     lastPosition = { x: NaN, y: NaN }; saveLocation();
     localStorage.setItem("420mon-current-map", id); localStorage.setItem("420mon-district", id);
@@ -559,11 +598,13 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   function closestInteraction() {
     const p = sourcePosition();
     let best: MapObj | undefined, closest = 1.9;
+    const defeatedIds = getSave().deadWild;
     for (const object of active.objs) {
-      if (object.kind === "wild" || object.kind === "sign") continue;
+      if (object.kind === "wild" || object.kind === "sign" || isDefeatedGate(object, defeatedIds)) continue;
       const d = distance(object, p);
       if (d < closest) { closest = d; best = object; }
     }
+    if (roamingNpc && distance(roamingNpc, p) < closest) best = roamingNpc;
     return best;
   }
   function interact() {
@@ -595,6 +636,18 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const dy = Math.max(obj.y - p.y, 0, p.y - obj.y - obj.h);
     return Math.hypot(dx, dy) * WORLD_SCALE;
   }
+  function trainerAction(obj: MapObj): string | undefined {
+    if (obj.id === "nim_body") return "DUELL";
+    if (obj.kind !== "npc" || !obj.mon) return;
+    const save = getSave();
+    if (DAILY_TRAINERS.has(obj.id)) {
+      const date = new Date();
+      const today = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+      const days = save.bossDay;
+      if (days && typeof days === "object" && !Array.isArray(days) && (days as Record<string, unknown>)[obj.id] === today) return "HEUTE BESIEGT";
+    } else if (save.deadWild.includes(obj.id)) return "BESIEGT";
+    return "HERAUSFORDERN";
+  }
   function update() {
     const time = performance.now();
     if (time - lastSave > 1800) { saveLocation(); lastSave = time; }
@@ -602,7 +655,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const overlay = overlayOpen();
     prompt.hidden = !nearby || overlay;
     if (nearby) {
-      const action = nearby.id.startsWith("kai_cast") ? "ANGELN" : nearby.id === "tank" ? "BECKEN" : nearby.door ? "BETRETEN" : nearby.kind === "pot" ? "PFLEGEN" : nearby.kind === "bed" || nearby.kind === "mattress" ? "AUSRUHEN" : nearby.kind === "npc" || nearby.kind === "shop" || nearby.kind === "stall" ? "ANSPRECHEN" : "BENUTZEN";
+      const action = trainerAction(nearby) ?? (nearby.id.startsWith("kai_cast") ? "ANGELN" : nearby.id === "tank" ? "BECKEN" : nearby.door ? "BETRETEN" : nearby.kind === "pot" ? "PFLEGEN" : nearby.kind === "bed" || nearby.kind === "mattress" ? "AUSRUHEN" : nearby.kind === "npc" || nearby.kind === "shop" || nearby.kind === "stall" ? "ANSPRECHEN" : "BENUTZEN");
       const reason = lockMessage(nearby);
       prompt.textContent = interactionMessage?.id === nearby.id && time < interactionMessage.until ? interactionMessage.text
         : `${reason ? "🔒 " : ""}${nearby.label.toUpperCase()} · ${action} [E]`;
@@ -610,6 +663,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     }
     for (const glow of glowing) (glow.mesh.material as THREE.MeshStandardMaterial).emissiveIntensity = .55 + Math.sin(time / 1800 + glow.phase) * .08;
   }
+  window.addEventListener("420mon-save-changed", syncDefeatedGates);
   const saved = getSave();
   const requested = saved.map ?? localStorage.getItem("420mon-current-map") ?? localStorage.getItem("420mon-district") ?? "capsule";
   // Initial load must read location before travel writes the active map.
@@ -625,11 +679,12 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       shopFn(obj); return true;
     },
     openShop: fn => { shopFn = fn; }, update,
-    collides: (x, z, radius = .48) => collidesOnMap(active, x, z, radius),
+    collides: (x, z, radius = .48) => collidesOnMap(active, x, z, radius, getSave().deadWild),
     getOccluders: () => occluders,
     getMapInfo: () => ({ id, name: active.name, map: active, w: active.w, h: active.h, scale: WORLD_SCALE,
       bounds: { minX: -active.w * WORLD_SCALE / 2, maxX: active.w * WORLD_SCALE / 2, minZ: -active.h * WORLD_SCALE / 2, maxZ: active.h * WORLD_SCALE / 2 }, player: sourcePosition() }),
     getRoot: () => root, toWorld: at,
     setInteractionHandler: fn => { interaction = fn; },
+    setRoamingNpc,
   };
 }
