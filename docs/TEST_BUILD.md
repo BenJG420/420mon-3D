@@ -253,8 +253,13 @@ quest rewards. Both were corrected, and their 17 targeted tests plus build passe
 in pass two. Its one touch smoke verified all eleven appearances, original T,
 inventory equipment, editor preview and saved HP0/XP/inventory/gold. The subsequent
 simulated walk did not record a step; closing the editor now releases hidden
-control focus explicitly. No full smoke was repeated. Pass three checks CI/Pages
-and the targeted live focus/walk plus desktop preview.
+control focus explicitly. No full smoke was repeated. Pass three completed full CI with 114/114 tests,
+build and Pages, and confirmed live focus release plus actual walking/steps.
+Its subsequent inventory assertion missed the legitimate Grow starter seed;
+the desktop preview step was not reached. Desktop visual verification therefore
+remains a player-check item. The three-pass limit was respected; no fourth smoke
+was run. The published v26 bundle includes the focus fix, CSS matches the checked
+build, and the stable v18 root remains intact (PR #33, source 4c450bd).
 
 Historical v25 check: the first pass completed all
 100 tests and the production build. One Chromium touch smoke confirmed Can's
