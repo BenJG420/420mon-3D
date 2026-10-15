@@ -490,7 +490,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
   window.addEventListener("keydown", e => {
     const target = e.target as HTMLElement | null;
     if (e.defaultPrevented || target?.closest("input,textarea,select,[contenteditable=true]")) return;
-    if (document.querySelector(".systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.studio-panel.is-open")) return;
+    if (document.querySelector(".systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.studio-panel.is-open")) return;
     if (e.code === "KeyE" && !e.repeat && !active) start();
   });
   return {

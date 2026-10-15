@@ -592,7 +592,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   document.querySelector("#app")!.append(prompt);
   function overlayOpen() {
     return document.body.classList.contains("menu-open") || !!document.querySelector(
-      ".systems-panel:not([hidden]), .grow-backdrop:not([hidden]), .monster-battle:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]), .studio-panel.is-open"
+      ".systems-panel:not([hidden]), .grow-backdrop:not([hidden]), .monster-battle:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]), .studio-panel.is-open"
     );
   }
   function closestInteraction() {

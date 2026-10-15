@@ -1,4 +1,4 @@
-# Original-world test build v24
+# Original-world test build v25
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -128,6 +128,30 @@ origin's localStorage.
   physical mattress rest. Other battles, Grow, fishing, NPC shops and save slots
   continue through their existing systems. Multiplayer sparring remains separate.
 
+- Can's achievement package: all 420 unchanged original definitions and checks,
+  seven chapters, free hints, original paid tips and hidden secret pages now use
+  the shared 3D save. Current team/box/collection are adapted to the original
+  party/caught predicates; fish never count toward the monster Dex. Existing
+  earned flags, tips and special event grants remain fulfilled permanently.
+- Talk to the physical Can in Rajko's cellar to open his book. Filter by chapter,
+  status or revealed name, with eight entries per page. Tips reveal original
+  instructions and are bought once at source prices. Secret names remain hidden
+  until earned or a tip is purchased. The menu's Erfolge journal is read-only;
+  buying tips and collecting rewards require the real NPC and current proximity.
+- Owner-requested extension, separate from the original rules: each fulfilled
+  achievement pays 10 Softcash, or 25 for a secret achievement, once at Can.
+  Individual and batch collection share persistent claimed IDs. A batch pays
+  only pages already available at that click; new earning achievements wait for
+  the next explicit collection. Historical completed achievements are eligible
+  once. Payouts never change monster HP, XP or inventory.
+- Source activity history is connected: real movement frames count steps,
+  unwrapped/tanktop play frames count the original nudeSeconds timer including
+  menus and indoors, and worn clothes remain remembered. Moss harvests now
+  record the original unique-find history. Synchronization occurs on load/save
+  and at the source eight-second interval. Future Felix/Eddi economy conditions
+  remain unearned until their own listed package or an existing imported flag;
+  achievement synchronization does not pretend those mechanics are implemented.
+
 ## How to try it
 
 1. Start in Kapsel. Walk toward the case and press E or the on-screen interaction
@@ -172,10 +196,19 @@ origin's localStorage.
     duel. A trainer loss leaves defeated partners at zero HP; use the physical
     Kapsel mattress to revive them.
 
+14. From Kapsel enter the cellar and approach Can (left of Ben, south of Rajko).
+    Choose Buch. Read a free hint, buy an original tip, then use Abholbereit to
+    collect an earned reward or collect the currently available batch. Reload to
+    verify the tip and claimed marker persist; the same reward cannot pay again.
+15. Open Erfolge through the game menu away from Can. Search revealed names and
+    use chapter/status filters and pagination. This journal shows progress and
+    reward status but cannot buy or pay remotely. Walking, capturing, winning,
+    growing and selling continue to earn the original pages through existing systems.
+
 ## Validation
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 83 regression tests covering 420 assets, restored source hashes, battle save
+suite has 100 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
@@ -183,13 +216,23 @@ inventory chip/healing integration, quest reward idempotence, turn-ins,
 container cooldowns and story mattress/merchant actions, original fish schools,
 cast settlement/refunds/recovery, fish-food buffs, the full aquarium Grow bonus,
 trainer roster/daily settlement/one-time bonuses/gates and source save compatibility,
-Nim team generation, movement, playtime cooldowns and HP0 preservation. `npm run build` performs TypeScript and Vite
-production checks. CI runs both commands. For v24, the single Chromium touch smoke
+Nim team generation, movement, playtime cooldowns and HP0 preservation, all 420
+original achievement predicates and save adapters, paid tips, exact-once single/
+batch rewards, earning thresholds, movement/time counters and Moss-find history. `npm run build` performs TypeScript and Vite
+production checks. CI runs both commands. For v25, the first pass completed all
+100 tests and the production build. One Chromium touch smoke confirmed Can's
+physical book, all 420 entries, pagination, hidden-secret search, a source-priced
+75-Softcash tip, a 10-Softcash single claim and batch collection, persistence
+without duplicate payment, and a read-only remote journal. HP0, XP and inventory
+were unchanged; no page errors or horizontal overflow occurred. CI/Pages and
+exact live artifact verification form the third and final pass.
+
+Historical v24 check: the single Chromium touch smoke
 confirmed a physical daily trainer dialogue, victory, once-only bonus and same-day
 lock; gate-trainer capture/removal/reload; Nim’s complete three-enemy queue and
 capture ban; and the source loss penalty/capsule return with HP0 preserved until
 physical mattress rest. No browser errors or horizontal overflow were found.
-CI/Pages and artifact verification form the third and final pass.
+CI/Pages and exact live artifact verification also succeeded for PR #31.
 
 Historical v23 check: one touch smoke confirmed the physical rod,
 wheel catch, fish food, timing-miss/close seed refunds and saved collection after
@@ -210,19 +253,20 @@ Quest/NPC package 1 is playable: source dialogue, turn-ins, loot, journal counte
 board rewards and the Lowtown thread chain are connected. This does not imply the
 following separate mechanics are implemented. As recorded in CODEX_HANDOFF.md,
 Felix/Eddi automation and the operational Ko-fi support economy belong to package
-6; Can and Rajko's radio are reserved for their listed packages.
+6; Rajko's radio remains reserved for its listed package.
 
 Fishing package 2 is implemented in v23; its successful catches, failed casts,
 food and aquarium collection share the existing save. Trainer package 3 is
 implemented in v24: seven daily Kiez trainers, three one-time gate trainers and
 Nim’s roaming multi-monster duels. Multiplayer sparring remains a separate source
-network feature and is not claimed as implemented. Continue with:
+network feature and is not claimed as implemented. Can package 4 is implemented
+in v25: 420 original achievement pages, paid tips, durable individual/batch reward
+claiming and a read-only menu journal. Continue with:
 
-1. Next: Can in the cellar — all 420 achievements and actual reward claiming.
-2. Equipped clothes visibly rendered on the character.
-3. Radio and story economy, including Felix/Eddi automation and Ben's support
+1. Next: equipped clothes visibly rendered on the character.
+2. Radio and story economy, including Felix/Eddi automation and Ben's support
    backend. Ben's quest acknowledgement alone does not implement payments.
-4. Individual 3D monster models following the retained source sprites.
+3. Individual 3D monster models following the retained source sprites.
 
 Physical Android performance and native 4K verification remain device tests;
 Chromium touch emulation does not replace those. The stable root release and the

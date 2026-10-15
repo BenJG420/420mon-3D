@@ -13,7 +13,7 @@ import { ensureIvs, ivScore, statsFor, statusName } from "./battle";
 import { getMove } from "./data/moves";
 import { spriteUrl } from "./sprites";
 const load = getSave;
-export function createGameSystems(world: DistrictTravel, openGrowShop?: () => void) {
+export function createGameSystems(world: DistrictTravel, openGrowShop?: () => void, achievements?: { openJournal: () => void }) {
   const host = document.createElement("div");
   host.className = "systems-root";
   host.innerHTML = `<button class="systems-toggle" id="systems-open">☰ 420MON MENÜ</button><button class="world-map-shortcut" id="world-map-open">🗺 STADTPLAN</button>
@@ -38,7 +38,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
     merchantItems = obj?.stall === "chips" ? STALL_CHIPS : obj?.stall === "threads" ? STALL_THREADS : obj?.stall === "fence" ? STALL_FENCE : SHOP;
     tab = "shop"; panel.hidden = false; render();
   });
-  const tabs = [["dex","📖 DEX"],["team","⚔ TEAM"],["box","▦ BOX"],["bag","🎒 INVENTAR"],["world","🗺 KARTE"],["quest","★ QUESTS"]] as const;
+  const tabs = [["dex","📖 DEX"],["team","⚔ TEAM"],["box","▦ BOX"],["bag","🎒 INVENTAR"],["world","🗺 KARTE"],["quest","★ QUESTS"],["ach","♛ ERFOLGE"]] as const;
   const escape = (v: string) => v.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c]!);
   const save = (v: Save) => { saveProgress(v); };
   const note = (msg: string) => { q("systems-footer").textContent = msg; };
@@ -49,7 +49,10 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
     for (const [key, label] of tabs) {
       const b = document.createElement("button");
       b.textContent = label; b.className = tab === key ? "selected" : "";
-      b.onclick = () => { tab = key; selected = ""; render(); };
+      b.onclick = () => {
+        if (key === "ach" && achievements) { panel.hidden = true; achievements.openJournal(); return; }
+        tab = key; selected = ""; render();
+      };
       tabsHost.append(b);
     }
     const body = q("systems-content");

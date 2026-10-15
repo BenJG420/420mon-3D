@@ -1,6 +1,10 @@
 # 420mon → 420mon-3D — Codex handoff (2026-10-12)
 
-> Prüfnotiz v24 (2026-10-15): Prüflauf 1 mit 83 Tests und Build bestanden; ein Touch-Smoke bestätigt Tagestrainer/Sieg/Bonus/Sperre, Tor-Trainer-Fang und Reload, Nims drei Gegner ohne Fang sowie Niederlage mit −8/Kapsel und HP0 bis zur physischen Matratze. Dritter Prüflauf: CI/Pages-Veröffentlichung.
+> Prüfnotiz v25 (2026-10-15): Prüflauf 1 mit 100 Tests und Build bestanden; ein Chromium-Touch-Smoke bestätigt Can im Keller, 420 Seiten, Filter/Blättern, Geheimnis-Suche, 75-Softcash-Tipp, 10-Softcash-Einzel- und Sammelabholung, Reload ohne doppelte Auszahlung sowie das nur lesbare Journal außerhalb des Kellers. HP0, XP und Inventar bleiben unverändert. Dritter Prüflauf: CI/Pages und Live-Artefakte.
+>
+> Annahme Can (2026-10-15): Das Original kennt 420 Erfolge und kostenpflichtige Tipps, aber keine Auszahlung; gemäß Nutzerwunsch zahlt Can zusätzlich jeden erfüllten Erfolg einmalig mit 10 Softcash bzw. 25 bei geheimen Erfolgen aus, auch übernommene fertige Erfolge, getrennt in achClaimed gespeichert und nur persönlich im Keller abholbar.
+>
+> Prüfnotiz v24 (2026-10-15): Prüflauf 1 mit 83 Tests und Build bestanden; ein Touch-Smoke bestätigt Tagestrainer/Sieg/Bonus/Sperre, Tor-Trainer-Fang und Reload, Nims drei Gegner ohne Fang sowie Niederlage mit −8/Kapsel und HP0 bis zur physischen Matratze. Dritter Prüflauf erfolgreich: CI/Pages und Live-Artefakte bestätigt, PR #31 veröffentlicht (9e74595).
 >
 > Annahme Trainer (2026-10-15): Die fangbaren Standard-Trainer und Nims fanggesperrte Team-Duelle folgen dem 2D-Laufzeitcode; eine Trainer-Niederlage kostet wie dort 8 Softcash und führt zur Kapsel, belebt aber gemäß Nutzerregel niemanden automatisch wieder.
 >
@@ -15,7 +19,7 @@
 > Latest user update (2026-10-14): mattresses revive defeated team partners, and Grow care gives real time/yield bonuses. These override the historical 0-HP and cosmetic-only rules below.
 >
 > Historical handoff below. v18 was merged through PR #25 on 2026-10-13. The
-> current v24 implementation and remaining work are documented in
+> current v25 implementation and remaining work are documented in
 > [docs/TEST_BUILD.md](docs/TEST_BUILD.md). Its runtime Dex has 420 local original
 > sheets; its world uses the original MAPS. Old branch/count statements below
 > are preserved as history and must not drive new merge decisions.

@@ -14,14 +14,16 @@ import { speciesById } from "./data/dex";
 import { spriteUrl } from "./sprites";
 import { trainerById, trainerPages, trainerStatus } from "./trainers";
 import { nimDialogue, declineNim } from "./nim";
+import { achievementCounts } from "./achievements";
 
 type FishingActions = { openFishing: (obj: MapObj) => void; openTank: (obj: MapObj) => void };
 
 type GrowActions = { open: (id: number) => void; sleep: () => void };
 type TrainerActions = { startTrainer: (mapId: string, id: string) => boolean; startNim: () => boolean };
+type AchievementActions = { openCan: (obj: MapObj) => void };
 
 /** Original Kapsel starter and Bolt route; all mutations use the shared save. */
-export function createHomeInteractions(world: DistrictTravel, grow: GrowActions, fishing?: FishingActions, combat?: TrainerActions) {
+export function createHomeInteractions(world: DistrictTravel, grow: GrowActions, fishing?: FishingActions, combat?: TrainerActions, achievements?: AchievementActions) {
   const dialog = document.createElement("section");
   dialog.className = "home-dialog"; dialog.hidden = true;
   dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true");
@@ -104,6 +106,16 @@ export function createHomeInteractions(world: DistrictTravel, grow: GrowActions,
     ]);
   }
   function interact(obj: MapObj, mapId: string): boolean | void {
+    if (obj.id === "can" && achievements) {
+      saveProgress(); const counts = achievementCounts(getSave());
+      show("Can · Erfolge-König", [
+        "Can lehnt am Regal. Die Krone sitzt schief, das Buch nicht.",
+        "Can: Ich bin der Erfolge-König. Vierhundertzwanzig Seiten. Ich kenn jede.",
+        `Can: ${counts.done} von 420. Ein Teil bleibt leer, bis du ihn verdienst.`,
+        "Can: Hinweis umsonst. Der Weg kostet Softcash. Der Tipp bleibt im Buch.",
+        `Can: ${counts.claimable} Belohnungen warten. Zehn Softcash pro Erfolg, fünfundzwanzig für einen geheimen. Einmal pro Seite.`,
+      ], [{ label: "Buch", run: () => { close(); achievements.openCan(obj); } }, { label: "Später", run: close }]); return;
+    }
     if (obj.id === "nim_body") { openNim(); return; }
     if (obj.kind === "npc" && obj.mon) { trainer(obj, mapId); return; }
     if (obj.id.startsWith("kai_cast") && fishing) { close(); fishing.openFishing(obj); return; }
