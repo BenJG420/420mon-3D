@@ -1,4 +1,4 @@
-# Original-world test build v26
+# Original-world test build v27
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -170,6 +170,32 @@ origin's localStorage.
   remain saved; they do not repaint equipped original clothing. Inventory also
   links to this preview. Shops still require their physical NPC.
 
+- Radio and helper economy package: Rajko and the physical cellar deck open
+  the original radio controls. Both original MP3s ship locally (verified Git blob
+  hashes); selection/mute persist, and music continues during exploration.
+  YouTube/Spotify links use their platform players; external HTTPS streams follow
+  the original GEMA toggle, enabled by default. Playback requires a browser gesture.
+- Felix's original free hire/puff conversation, 5%/10% cut, capsule crate,
+  100-seed bag, fertilizer priority, individual walking/work states and 420-bud
+  delivery threshold now use the shared Grow save. Automatic planting/cutting
+  follows source timing and grants no player/partner XP. Offline production uses
+  the original cycle simulation and 72-hour cap. Manual plants stay untouched;
+  earned care bonuses also count on Felix's harvests.
+- Eddi arrives after the 100th growbox harvest, wanders through the Kapsel and
+  has the original single 34% chance per look to triple a plant's base yield.
+  His physical shop buys at double the base price, sells at half price (exclusive
+  items retain their original 420 price), and sells the unique 10,000-Softcash
+  grow-speed title. Offline time does not invent Eddi visits. Helpers share one
+  plant clock without incrementing playtime or changing defeated HP.
+- Ben's physical counter shows the original fixed EUR 3/8/20 packages. A separate
+  Node/SQLite service verifies Ko-fi receipts, privately bound Kassenwörter and
+  server-signed codes, with durable transaction ownership and duplicate protection.
+  Client grants and receipt IDs save together; persistence failure rolls back the
+  grant. **Payments are not live:** no external backend account, public endpoint
+  or payment credentials are configured. The UI keeps payments, code redemption
+  and the Ko-fi payment link closed. See [server setup](../server/support-README.md).
+  Original private server secrets were not copied into this public repository.
+
 ## How to try it
 
 1. Start in Kapsel. Walk toward the case and press E or the on-screen interaction
@@ -231,10 +257,23 @@ origin's localStorage.
     Change body/hair or base colors, then close and reload. The equipped piece,
     its source colors, existing presets and gameplay bonuses remain consistent.
 
+18. Approach Rajko in the cellar or his desk, choose Rajko/Lowtown, mute,
+    close and reload. Selection persists. The URL field supports platform players
+    and optional HTTPS streams; the original protection toggle starts enabled.
+19. Meet Felix in the Gasse. Choose Ein Zug or Lass, then Deal. In Kapsel use the
+    crate at the lower right to deposit seeds/fertilizer and retrieve harvested
+    buds. Watch Felix work; returning after an absence also advances production.
+20. After 100 growbox harvests meet Eddi in Kapsel. Buy seeds, try his title and
+    sell buds. His star marks triple base yield; the existing care bonus still
+    adds to that harvest. His shop remains attached to the actual NPC.
+21. Talk to Ben and choose Kasse auf. Review the fixed packages. Until the
+    separate payment service is deployed this build clearly shows the counter
+    closed and cannot take a payment or award a payment reward.
+
 ## Validation
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 114 regression tests covering 420 assets, restored source hashes, battle save
+suite has 148 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
@@ -247,7 +286,20 @@ original achievement predicates and save adapters, paid tips, exact-once single/
 batch rewards, earning thresholds, movement/time counters and Moss-find history,
 clothing ownership/legacy saves/bonuses and distinct reusable 3D garment layers,
 walking pivots and GPU resource ownership. `npm run build` performs TypeScript and Vite
-production checks. CI runs both commands. For v26, the first pass had 112/114
+production checks. CI runs both commands. The v27 extension also covers original
+radio assets/URL rules, worker stock and clock conservation, offline production,
+Eddi pricing/stars/title, secure receipt ownership/retries and persistence failure.
+
+For v27, pass 1 completed with all 148 tests and the test-channel production build
+successful. Pass 2: one Chromium touch smoke confirmed real local MP3 playback,
+radio URL/protection rules and selection/mute after reload, Felix's physical
+hire/puff and offline harvest, crate deposits/withdrawals and reload, Eddi's
+half-price seed/title/double-base sale, HP0/XP preservation and the closed Ben
+counter. No browser exceptions or horizontal touch overflow were observed.
+External YouTube/Spotify availability and physical Android audio/performance
+remain user/device checks. Pass 3 is CI/Pages and the live artifact check.
+
+Historical v26: the first pass had 112/114
 successful cases; two fixture currency expectations missed legitimate Tanktop or
 quest rewards. Both were corrected, and their 17 targeted tests plus build passed
 in pass two. Its one touch smoke verified all eleven appearances, original T,
@@ -294,8 +346,8 @@ module tests; his browser interaction remains a user-check item.
 Quest/NPC package 1 is playable: source dialogue, turn-ins, loot, journal counters,
 board rewards and the Lowtown thread chain are connected. This does not imply the
 following separate mechanics are implemented. As recorded in CODEX_HANDOFF.md,
-Felix/Eddi automation and the operational Ko-fi support economy belong to package
-6; Rajko's radio remains reserved for its listed package.
+Felix/Eddi automation, radio and the support service belong to package 6, whose
+implemented scope and external deployment blocker are recorded below.
 
 Fishing package 2 is implemented in v23; its successful catches, failed casts,
 food and aquarium collection share the existing save. Trainer package 3 is
@@ -305,10 +357,17 @@ network feature and is not claimed as implemented. Can package 4 is implemented
 in v25: 420 original achievement pages, paid tips, durable individual/batch reward
 claiming and a read-only menu journal. Clothing package 5 is implemented in v26:
 all ten source wearables visibly equip on the existing character and remain
-consistent with the retained editor, walking and saves. Continue with:
+consistent with the retained editor, walking and saves. In v27 the original
+radio, Felix automation/crate/offline economy and Eddi visitor/shop/title are
+implemented. Ben has a complete configurable client and persistent receipt server,
+but its operational payment deployment is still open. Continue with:
 
-1. Next: radio and story economy, including Felix/Eddi automation and Ben's
-   support backend. Ben's quest acknowledgement alone does not implement payments.
+1. Next open work in package 6: deploy Ben's service on a persistent HTTPS host,
+   configure Ko-fi's verification token and a new server-only code secret, then
+   set the GitHub repository variable `SUPPORT_API_URL`. The included Pages
+   workflow passes this public URL to the test build. Do not call payments live
+   or move this blocker to done before actual backend setup and a real receipt
+   check. No backend credentials or hosting capabilities were available in v27.
 2. Individual 3D monster models following the retained source sprites.
 
 Physical Android performance and native 4K verification remain device tests;

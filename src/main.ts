@@ -10,6 +10,9 @@ import { fishEffectMultiplier } from "./game/fish-consumption";
 import { getSave, saveProgress } from "./game/save";
 import { createHomeInteractions } from "./game/home";
 import { createRivalSystem } from "./game/rival";
+import { createStoryEconomy } from "./game/story-economy";
+import { createRadioSystem } from "./game/radio";
+import { createSupportSystem } from "./game/support";
 import { createAchievementBook } from "./game/achievement-book";
 import { syncAchievements } from "./game/achievements";
 import { recordAchievementActivity } from "./game/achievement-activity";
@@ -113,7 +116,10 @@ const grow = createGrowSystem(districtWorld);
 const fishing = createFishingSystem(districtWorld);
 const fishingWorld = createFishingWorld(districtWorld);
 const achievements = createAchievementBook(districtWorld);
-const home = createHomeInteractions(districtWorld, grow, fishing, monsterGame, achievements);
+const story = createStoryEconomy(districtWorld);
+const radio = createRadioSystem();
+const support = createSupportSystem(districtWorld);
+const home = createHomeInteractions(districtWorld, grow, fishing, monsterGame, achievements, { ...story, openRadio: radio.open, openBen: support.openBen });
 const rival = createRivalSystem(districtWorld, home.openNim);
 createGameSystems(districtWorld, () => grow.openShop(), achievements);
 
@@ -170,7 +176,7 @@ hud.innerHTML = `
   <div class="brand">420MON <span>LOWTOWN</span></div>
   <div class="status">DEIN ZUHAUSE IN 3D</div>
   <div class="hint">WASD / PFEILE · E INTERAGIEREN · T KLEIDUNG · SHIFT LAUFEN</div>
-  <div class="target">KAPSEL & KELLER · TESTVERSION 26</div>
+  <div class="target">KAPSEL & KELLER · TESTVERSION 27</div>
   <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
@@ -318,7 +324,7 @@ studioOpen.textContent = "✎ CHARAKTER";
 studioOpen.type = "button";
 app.appendChild(studioOpen);
 function toggleStudio(open: boolean) {
-  if (open && document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden])")) return;
+  if (open && document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden])")) return;
   studioPanel.classList.toggle("is-open", open);
   document.body.classList.toggle("wardrobe-preview", open);
   if (!open && studioPanel.contains(document.activeElement)) (document.activeElement as HTMLElement)?.blur();
@@ -330,7 +336,7 @@ function toggleStudio(open: boolean) {
 window.addEventListener("420mon-preview-clothes", () => toggleStudio(true));
 window.addEventListener("keydown", event => {
   if (event.code === "Escape" && studioPanel.classList.contains("is-open")) toggleStudio(false);
-  if (event.code !== "KeyT" || event.repeat || event.defaultPrevented || (event.target as HTMLElement)?.closest("input,select,textarea,[contenteditable=true]") || document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden])")) return;
+  if (event.code !== "KeyT" || event.repeat || event.defaultPrevented || (event.target as HTMLElement)?.closest("input,select,textarea,[contenteditable=true]") || document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden])")) return;
   const result = toggleBag(getSave()); if (result.ok) saveProgress();
 });
 studioOpen.addEventListener("click", () => toggleStudio(!studioPanel.classList.contains("is-open")));
@@ -468,6 +474,8 @@ function animate() {
   rival.update(dt);
   districtWorld.update();
   grow.update(dt);
+  story.update();
+  support.update(dt);
   fishing.update(dt);
   fishingWorld.update(dt);
   achievements.update(dt);
@@ -484,7 +492,7 @@ function animate() {
 
   if (input.lengthSq() > 0) input.normalize();
 
-  const overlayOpen = !!document.querySelector(".systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden])");
+  const overlayOpen = !!document.querySelector(".systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden])");
   const speed = monsterGame.inBattle || overlayOpen ? 0 : ((state.sprint || touch.sprint) ? 7.5 : 4.2) * fishEffectMultiplier(getSave(), "speed");
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
   blockedThisFrame = false;

@@ -104,12 +104,18 @@ export function advanceGrow(s: GrowState, now = Date.now()): number {
   const elapsed = Math.min(OFFLINE_CAP, Math.max(0, (now - s.lastGrowAt) / 1000));
   if (now <= s.lastGrowAt) return 0;
   s.lastGrowAt = now;
+  advanceGrowSeconds(s, elapsed);
+  return elapsed;
+}
+
+/** Shared plant clock for online workers and the source offline simulator. */
+export function advanceGrowSeconds(s: GrowState, elapsed: number): void {
+  if (!Number.isFinite(elapsed) || elapsed <= 0) return;
   for (const p of s.pots) {
     if (p.phase === "empty" || p.phase === "ready") continue;
     p.timeLeft = Math.max(0, p.timeLeft - elapsed * growTickSpeed(p.fert, !!p.byFelix, s.schnittTitle, s.eddiIn) * tankSpeed(s));
     refreshPot(p);
   }
-  return elapsed;
 }
 
 function grantXp(s: GrowState, amount: number): number {

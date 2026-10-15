@@ -1,0 +1,29 @@
+.radio-overlay[hidden], .radio-dock[hidden], .radio-stage[hidden] { display: none; }
+.radio-overlay { position: fixed; z-index: 85; inset: 0; padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom)); display: grid; place-items: center; background: #020b12ba; backdrop-filter: blur(9px); color: #e9fff9; }
+.radio-panel { box-sizing: border-box; width: min(680px, 100%); max-height: 100%; overflow: auto; overscroll-behavior: contain; padding: 22px; border: 1px solid #61f7bd77; border-radius: 18px; background: linear-gradient(145deg, #102a2c, #07131e); box-shadow: 0 18px 70px #000b; }
+.radio-panel header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.radio-panel header span { font-size: 10px; letter-spacing: .14em; color: #76d9bf; }
+.radio-panel h2 { margin: 7px 0; font-size: 26px; }
+.radio-panel p { font-size: 13px; line-height: 1.55; color: #bfd8d5; }
+.radio-panel button, .radio-fullscreen, .radio-mute-dock { min-height: 44px; border: 1px solid #4f9c8a; border-radius: 9px; background: #163a37; padding: 10px 13px; color: #eafff7; cursor: pointer; font: 700 12px system-ui; }
+.radio-panel button:disabled { opacity: .42; cursor: default; }
+.radio-panel button.selected { background: #186644; border-color: #75ffc6; }
+.radio-track-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 18px 0; }
+.radio-panel .radio-close { background: transparent; min-width: 44px; font-size: 19px; }
+.radio-panel .radio-shield { min-width: 160px; }
+.radio-panel .radio-shield-copy { font-size: 11px; margin: 8px 0 18px; }
+.radio-panel label { font-size: 12px; color: #d4f2e8; }
+.radio-url-form { display: flex; gap: 9px; margin-top: 8px; }
+.radio-url-form input { min-height: 45px; box-sizing: border-box; flex: 1; min-width: 0; border: 1px solid #478873; border-radius: 8px; padding: 10px; background: #061915; color: #f0fff8; font-size: 16px; }
+.radio-url-actions { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+.radio-url-hint { flex: 1; color: #a2ccbc; font-size: 11px; line-height: 1.4; }
+.radio-stage { position: relative; width: 100%; }
+.radio-frame { display: block; width: 100%; aspect-ratio: 16/9; border: 1px solid #2d5e53; border-radius: 11px; background: #040b13; }
+.radio-fullscreen { position: absolute; top: 9px; right: 9px; min-height: 35px; padding: 7px 10px; background: #071c23e8; }
+.radio-stage:fullscreen { background: #02090e; display: grid; place-items: center; }
+.radio-stage:fullscreen .radio-frame { height: 100%; aspect-ratio: auto; border-radius: 0; }
+.radio-dock { position: fixed; left: 14px; bottom: 100px; width: min(240px, 40vw); z-index: 24; }
+.radio-dock .radio-fullscreen { font-size: 10px; min-height: 30px; padding: 5px 7px; top: 4px; right: 4px; }
+.radio-mute-dock { position: fixed; top: max(200px, env(safe-area-inset-top)); right: 16px; z-index: 29; min-height: 36px; padding: 8px 11px; background: #092b2be8; font-size: 10px; }
+body.wardrobe-preview .radio-mute-dock, body.wardrobe-preview .radio-dock { visibility: hidden; }
+@media (max-width: 480px) { .radio-panel { padding: 16px; border-radius: 13px; } .radio-url-form { flex-direction: column; } .radio-url-actions { align-items: flex-start; } .radio-mute-dock { right: 10px; top: max(190px, env(safe-area-inset-top)); } .radio-dock { left: 10px; bottom: 102px; width: 38vw; } }
