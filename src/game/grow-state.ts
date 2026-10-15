@@ -1,4 +1,5 @@
 import { normalizePartnerForBattle, tryLevel } from "./battle";
+import { tankGrowMul } from "./data/fish";
 import { DEX } from "./data/dex";
 import { BOX_MAX, BOX_UNLOCK, GROW_SLOTS, ITEMS, POT_MAX, POT_START, POT_UNLOCK, STALL_GROW, isGrowBox } from "./data/items";
 import { OFFLINE_CAP, growTickSpeed, potYieldRaw, strainGrowBase, wallLeft } from "./data/grow";
@@ -68,7 +69,8 @@ export function refreshPot(p: GrowPot): void {
 }
 
 export const slotOpen = (s: GrowState, index: number): boolean => Number.isInteger(index) && index >= 0 && index < GROW_SLOTS && (isGrowBox(index) ? index - POT_MAX < s.boxesUnlocked : index < s.potsUnlocked);
-export const growRemaining = (s: GrowState, p: GrowPot): number => wallLeft(p.timeLeft, p.fert, !!p.byFelix, s.schnittTitle, s.eddiIn);
+const tankSpeed = (s: GrowState) => tankGrowMul(typeof s.map === "string" ? s.map : "", s.fishCaught as Record<string, number> | undefined);
+export const growRemaining = (s: GrowState, p: GrowPot): number => wallLeft(p.timeLeft, p.fert, !!p.byFelix, s.schnittTitle, s.eddiIn) / tankSpeed(s);
 const careHits = (value: unknown): number => Math.floor(clamp(finite(value, 0), 0, 3));
 /** Each earned hit gives this planting 10% shorter growth and 10% more buds. */
 export const growCareBonus = (p: GrowPot): number => careHits(p.careRewardHits) / 10;
@@ -97,7 +99,7 @@ export function advanceGrow(s: GrowState, now = Date.now()): number {
   s.lastGrowAt = now;
   for (const p of s.pots) {
     if (p.phase === "empty" || p.phase === "ready") continue;
-    p.timeLeft = Math.max(0, p.timeLeft - elapsed * growTickSpeed(p.fert, !!p.byFelix, s.schnittTitle, s.eddiIn));
+    p.timeLeft = Math.max(0, p.timeLeft - elapsed * growTickSpeed(p.fert, !!p.byFelix, s.schnittTitle, s.eddiIn) * tankSpeed(s));
     refreshPot(p);
   }
   return elapsed;

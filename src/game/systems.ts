@@ -3,6 +3,7 @@ import { DEX, DEX_ORDER, dexNum, speciesById } from "./data/dex";
 import { DISTRICTS } from "./data/zones";
 import { ITEMS, SHOP, STALL_CHIPS, STALL_THREADS, STALL_FENCE } from "./data/items";
 import { xpToNext } from "./data/progress";
+import { consumeFish, activeFishEffects } from "./fish-consumption";
 import { questProgress } from "./quests";
 import { salePrice, sellMerchantItem } from "./merchant-state";
 import { QUEST_DEFS } from "./data/quests";
@@ -122,11 +123,16 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
       if (team) row("✚ TEAM HEILEN", () => { if (document.querySelector(".monster-battle:not([hidden])")) { note("Nicht während eines Kampfes."); return; } const n = healLiving(s.team); save(s); render(); note(n ? "Lebende Teammonster geheilt." : "Kein verletztes lebendes Monster im Team."); }, "Heilstation · außerhalb des Kampfes");
     } else if (tab === "bag") {
       title("INVENTAR · " + s.gold + " ₲");
+      const buffs = activeFishEffects(s);
+      if (buffs.length) row(buffs.map(effect => effect.label).join(" · "));
       row("◉ STANDARD-KAPSEL ×" + s.balls, undefined, "Fangversuche im Kampf");
       for (const [id, amount] of Object.entries(s.inventory!)) {
         if (amount <= 0) continue;
         const it = ITEMS[id]; if (!it) continue;
-        row(it.name + " ×" + amount, it.use === "heal" || it.use === "heal_all" ? () => {
+        row(it.name + " ×" + amount, it.cat === "fish" ? () => {
+          if (document.querySelector(".monster-battle:not([hidden])")) { note("Fisch nach dem Kampf essen."); return; }
+          const result = consumeFish(s, id); if (result.ok) { save(s); render(); } note(result.lines.join(" "));
+        } : it.use === "heal" || it.use === "heal_all" ? () => {
           if (document.querySelector(".monster-battle:not([hidden])")) { note("Im Kampf nicht verfügbar."); return; }
           const living = s.team.filter(mon => mon.hp > 0 && mon.hp < maxHp(mon));
           const targets = it.use === "heal_all" ? living : living.sort((a, b) => (maxHp(b) - b.hp) - (maxHp(a) - a.hp)).slice(0, 1);

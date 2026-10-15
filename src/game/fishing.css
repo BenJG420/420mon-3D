@@ -1,0 +1,56 @@
+.fish-overlay { position:fixed; inset:0; z-index:200; display:grid; place-items:center; padding:18px; color:#e5ead9; background:#07151cba; }
+.fish-overlay[hidden] { display:none; }
+.fish-panel { width:min(720px,100%); max-height:calc(100dvh - 36px); display:flex; flex-direction:column; background:linear-gradient(140deg,#294345,#152b34); border:1px solid #9ab89580; border-radius:12px; box-shadow:0 25px 100px #0008; overflow:hidden; font:13px system-ui; }
+.fish-panel header { display:flex; align-items:center; justify-content:space-between; padding:20px 22px 14px; }
+.fish-eyebrow { font-size:9px; color:#d8c296; letter-spacing:.18em; }
+.fish-panel h2 { font-size:28px; font-weight:600; margin:7px 0 0; }
+.fish-panel button { cursor:pointer; color:#e8ebd5; background:#35574d; border:1px solid #a9ba8880; border-radius:6px; min-height:44px; padding:10px 13px; font:600 12px system-ui; }
+.fish-panel button:disabled { opacity:.45; cursor:default; }
+.fish-panel button:focus-visible { outline:2px solid #e1c896; outline-offset:2px; }
+.fish-panel .fish-close { background:transparent; border:0; font-size:18px; }
+.fish-tabs { display:flex; gap:7px; padding:0 22px 14px; border-bottom:1px solid #a6ba8b40; }
+.fish-tabs button { flex:1; padding:9px 7px; background:#203b3e; font-size:10px; letter-spacing:.05em; }
+.fish-tabs .selected { background:#53745a; border-color:#c6d69d; }
+.fish-content { overflow:auto; overscroll-behavior:contain; min-height:0; padding:18px 22px; }
+.fish-intro { margin:0 0 16px; line-height:1.7; color:#c3d1c1; }
+.fish-baits { display:grid; gap:8px; }
+.fish-baits button { text-align:left; display:grid; gap:6px; padding:13px; background:#29483f; }
+.fish-baits strong { font-size:13px; }
+.fish-baits strong span { color:#d9c18f; float:right; margin-left:8px; }
+.fish-baits small { font-size:11px; line-height:1.5; color:#b7cab8; font-weight:400; }
+.fish-note { padding:12px 22px; background:#12272cb8; border-top:1px solid #a7bd8e30; min-height:47px; font-size:11px; line-height:1.6; color:#dbcea5; }
+.fish-result { padding:15px; margin-bottom:16px; border:1px solid #a6bc8070; background:#314e40; border-radius:8px; min-height:85px; }
+.fish-result h3 { margin:0 0 6px; font-size:18px; }
+.fish-result p { margin:0; color:#c9d4be; line-height:1.6; }
+.fish-result canvas { width:80px; height:80px; float:left; margin-right:12px; image-rendering:pixelated; }
+.fish-wheel-wrap { text-align:center; }
+.fish-wheel-wrap p { color:#b8cabc; font-size:11px; }
+.fish-wheel-wrap .fish-bite { letter-spacing:.15em; font-size:11px; color:#d8d6ad; }
+.fish-panel .fish-wheel { width:240px; max-width:100%; aspect-ratio:1; display:block; position:relative; padding:0; margin:16px auto; border:0; background:none; }
+.fish-wheel svg { width:100%; height:100%; display:block; }
+.fish-wheel span { position:absolute; left:0; right:0; top:57%; font-size:10px; letter-spacing:.16em; color:#d5d8bd; }
+.fish-track { fill:#1c3437; stroke:#0c232b; stroke-width:22; }
+.fish-zone { fill:none; stroke:#99d39c; stroke-width:22; }
+.fish-ticks { stroke:#a1b89c66; stroke-width:1; }
+.fish-needle { fill:#eceddb; stroke:#eceddb; stroke-width:4; stroke-linecap:round; }
+.fish-wait { text-align:center; padding:10px 0 16px; }
+.fish-wait p { color:#bfcec0; }
+.fish-water { height:180px; position:relative; overflow:hidden; border-radius:8px; background:linear-gradient(#203b42 35%,#42666c 36%,#163947 39%,#0c2634); }
+.fish-water i { display:block; width:47%; height:3px; position:absolute; top:45%; left:10%; background:#bfa37a; transform:rotate(-25deg); transform-origin:left; }
+.fish-water i:after { content:""; display:block; width:1px; height:75px; background:#d5ddd299; position:absolute; right:0; top:0; transform:rotate(25deg); }
+.fish-float { position:absolute; left:65%; top:47%; width:14px; height:18px; border-radius:50%; background:linear-gradient(#d2745a 50%,#e3e7d5 50%); box-shadow:0 10px 15px #71989b44; animation:fish-bob 1.7s ease-in-out infinite; }
+.fish-wait-number { position:absolute; top:18px; left:18px; font-size:17px; color:#d5d7bf; font-weight:500; }
+@keyframes fish-bob { 50% {transform:translate(4px,5px) rotate(6deg);} }
+.fish-catalog { display:grid; gap:9px; grid-template-columns:1fr 1fr; }
+.fish-species { display:flex; gap:9px; padding:10px; border:1px solid #a3b78630; border-radius:7px; background:#1b353a; min-width:0; }
+.fish-species.caught { border-color:#b6ca8b80; background:#2a453d; }
+.fish-art { flex:0 0 60px; height:60px; display:grid; place-items:center; background:#142a303d; border-radius:5px; font:25px Georgia; color:#829e89; }
+.fish-art canvas { width:60px; height:60px; image-rendering:pixelated; }
+.fish-species strong { font-size:12px; }
+.fish-species small { display:block; color:#acc3ad; font-size:10px; margin-top:5px; }
+.fish-species p { color:#bdcdb9; font-size:11px; line-height:1.5; margin:7px 0 0; }
+.fish-food { display:flex; align-items:center; gap:10px; }
+.fish-food canvas { width:64px; height:64px; image-rendering:pixelated; }
+.fish-food button { flex:1; }
+.fish-active-effects { color:#dec993; font-size:12px; line-height:1.6; }
+@media(max-width:680px) { .fish-overlay {padding:8px;} .fish-panel {max-height:calc(100dvh - 16px);} .fish-panel header {padding:15px 16px 13px;} .fish-panel h2 {font-size:24px;} .fish-tabs {padding:0 14px 12px;} .fish-content {padding:15px;} .fish-note {padding:11px 15px;} .fish-catalog {grid-template-columns:1fr;} }

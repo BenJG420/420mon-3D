@@ -33,3 +33,13 @@ below and checked by `tests/assets.test.mjs`.
 
 Runtime image requests use only this repository's local build assets. The
 private original repository is never required by a player's browser.
+
+
+## v23 fishing artwork
+
+The 42 fish names, bait schools, colors, body skins and accessories are copied
+from original `src/game/data/fish.ts` at revision
+`010807da77df8468a297adf33eaf1fb5c9a61c8b`. `src/game/fishArt.ts` preserves the
+original procedural four-pose canvas artwork. UI portraits and aquarium sprites
+select one pose. The fish are a separate catalogue, not additions to the 420 Dex
+or completed individual 3D monster meshes. No private runtime image URLs are used.
