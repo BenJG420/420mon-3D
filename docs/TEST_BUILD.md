@@ -356,8 +356,17 @@ page errors. High/HDR/bloom enabled successfully, but its 1280×800 screenshot a
 emulated DPR3 hit a 16-second software-rendering timeout; subsequent indoor,
 reload/payment/viewer checks in that script were not reached. No whole smoke
 rerun. The observed mobile graphic-selector/prompt overlap was corrected in CSS.
-Pass 3 is CI/Pages plus focused live verification. Physical high-quality/4K
-performance remains a device check.
+Pass 3 completed PR CI run 38854928401, main CI run 38855024073 (161/161
+and build), and Pages run 38855024104. PR #36 published source
+`c82f7c830700019fbcac5872927dfb80709597b8`. Live bundle `index-CUSOzd0g.js`
+(SHA-256 `28581be3e6f8be5a27c029ee3487c379698bd69d31e8b5102a19de8dcfadb695`)
+and CSS `index-B22-BWfz.css` match the CI artifact names; stable root remains
+`index-DWZ4yP_E.js`. A focused live check at DPR1 confirmed high/HDR/bloom,
+indoor rain off, persisted Sparsam preference, no payment counter, preserved
+HP0/XP/gold/inventory and the corrected mobile control position. No shader or
+page exceptions occurred. No full smoke was repeated. Sustained high-DPR/native
+4K performance remains a physical device check. This final note changes docs
+only (`[skip ci]`); the above merge remains the published source.
 
 Historical v28: pass 1 completed all 156 tests, including all 420 model assets and
 source palettes/hashes, non-flat closed geometry/budgets, 24 distinct sculptures,

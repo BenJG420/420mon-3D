@@ -1,4 +1,10 @@
-# Ben's payment service
+# Ben's payment service — archived / skipped
+
+**Owner instruction 2026-10-16: skip Ko-fi and payment-server work completely.**
+This historical setup is not a pending task. The live game no longer wires this
+counter, polling client or deployment URL. Do not configure or re-enable it as
+part of the graphics packages. Existing code and receipt fields are retained for
+compatibility; the instructions below are historical reference only.
 
 GitHub Pages cannot run a webhook or store payment receipts. The game therefore
 keeps payment actions closed until a separate HTTPS payment service is configured.
