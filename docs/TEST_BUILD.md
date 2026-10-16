@@ -329,8 +329,15 @@ smoke confirmed six sculptures and two generated volumes, real rendered rotation
 zoom/reset, desktop/mobile fit, close/reload without HP0/XP/gold/inventory changes,
 and the correct trainer opponent preview without consuming a turn. A guaranteed
 source chip then caught that trainer monster; the defeated partner stayed at
-zero HP with unchanged XP. No browser exceptions occurred. Pass 3 is CI/Pages
-and the live artifact check; no second full test or smoke loop is planned.
+zero HP with unchanged XP. No browser exceptions occurred. Pass 3 completed PR
+CI run 38843795101, main CI run 38843909379 (156/156 tests/build), and Pages run
+38843909553. PR #35 published source `861750bbcc1057326c6cb1db0b11bd68bc5d7119`.
+The live JS `index-CaFS25C1.js` exactly matches the checked production bundle
+(SHA-256 `f42e5c3d422f2bb54dc38c346313e7b0a2be62dc3821a9af97baceb70b687bdd`);
+CSS is `index-CqXk0kcd.css`. The full 420-entry manifest and sampled model files
+match local hashes. The stable root remains `index-DWZ4yP_E.js`. No extra full
+test/build or browser smoke loop was run. This final deployment note is docs only
+(`[skip ci]`); published game source is the above PR merge.
 
 Historical v27: pass 1 completed with all 148 tests and the test-channel production build
 successful. Pass 2: one Chromium touch smoke confirmed real local MP3 playback,
