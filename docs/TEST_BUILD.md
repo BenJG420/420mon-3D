@@ -1,4 +1,4 @@
-# Original-world test build v28
+# Original-world test build v29
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -187,14 +187,11 @@ origin's localStorage.
   items retain their original 420 price), and sells the unique 10,000-Softcash
   grow-speed title. Offline time does not invent Eddi visits. Helpers share one
   plant clock without incrementing playtime or changing defeated HP.
-- Ben's physical counter shows the original fixed EUR 3/8/20 packages. A separate
-  Node/SQLite service verifies Ko-fi receipts, privately bound Kassenwörter and
-  server-signed codes, with durable transaction ownership and duplicate protection.
-  Client grants and receipt IDs save together; persistence failure rolls back the
-  grant. **Payments are not live:** no external backend account, public endpoint
-  or payment credentials are configured. The UI keeps payments, code redemption
-  and the Ko-fi payment link closed. See [server setup](../server/support-README.md).
-  Original private server secrets were not copied into this public repository.
+- **Übersprungen — Ko-fi und Zahlungsserver (user instruction 2026-10-16).**
+  This work is no longer blocked, pending setup or a next task. The game no
+  longer opens Ben's payment UI, polls a payment service or passes a payment URL
+  to its deployment. Historical service/client files and receipt/save history
+  remain archived; Ben's existing quest acknowledgement remains available.
 
 - Monster model package: every runtime species now has its own rounded 3D
   volume reconstructed from the exact first original pose, preserving its color,
@@ -216,6 +213,27 @@ origin's localStorage.
   pose and close with Escape. One temporary viewer renderer is destroyed on
   close; the covered world renderer pauses GPU drawing. Keyboard/touch movement
   is cleared on entry. Battle turns and save data do not change by viewing.
+
+- District atmosphere package: dark blue-green industrial materials and small
+  paving, warm-white/amber key and lamp pools, cool fill/rim, distance fog, wet
+  PBR roughness/normal/clearcoat and irregular puddles follow the owner's visual
+  reference. Facades add merged windows, roof trim, vents and downpipes. A
+  per-district HDR/PMREM environment supplies material reflections; this is not
+  a claim of screen-space ray tracing or exact moving-character reflections.
+- GPU rain streaks, world-anchored splashes and ground haze use fixed resources;
+  source indoor maps remain rain-free, with warm dust instead. Nearby physical
+  lamps are capped at four outdoors/five indoors, and the shadow area follows
+  the player. Geometry, map coordinates, routes, collisions and NPC actions stay
+  in place. See [graphics pipeline and budgets](GRAPHICS.md).
+- The world now passes through color grading, vignette/grain, ACES/sRGB output
+  and FXAA. Supported high mode adds bounded HDR bloom; the automatic phone/low
+  path keeps grading and antialiasing without the expensive bloom chain. Grafik
+  selects Automatisch/Hoch/Sparsam and saves only a presentation preference.
+  Pixel budgets and DPR caps avoid forced phone supersampling. DOM menus and
+  existing monster/editor previews retain their own rendering.
+- Licensed rigged player and NPC replacements are deliberately next, followed
+  by individual monster refinement. No external character asset is introduced
+  here; current procedural asset provenance is in [ASSET_ATTRIBUTION.md](ASSET_ATTRIBUTION.md).
 
 ## How to try it
 
@@ -287,9 +305,8 @@ origin's localStorage.
 20. After 100 growbox harvests meet Eddi in Kapsel. Buy seeds, try his title and
     sell buds. His star marks triple base yield; the existing care bonus still
     adds to that harvest. His shop remains attached to the actual NPC.
-21. Talk to Ben and choose Kasse auf. Review the fixed packages. Until the
-    separate payment service is deployed this build clearly shows the counter
-    closed and cannot take a payment or award a payment reward.
+21. Ko-fi/payment work is intentionally skipped. Ben remains an ordinary story
+    NPC for the existing acknowledgement; no payment counter opens.
 
 22. Open the Dex and select a captured entry marked 3D ansehen. Compare the
     original pose with its model, drag to rotate, zoom, reset and close with Esc.
@@ -300,10 +317,18 @@ origin's localStorage.
     catching with the existing rules. Evolution, respawn and Nim's next opponent
     update the same model slot.
 
+24. Explore the Gasse or another outdoor district: wet paving, warm pools,
+    cool shadows, thin rain and low haze replace the previous late-day lighting.
+    Enter Kapsel or Rajko's cellar: rainfall stops and warm interior lighting
+    remains. Changing districts also changes the color/fog/wetness profile.
+25. Switch Grafik between Automatisch, Hoch and Sparsam, resize and reload.
+    High enables bloom on supported hardware; automatic phones use the cheaper
+    path. Menus, movement, interaction, model previews and save slots still work.
+
 ## Validation
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 156 regression tests covering 420 assets, restored source hashes, battle save
+suite has 161 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
@@ -320,7 +345,21 @@ production checks. CI runs both commands. The v27 extension also covers original
 radio assets/URL rules, worker stock and clock conservation, offline production,
 Eddi pricing/stars/title, secure receipt ownership/retries and persistence failure.
 
-For v28, pass 1 completed all 156 tests, including all 420 model assets and
+For v29, pass 1 completed all 161 tests and the test-channel build. Five new
+checks cover all 22 presentation profiles/shelter rules, profile isolation,
+phone/4K pixel budgets, fixed weather resources across district changes and
+owned-resource cleanup. The existing world fixture now supplies real image-data
+buffers for its procedural PBR atlas. Browser smoke and deployment are recorded
+below after completion. Pass 2 confirmed outdoor rain, the automatic mobile
+post path and the DPR3 pixel budget, with a captured Gasse image and no shader or
+page errors. High/HDR/bloom enabled successfully, but its 1280×800 screenshot at
+emulated DPR3 hit a 16-second software-rendering timeout; subsequent indoor,
+reload/payment/viewer checks in that script were not reached. No whole smoke
+rerun. The observed mobile graphic-selector/prompt overlap was corrected in CSS.
+Pass 3 is CI/Pages plus focused live verification. Physical high-quality/4K
+performance remains a device check.
+
+Historical v28: pass 1 completed all 156 tests, including all 420 model assets and
 source palettes/hashes, non-flat closed geometry/budgets, 24 distinct sculptures,
 cache ownership and stale/error/retry paths. Its production build stopped on a
 TypeScript narrowing error in the new raster validator. The validator now checks
@@ -358,7 +397,7 @@ names, v27 contents and both original MP3 hashes. No build or browser smoke was
 repeated. The stable root still serves `index-DWZ4yP_E.js`.
 
 The v27 final deployment note was documentation only (`[skip ci]`). Payment
-operation is still not live; current v28 publication is recorded above.
+work was later skipped by the owner; current publication is recorded above.
 
 Historical v26: the first pass had 112/114
 successful cases; two fixture currency expectations missed legitimate Tanktop or
@@ -404,40 +443,34 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — continue in this order
 
-Quest/NPC package 1 is playable: source dialogue, turn-ins, loot, journal counters,
-board rewards and the Lowtown thread chain are connected. This does not imply the
-following separate mechanics are implemented. As recorded in CODEX_HANDOFF.md,
-Felix/Eddi automation, radio and the support service belong to package 6, whose
-implemented scope and external deployment blocker are recorded below.
+**Übersprungen: Ko-fi und Zahlungsserver.** The owner explicitly cancelled that
+work on 2026-10-16. Do not investigate hosting, configure Ko-fi, re-enable a
+payment link or describe this as a blocker. Archived implementation and old
+payment save fields are retained only for compatibility.
 
-Fishing package 2 is implemented in v23; its successful catches, failed casts,
-food and aquarium collection share the existing save. Trainer package 3 is
-implemented in v24: seven daily Kiez trainers, three one-time gate trainers and
-Nim’s roaming multi-monster duels. Multiplayer sparring remains a separate source
-network feature and is not claimed as implemented. Can package 4 is implemented
-in v25: 420 original achievement pages, paid tips, durable individual/batch reward
-claiming and a read-only menu journal. Clothing package 5 is implemented in v26:
-all ten source wearables visibly equip on the existing character and remain
-consistent with the retained editor, walking and saves. In v27 the original
-radio, Felix automation/crate/offline economy and Eddi visitor/shop/title are
-implemented. Ben has a complete configurable client and persistent receipt server,
-but its operational payment deployment is still open. Continue with:
+The owner replaced the previous work order with these graphics packages. Keep
+all existing districts, routes, combat/capture, Grow, fishing, mattress healing,
+quests, inventory, achievements, clothing bonuses and save slots intact:
 
-1. Next open work in package 6: deploy Ben's service on a persistent HTTPS host,
-   configure Ko-fi's verification token and a new server-only code secret, then
-   set the GitHub repository variable `SUPPORT_API_URL`. The included Pages
-   workflow passes this public URL to the test build. Do not call payments live
-   or move this blocker to done before actual backend setup and a real receipt
-   check. No backend credentials or hosting capabilities were available in v27. If they
-   remain unavailable, keep this marked blocked and proceed with the next
-   implementable package; do not rebuild the already delivered client/service.
-2. v28 delivers playable 3D models for every species: 24 individual sculptures
-   and 396 source-pose volume reconstructions. Next art work: individually sculpt
-   the remaining 396, starting with the next unsculpted Dex entries, then review
-   side/back anatomy and animations. Keep the 420-source pipeline, bounded cache,
-   existing model slots and comparison viewer; do not rebuild them. The exact
-   24 preferred IDs are exported by `AUTHORED_MONSTER_IDS` in
-   `src/game/monster-authored.ts`. Do not claim all 420 are hand-sculpted.
+1. v29 implements district lighting, wet materials, fog, rain and
+   post-processing matching the README/visual reference. Publication and its
+   exact validation limits are recorded above. Retain these systems; device
+   performance tuning can follow actual player feedback.
+2. Next: replace the block-style player with a realistic freely licensed rigged
+   model and idle/walk/run animations (CC0 or appropriately licensed compatible
+   assets). Record source URLs, license text/terms, author and redistribution
+   permissions in `docs/ASSET_ATTRIBUTION.md`. Preserve existing equipment,
+   clothing visibility, controls, collisions and saves.
+3. Upgrade NPCs with the same model/animation approach while preserving all
+   existing physical interaction points, identities and quest/shop actions.
+4. Continue individual 3D monster models from the retained 2D sprites. v28 has
+   24 preferred sculptures and 396 source-pose volume reconstructions. Preserve
+   the 420-source pipeline, bounded cache, model slots and comparison viewer;
+   do not rebuild these systems or claim all 420 are individually sculpted.
+
+Each package gets one PR, at most three focused validation passes, an updated
+handoff and explicit Remaining work. Do not ask routine questions; write a
+one-line assumption and continue with the available evidence.
 
 Physical Android performance and native 4K verification remain device tests;
 Chromium touch emulation does not replace those. The stable root release and the

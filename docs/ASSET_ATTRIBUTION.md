@@ -1,58 +1,24 @@
-# Original 420mon artwork
+# Asset attribution
 
-The monster artwork is reused from the user's original `BenJG420/420mon` 2D
-game, with the repository owner's authorization for this 3D upgrade. The
-original game remains the source for species names, designs and gameplay data.
-No third-party artwork or generated replacement monster designs are included.
+## District atmosphere — v29
 
-All 420 assembled Dex species now resolve to a local original spritesheet in
-`public/game/sprites/`. These sheets contain four 128 × 128 poses in a 256 × 256
-image. The Dex and the 3D encounter billboards show the top-left pose only, and
-the complete sheets remain available as references for future species models.
-Encounter billboards are 2D artwork placed in the 3D world, not finished 3D
-monster meshes.
+- Procedural asphalt, stone, plaster, wood and metal color/roughness/normal maps,
+  puddle masks, light pools, reflection cards, rain, splashes and haze are authored
+  in this repository. No third-party texture pack or HDR photograph is shipped.
+- Rendering uses [Three.js](https://threejs.org/) and its post-processing addons,
+  distributed under the [MIT license](https://github.com/mrdoob/three.js/blob/dev/LICENSE).
+  The dependency retains its upstream license.
+- The owner's [shared graphics reference](https://photos.app.goo.gl/EjPtD2afQq3hnZ4x5)
+  was viewed as an art-direction reference. Its photo/video is not bundled or
+  claimed as an asset licensed for redistribution.
+- Existing original 420mon sprites and project-authored monster/clothing meshes
+  remain unchanged in this package; see [MONSTER_MODELS.md](MONSTER_MODELS.md).
 
-Existing `.svg` files are wrappers containing the unchanged source PNG image.
-The existing Budling, Neonpunx and Puffpuff PNGs remain in place. The ten missing
-legendary sheets were copied byte for byte from `public/game/sprites/` in the
-original repository on 2026-10-13. Their original Git blob hashes are recorded
-below and checked by `tests/assets.test.mjs`.
+## Next: rigged player and NPC assets
 
-| Original source path | Git blob SHA-1 |
-| --- | --- |
-| `public/game/sprites/kerboss.png` | `62c666daef714bc5ec5bbdde1dd47dd7928f815f` |
-| `public/game/sprites/kronkush.png` | `5bfadcc0ef93e11b9832f232798fe69e53f04870` |
-| `public/game/sprites/rootkaiser.png` | `62604531fa473fcc31679ea185b6f97569d58aa3` |
-| `public/game/sprites/glutarch.png` | `3dbd6503bf9a27563a0b588651a953756512cbaa` |
-| `public/game/sprites/rohrlethe.png` | `07ffbfc5a001a0daca301e93a0e644d1c32bbce5` |
-| `public/game/sprites/vialith.png` | `01fe2ec423790c88663c78627746818f4d6e563c` |
-| `public/game/sprites/cagekaiser.png` | `8862f286e7797e2eb0577391792077ed90334945` |
-| `public/game/sprites/noxarch.png` | `035fdcc4c68dbe2da02c58d9849f65a328c8aa23` |
-| `public/game/sprites/velouryx.png` | `6fef39c3b51c234c72bb6729741244620720a6be` |
-| `public/game/sprites/slagodon.png` | `d2739e01c6078a041e2189454c18fdc184e8b7c1` |
-
-Runtime image requests use only this repository's local build assets. The
-private original repository is never required by a player's browser.
-
-
-## v23 fishing artwork
-
-The 42 fish names, bait schools, colors, body skins and accessories are copied
-from original `src/game/data/fish.ts` at revision
-`010807da77df8468a297adf33eaf1fb5c9a61c8b`. `src/game/fishArt.ts` preserves the
-original procedural four-pose canvas artwork. UI portraits and aquarium sprites
-select one pose. The fish are a separate catalogue, not additions to the 420 Dex
-or completed individual 3D monster meshes. No private runtime image URLs are used.
-
-
-## v26 visible clothing
-
-The procedural garment meshes in `src/game/clothing-visuals.ts` follow the
-original `public/game/sprites/player_{nude,bag,collar,jacket,vest,coat,hoodie,track,rain,overalls,lack}.png`
-sheets from BenJG420/420mon revision
-`010807da77df8468a297adf33eaf1fb5c9a61c8b`. Each reference sheet contains 4×4
-352-pixel poses. The original silhouettes and palettes guide the 3D forms,
-including the torn charcoal trashbag and cyan lacquer jacket. These are newly
-authored geometry fitted to the retained avatar, not embedded source textures.
-The inspected full sheets remain unchanged in the development reference cache;
-no additional PNG downloads or private URLs are required at runtime.
+No external rigged player/NPC asset is introduced by v29. Before shipping one,
+record its exact download/source URL, author, asset version, license text/URL,
+redistribution conditions and required credit here, including animation sources.
+Prefer CC0 or another explicit license compatible with shipping the model and
+clips in this public game. A format described as Mixamo-compatible does not by
+itself grant a license to redistribute its model or animations.

@@ -1,5 +1,15 @@
 # 420mon → 420mon-3D — Codex handoff (2026-10-12)
 
+> v29 Grafik-Paket 1: Bezirksprofile, dunkle PBR-Kachelmaterialien/Nassglanz, nahe Lampen/Fassaden, HDR-PMREM, GPU-Regen/Bodenringe/Haze und Composer mit Hoch-Bloom/Grading/FXAA sind integriert. Grafikpräferenz ist getrennt vom Spielstand. Keine neuen Spieler-/NPC-Assets; nächstes Paket ist der lizenzierte Rigged-Spieler, dann NPCs, dann Monster. Ko-fi ist übersprungen und im Spiel nicht mehr erreichbar.
+>
+> Prüfnotiz v29: Lauf 1 mit 161 Tests und Build grün. Lauf 2 bestätigt Gasse/Handy-Automatik/Regen/DPR3-Budget ohne Shader-/Browserfehler; Hoch/HDR/Bloom aktiviert, dann Screenshot-Timeout bei emuliertem DPR3 und 1280×800. Nachfolgende Indoor-/Save-/Ben-/Viewer-Schritte nicht erreicht; keine volle Wiederholung. Sichtbare mobile Grafikschalter-Überlappung in CSS korrigiert. Lauf 3 ist CI/Pages und gezielter Live-Check; Hoch/4K bleibt Gerätetest.
+>
+
+> Nutzerwechsel v29 (2026-10-16): Ko-fi/Zahlungsserver sind **übersprungen**, nicht mehr blockiert/offen. Grafik-Reihenfolge jetzt: 1. Bezirkslicht/Materialien/Wetter/Post-Processing nach README/Bildvorlage, 2. realistischer frei lizenzierter Rigged-Spieler samt Animationen (Lizenz in docs/ASSET_ATTRIBUTION.md), 3. NPCs, 4. individuelle Monster nach 2D. Mechaniken bleiben außer nötigen Grafik-Anpassungen erhalten; ein PR und höchstens drei Prüfläufe je Paket.
+>
+> Annahme v29: Die README-Prosabeschreibung und die zugängliche frühere Google-Photos-Vorlage bestimmen dunkle Industriehöfe mit warmweiß/bernsteinfarbenen Reflexen, kühlen Schatten, Bodenhaze und dünnem Regen; Innenräume bleiben trocken. Die Vorlage wird nur angesehen, nicht als ungeklärtes Spiel-Asset übernommen.
+>
+
 > v28 (2026-10-16): Alle 420 Arten haben individuelle lokale Sprite-Volumen; die ersten 24 (Budling–Graterat, AUTHORED_MONSTER_IDS) bevorzugte eigens modellierte Körper. Welt, Kampfpartner und Gegnerwechsel nutzen dieselben bestehenden Modell-Slots. Dex-/Kampfansicht mit Drehung, Zoom und Originalvergleich ist integriert. Nächste Kunst-Arbeit sind die 396 noch nicht einzeln modellierten Arten; Pipeline/Cache/Viewer nicht neu bauen. Bens Betrieb bleibt extern blockiert. Details: [docs/MONSTER_MODELS.md](docs/MONSTER_MODELS.md).
 >
 > Prüfnotiz v28: Lauf 1: 156/156 Tests grün, Build an TS-Typnarrowing im neuen Validator gestoppt und korrigiert. Lauf 2: Build und ein Touch-Smoke mit sechs Skulpturen/zwei Volumen, Drehung/Zoom, Handy/Desktop/Reload und Trainer-Gegnermodell/Fang bestanden; HP0/XP/Inventar/Gold bleiben erhalten. Lauf 3 bestanden: PR-/Main-CI mit 156/156, Build und Pages grün; PR #35 veröffentlicht (861750b). Live-Bundle index-CaFS25C1.js entspricht exakt dem geprüften Build, 420er-Manifest und Modellstichproben entsprechen lokalen Hashes, stabiler Root bleibt v18. Keine weiteren Vollprüfungen.
@@ -38,7 +48,7 @@
 > Latest user update (2026-10-14): mattresses revive defeated team partners, and Grow care gives real time/yield bonuses. These override the historical 0-HP and cosmetic-only rules below.
 >
 > Historical handoff below. v18 was merged through PR #25 on 2026-10-13. The
-> current v28 implementation and remaining work are documented in
+> current v29 implementation and remaining work are documented in
 > [docs/TEST_BUILD.md](docs/TEST_BUILD.md). Its runtime Dex has 420 local original
 > sheets; its world uses the original MAPS. Old branch/count statements below
 > are preserved as history and must not drive new merge decisions.

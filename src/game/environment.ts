@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { getDistrictGraphics, type DistrictGraphics } from "./graphics-profile";
+import { createDistrictWeather } from "./weather";
 
 export type SurfaceKind = "floor" | "wall" | "metal" | "wood";
 
@@ -233,110 +235,146 @@ export function dressBuilding(group: THREE.Group, width: number, depth: number, 
   instanceParts(group, windowWarm, lit);
 }
 
-function reflectionSky() {
-  const faces = ["#82989e", "#89989c", "#a3b5bb", "#4c5147", "#adb1a0", "#788f97"];
-  const images = faces.map(color => {
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 32;
-    const ctx = canvas.getContext("2d")!;
-    const gradient = ctx.createLinearGradient(0, 0, 0, 32);
-    gradient.addColorStop(0, color);
-    gradient.addColorStop(1, "#878779");
-    ctx.fillStyle = gradient; ctx.fillRect(0, 0, 32, 32);
-    return canvas;
+/** Linear HDR light cards provide genuine roughness-filtered reflections on wet paving. */
+function districtReflection(generator: THREE.PMREMGenerator, profile: DistrictGraphics, indoor: boolean) {
+  const probeScene = new THREE.Scene();
+  const resources: { dispose: () => void }[] = [];
+  const shellGeometry = new THREE.BoxGeometry(60, 60, 60);
+  const shellMaterial = new THREE.MeshBasicMaterial({
+    color: new THREE.Color(profile.fillColor).multiplyScalar(indoor ? .16 : .09),
+    side: THREE.BackSide,
   });
-  const cube = new THREE.CubeTexture(images);
-  cube.colorSpace = THREE.SRGBColorSpace;
-  cube.needsUpdate = true;
-  return cube;
+  probeScene.add(new THREE.Mesh(shellGeometry, shellMaterial));
+  resources.push(shellGeometry, shellMaterial);
+  const panelGeometry = new THREE.PlaneGeometry(1, 1);
+  resources.push(panelGeometry);
+  const origin = new THREE.Vector3();
+  const panel = (color: string, brightness: number, x: number, y: number, z: number, width: number, height: number) => {
+    const material = new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(brightness), side: THREE.DoubleSide });
+    const mesh = new THREE.Mesh(panelGeometry, material);
+    mesh.position.set(x, y, z); mesh.scale.set(width, height, 1); mesh.lookAt(origin);
+    resources.push(material); probeScene.add(mesh);
+  };
+  // A broad white/amber opening, cool sky slit and restrained district-colored sign.
+  panel(profile.keyColor, indoor ? 3.3 : 5.5, -15, 12, 10, 15, 8);
+  panel(profile.fillColor, indoor ? .9 : 1.8, 14, 8, -12, 7, 12);
+  panel(profile.accent, indoor ? 1.1 : 2.4, 9, 2.2, 15, 7, 1.4);
+  panel(profile.keyColor, indoor ? 1.2 : 2.6, -11, 2.5, -14, 4, 1.2);
+  const target = generator.fromScene(probeScene, .045, .1, 100, { size: 128 });
+  for (const resource of resources) resource.dispose();
+  return target;
 }
 
 export type GameEnvironment = {
   update: (player: THREE.Object3D, dt: number) => void;
   setIndoor: (indoor: boolean) => void;
+  setDistrict: (mapId: string, indoor?: boolean) => void;
+  getDiagnostics: () => {
+    district: string; indoor: boolean; rainDrops: number; rippleCount: number;
+    mistPatches: number; lights: number; reflection: string;
+  };
   dispose: () => void;
 };
 
-/** Warm late-day light, blue sky fill and a shadow volume that follows the player. */
+/** Amber key, blue shadow fill, wet reflections and bounded rain for the current map. */
 export function createEnvironment(scene: THREE.Scene, renderer: THREE.WebGLRenderer): GameEnvironment {
-  const previous = { background: scene.background, fog: scene.fog, environment: scene.environment, intensity: scene.environmentIntensity };
-  const root = new THREE.Group();
-  root.name = "cinematic-environment";
-  scene.add(root);
-  scene.background = new THREE.Color(0x697f85);
-  scene.fog = new THREE.Fog(0x81918e, 48, 145);
-  const sky = reflectionSky();
-  scene.environment = sky;
-  scene.environmentIntensity = 0.55;
+  const previous = {
+    background: scene.background, fog: scene.fog, environment: scene.environment,
+    intensity: scene.environmentIntensity, toneMapping: renderer.toneMapping,
+    exposure: renderer.toneMappingExposure, shadows: renderer.shadowMap.enabled,
+    shadowType: renderer.shadowMap.type,
+  };
+  const root = new THREE.Group(); root.name = "cinematic-district-environment"; scene.add(root);
+  const mobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 760;
+  const skyFill = new THREE.HemisphereLight(0x50778d, 0x211b15, .65);
+  const key = new THREE.DirectionalLight(0xffe0b2, 2.1);
+  const rim = new THREE.DirectionalLight(0x7596ad, .45);
+  key.castShadow = true;
+  key.shadow.mapSize.set(mobile ? 1024 : 2048, mobile ? 1024 : 2048);
+  Object.assign(key.shadow.camera, { near: 1, far: 105, left: -23, right: 23, top: 23, bottom: -23 });
+  key.shadow.camera.updateProjectionMatrix();
+  key.shadow.bias = -.00018; key.shadow.normalBias = .035; key.shadow.radius = 2;
+  root.add(skyFill, key, key.target, rim, rim.target);
+  const keyOffset = new THREE.Vector3(-24, 30, 17);
+  const rimOffset = new THREE.Vector3(17, 12, -19);
+  const shadowCenter = new THREE.Vector3();
+  const fog = new THREE.FogExp2(0x102331, .024);
+  const background = new THREE.Color();
+  const generator = new THREE.PMREMGenerator(renderer);
+  let reflection: THREE.WebGLRenderTarget | undefined;
+  const weather = createDistrictWeather(root, mobile);
+
+  const dustGeometry = new THREE.BufferGeometry();
+  const dustPositions = new Float32Array((mobile ? 28 : 48) * 3);
+  const random = randomSource(7159);
+  for (let i = 0; i < dustPositions.length; i += 3) {
+    dustPositions[i] = (random() - .5) * 18;
+    dustPositions[i + 1] = .3 + random() * 4.5;
+    dustPositions[i + 2] = (random() - .5) * 18;
+  }
+  dustGeometry.setAttribute("position", new THREE.BufferAttribute(dustPositions, 3));
+  const dustMaterial = new THREE.PointsMaterial({
+    color: 0xe7c99f, size: .023, transparent: true, opacity: .19, depthWrite: false,
+  });
+  const dust = new THREE.Points(dustGeometry, dustMaterial);
+  dust.name = "interior-dust"; dust.frustumCulled = false; root.add(dust);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.08;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  let district = "", indoor = true, initial = true, elapsed = 0;
 
-  const hemi = new THREE.HemisphereLight(0x9fc1d3, 0x443b29, 1.6);
-  const sun = new THREE.DirectionalLight(0xffdea3, 3.25);
-  sun.castShadow = true;
-  const mobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 760;
-  sun.shadow.mapSize.set(mobile ? 1024 : 2048, mobile ? 1024 : 2048);
-  Object.assign(sun.shadow.camera, { near: 1, far: 125, left: -25, right: 25, top: 25, bottom: -25 });
-  sun.shadow.camera.updateProjectionMatrix();
-  sun.shadow.bias = -0.0002;
-  sun.shadow.normalBias = 0.035;
-  sun.shadow.radius = 2;
-  const bounce = new THREE.AmbientLight(0x938675, 0.19);
-  root.add(hemi, sun, sun.target, bounce);
-
-  const particleGeometry = new THREE.BufferGeometry();
-  const particlePositions = new Float32Array(60 * 3);
-  const random = randomSource(7159);
-  for (let i = 0; i < particlePositions.length; i += 3) {
-    particlePositions[i] = (random() - 0.5) * 27;
-    particlePositions[i + 1] = 0.3 + random() * 6;
-    particlePositions[i + 2] = (random() - 0.5) * 27;
-  }
-  particleGeometry.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
-  const particleMaterial = new THREE.PointsMaterial({ color: 0xf6e4b8, size: 0.028, transparent: true, opacity: 0.31, depthWrite: false });
-  const dust = new THREE.Points(particleGeometry, particleMaterial);
-  dust.frustumCulled = false;
-  root.add(dust);
-  const sunOffset = new THREE.Vector3(-28, 39, 24);
-  const shadowCenter = new THREE.Vector3();
-  let indoor = false, initial = true, elapsed = 0;
-  sun.position.copy(sunOffset);
+  const setDistrict = (mapId: string, indoorValue?: boolean) => {
+    // The animation loop calls this every frame; unchanged maps do absolutely no GPU work.
+    if (district === mapId && (indoorValue === undefined || indoor === indoorValue)) return;
+    const resolvedIndoor = indoorValue ?? getDistrictGraphics(mapId).indoor;
+    district = mapId; indoor = resolvedIndoor;
+    const profile = getDistrictGraphics(mapId, indoor);
+    background.set(profile.background); scene.background = background;
+    fog.color.set(profile.fog.color); fog.density = profile.fog.density;
+    scene.fog = profile.fog.density > 0 ? fog : null;
+    renderer.toneMappingExposure = profile.exposure;
+    key.color.set(profile.keyColor); key.intensity = profile.keyIntensity;
+    skyFill.color.set(profile.fillColor); skyFill.intensity = profile.fillIntensity;
+    rim.color.set(profile.fillColor).lerp(new THREE.Color(profile.accent), .12);
+    rim.intensity = indoor ? .28 : .48;
+    scene.environmentIntensity = profile.environmentIntensity;
+    const nextReflection = districtReflection(generator, profile, indoor);
+    scene.environment = nextReflection.texture;
+    reflection?.dispose(); reflection = nextReflection;
+    weather.setStyle({ rain: profile.rain, fill: profile.fillColor, accent: profile.accent, indoor });
+    dust.visible = indoor;
+    dustMaterial.color.set(profile.keyColor);
+    initial = true;
+  };
+  setDistrict("capsule", true);
 
   return {
-    setIndoor(value) {
-      if (indoor === value) return;
-      indoor = value;
-      // Roofless cutaway rooms still receive a gentle key light for readability.
-      sun.intensity = indoor ? 1.45 : 3.25;
-      hemi.intensity = indoor ? 1.3 : 1.6;
-      scene.environmentIntensity = indoor ? 0.3 : 0.55;
-      scene.fog = indoor ? null : new THREE.Fog(0x81918e, 48, 145);
-      scene.background = new THREE.Color(indoor ? 0x151d20 : 0x697f85);
-      particleMaterial.opacity = indoor ? 0.2 : 0.31;
+    setDistrict,
+    setIndoor(value) { setDistrict(district, value); },
+    getDiagnostics() {
+      return { district, indoor, ...weather.getDiagnostics(), lights: 3, reflection: "hdr-pmrem" };
     },
     update(player, dt) {
-      elapsed += Math.min(Math.max(dt, 0), 0.1);
+      const step = Math.min(Math.max(dt, 0), .1);
+      elapsed = (elapsed + step) % 4096;
       if (initial || shadowCenter.distanceToSquared(player.position) > 300) {
-        shadowCenter.copy(player.position);
-        initial = false;
-      } else shadowCenter.lerp(player.position, 1 - Math.exp(-4 * dt));
-      sun.target.position.copy(shadowCenter);
-      sun.position.copy(shadowCenter).add(sunOffset);
-      dust.position.set(player.position.x + Math.sin(elapsed * 0.13) * 0.9, player.position.y, player.position.z + Math.cos(elapsed * 0.1) * 0.9);
-      dust.rotation.y = Math.sin(elapsed * 0.02) * 0.08;
+        shadowCenter.copy(player.position); initial = false;
+      } else shadowCenter.lerp(player.position, 1 - Math.exp(-4 * step));
+      key.target.position.copy(shadowCenter); key.position.copy(shadowCenter).add(keyOffset);
+      rim.target.position.copy(shadowCenter); rim.position.copy(shadowCenter).add(rimOffset);
+      dust.position.set(player.position.x + Math.sin(elapsed * .13) * .9, 0, player.position.z + Math.cos(elapsed * .1) * .9);
+      dust.rotation.y = Math.sin(elapsed * .02) * .08;
+      weather.update(player, step);
     },
     dispose() {
-      scene.remove(root);
-      particleGeometry.dispose();
-      particleMaterial.dispose();
-      sun.shadow.map?.dispose();
-      sky.dispose();
-      scene.background = previous.background;
-      scene.fog = previous.fog;
-      scene.environment = previous.environment;
-      scene.environmentIntensity = previous.intensity;
+      weather.dispose(); scene.remove(root);
+      dustGeometry.dispose(); dustMaterial.dispose();
+      key.dispose(); rim.dispose(); skyFill.dispose();
+      reflection?.dispose(); generator.dispose();
+      scene.background = previous.background; scene.fog = previous.fog;
+      scene.environment = previous.environment; scene.environmentIntensity = previous.intensity;
+      renderer.toneMapping = previous.toneMapping; renderer.toneMappingExposure = previous.exposure;
+      renderer.shadowMap.enabled = previous.shadows; renderer.shadowMap.type = previous.shadowType;
     },
   };
 }
