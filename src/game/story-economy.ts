@@ -135,7 +135,7 @@ export function createStoryEconomy(world: DistrictTravel) {
         if (s.eddiIn) bodies.push(eddiBody(s));
       }
       world.setStoryNpcs(bodies);
-      if (arrivalPending && world.current() === "capsule" && !document.querySelector(".systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.monster-battle:not([hidden]),.home-dialog:not([hidden]),.story-overlay:not([hidden]),.support-overlay:not([hidden]),.radio-overlay:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.studio-panel.is-open")) {
+      if (arrivalPending && world.current() === "capsule" && !document.querySelector(".systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.monster-battle:not([hidden]),.home-dialog:not([hidden]),.story-overlay:not([hidden]),.support-overlay:not([hidden]),.radio-overlay:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.studio-panel.is-open")) {
         arrivalPending = false; open("arrival");
       }
     },

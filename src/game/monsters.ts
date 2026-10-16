@@ -100,8 +100,8 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
       <section class="monster-battle-card">
         <header class="monster-battle-heading"><div><span id="monster-battle-kind">LOWTOWN · WILDE BEGEGNUNG</span><strong id="monster-battle-title">DEIN NÄCHSTER ZUG</strong></div><span id="monster-turn">RUNDE 1</span></header>
         <div class="battle-fighters">
-          <div class="battle-fighter battle-ally"><div class="battle-portrait dex-sprite-frame" id="monster-ally-art"></div><div><div id="monster-team-status"></div><div class="monster-hp"><div id="monster-ally-hp-bar"></div></div><small id="monster-ally-detail"></small></div></div>
-          <div class="battle-fighter battle-enemy"><div class="battle-portrait dex-sprite-frame" id="monster-enemy-art"></div><div><div id="monster-name"></div><div class="monster-hp"><div id="monster-hp-bar"></div></div><small id="monster-enemy-detail"></small></div></div>
+          <div class="battle-fighter battle-ally"><div><div class="battle-portrait dex-sprite-frame" id="monster-ally-art"></div><button type="button" class="battle-model-open" id="monster-ally-model">3D ansehen</button></div><div><div id="monster-team-status"></div><div class="monster-hp"><div id="monster-ally-hp-bar"></div></div><small id="monster-ally-detail"></small></div></div>
+          <div class="battle-fighter battle-enemy"><div><div class="battle-portrait dex-sprite-frame" id="monster-enemy-art"></div><button type="button" class="battle-model-open" id="monster-enemy-model">3D ansehen</button></div><div><div id="monster-name"></div><div class="monster-hp"><div id="monster-hp-bar"></div></div><small id="monster-enemy-detail"></small></div></div>
         </div>
         <div id="monster-message" class="battle-log" aria-live="polite" aria-atomic="true"></div>
         <div class="battle-moves" id="monster-moves">
@@ -152,6 +152,8 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
   let duelCount = 0;
   const log: string[] = [];
   const moveButtons = ["monster-attack", "monster-special", "monster-move-2", "monster-move-3"];
+  get("monster-ally-model").onclick = () => { if (fighter) window.dispatchEvent(new CustomEvent("420mon-open-model", { detail: { id: fighter.inst.id } })); };
+  get("monster-enemy-model").onclick = () => { if (enemy) window.dispatchEvent(new CustomEvent("420mon-open-model", { detail: { id: enemy.inst.id } })); };
   const escape = (value: string) => value.replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[c]!);
   const finite = (value: unknown, fallback = 0) => typeof value === "number" && Number.isFinite(value) ? value : fallback;
   const available = (mon: Partner) => mon.hp > 0 && !!mon.id && !!DEX_ORDER.includes(mon.id);
@@ -490,7 +492,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
   window.addEventListener("keydown", e => {
     const target = e.target as HTMLElement | null;
     if (e.defaultPrevented || target?.closest("input,textarea,select,[contenteditable=true]")) return;
-    if (document.querySelector(".systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.studio-panel.is-open")) return;
+    if (document.querySelector(".systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.studio-panel.is-open")) return;
     if (e.code === "KeyE" && !e.repeat && !active) start();
   });
   return {
@@ -500,8 +502,8 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
     update(dt: number) {
       time += dt;
       saved.playtime = Math.max(0, finite(saved.playtime)) + Math.max(0, dt);
-      if (allyModel) allyModel.children[0].position.y = 0.82 + Math.sin(time * 3.5) * 0.09;
-      if (challengeMon) challengeMon.mesh.children[0].position.y = 0.82 + Math.sin(time * 2.3) * 0.13;
+      if (allyModel) allyModel.children[0].position.y = 0.82 + Math.abs(Math.sin(time * 3.5)) * 0.06;
+      if (challengeMon) challengeMon.mesh.children[0].position.y = 0.82 + Math.abs(Math.sin(time * 2.3)) * 0.08;
       cooldown = Math.max(0, cooldown - dt);
       nearest = null;
       let best = 3.2 * 3.2;
@@ -525,7 +527,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
           }
           continue;
         }
-        mon.mesh.children[0].position.y = 0.82 + Math.sin(time * 2.3 + mon.phase) * 0.13;
+        mon.mesh.children[0].position.y = 0.82 + Math.abs(Math.sin(time * 2.3 + mon.phase)) * 0.08;
         const distance = mon.mesh.position.distanceToSquared(player.position);
         if (distance < best) { best = distance; nearest = mon; }
       }

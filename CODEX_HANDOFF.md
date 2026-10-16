@@ -1,5 +1,13 @@
 # 420mon → 420mon-3D — Codex handoff (2026-10-12)
 
+> v28 (2026-10-16): Alle 420 Arten haben individuelle lokale Sprite-Volumen; die ersten 24 (Budling–Graterat, AUTHORED_MONSTER_IDS) bevorzugte eigens modellierte Körper. Welt, Kampfpartner und Gegnerwechsel nutzen dieselben bestehenden Modell-Slots. Dex-/Kampfansicht mit Drehung, Zoom und Originalvergleich ist integriert. Nächste Kunst-Arbeit sind die 396 noch nicht einzeln modellierten Arten; Pipeline/Cache/Viewer nicht neu bauen. Bens Betrieb bleibt extern blockiert. Details: [docs/MONSTER_MODELS.md](docs/MONSTER_MODELS.md).
+>
+> Prüfnotiz v28: Lauf 1: 156/156 Tests grün, Build an TS-Typnarrowing im neuen Validator gestoppt und korrigiert. Lauf 2: Build und ein Touch-Smoke mit sechs Skulpturen/zwei Volumen, Drehung/Zoom, Handy/Desktop/Reload und Trainer-Gegnermodell/Fang bestanden; HP0/XP/Inventar/Gold bleiben erhalten. Lauf 3 ist CI/Pages und Live-Artefakte; keine weiteren Vollprüfungen.
+>
+
+> Annahme v28 (2026-10-16): Eine einzelne Originalpose legt die Rückseite nicht fest; 24 Arten erhalten nach dieser Vorlage modellierte Körper, die übrigen Arten individuelle abgerundete Sprite-Volumen mit ausdrücklich rekonstruierter Rückseite. Original-Sheets und sämtliche Spiel-/Speicherdaten bleiben unverändert; Bens externer Betrieb bleibt mangels Zugang blockiert.
+>
+
 > v27 (2026-10-15): Radio mit beiden lokalen Original-MP3s, Felix-Kiste/Automation/Offline-Produktion und Eddis Besuche, Sterne, Handel/Titel sind integriert. Bens sichere Node/SQLite-Kasse ist geliefert, aber ohne HTTPS-Backend/Ko-fi-Zugang geschlossen; dieser Betrieb bleibt der nächste offene Punkt vor Monster-Modellen. Einrichtung: [server/support-README.md](server/support-README.md).
 >
 > Annahme v27 (2026-10-15): Die statische Testseite nutzt einen separat konfigurierbaren Zahlungsserver mit neuen ausschließlich serverseitigen Geheimnissen; der private 2D-Server, seine Schlüssel und alte Signatur-Codes werden nicht in das öffentliche 3D-Spiel übernommen. Fehlt der externe Betriebszugang weiter, bleibt Ben ausdrücklich blockiert; das nächste umsetzbare Paket sind dann die Monster-Modelle, ohne die fertige Kasse erneut zu bauen.
@@ -30,7 +38,7 @@
 > Latest user update (2026-10-14): mattresses revive defeated team partners, and Grow care gives real time/yield bonuses. These override the historical 0-HP and cosmetic-only rules below.
 >
 > Historical handoff below. v18 was merged through PR #25 on 2026-10-13. The
-> current v27 implementation and remaining work are documented in
+> current v28 implementation and remaining work are documented in
 > [docs/TEST_BUILD.md](docs/TEST_BUILD.md). Its runtime Dex has 420 local original
 > sheets; its world uses the original MAPS. Old branch/count statements below
 > are preserved as history and must not drive new merge decisions.

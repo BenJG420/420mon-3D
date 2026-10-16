@@ -174,3 +174,5 @@ canvas {
 @media (max-width: 560px) { .world-map-shortcut { left: 8px; bottom: 54px; font-size: 12px; padding: 10px; } }
 
 .dex-original-missing { display:inline-flex; flex:0 0 58px; width:58px; height:58px; align-items:center; justify-content:center; border:1px solid #5d936e; border-radius:9px; color:#a9ffc1; background:#102b22; font-size:28px; }
+
+.battle-model-open { font: inherit; font-size: 10px; min-height: 32px; border: 1px solid #92bf9a66; border-radius: 6px; padding: 4px 6px; color: #d7e8cf; background: #172a26; cursor: pointer; }

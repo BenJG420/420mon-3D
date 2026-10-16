@@ -1,4 +1,4 @@
-# Original-world test build v27
+# Original-world test build v28
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -196,6 +196,27 @@ origin's localStorage.
   and the Ko-fi payment link closed. See [server setup](../server/support-README.md).
   Original private server secrets were not copied into this public repository.
 
+- Monster model package: every runtime species now has its own rounded 3D
+  volume reconstructed from the exact first original pose, preserving its color,
+  outline and holes. All 420 local model assets include source hashes and a
+  reproducible pipeline; they total 6.65 MB and are requested per visible species.
+  These reconstructions have inferred side/back depth, not authored rear anatomy.
+- The first 24 species, Budling through Graterat, additionally use individually
+  modeled bodies: leaves, vines, cables, punk armor, smoke, wings, jaws, legs and
+  tails follow their original references. Each sculpture merges into one colored
+  mesh. The other 396 use their own source-derived volumes. Original Dex sheets
+  remain unchanged. See [model scope and pipeline](MONSTER_MODELS.md).
+- Wild monsters, daily/gate trainers, Nim's changing opponents and battle allies
+  share the same model renderer and existing species IDs. Original portraits are
+  used while loading or on error. Caches retain active models and at most 24
+  unused species; stale async loads cannot attach to a different creature or a
+  removed instance. Bobbing keeps the new model feet above the ground.
+- Captured Dex entries and battle fighter buttons open a read-only 3D comparison
+  studio. Rotate by touch/mouse or arrows, zoom/reset, compare with one original
+  pose and close with Escape. One temporary viewer renderer is destroyed on
+  close; the covered world renderer pauses GPU drawing. Keyboard/touch movement
+  is cleared on entry. Battle turns and save data do not change by viewing.
+
 ## How to try it
 
 1. Start in Kapsel. Walk toward the case and press E or the on-screen interaction
@@ -270,10 +291,19 @@ origin's localStorage.
     separate payment service is deployed this build clearly shows the counter
     closed and cannot take a payment or award a payment reward.
 
+22. Open the Dex and select a captured entry marked 3D ansehen. Compare the
+    original pose with its model, drag to rotate, zoom, reset and close with Esc.
+    The first 24 entries use individual sculptures; other entries identify their
+    source-sprite reconstruction. Return to the world to see the same creatures.
+23. In a trainer or wild battle choose 3D ansehen under either fighter portrait.
+    Inspect and close: the same battle turn remains active. Continue fighting or
+    catching with the existing rules. Evolution, respawn and Nim's next opponent
+    update the same model slot.
+
 ## Validation
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 148 regression tests covering 420 assets, restored source hashes, battle save
+suite has 156 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
@@ -290,7 +320,19 @@ production checks. CI runs both commands. The v27 extension also covers original
 radio assets/URL rules, worker stock and clock conservation, offline production,
 Eddi pricing/stars/title, secure receipt ownership/retries and persistence failure.
 
-For v27, pass 1 completed with all 148 tests and the test-channel production build
+For v28, pass 1 completed all 156 tests, including all 420 model assets and
+source palettes/hashes, non-flat closed geometry/budgets, 24 distinct sculptures,
+cache ownership and stale/error/retry paths. Its production build stopped on a
+TypeScript narrowing error in the new raster validator. The validator now checks
+number types explicitly. Pass 2's production build passed and one Chromium touch
+smoke confirmed six sculptures and two generated volumes, real rendered rotation,
+zoom/reset, desktop/mobile fit, close/reload without HP0/XP/gold/inventory changes,
+and the correct trainer opponent preview without consuming a turn. A guaranteed
+source chip then caught that trainer monster; the defeated partner stayed at
+zero HP with unchanged XP. No browser exceptions occurred. Pass 3 is CI/Pages
+and the live artifact check; no second full test or smoke loop is planned.
+
+Historical v27: pass 1 completed with all 148 tests and the test-channel production build
 successful. Pass 2: one Chromium touch smoke confirmed real local MP3 playback,
 radio URL/protection rules and selection/mute after reload, Felix's physical
 hire/puff and offline harvest, crate deposits/withdrawals and reload, Eddi's
@@ -308,8 +350,8 @@ its own filename. The targeted live check then confirmed the actual CI artifact
 names, v27 contents and both original MP3 hashes. No build or browser smoke was
 repeated. The stable root still serves `index-DWZ4yP_E.js`.
 
-The final deployment note is documentation only and uses `[skip ci]`; published
-source remains the above merge. Payment operation is still not live.
+The v27 final deployment note was documentation only (`[skip ci]`). Payment
+operation is still not live; current v28 publication is recorded above.
 
 Historical v26: the first pass had 112/114
 successful cases; two fixture currency expectations missed legitimate Tanktop or
@@ -382,8 +424,13 @@ but its operational payment deployment is still open. Continue with:
    check. No backend credentials or hosting capabilities were available in v27. If they
    remain unavailable, keep this marked blocked and proceed with the next
    implementable package; do not rebuild the already delivered client/service.
-2. Next implementable package: individual 3D monster models following the
-   retained source sprites.
+2. v28 delivers playable 3D models for every species: 24 individual sculptures
+   and 396 source-pose volume reconstructions. Next art work: individually sculpt
+   the remaining 396, starting with the next unsculpted Dex entries, then review
+   side/back anatomy and animations. Keep the 420-source pipeline, bounded cache,
+   existing model slots and comparison viewer; do not rebuild them. The exact
+   24 preferred IDs are exported by `AUTHORED_MONSTER_IDS` in
+   `src/game/monster-authored.ts`. Do not claim all 420 are hand-sculpted.
 
 Physical Android performance and native 4K verification remain device tests;
 Chromium touch emulation does not replace those. The stable root release and the
