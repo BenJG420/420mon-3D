@@ -1,3 +1,8 @@
+> Annahme v31: Mira/Cherry/Silk/Velvet nutzen das weibliche Rig; weitere NPCs das männliche, mit stabiler Sprite-ID-Palette. Identität, Quelle-Koordinaten, Tags, Quests und Shops bleiben unverändert.
+> v30: PR #37 gemergt (328f3e8), PR-CI mit 162 Tests grün; Main-CI und Pages grün; Live-JS index-Bth2vcda.js, beide GLB-SHA256 und MIT-Datei bestätigt, stabiler Root unverändert.
+> Prüfnotiz v31: Pass 1 mit 162 Tests + Build grün. Pass 2 bestätigt drei geladene Keller-NPC-Rigs ohne Browserfehler; danach Timeout im Prüfskript, weil bei Can vor der Buchprüfung der Dialogknopf „Buch“ fehlte. Kein voller Smoke-Neulauf; gezielte Live-Interaktion und finale gemeinsame Kleiderkorrekturen folgen in Pass 3.
+> v31: NPCs erhalten unabhängige Skelette/Mixer aus denselben zwei MIT-Vorlagen, Idle-Phasen und Animation nur für Quellbewegung; Entfernung pausiert die Darstellung, Kartenwechsel/Entfernen verwirft verspätete Ladeergebnisse. Gemeinsame Kleidung hat freie Arme/Unterschenkel für originale kurze Schnitte.
+
 > Annahme v30: Rocketbox MIT (Revision 0943055) liefert beide Körper und drei passende Clips; gespeicherte Editorwerte bleiben erhalten, Kleidung folgt dem echten Skinning statt den alten Box-Pivots.
 > v30: Rigged-Spieler integriert; lokale Lizenz/Quellhashes, Idle/Walk/Run, unveränderte Bewegung und Fallback bei Ladefehler. Pass 1: 161 Tests + Build grün; Pass 2: Desktop-/Touch-Layout-Smoke mit beiden geladenen Rigs, Idle/Walk/Run, T und Reload grün, HP0/XP erhalten, keine Browser-/Shaderfehler. Neuer Asset-Integritätstest und finale Basisfarb-Anpassung werden im dritten CI-/Deploy-Lauf geprüft.
 

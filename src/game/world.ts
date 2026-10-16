@@ -6,6 +6,7 @@ import { getSave, saveProgress } from "./save";
 import { recordVisit, setQuestState } from "./quests";
 import { stageOf } from "./data/progress";
 import { createWorldSurfaces, projectSurfaceUvs } from "./world-surfaces";
+import { createNpcHuman } from "./npc-humanoids";
 import { getDistrictGraphics } from "./graphics-profile";
 
 /** Geometry, object positions and routes come from the original 2D game. */
@@ -76,6 +77,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   let lastPosition = { x: NaN, y: NaN };
   const glowing: { mesh: THREE.Mesh; phase: number }[] = [];
   const mapObjects = new Map<string, THREE.Group>();
+  const npcActors = new Map<string, ReturnType<typeof createNpcHuman>>();
+  let lastActorTime = performance.now();
   let roamingNpc: MapObj | undefined;
   const storyNpcs = new Map<string, MapObj>();
 
@@ -160,18 +163,20 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     for (const x of [-1, 1]) for (const z of [-1, 1]) box(g, .1, .25, .1, mat(palette.dark), x * (w / 2 - .12), .1, z * (d / 2 - .12));
   }
   function npc(obj: MapObj, g: THREE.Group) {
+    const body = new THREE.Group(); body.name = "npc-load-fallback"; g.add(body);
     const seed = Array.from(obj.id).reduce((n, c) => n + c.charCodeAt(0), 0);
     const outfit = [0x596a59, 0x786047, 0x59536a, 0x597580, 0x8a6256][seed % 5];
     const skin = mat([0xc09d77, 0x8c6b4d, 0xcfb18f][seed % 3]);
-    mesh(new THREE.CapsuleGeometry(.31, .56, 4, 8), mat(outfit, "plaster"), g, 0, 1.15, 0);
-    mesh(new THREE.SphereGeometry(.24, 12, 10), skin, g, 0, 1.9, 0);
-    mesh(new THREE.SphereGeometry(.255, 12, 8, 0, Math.PI * 2, 0, Math.PI * .5), mat(0x272725), g, 0, 1.98, -.025);
+    mesh(new THREE.CapsuleGeometry(.31, .56, 4, 8), mat(outfit, "plaster"), body, 0, 1.15, 0);
+    mesh(new THREE.SphereGeometry(.24, 12, 10), skin, body, 0, 1.9, 0);
+    mesh(new THREE.SphereGeometry(.255, 12, 8, 0, Math.PI * 2, 0, Math.PI * .5), mat(0x272725), body, 0, 1.98, -.025);
     for (const s of [-1, 1]) {
-      box(g, .2, .68, .23, mat(0x2e3431), s * .17, .49);
-      box(g, .25, .18, .38, mat(0x272820), s * .17, .09, .065);
-      const arm = box(g, .17, .58, .2, mat(outfit), s * .43, 1.13); arm.rotation.z = s * .09;
-      box(g, .15, .15, .17, skin, s * .46, .78);
+      box(body, .2, .68, .23, mat(0x2e3431), s * .17, .49);
+      box(body, .25, .18, .38, mat(0x272820), s * .17, .09, .065);
+      const arm = box(body, .17, .58, .2, mat(outfit), s * .43, 1.13); arm.rotation.z = s * .09;
+      box(body, .15, .15, .17, skin, s * .46, .78);
     }
+    npcActors.set(obj.id, createNpcHuman(obj, g, body));
     tag(g, obj.label, Math.min(2.5, Math.max(1.4, obj.label.length * .13)), 2.7);
     if (obj.kind === "shop" || obj.kind === "stall") {
       box(g, 2.7, .86, 1.1, mat(palette.wood, "wood"), 0, .43, .94);
@@ -539,12 +544,14 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     });
   }
   function disposeMap() {
+    for (const actor of npcActors.values()) actor.dispose(); npcActors.clear();
     disposeOwnedObjects(root);
     root.clear(); mapObjects.clear(); roamingNpc = undefined; storyNpcs.clear(); occluders = []; lampLights.length = 0; lastLightSelection = -Infinity; glowing.length = 0;
   }
   function removeMapObject(objectId: string) {
     const group = mapObjects.get(objectId);
     if (group) {
+      npcActors.get(objectId)?.dispose(); npcActors.delete(objectId);
       // Remove only this map-owned group. Rebuilding root would also detach
       // the encounter, Grow and aquarium systems' independently owned meshes.
       const removed = new Set<THREE.Object3D>();
@@ -707,6 +714,9 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
   function update() {
     const time = performance.now();
+    const actorDt = Math.min(.05, Math.max(0, (time - lastActorTime) / 1000)); lastActorTime = time;
+    for (const actor of npcActors.values()) actor.update(actorDt, player.position);
+    root.userData.riggedNpcs = [...mapObjects.values()].filter(group => group.userData.npcModel === "rocketbox-rigged").length;
     if (time - lastLightSelection > 350) {
       lastLightSelection = time;
       const closest = lampLights.map(light => ({ light, distance: light.getWorldPosition(lightPosition).distanceToSquared(player.position) }));

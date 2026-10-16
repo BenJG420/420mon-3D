@@ -1,3 +1,5 @@
+> v31: Rigged NPC graphics package; v30 player published via PR #37.
+
 > v30: Licensed rigged player package; publication/check notes follow in the handoff.
 
 # Original-world test build v29
@@ -471,8 +473,10 @@ quests, inventory, achievements, clothing bonuses and save slots intact:
    local Idle/Walk/Run clips and skin-weight wardrobe colors. Editor selections,
    movement, collisions and saves remain. Source/license/hashes are recorded in
    `docs/ASSET_ATTRIBUTION.md`; appearance device checks remain user feedback.
-3. Upgrade NPCs with the same model/animation approach while preserving all
-   existing physical interaction points, identities and quest/shop actions.
+3. v31 upgrades physical NPCs to independent Rocketbox skeletons and idle/source-
+   locomotion clips, stable visual identities and a bounded two-template cache.
+   NPC interaction points, signs, quests, shops and source positions remain.
+   Runtime checks/publication are recorded in the handoff.
 4. Continue individual 3D monster models from the retained 2D sprites. v28 has
    24 preferred sculptures and 396 source-pose volume reconstructions. Preserve
    the 420-source pipeline, bounded cache, model slots and comparison viewer;
