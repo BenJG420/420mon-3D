@@ -19,6 +19,7 @@ import { createAchievementBook } from "./game/achievement-book";
 import { syncAchievements } from "./game/achievements";
 import { recordAchievementActivity } from "./game/achievement-activity";
 import { clothingId, clothingLabel, CLOTHING_IDS, toggleClothing, toggleBag } from "./game/clothing-state";
+import { createHumanoid } from "./game/humanoid";
 import { createClothingVisuals } from "./game/clothing-visuals";
 import "./styles.css";
 import "./home.css";
@@ -112,6 +113,10 @@ function applyCharacterChoice(choice: CharacterChoice) {
 }
 applyCharacterChoice(characterChoice);
 let walkCycle = 0;
+const human = createHumanoid(player, ready => {
+  character.visible = !ready;
+  renderer.domElement.dataset.playerModel = ready ? "rocketbox-rigged" : "fallback";
+});
 
 const playerRadius = 0.4;
 let collisionCount = 0;
@@ -182,7 +187,7 @@ hud.innerHTML = `
   <div class="brand">420MON <span>LOWTOWN</span></div>
   <div class="status">DEIN ZUHAUSE IN 3D</div>
   <div class="hint">WASD / PFEILE · E INTERAGIEREN · T KLEIDUNG · SHIFT LAUFEN</div>
-  <div class="target">LOWTOWN · TESTVERSION 29</div>
+  <div class="target">LOWTOWN · TESTVERSION 30</div>
   <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
@@ -262,6 +267,7 @@ const clothes = createClothingVisuals({ character, torso, leftArm, rightArm, lef
 function syncClothes() {
   clothes.apply(clothingId(getSave().outfit), studio.choice === "woman" ? .83 : 1);
   renderer.domElement.dataset.outfit = clothes.current();
+  human.setLook(studio, clothes.current());
 }
 function applyStudio() {
   applyCharacterChoice(studio.choice);
@@ -551,6 +557,8 @@ function animate() {
     );
     player.rotation.y += delta * (1 - Math.exp(-12 * dt));
   }
+  human.update(dt, velocity.length(), state.sprint || touch.sprint);
+  renderer.domElement.dataset.playerAnimation = human.root.userData.animation;
   const moving = velocity.length() > 0.35;
   const gait = Math.min(1, velocity.length() / 4.2);
   if (moving) walkCycle += dt * (state.sprint || touch.sprint ? 13 : 9);
