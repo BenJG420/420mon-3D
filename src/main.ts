@@ -12,8 +12,9 @@ import { createHomeInteractions } from "./game/home";
 import { createRivalSystem } from "./game/rival";
 import { createStoryEconomy } from "./game/story-economy";
 import { createRadioSystem } from "./game/radio";
-import { createSupportSystem } from "./game/support";
 import { createMonsterViewer } from "./game/monster-viewer";
+import { createPostProcessing } from "./game/post-processing";
+import { graphicsPixelRatio, type GraphicsQuality } from "./game/graphics-profile";
 import { createAchievementBook } from "./game/achievement-book";
 import { syncAchievements } from "./game/achievements";
 import { recordAchievementActivity } from "./game/achievement-activity";
@@ -46,6 +47,10 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 app.appendChild(renderer.domElement);
 
 const environment = createEnvironment(scene, renderer);
+const postProcessing = createPostProcessing(renderer, scene, camera);
+const storedQuality = localStorage.getItem("420mon-graphics-quality");
+let graphicsQuality: GraphicsQuality = storedQuality === "high" || storedQuality === "low" ? storedQuality : "auto";
+postProcessing.setQuality(graphicsQuality);
 
 // Modular low-poly humanoid. Individual limb pivots can later be replaced
 // with rigged meshes, clothing and equipment without changing movement code.
@@ -119,9 +124,8 @@ const fishingWorld = createFishingWorld(districtWorld);
 const achievements = createAchievementBook(districtWorld);
 const story = createStoryEconomy(districtWorld);
 const radio = createRadioSystem();
-const support = createSupportSystem(districtWorld);
 const monsterViewer = createMonsterViewer();
-const home = createHomeInteractions(districtWorld, grow, fishing, monsterGame, achievements, { ...story, openRadio: radio.open, openBen: support.openBen });
+const home = createHomeInteractions(districtWorld, grow, fishing, monsterGame, achievements, { ...story, openRadio: radio.open });
 const rival = createRivalSystem(districtWorld, home.openNim);
 createGameSystems(districtWorld, () => grow.openShop(), achievements);
 
@@ -178,10 +182,22 @@ hud.innerHTML = `
   <div class="brand">420MON <span>LOWTOWN</span></div>
   <div class="status">DEIN ZUHAUSE IN 3D</div>
   <div class="hint">WASD / PFEILE · E INTERAGIEREN · T KLEIDUNG · SHIFT LAUFEN</div>
-  <div class="target">KAPSEL & KELLER · TESTVERSION 28</div>
+  <div class="target">LOWTOWN · TESTVERSION 29</div>
   <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
+const graphicsControl = document.createElement("label");
+graphicsControl.className = "graphics-control";
+graphicsControl.innerHTML = '<span>Grafik</span><select aria-label="Grafikqualität"><option value="auto">Automatisch</option><option value="high">Hoch</option><option value="low">Sparsam</option></select>';
+const graphicsSelect = graphicsControl.querySelector<HTMLSelectElement>("select")!;
+graphicsSelect.value = graphicsQuality;
+graphicsSelect.onchange = () => {
+  graphicsQuality = graphicsSelect.value as GraphicsQuality;
+  localStorage.setItem("420mon-graphics-quality", graphicsQuality);
+  postProcessing.setQuality(graphicsQuality);
+  resize();
+};
+app.appendChild(graphicsControl);
 const characterPicker = document.createElement("div");
 characterPicker.className = "character-picker";
 characterPicker.innerHTML = '<span>CHARAKTER</span><button type="button" data-choice="man">MANN</button><button type="button" data-choice="woman">FRAU</button>';
@@ -461,8 +477,11 @@ function resize() {
   const height = window.innerHeight;
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const mobile = window.matchMedia("(pointer: coarse)").matches || width < 760;
+  const ratio = graphicsPixelRatio(width, height, window.devicePixelRatio, graphicsQuality, mobile);
+  renderer.setPixelRatio(ratio);
   renderer.setSize(width, height, false);
+  postProcessing.resize(width, height, ratio);
   updateStudioView();
 }
 function updateStudioView() {
@@ -475,6 +494,7 @@ window.addEventListener("resize", resize);
 resize();
 
 let achievementClock = 0;
+let graphicsDistrict = "";
 function animate() {
   requestAnimationFrame(animate);
   const dt = Math.min(clock.getDelta(), 0.05);
@@ -483,11 +503,19 @@ function animate() {
   districtWorld.update();
   grow.update(dt);
   story.update();
-  support.update(dt);
   fishing.update(dt);
   fishingWorld.update(dt);
   achievements.update(dt);
-  environment.setIndoor(!!districtWorld.getMapInfo().map.indoor);
+  const graphicsMap = districtWorld.getMapInfo();
+  if (graphicsDistrict !== graphicsMap.id) {
+    graphicsDistrict = graphicsMap.id;
+    environment.setDistrict(graphicsMap.id, !!graphicsMap.map.indoor);
+    postProcessing.setDistrict(graphicsMap.id);
+    const diagnostics = environment.getDiagnostics();
+    renderer.domElement.dataset.district = graphicsMap.id;
+    renderer.domElement.dataset.rain = String(diagnostics.rainDrops);
+    renderer.domElement.dataset.indoor = String(diagnostics.indoor);
+  }
   environment.update(player, dt);
   mapClock += dt;
   if (mapClock > 0.15) { mapClock = 0; drawLocalMap(); }
@@ -565,7 +593,10 @@ function animate() {
     material.depthWrite = !hidden;
   }
 
-  if (!monsterViewer.isOpen()) renderer.render(scene, camera);
+  if (!monsterViewer.isOpen()) postProcessing.render(dt);
+  const graphicsState = postProcessing.getDiagnostics();
+  renderer.domElement.dataset.graphics = graphicsState.mode;
+  renderer.domElement.dataset.bloom = String(graphicsState.bloom);
 
   const status = hud.querySelector(".status");
   if (status) status.textContent = districtWorld.getMapInfo().name;

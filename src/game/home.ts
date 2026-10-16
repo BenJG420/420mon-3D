@@ -23,7 +23,7 @@ type TrainerActions = { startTrainer: (mapId: string, id: string) => boolean; st
 type AchievementActions = { openCan: (obj: MapObj) => void };
 type StoryActions = {
   openFelix(obj: MapObj): void; openCrate(obj: MapObj): void; openCage(obj: MapObj): void;
-  openEddi(obj: MapObj): void; openRadio(): void; openBen(obj: MapObj): void;
+  openEddi(obj: MapObj): void; openRadio(): void;
 };
 
 /** Original Kapsel starter and Bolt route; all mutations use the shared save. */
@@ -157,8 +157,7 @@ export function createHomeInteractions(world: DistrictTravel, grow: GrowActions,
     }
     if (obj.id === "ben") {
       const s = getSave();
-      npc("Ben", [...NPC_DIALOGUES.ben.lines, "Ab Trainerstufe 10. Ben steht in Rajkos Keller. Von der Kapsel durch die Tür Keller."], [
-        ...(story ? [{ label: "Kasse auf", run: () => { close(); story.openBen(obj); } }] : []),
+      npc("Ben", ["Ben: Keller, von der Kapsel aus.", "Ab Trainerstufe 10. Ben steht in Rajkos Keller. Von der Kapsel durch die Tür Keller."], [
         ...(Number(s.trainerLv ?? 1) >= 10 && !s.benRead ? [{ label: "Gelesen. Ich weiß, wo Ben steht.", run: () => { acknowledgeBen(getSave()); saveProgress(); npc("Ben", ["Ben: Keller, von der Kapsel aus."]); } }] : []),
       ]); return;
     }

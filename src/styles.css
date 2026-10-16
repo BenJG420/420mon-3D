@@ -176,3 +176,7 @@ canvas {
 .dex-original-missing { display:inline-flex; flex:0 0 58px; width:58px; height:58px; align-items:center; justify-content:center; border:1px solid #5d936e; border-radius:9px; color:#a9ffc1; background:#102b22; font-size:28px; }
 
 .battle-model-open { font: inherit; font-size: 10px; min-height: 32px; border: 1px solid #92bf9a66; border-radius: 6px; padding: 4px 6px; color: #d7e8cf; background: #172a26; cursor: pointer; }
+.graphics-control { position: fixed; right: 16px; bottom: 176px; z-index: 25; display: flex; align-items: center; gap: 7px; padding: 6px 9px; border: 1px solid #829b8d66; border-radius: 7px; background: #0a171bdc; color: #d7e3d9; font-size: 11px; }
+.graphics-control select { min-height: 34px; max-width: 130px; border: 0; border-radius: 4px; padding: 5px; color: #edf2e3; background: #20302e; font: inherit; }
+body.wardrobe-preview .graphics-control { display: none; }
+@media (max-width: 680px) { .graphics-control { right: 10px; top: 235px; bottom: auto; padding: 4px 7px; } .graphics-control select { max-width: 115px; } }

@@ -122,7 +122,7 @@ test("world interaction, original door gates and resource ownership work togethe
   const data = new Map([["420mon-progress-v1", JSON.stringify({ gold: 150, map: "retired-map", x: 210, y: 15 })]]);
   const events = new Map();
   let modalOpen = false, prompt;
-  const context = new Proxy({}, { get: (_, name) => name === "createRadialGradient" ? () => ({ addColorStop() {} }) : () => {} });
+  const context = new Proxy({}, { get: (_, name) => name === "createRadialGradient" ? () => ({ addColorStop() {} }) : name === "createImageData" ? (width, height) => ({ data: new Uint8ClampedArray(width * height * 4), width, height }) : () => {} });
   const app = { append(element) { if (element.className?.includes("world-interaction")) prompt = element; } };
   globalThis.localStorage = { getItem: key => data.get(key) ?? null, setItem: (key, value) => data.set(key, value) };
   globalThis.document = {

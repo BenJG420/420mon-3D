@@ -1,9 +1,12 @@
 import * as THREE from "three";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { MAPS, mapSketch, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y, type MapDef, type MapObj, type Rect } from "./data/maps";
 import { WORLD_SCALE, mapToWorld, worldToMap, collidesOnMap, safeSpawn, isDefeatedGate } from "./worldGeometry";
 import { getSave, saveProgress } from "./save";
 import { recordVisit, setQuestState } from "./quests";
 import { stageOf } from "./data/progress";
+import { createWorldSurfaces, projectSurfaceUvs } from "./world-surfaces";
+import { getDistrictGraphics } from "./graphics-profile";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -29,65 +32,36 @@ export type DistrictTravel = {
 };
 
 const palette = {
-  plaster: 0x888072, stone: 0x4a4941, wood: 0x594732, dark: 0x202826,
-  brass: 0x9c8050, linen: 0xc0aa86, rust: 0x70513e, soil: 0x231c16,
+  plaster: 0x56616b, stone: 0x39434c, wood: 0x65503b, dark: 0x1e2931,
+  brass: 0x9c8050, linen: 0xbab09d, rust: 0x725344, soil: 0x231c16,
   green: 0x507462, glow: 0xd7a459, blue: 0x638b96,
 };
 const seeded = (i: number) => { const n = Math.sin(i * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
 const DAILY_TRAINERS = new Set(["cinder", "tide", "vial", "knuckle", "hush", "glow", "coil"]);
 
-/** Canvas textures stay local, so a public build has no private asset requests. */
-function wornTexture(kind: "stone" | "wood" | "plaster" | "metal"): THREE.CanvasTexture {
-  const canvas = document.createElement("canvas"); canvas.width = canvas.height = 512;
-  const ctx = canvas.getContext("2d")!;
-  const base = kind === "stone" ? [95, 95, 87] : kind === "wood" ? [99, 76, 51] : kind === "plaster" ? [146, 140, 119] : [75, 81, 76];
-  ctx.fillStyle = `rgb(${base.join(",")})`; ctx.fillRect(0, 0, 512, 512);
-  if (kind === "stone") {
-    for (let row = 0; row < 8; row++) for (let col = -1; col < 9; col++) {
-      const jitter = seeded(row * 50 + col + 40) * 26 - 13;
-      ctx.fillStyle = `rgb(${base.map(v => Math.round(v + jitter)).join(",")})`;
-      const x = col * 64 + (row % 2) * 32;
-      ctx.fillRect(x + 2, row * 64 + 2, 60, 60);
-      ctx.strokeStyle = "rgba(195,191,162,.14)"; ctx.strokeRect(x + 3, row * 64 + 3, 58, 58);
-    }
-  } else if (kind === "wood") {
-    for (let i = 0; i < 8; i++) {
-      ctx.fillStyle = `rgba(18,13,6,${.14 + seeded(i) * .2})`; ctx.fillRect(i * 64, 0, 3, 512);
-      for (let j = 0; j < 18; j++) {
-        ctx.strokeStyle = j % 3 ? "rgba(33,21,10,.12)" : "rgba(186,149,92,.11)";
-        ctx.beginPath(); ctx.moveTo(i * 64 + 5 + j * 3, 0);
-        ctx.bezierCurveTo(i * 64 + j * 3 + 14, 200, i * 64 + j * 3 - 2, 360, i * 64 + j * 3 + 8, 512); ctx.stroke();
-      }
-    }
-  }
-  for (let i = 0; i < 2400; i++) {
-    const x = seeded(i + 10) * 512, y = seeded(i + 6500) * 512;
-    ctx.fillStyle = i % 2 ? "rgba(12,16,12,.06)" : "rgba(240,233,202,.055)";
-    ctx.fillRect(x, y, 1 + seeded(i + 20) * 5, 1 + seeded(i + 30) * 3);
-  }
-  for (let i = 0; i < 26; i++) {
-    const x = seeded(i + 730) * 512, y = seeded(i + 910) * 512;
-    const radius = 4 + seeded(i + 1200) * 26;
-    const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    g.addColorStop(0, "rgba(24,30,18,.17)"); g.addColorStop(1, "rgba(24,30,18,0)");
-    ctx.fillStyle = g; ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-  }
-  const tex = new THREE.CanvasTexture(canvas); tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4; tex.repeat.set(3, 3); return tex;
-}
-
 export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): DistrictTravel {
   const root = new THREE.Group(); root.name = "original-map-world"; scene.add(root);
-  const materials = new Map<string, THREE.MeshStandardMaterial>();
-  const textures = { stone: wornTexture("stone"), wood: wornTexture("wood"), plaster: wornTexture("plaster"), metal: wornTexture("metal") };
-  const mat = (color: THREE.ColorRepresentation, kind?: keyof typeof textures, emissive?: THREE.ColorRepresentation) => {
-    const key = `${new THREE.Color(color).getHexString()}-${kind ?? ""}-${emissive === undefined ? "" : new THREE.Color(emissive).getHexString()}`;
-    if (!materials.has(key)) materials.set(key, new THREE.MeshStandardMaterial({
-      color, map: kind ? textures[kind] : null, roughness: kind === "metal" ? .53 : .87,
-      metalness: kind === "metal" ? .45 : .04, emissive: emissive ?? 0, emissiveIntensity: emissive ? .8 : 0,
-    }));
-    return materials.get(key)!;
-  };
+  const surfaces = createWorldSurfaces();
+  const mat = surfaces.material;
+  const poolCanvas = document.createElement("canvas"); poolCanvas.width = poolCanvas.height = 128;
+  const poolContext = poolCanvas.getContext("2d")!;
+  const poolGradient = poolContext.createRadialGradient(64, 64, 3, 64, 64, 64);
+  poolGradient.addColorStop(0, "rgba(255,255,255,.75)"); poolGradient.addColorStop(.25, "rgba(255,255,255,.35)"); poolGradient.addColorStop(1, "rgba(255,255,255,0)");
+  poolContext.fillStyle = poolGradient; poolContext.fillRect(0, 0, 128, 128);
+  const poolTexture = new THREE.CanvasTexture(poolCanvas);
+  const puddleCanvas = document.createElement("canvas"); puddleCanvas.width = puddleCanvas.height = 128;
+  const puddleContext = puddleCanvas.getContext("2d")!;
+  const puddlePixels = puddleContext.createImageData(128, 128);
+  for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
+    const dx = (x - 64) / 64, dy = (y - 64) / 64, angle = Math.atan2(dy, dx);
+    const edge = .75 + .13 * Math.sin(angle * 5) + .06 * Math.cos(angle * 9);
+    const distance = Math.hypot(dx, dy), i = (y * 128 + x) * 4;
+    const alpha = Math.max(0, Math.min(1, (edge - distance) * 18)) * (225 + seeded(x + y * 128) * 30);
+    puddlePixels.data[i] = puddlePixels.data[i + 1] = puddlePixels.data[i + 2] = alpha; puddlePixels.data[i + 3] = 255;
+  }
+  puddleContext.putImageData(puddlePixels, 0, 0);
+  const puddleTexture = new THREE.CanvasTexture(puddleCanvas);
+  const puddleMaterial = new THREE.MeshPhysicalMaterial({ color: 0x7c8b91, alphaMap: puddleTexture, transparent: true, opacity: .48, roughness: .09, metalness: .12, clearcoat: 1, clearcoatRoughness: .055, depthWrite: false });
   let id = "capsule";
   let active = MAPS[id];
   let occluders: THREE.Mesh[] = [];
@@ -95,7 +69,9 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   let shopFn: ((obj?: MapObj) => void) | undefined;
   let nearby: MapObj | undefined;
   let interactionMessage: { id: string; text: string; until: number } | undefined;
-  let lamps = 0;
+  const lampLights: THREE.PointLight[] = [];
+  let lastLightSelection = -Infinity;
+  const lightPosition = new THREE.Vector3();
   let lastSave = 0;
   let lastPosition = { x: NaN, y: NaN };
   const glowing: { mesh: THREE.Mesh; phase: number }[] = [];
@@ -104,6 +80,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   const storyNpcs = new Map<string, MapObj>();
 
   function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, parent: THREE.Object3D, x: number, y: number, z: number, shadow = true) {
+    projectSurfaceUvs(geometry, material);
     const m = new THREE.Mesh(geometry, material); m.position.set(x, y, z); m.castShadow = shadow; m.receiveShadow = true;
     m.userData.worldOwned = true;
     parent.add(m); return m;
@@ -134,8 +111,17 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   function lamp(parent: THREE.Object3D, x: number, y: number, z: number, color = 0xf5bc71, strength = 12) {
     box(parent, .42, .13, .33, mat(palette.dark, "metal"), x, y, z);
     box(parent, .33, .035, .22, mat(color, undefined, color), x, y - .08, z);
-    if (lamps++ < 5) {
-      const light = new THREE.PointLight(color, strength, 11, 2); light.position.set(x, y - .2, z); parent.add(light);
+    const light = new THREE.PointLight(color, strength * (active.indoor ? 1 : 1.6), 12, 2);
+    light.position.set(x, y - .2, z); light.visible = false; parent.add(light); lampLights.push(light);
+    if (!active.indoor) {
+      // Soft pools and broken wet streaks sit directly below the actual fixture.
+      const pool = new THREE.MeshBasicMaterial({ color, map: poolTexture, transparent: true, opacity: .19, depthWrite: false, blending: THREE.AdditiveBlending });
+      pool.userData.local = true; pool.userData.sharedTexture = true;
+      const reflected = mesh(new THREE.PlaneGeometry(2.8, 3.8), pool, parent, x, .066, z, false);
+      reflected.rotation.x = -Math.PI / 2;
+      const shaft = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .018, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }); shaft.userData.local = true;
+      const cone = mesh(new THREE.ConeGeometry(1.15, Math.max(.3, y - .25), 16, 1, true), shaft, parent, x, (y - .25) / 2 + .1, z, false);
+      cone.name = "lamp-haze";
     }
   }
   function at(x: number, y: number) {
@@ -370,27 +356,67 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const building = active.buildings?.find(b => b.x === r.x && b.y === r.y && b.w === r.w && b.h === r.h);
       const outside = !active.indoor && !edge && r.w >= 56 && r.h >= 56;
       const height = edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : outside ? 3.7 + seeded(i + 17) * 4.8 : 2.25;
-      const m = region(r, height, mat(outside ? new THREE.Color(building?.tone ?? "#686c5d").lerp(new THREE.Color(0x746c56), .62) : palette.plaster, "plaster"));
+      const m = region(r, height, mat(outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : palette.plaster, "plaster"));
       m.name = `original-wall:${i}`; occluder(m);
       // Dark plinth and narrow cap keep the rooms readable as a cutaway diorama.
       region(r, .16, mat(palette.stone, "stone"), .08);
-      region(r, .1, mat(outside ? 0x494c41 : 0xb29e76, "stone"), height + .02);
+      region(r, .1, mat(outside ? 0x626c6b : 0x7d8681, "stone"), height + .02);
       if (outside && r.w > 100 && r.h > 80) {
-        const group = new THREE.Group(); group.position.copy(at(r.x + r.w / 2, r.y + r.h / 2)); root.add(group);
-        const w = r.w * WORLD_SCALE, d = r.h * WORLD_SCALE;
-        const count = Math.min(12, Math.floor(w / 2.2));
-        for (let row = 0; row < Math.floor(height / 1.8); row++) for (let j = 0; j < count; j++) {
-          const x = -w / 2 + (j + .5) * w / count;
-          box(group, .78, .88, .055, mat(0x1d2d28, undefined, (row + j + i) % 4 ? 0x4c4b28 : 0x1e413d), x, 1.25 + row * 1.7, d / 2 + .03);
-          box(group, .82, .08, .14, mat(0xa39470), x, .78 + row * 1.7, d / 2 + .07);
-        }
-        if (w < 23 && d < 23) {
-          box(group, w * .4, .7, d * .35, mat(0x424d43, "metal"), -w * .17, height + .48);
-          for (let k = 0; k < 3; k++) box(group, .07, .18, d * .4, mat(0x796c54, "metal"), w * .15 + k * .23, height + .12);
-        }
-        if (building?.name) { const n = tag(group, building.name.toUpperCase(), Math.min(4, w * .8), 2.9, "#d7b778", d / 2 + .11); n.name = "house-name"; }
+        buildingDetails(r, height, i, building?.name);
       }
     }
+  }
+
+  function buildingDetails(r: Rect, height: number, seed: number, name?: string) {
+    const group = new THREE.Group(); group.name = "rain-worn-facade";
+    group.position.copy(at(r.x + r.w / 2, r.y + r.h / 2)); root.add(group);
+    const w = r.w * WORLD_SCALE, d = r.h * WORLD_SCALE;
+    // Merge all repeated trim by material: dense façades cost a handful of draws.
+    const batches = new Map<THREE.Material, THREE.BufferGeometry[]>();
+    function detail(material: THREE.Material, width: number, h: number, depth: number, x: number, y: number, z: number) {
+      const geometry = new THREE.BoxGeometry(width, h, depth); geometry.translate(x, y, z);
+      const batch = batches.get(material) ?? []; batch.push(geometry); batches.set(material, batch);
+    }
+    const frame = mat(0x1f2a30, "metal"), stone = mat(0x66706d, "stone"), metal = mat(0x4b5c60, "metal");
+    const unlit = mat(0x14252c, "metal"), warm = mat(0x514432, undefined, 0x9b7044), cool = mat(0x273e43, undefined, 0x3a6268);
+    const cols = Math.min(12, Math.max(2, Math.floor(w / 2.1))), rows = Math.max(1, Math.floor((height - .5) / 1.65));
+    for (let side = 0; side < 3; side++) {
+      const length = side ? d : w, count = side ? Math.min(8, Math.max(1, Math.floor(d / 2.2))) : cols;
+      for (let row = 0; row < rows; row++) for (let col = 0; col < count; col++) {
+        const u = -length / 2 + (col + .5) * length / count, y = 1.2 + row * 1.65;
+        const light = seeded(seed * 101 + row * 27 + col * 7 + side * 19);
+        const pane = light > .81 ? warm : light < .055 ? cool : unlit;
+        const x = side === 1 ? -w / 2 - .04 : side === 2 ? w / 2 + .04 : u;
+        const z = side ? u : d / 2 + .04;
+        detail(frame, side ? .1 : .96, 1.11, side ? .96 : .1, x, y, z);
+        detail(pane, side ? .11 : .74, .88, side ? .74 : .11, x + (side === 1 ? -.025 : side === 2 ? .025 : 0), y, z + (side ? 0 : .025));
+        detail(stone, side ? .26 : 1.05, .09, side ? 1.05 : .26, x, y - .55, z);
+        detail(frame, side ? .14 : .04, .94, side ? .04 : .14, x, y, z + (side ? 0 : .07));
+        if (light > .5) detail(frame, side ? .14 : .8, .04, side ? .8 : .14, x, y + .08, z + (side ? 0 : .07));
+      }
+    }
+    // Rain-darkened corner columns, roof parapet blocks, drainage and service ducts.
+    for (const x of [-w / 2 + .13, w / 2 - .13]) {
+      detail(stone, .25, height, d + .12, x, height / 2, 0);
+      detail(metal, .09, height - .3, .09, x + (x < 0 ? .34 : -.34), height / 2, d / 2 + .17);
+      for (let y = .6; y < height; y += 1.6) detail(frame, .2, .055, .15, x + (x < 0 ? .34 : -.34), y, d / 2 + .15);
+    }
+    detail(stone, w + .26, .26, .46, 0, height + .22, d / 2);
+    detail(stone, w + .26, .26, .46, 0, height + .22, -d / 2);
+    for (const x of [-w / 2, w / 2]) detail(stone, .46, .26, d + .25, x, height + .22, 0);
+    const blocks = Math.min(18, Math.ceil(w / 1.3));
+    for (let i = 0; i < blocks; i++) detail(stone, w / blocks - .06, .16, .53, -w / 2 + (i + .5) * w / blocks, height + .42, d / 2);
+    if (w < 23 && d < 23) {
+      detail(metal, w * .36, .7, d * .28, -w * .17, height + .65, 0);
+      for (let i = 0; i < 5; i++) detail(frame, w * .32, .035, .04, -w * .17, height + .42 + i * .1, d * .145);
+      for (let i = 0; i < 3; i++) detail(metal, .1, .25, d * .34, w * .15 + i * .23, height + .25, 0);
+    }
+    for (const [material, geometries] of batches) {
+      const geometry = mergeGeometries(geometries, false);
+      for (const part of geometries) part.dispose();
+      if (geometry) occluder(mesh(geometry, material, group, 0, 0, 0));
+    }
+    if (name) { const n = tag(group, name.toUpperCase(), Math.min(4, w * .8), 2.9, "#c6b48f", d / 2 + .2); n.name = "house-name"; }
   }
   function renderObstacle(rect: Rect & { kind: string }) {
     const p = at(rect.x + rect.w / 2, rect.y + rect.h / 2);
@@ -426,18 +452,19 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   function buildFloor() {
     const w = active.w * WORLD_SCALE, d = active.h * WORLD_SCALE;
     box(root, w + .25, .45, d + .25, mat(palette.dark, "stone"), 0, -.27);
-    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" || id === "studio" ? 0xc3b898 : id === "yard" ? 0x6d7453 : 0x898979, id === "capsule" ? "wood" : "stone"), root, 0, .002, 0);
+    const indoor = getDistrictGraphics(id).wetness < .15;
+    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor ? "stone" : "asphalt"), root, 0, .002, 0);
     floor.rotation.x = -Math.PI / 2;
     const sketch = mapSketch(id);
     if (!active.indoor) for (const r of sketch.walk) {
-      const m = region(r, .045, mat(id === "yard" ? 0x596d4d : 0x9c9987, "stone"), .007);
+      const m = region(r, .045, mat(id === "yard" ? 0x637263 : 0x788487, "stone"), .007);
       m.name = "original-walkway";
     }
     for (const { r, fill } of sketch.extras) {
       const water = id === "drain" || id === "kai";
       const color = new THREE.Color(fill);
-      const m = region(r, .025, mat(color.lerp(new THREE.Color(water ? 0x426c62 : 0x6d7246), .4), water ? "metal" : "stone"), .025);
-      if (water) (m.material as THREE.MeshStandardMaterial).roughness = .24;
+      const m = region(r, .025, mat(color.lerp(new THREE.Color(water ? 0x1c3945 : 0x3c5146), .7), water ? "metal" : "stone"), .025);
+      if (water) { const material = m.material as THREE.MeshPhysicalMaterial; material.roughness = .15; material.clearcoat = .9; }
       if (id === "alley" || id === "yard") {
         const amount = Math.min(55, Math.round(r.w * r.h / 1000));
         for (let i = 0; i < amount; i++) {
@@ -447,13 +474,24 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         }
       }
     }
-    // Small irregular wet patches catch the warm lamps without adding colliders.
-    if (!active.indoor || id === "cable") for (let i = 0; i < 24; i++) {
+    // Irregular clearcoat patches preserve the masonry below and reflect the HDR lamps.
+    if (getDistrictGraphics(id).wetness > .25) for (let i = 0; i < 32; i++) {
       const r = sketch.walk[i % Math.max(1, sketch.walk.length)]; if (!r) continue;
       const p = at(r.x + seeded(i + 712) * r.w, r.y + seeded(i + 309) * r.h);
-      const material = new THREE.MeshStandardMaterial({ color: 0x2f463e, roughness: .17, metalness: .42, transparent: true, opacity: .32 }); material.userData.local = true;
-      const puddle = mesh(new THREE.CircleGeometry(.2 + seeded(i) * .85, 9), material, root, p.x, .058, p.z, false);
-      puddle.rotation.x = -Math.PI / 2; puddle.scale.y = .35 + seeded(i + 69) * .5;
+      const size = .9 + seeded(i) * 2.5;
+      const puddle = mesh(new THREE.PlaneGeometry(size, size), puddleMaterial, root, p.x, .058, p.z, false);
+      puddle.rotation.x = -Math.PI / 2; puddle.rotation.z = seeded(i + 69) * Math.PI; puddle.scale.y = .35 + seeded(i + 69) * .5;
+      puddle.name = "rain-puddle";
+    }
+    if (!active.indoor) for (let i = 0; i < Math.min(6, sketch.walk.length); i++) {
+      const r = sketch.walk[i];
+      const p = at(r.x + r.w * .82, r.y + r.h * .68);
+      const pieces: THREE.BufferGeometry[] = [];
+      for (let bar = 0; bar < 7; bar++) {
+        const geometry = new THREE.BoxGeometry(.055, .035, .49); geometry.translate(p.x - .26 + bar * .087, .063, p.z); pieces.push(geometry);
+      }
+      const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+      if (geometry) { const grate = mesh(geometry, mat(0x28363e, "metal"), root, 0, 0, 0, false); grate.name = "storm-drain-detail"; }
     }
   }
   function mapDetails() {
@@ -502,7 +540,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
   function disposeMap() {
     disposeOwnedObjects(root);
-    root.clear(); mapObjects.clear(); roamingNpc = undefined; storyNpcs.clear(); occluders = []; lamps = 0; glowing.length = 0;
+    root.clear(); mapObjects.clear(); roamingNpc = undefined; storyNpcs.clear(); occluders = []; lampLights.length = 0; lastLightSelection = -Infinity; glowing.length = 0;
   }
   function removeMapObject(objectId: string) {
     const group = mapObjects.get(objectId);
@@ -583,7 +621,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       progress.ach = ach;
     }
     progress.map = next; recordVisit(progress, next);
-    disposeMap(); buildFloor(); buildWalls(); active.objs.forEach(renderObject); mapDetails();
+    disposeMap(); surfaces.setWetness(getDistrictGraphics(id).wetness);
+    buildFloor(); buildWalls(); active.objs.forEach(renderObject); mapDetails();
     const desired = x !== undefined && y !== undefined ? { x, y }
       : id === "capsule" ? { x: CAPSULE_SPAWN_X, y: CAPSULE_SPAWN_Y }
       : id === "studio" ? { x: 440, y: 140 }
@@ -668,6 +707,13 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
   function update() {
     const time = performance.now();
+    if (time - lastLightSelection > 350) {
+      lastLightSelection = time;
+      const closest = lampLights.map(light => ({ light, distance: light.getWorldPosition(lightPosition).distanceToSquared(player.position) }));
+      closest.sort((a, b) => a.distance - b.distance);
+      const count = active.indoor ? 5 : 4;
+      for (let i = 0; i < closest.length; i++) closest[i].light.visible = i < count && closest[i].distance < 24 * 24;
+    }
     if (time - lastSave > 1800) { saveLocation(); lastSave = time; }
     nearby = closestInteraction();
     const overlay = overlayOpen();

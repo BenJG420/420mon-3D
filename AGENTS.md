@@ -19,7 +19,18 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 9. Do not overwrite or delete the original 2D repository. Preserve source attribution and be mindful that its content is private; access requires authorization.
 10. Report what is implemented, tested, missing, and deployed factually in German. Do not repeatedly ask what to work on next when the goal is clear.
 
-## Package order (latest user instruction, 2026-10-15)
+## Current graphics order (user instruction, 2026-10-16)
+
+Ko-fi and payment-server work is **skipped by user request**, not blocked or next.
+Preserve the existing game mechanics; change them only if rendering requires it.
+Continue graphics packages in order, one PR each: (1) district lighting, materials,
+weather and post-processing matching the README/reference, (2) realistic rigged
+player with freely licensed model/animations and docs/ASSET_ATTRIBUTION.md,
+(3) equivalent NPC upgrade, (4) individual original-sprite monster models.
+Keep the same read-only-file discipline, no questions, handoff assumptions, and
+maximum three focused validation passes. Older order below is historical.
+
+## Historical package order (2026-10-15)
 Read only AGENTS.md, CODEX_HANDOFF.md and docs/TEST_BUILD.md before choosing the
 next package; then read only its required files. No full repository scan or
 questions. Record unclear choices in one handoff line. Keep existing systems.
