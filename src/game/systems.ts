@@ -101,9 +101,12 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
           portrait.append(image);
           item.append(portrait);
           const details = document.createElement("span");
-          details.textContent = index + " · " + (owned ? sp.name : "???") + " · " + sp.types.join("/");
+          details.textContent = index + " · " + (owned ? sp.name : "???") + " · " + sp.types.join("/") + (owned ? " · 3D ansehen" : "");
           item.append(details);
-          item.onclick = () => note(owned ? sp.blurb + " · " + sp.where : "Noch nicht gefangen · Fundort: " + sp.where);
+          item.onclick = () => {
+            note(owned ? sp.blurb + " · " + sp.where : "Noch nicht gefangen · Fundort: " + sp.where);
+            if (owned) window.dispatchEvent(new CustomEvent("420mon-open-model", { detail: { id } }));
+          };
           list.append(item);
         }
       };
