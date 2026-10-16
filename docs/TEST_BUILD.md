@@ -1,3 +1,5 @@
+> v30: Licensed rigged player package; publication/check notes follow in the handoff.
+
 # Original-world test build v29
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
@@ -465,11 +467,10 @@ quests, inventory, achievements, clothing bonuses and save slots intact:
    post-processing matching the README/visual reference. Publication and its
    exact validation limits are recorded above. Retain these systems; device
    performance tuning can follow actual player feedback.
-2. Next: replace the block-style player with a realistic freely licensed rigged
-   model and idle/walk/run animations (CC0 or appropriately licensed compatible
-   assets). Record source URLs, license text/terms, author and redistribution
-   permissions in `docs/ASSET_ATTRIBUTION.md`. Preserve existing equipment,
-   clothing visibility, controls, collisions and saves.
+2. v30 replaces the box player with male/female MIT Rocketbox skinned models,
+   local Idle/Walk/Run clips and skin-weight wardrobe colors. Editor selections,
+   movement, collisions and saves remain. Source/license/hashes are recorded in
+   `docs/ASSET_ATTRIBUTION.md`; appearance device checks remain user feedback.
 3. Upgrade NPCs with the same model/animation approach while preserving all
    existing physical interaction points, identities and quest/shop actions.
 4. Continue individual 3D monster models from the retained 2D sprites. v28 has

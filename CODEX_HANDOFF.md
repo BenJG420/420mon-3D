@@ -1,3 +1,6 @@
+> Annahme v30: Rocketbox MIT (Revision 0943055) liefert beide Körper und drei passende Clips; gespeicherte Editorwerte bleiben erhalten, Kleidung folgt dem echten Skinning statt den alten Box-Pivots.
+> v30: Rigged-Spieler integriert; lokale Lizenz/Quellhashes, Idle/Walk/Run, unveränderte Bewegung und Fallback bei Ladefehler. Pass 1: 161 Tests + Build grün; Pass 2: Desktop-/Touch-Layout-Smoke mit beiden geladenen Rigs, Idle/Walk/Run, T und Reload grün, HP0/XP erhalten, keine Browser-/Shaderfehler. Neuer Asset-Integritätstest und finale Basisfarb-Anpassung werden im dritten CI-/Deploy-Lauf geprüft.
+
 # 420mon → 420mon-3D — Codex handoff (2026-10-12)
 
 > v29 Grafik-Paket 1: Bezirksprofile, dunkle PBR-Kachelmaterialien/Nassglanz, nahe Lampen/Fassaden, HDR-PMREM, GPU-Regen/Bodenringe/Haze und Composer mit Hoch-Bloom/Grading/FXAA sind integriert. Grafikpräferenz ist getrennt vom Spielstand. Keine neuen Spieler-/NPC-Assets; nächstes Paket ist der lizenzierte Rigged-Spieler, dann NPCs, dann Monster. Ko-fi ist übersprungen und im Spiel nicht mehr erreichbar.

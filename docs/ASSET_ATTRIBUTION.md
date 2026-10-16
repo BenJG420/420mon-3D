@@ -14,11 +14,26 @@
 - Existing original 420mon sprites and project-authored monster/clothing meshes
   remain unchanged in this package; see [MONSTER_MODELS.md](MONSTER_MODELS.md).
 
-## Next: rigged player and NPC assets
+## Rigged humans — v30 / v31
 
-No external rigged player/NPC asset is introduced by v29. Before shipping one,
-record its exact download/source URL, author, asset version, license text/URL,
-redistribution conditions and required credit here, including animation sources.
-Prefer CC0 or another explicit license compatible with shipping the model and
-clips in this public game. A format described as Mixamo-compatible does not by
-itself grant a license to redistribute its model or animations.
+- **Microsoft Rocketbox Avatar Library**, Microsoft and the Rocketbox original
+  avatar team (Markus Wojcik); maintained by Mar Gonzalez-Franco and contributors.
+- Source: https://github.com/microsoft/Microsoft-Rocketbox/tree/0943055db6ec570bcef9f2c8b41c9e5467c808f9
+- Assets: `Assets/Avatars/Adults/Male_Adult_01` and `Female_Adult_01`, FBX export,
+  body/head/opacity color textures; corresponding `m_` / `f_` idle_breathe_01,
+  walk_neutral and run_neutral FBX clips in `Assets/Animations`.
+- **MIT**, Copyright (c) 2020 Microsoft. The library changed to MIT in December
+  2020; older announcements about research-only use do not describe this pinned
+  revision. Redistribution, modification and commercial game use are permitted
+  provided the copyright and permission notice accompany substantial copies.
+- Full upstream notice is shipped at `public/game/characters/LICENSE.txt`,
+  including the deployed asset directory. Upstream license:
+  https://github.com/microsoft/Microsoft-Rocketbox/blob/0943055db6ec570bcef9f2c8b41c9e5467c808f9/LICENSE.md
+- Conversion: Blender 4.3.2, original rig/UVs retained, textures downsampled to
+  1024 pixels, bone rotations retargeted between matching Rocketbox skeletons,
+  root movement removed so gameplay controls remain authoritative. Three clips
+  named Idle, Walk and Run. Wardrobe tint/roughness regions follow skin weights;
+  head accessories and body proportions are project adaptations.
+- `public/game/characters/sources.json` records every input path/hash and the
+  exact distributed GLB hashes. `scripts/convert-rocketbox.py` records conversion.
+  No Adobe/Mixamo asset or animation is redistributed.
