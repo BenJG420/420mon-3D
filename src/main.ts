@@ -187,7 +187,7 @@ hud.innerHTML = `
   <div class="brand">420MON <span>LOWTOWN</span></div>
   <div class="status">DEIN ZUHAUSE IN 3D</div>
   <div class="hint">WASD / PFEILE · E INTERAGIEREN · T KLEIDUNG · SHIFT LAUFEN</div>
-  <div class="target">LOWTOWN · TESTVERSION 30</div>
+  <div class="target">LOWTOWN · TESTVERSION 31</div>
   <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
@@ -507,6 +507,7 @@ function animate() {
   monsterGame.update(dt);
   rival.update(dt);
   districtWorld.update();
+  renderer.domElement.dataset.npcModels = String(districtWorld.getRoot().userData.riggedNpcs ?? 0);
   grow.update(dt);
   story.update();
   fishing.update(dt);

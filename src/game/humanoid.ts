@@ -25,12 +25,15 @@ export const OUTFIT_PALETTES: Record<string, [string, string]> = {
   wear_rain: ["#f0c018", "#181818"], wear_overalls: ["#603018", "#784830"],
   wear_lack: ["#30a8c0", "#181818"],
 };
-type Region = "shirt" | "pants" | "shoes" | "skin" | "hair";
+type Region = "shirt" | "pants" | "shoes" | "skin" | "hair" | "upperArm" | "forearm" | "calf";
 /** Semantic skin-weight regions keep clothing on the actual deforming mesh. */
 export function clothingRegion(names: string[]): Region {
   if (names.some(n => /Finger|Hand/i.test(n))) return "skin";
   if (names.some(n => /Foot|Toe/i.test(n))) return "shoes";
-  if (names.some(n => /Thigh|Calf|Pelvis/i.test(n))) return "pants";
+  if (names.some(n => /Calf/i.test(n))) return "calf";
+  if (names.some(n => /Thigh|Pelvis/i.test(n))) return "pants";
+  if (names.some(n => /Forearm/i.test(n))) return "forearm";
+  if (names.some(n => /UpperArm/i.test(n))) return "upperArm";
   return "shirt";
 }
 
@@ -55,15 +58,19 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
   }
   function applyAppearance() {
     if (!look) return;
-    const colors = outfit === "nude" ? [look.jacket, look.pants] : OUTFIT_PALETTES[outfit] ?? OUTFIT_PALETTES.nude;
+    const colors = (outfit === "nude" || outfit === "npc") ? [look.jacket, look.pants] : OUTFIT_PALETTES[outfit] ?? OUTFIT_PALETTES.nude;
     for (const { material, region, base } of ownedMaterials) {
-      const color = region === "skin" ? look.skin : region === "hair" ? look.hair : region === "shoes" ? look.shoes : region === "pants" ? colors[1] : colors[0];
+      const bareArm = (region === "upperArm" || region === "forearm") && ["nude", "wear_vest", "wear_overalls"].includes(outfit);
+      const bareCalf = region === "calf" && ["nude", "wear_trashbag", "wear_collar"].includes(outfit);
+      const bare = bareArm || bareCalf;
+      const color = bare ? look.skin : region === "skin" ? look.skin : region === "hair" ? look.hair : region === "shoes" ? look.shoes : (region === "pants" || region === "calf") ? colors[1] : colors[0];
       // Vertex/texture detail remains visible, including eyes, seams and fabric folds.
       material.color.set(color);
       if (region === "skin") material.color.lerp(new THREE.Color(0xffffff), .64);
       material.roughness = outfit === "wear_lack" && region === "shirt" ? .22 : region === "shoes" ? .7 : .86;
       material.metalness = outfit === "wear_lack" && region === "shirt" ? .35 : 0;
-      material.map = base;
+      const map = bare ? null : base;
+      if (material.map !== map) { material.map = map; material.needsUpdate = true; }
     }
     root.scale.set(look.build * (look.choice === "woman" ? .94 : 1), look.height, look.build);
     for (const accessory of hairAccessories) {
@@ -103,7 +110,7 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
         // Reassign triangles by weighted bone influence, preserving UVs and skinning.
         const geometry = o.geometry.clone(); ownedGeometry.push(geometry); o.geometry = geometry;
         const idx = geometry.index, skinIndex = geometry.getAttribute("skinIndex"), weight = geometry.getAttribute("skinWeight");
-        const regions: Region[] = ["shirt", "pants", "shoes", "skin"];
+        const regions: Region[] = ["shirt", "pants", "shoes", "skin", "upperArm", "forearm", "calf"];
         const materials = regions.map(region => {
           const material = original.clone(); ownedMaterials.push({ material, region, base: material.map }); return material;
         });
@@ -137,7 +144,7 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
       applyAppearance(); root.userData.status = "ready"; root.userData.license = "MIT"; onReady?.(true);
     } catch {
       if (disposed || token !== generation) return;
-      root.userData.status = "error"; onReady?.(false);
+      clear(); root.userData.status = "error"; onReady?.(false);
     }
   }
   return {
