@@ -1,9 +1,11 @@
-> **v34 implemented:** physical Glutwalzen restored from the original 2D rules.
-> Local build and eight targeted tests pass; one touch smoke passed all three
-> cabinets, close/reload settlement, Auto/Stop and locked-stake free spins.
-> Final CI/publication is recorded in the handoff. Next package: aquarium,
-> then building occlusion, HD/PBR monsters and remaining species.
-> Previous published source: v33 / PR #40; stable root remains pinned.
+> **Published v34:** Spielautomaten-Paket [PR #41](https://github.com/BenJG420/420mon-3D/pull/41),
+> source `a587f99`. Main CI 39079548638: 175/175 tests + build; Pages
+> 39079548649 green. Live `index-CwP6WDhZ.js`, SHA256
+> `115bfe8bd1119077fcd7af7eab6230a95791f0f428335cac53ecf09fb1d95cca`,
+> CSS `index-Cf6YlD54.css`, both byte-identical to the local build.
+> Stable root remains `index-DWZ4yP_E.js`; same `/test/` URL and save slots.
+> **Next: aquarium**, then building occlusion, HD/PBR monsters and remaining
+> species. One PR and at most three focused check rounds per package.
 
 # Original-world test build v34
 
@@ -351,6 +353,16 @@ origin's localStorage.
 
 ## Validation
 
+v34: round 1 passed build and 174/175 tests; one new fixture wrongly expected
+crown chips to count as unique Kiez finds. The source list excludes these items,
+so only the fixture changed. Round 2 passed eight targeted tests and one
+Chromium touch smoke at all three physical cabinets, affordability, closing
+mid-spin without loss/double-booking, reload, Auto/Stop and locked-stake free
+spins across reload, unchanged HP0/XP and no overflow/page/shader errors. Round 3
+passed PR/Main CI (175 tests), Pages and exact live JS/CSS verification. No
+fourth whole smoke/test loop. Physical device checks remain separate.
+
+
 v33 closing validation: the first round passed build and 165/167 tests; two
 new skin assertions compared FBX mesh centimetres to world metres. Applying
 the actual mesh world matrix fixed the fixture without relaxing the bound.
@@ -500,7 +512,7 @@ Then deliver these playable packages in this exact order, **one PR per package**
    new skin fixture to world units. Final CI/Pages is recorded in the current
    publication note. Movement, editor,
    clothes and saves remain.
-2. **v34 implemented — publication/check notes follow:** the three physical
+2. **DONE — PR #41 / v34:** the three physical
    Glutwalzen (Keller/Kino/Neonkai) open the original 420/Obststand/Freidreher
    games, with authentic strips, 20/5/9 lines, stakes, wild/scatter payouts,
    fruit nudge, double free spins and jackpot (10 Zero-Day seeds + 10 crown chips).
@@ -508,7 +520,7 @@ Then deliver these playable packages in this exact order, **one PR per package**
    spins retain their locked stake/lines in isolated slotState. Original gold
    earnings/discovery counters and all existing saves/HP/mechanics remain.
    Auto/Stop, winning cells/line table, keyboard/touch and interaction guards
-   are integrated. No fourth verification loop; final checks recorded below.
+   are integrated. Three rounds completed; publication/checks recorded above.
 3. **NEXT — Aquarium:** enlarge the physical aquarium and open a dedicated view when
    clicked/interacted with, showing the player's caught fish swimming. Preserve
    the 42-fish catalogue, collection, fishing and bonuses.
