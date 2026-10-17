@@ -1,16 +1,16 @@
-# Source-derived monster volumes (v28)
+# Source-derived monster models (v28 / v32)
 
 Every one of the 420 runtime species has its own local, colored 3D voxel volume.
-The first 24 additionally have individually authored, preferred low-poly meshes
-in `src/game/monster-sculpts-a.ts` and `monster-sculpts-b.ts`, built from the same
-original references: Budling through Graterat in the runtime Dex order. Their
+The first 48 additionally have individually authored, preferred low-poly meshes
+in `src/game/monster-sculpts-a.ts` and `monster-sculpts-b.ts` and `monster-sculpts-c.ts`, built from the same
+original references: Budling through Slagjaw in the runtime Dex order. Their
 leaf crowns, cables, armor, limbs, jaws, wings and tails are geometry. They merge
 into one vertex-colored mesh per species; `monster-authored.ts` records the source
 hashes and selects them before the voxel reconstruction. The reconstruction is
 retained for all species so a later sculpt never changes the asset pipeline.
 The designs come from the retained original monster sprites at original source
 revision `010807da77df8468a297adf33eaf1fb5c9a61c8b`. The generated volumes are **procedural volume
-reconstructions**, distinct from the 24 individually sculpted meshes. The source silhouette,
+reconstructions**, distinct from the 48 individually sculpted meshes. The source silhouette,
 holes and colors determine the model; no substitute monster catalogue, random
 sphere generator or sprite billboard is used. The unmodified full spritesheets
 remain the Dex artwork and the references for future sculpting.
@@ -140,3 +140,20 @@ The covered world renderer pauses its GPU drawing while game simulation continue
 Remaining art work is anatomical refinement of the other 396 species and artist
 review of inferred side/back details. The generated volumes are playable original
 art reconstructions, not a claim that all 420 have hand-authored rear anatomy.
+
+## v32 — original Dex 25–48
+
+Twenty-four additional authored meshes replace the volume presentation for
+Coinbat, Dumpsterpup, Harzling, Wiremite, Glutmoth, Rohrling, Fumemoth, Knuckrat,
+Shadefox, Lacebat, Slagpup, Foambat, Stallfox, Kerbstomp, Binmaw, Moosback,
+Cinderfang, Schlickhound, Tapedog, Racklurk, Knuckbrute, Gratehound, Coinwraith
+and Slagjaw. Each was modelled against its unchanged local first-pose sprite.
+Coin wings, grates/lids, resin drops, coil shells, pipes, scalloped membranes,
+bandages, teeth, rock cracks and moss are geometry, including conservative
+authored backs. The new closed membrane helper preserves thin wing silhouettes.
+
+All 420 volume files remain untouched and the same bounded lease cache, world
+slots, battle controls, source portraits and comparison viewer are retained.
+**48 individual sculptures are preferred; 372 species still use their source-
+volume reconstruction.** Continue sculpting at Dex #49, without rebuilding
+the asset pipeline or describing the remaining reconstructions as hand sculpts.

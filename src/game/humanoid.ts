@@ -44,6 +44,7 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
   let look: HumanLook | undefined;
   let model: THREE.Object3D | undefined, mixer: THREE.AnimationMixer | undefined;
   let active: THREE.AnimationAction | undefined;
+  let headBone: THREE.Object3D | undefined;
   let actions: Record<string, THREE.AnimationAction> = {};
   const ownedMaterials: { material: THREE.MeshStandardMaterial; region: Region; base: THREE.Texture | null }[] = [];
   const ownedGeometry: THREE.BufferGeometry[] = [];
@@ -54,7 +55,7 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
     for (const item of ownedMaterials) item.material.dispose(); ownedMaterials.length = 0;
     for (const g of ownedGeometry) g.dispose(); ownedGeometry.length = 0;
     for (const m of hairAccessories) { m.geometry.dispose(); (m.material as THREE.Material).dispose(); }
-    hairAccessories.length = 0; root.clear(); model = undefined; mixer = undefined; active = undefined; actions = {};
+    hairAccessories.length = 0; headBone = undefined; root.clear(); model = undefined; mixer = undefined; active = undefined; actions = {};
   }
   function applyAppearance() {
     if (!look) return;
@@ -77,11 +78,11 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
       accessory.visible = accessory.name === look.hairStyle;
       (accessory.material as THREE.MeshStandardMaterial).color.set(look.hair);
     }
-    if (model) {
-      const head = model.getObjectByName("Bip01_Head") ?? model.getObjectByName("Bip01 Head");
-      head?.scale.set(look.face === "soft" ? 1.04 : look.face === "sharp" ? .95 : 1, look.face === "sharp" ? 1.04 : 1, 1);
-    }
+    applyHeadShape();
     root.userData.outfit = outfit;
+  }
+  function applyHeadShape() {
+    if (headBone && look) headBone.scale.set(look.face === "soft" ? 1.04 : look.face === "sharp" ? .95 : 1, look.face === "sharp" ? 1.04 : 1, 1);
   }
   async function load(choice: string) {
     selected = choice; const token = ++generation;
@@ -134,7 +135,8 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
       for (const clip of gltf.animations) actions[clip.name] = mixer.clipAction(clip);
       active = actions.Idle; active?.play();
       // Head-bone hair options follow animation and preserve the existing editor keys.
-      const head = model.getObjectByName("Bip01_Head") ?? model.getObjectByName("Bip01 Head");
+      headBone = model.getObjectByName("Bip01_Head") ?? model.getObjectByName("Bip01 Head");
+      const head = headBone;
       if (head) for (const style of ["long", "mohawk"]) {
         const geometry = new THREE.CapsuleGeometry(style === "long" ? .07 : .035, style === "long" ? .22 : .12, 4, 8);
         const accessory = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ roughness: .95 }));
@@ -158,7 +160,7 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
       const action = actions[key];
       if (action && action !== active) { active?.fadeOut(.18); action.reset().fadeIn(.18).play(); active = action; }
       if (active) active.timeScale = key === "Idle" ? 1 : THREE.MathUtils.clamp(speed / (key === "Run" ? 7 : 4.2), .55, 1.5);
-      mixer?.update(dt); root.userData.animation = key;
+      mixer?.update(dt); applyHeadShape(); root.userData.animation = key;
     },
     dispose() { disposed = true; generation++; clear(); root.removeFromParent(); },
   };
