@@ -1,3 +1,14 @@
+> **Published:** v30 player PR #37 and v31 NPCs PR #38; same `/test/` URL.
+> Live JS `index-CZwokPcC.js`, Main/Pages green, two GLB hashes/license confirmed;
+> targeted live Can → Buch/editor/narrow layout and HP0/XP checks passed.
+> **Next: finish existing Draft PR #39**, branch `feature/source-sculpts-v32`,
+> head `351be52`. Not deployed. It contains Dex #25–48 sculptures (48 authored /
+> 372 reconstructed total) and the human animation rest-basis/head-editor fixes.
+> Three v32 rounds exhausted: CI 39066240154 passed 161/162; only Coinwraith
+> exceeded the existing 15k-triangle ceiling. Reduced its coins 18 → 13 after
+> that run; final correction is not re-tested. Continue this PR, do not create
+> a replacement. Once published, continue sculpting from Dex #49.
+
 > v31: Rigged NPC graphics package; v30 player published via PR #37.
 
 > v30: Licensed rigged player package; publication/check notes follow in the handoff.
@@ -477,7 +488,10 @@ quests, inventory, achievements, clothing bonuses and save slots intact:
    locomotion clips, stable visual identities and a bounded two-template cache.
    NPC interaction points, signs, quests, shops and source positions remain.
    Runtime checks/publication are recorded in the handoff.
-4. Continue individual 3D monster models from the retained 2D sprites. v28 has
+4. First finish and verify **existing Draft PR #39** (branch/head above),
+   including the remaining Coinwraith mesh-budget and human-pose corrections;
+   no new package/PR for this same work. Then continue individual 3D monster
+   models from the retained 2D sprites. v28 has
    24 preferred sculptures and 396 source-pose volume reconstructions. Preserve
    the 420-source pipeline, bounded cache, model slots and comparison viewer;
    do not rebuild these systems or claim all 420 are individually sculpted.
