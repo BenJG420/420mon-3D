@@ -81,13 +81,14 @@
   "outputs": [
     {
       "file": "female.glb",
-      "sha256": "475c7f900bff8ac45462ad3e49908c09f1d82358d9fff436105277970f6c1f17",
-      "bytes": 4985296
+      "sha256": "89fe98fb31bc6553952effb1e49a8b565e161eb687a706faa9000c8c3f3a01aa",
+      "bytes": 4985292
     },
     {
       "file": "male.glb",
-      "sha256": "807748191f1a995d08524a6fc8da12d20236576c53616f10c33213158cbb1a7c",
-      "bytes": 4849540
+      "sha256": "0bc5b219b748320de184ef4111e6402c1da27837d34c946eba36f1125c828ca9",
+      "bytes": 4849496
     }
-  ]
+  ],
+  "conversion": "absolute local pose retargeting into avatar rest bases; initial nodes use first Idle sample"
 }

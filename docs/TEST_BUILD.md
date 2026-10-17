@@ -1,3 +1,6 @@
+> v32: 24 further individual source-sprite sculptures; 48 authored / 372 reconstructed.
+> Also corrects human animation rest-basis transfer found in the v31 close view.
+
 > v31: Rigged NPC graphics package; v30 player published via PR #37.
 
 > v30: Licensed rigged player package; publication/check notes follow in the handoff.
@@ -477,10 +480,11 @@ quests, inventory, achievements, clothing bonuses and save slots intact:
    locomotion clips, stable visual identities and a bounded two-template cache.
    NPC interaction points, signs, quests, shops and source positions remain.
    Runtime checks/publication are recorded in the handoff.
-4. Continue individual 3D monster models from the retained 2D sprites. v28 has
-   24 preferred sculptures and 396 source-pose volume reconstructions. Preserve
-   the 420-source pipeline, bounded cache, model slots and comparison viewer;
-   do not rebuild these systems or claim all 420 are individually sculpted.
+4. v32 adds individual original-sprite sculptures for Dex #25–48 (Coinbat to
+   Slagjaw): 48 preferred authored sculptures total, 372 source-pose volume
+   reconstructions remain. Continue with Dex #49. Preserve the 420-source
+   pipeline, bounded cache, model slots and comparison viewer; do not rebuild
+   these systems or claim all 420 are individually sculpted.
 
 Each package gets one PR, at most three focused validation passes, an updated
 handoff and explicit Remaining work. Do not ask routine questions; write a

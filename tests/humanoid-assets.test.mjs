@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {Matrix4,Vector3,Quaternion} from 'three';
 const base=new URL('../public/game/characters/',import.meta.url);
 const sources=JSON.parse(readFileSync(new URL('sources.json',base),'utf8'));
 test('both redistributable human assets bundle a real weighted skeleton, three nonempty clips and all textures',()=>{
@@ -20,6 +21,20 @@ test('both redistributable human assets bundle a real weighted skeleton, three n
     for(const mesh of asset.meshes)for(const primitive of mesh.primitives){
       assert.ok(primitive.attributes.JOINTS_0!==undefined);
       assert.ok(primitive.attributes.WEIGHTS_0!==undefined);
+    }
+    // The clip FBXs have different rest bases. An authentic idle must place
+    // both wrists near the hips rather than preserve the avatar's A-pose.
+    const parents=new Map();asset.nodes.forEach((n,i)=>(n.children??[]).forEach(c=>parents.set(c,i)));
+    const world=index=>{
+      const n=asset.nodes[index],m=new Matrix4().compose(new Vector3(...(n.translation??[0,0,0])),new Quaternion(...(n.rotation??[0,0,0,1])),new Vector3(...(n.scale??[1,1,1])));
+      return parents.has(index)?world(parents.get(index)).multiply(m):m;
+    };
+    const point=name=>new Vector3().setFromMatrixPosition(world(asset.nodes.findIndex(n=>n.name===name)));
+    const pelvis=point('Bip01 Pelvis'),head=point('Bip01 Head');
+    for(const side of ['L','R']){
+      const hand=point(`Bip01 ${side} Hand`);
+      assert.ok(Math.abs(hand.x-pelvis.x)<.4,`${output.file}: idle wrist must hang beside the body`);
+      assert.ok(hand.y<head.y-.35,`${output.file}: idle wrist stays below shoulders`);
     }
     assert.ok(asset.images.length>=3);
     assert.ok(asset.images.every(image=>image.bufferView!==undefined&&!image.uri));
