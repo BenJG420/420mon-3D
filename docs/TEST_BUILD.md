@@ -1,3 +1,9 @@
+> **v32 published:** existing PR #39 merged as `cfb13ff`; 48 authored sculptures,
+> 372 source-volume reconstructions. Closing tests/build and three model smokes
+> passed. Pages run 39075552733 completed successfully (explicit dispatch because
+> the squash body retained an old skip marker). Fix 1 below now proceeds in its
+> own PR; static Idle alone does not establish correct walking knees/arms.
+
 > Current instruction: finish existing PR #39 first, then Bens Fix-Liste below.
 > Older stop/publication notes below are historical and superseded by this order.
 
@@ -469,18 +475,21 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (2026-10-17)
 
-First finish and merge the **existing PR #39** (v32, Dex #25–48 and initial
-human pose transfer). Do not replace it or start another monster batch first.
-The owner explicitly requested this continuation; use at most three focused
-closing checks in this run and record their results.
+Existing PR #39 is merged and published. Keep its 48 authored/372 reconstructed
+models. Continue Bens packages below; do not start another monster batch before
+the HD/PBR pass. Historical Draft/stop notes above are superseded by this status.
 
 Then deliver these playable packages in this exact order, **one PR per package**:
 
-1. **v30 animation bug:** correct retargeting and bone mapping for walking/running
+1. **v33 implemented — publication/check result in handoff:** correct retargeting and bone mapping for walking/running
    arms (T-pose) and the incorrectly bending knee. Inspect male/female player
    and NPCs with the shared rig; verify actual animated poses, not just clip
-   names or static Idle. Preserve movement, editor, clothes and saves.
-2. **Slot machines:** repair the existing original 2D-based Spielautomaten;
+   names or static Idle. v33 adds explicit limb mapping, rotation-only target
+   animation and phase-matched sprint blends shared by player/NPCs. Real GLTF
+   full-cycle/skin/transition tests and game smoke passed after correcting the
+   new skin fixture to world units; final CI/Pages follows. Movement, editor,
+   clothes and saves remain.
+2. **NEXT — Slot machines:** repair the existing original 2D-based Spielautomaten;
    retain their authentic rules and existing save/economy semantics.
 3. **Aquarium:** enlarge the physical aquarium and open a dedicated view when
    clicked/interacted with, showing the player's caught fish swimming. Preserve

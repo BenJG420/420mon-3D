@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
+import { createHumanAnimation } from "./human-animation";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
 
 export type HumanLook = {
@@ -42,20 +43,19 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
   const root = new THREE.Group(); root.name = "licensed-rocketbox-human"; parent.add(root);
   let generation = 0, disposed = false, selected = "", outfit = "nude";
   let look: HumanLook | undefined;
-  let model: THREE.Object3D | undefined, mixer: THREE.AnimationMixer | undefined;
-  let active: THREE.AnimationAction | undefined;
+  let model: THREE.Object3D | undefined;
+  let animation: ReturnType<typeof createHumanAnimation> | undefined;
   let headBone: THREE.Object3D | undefined;
-  let actions: Record<string, THREE.AnimationAction> = {};
   const ownedMaterials: { material: THREE.MeshStandardMaterial; region: Region; base: THREE.Texture | null }[] = [];
   const ownedGeometry: THREE.BufferGeometry[] = [];
   const hairAccessories: THREE.Mesh[] = [];
   function clear() {
-    mixer?.stopAllAction(); if (model) mixer?.uncacheRoot(model);
+    animation?.dispose(); animation = undefined;
     model?.traverse(o => { if (o instanceof THREE.SkinnedMesh) o.skeleton.dispose(); });
     for (const item of ownedMaterials) item.material.dispose(); ownedMaterials.length = 0;
     for (const g of ownedGeometry) g.dispose(); ownedGeometry.length = 0;
     for (const m of hairAccessories) { m.geometry.dispose(); (m.material as THREE.Material).dispose(); }
-    hairAccessories.length = 0; headBone = undefined; root.clear(); model = undefined; mixer = undefined; active = undefined; actions = {};
+    hairAccessories.length = 0; headBone = undefined; root.clear(); model = undefined;
   }
   function applyAppearance() {
     if (!look) return;
@@ -131,9 +131,7 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
         indices.forEach((part, i) => { geometry.addGroup(offset, part.length, i); offset += part.length; combined.push(...part); });
         geometry.setIndex(combined); o.material = materials;
       });
-      mixer = new THREE.AnimationMixer(model);
-      for (const clip of gltf.animations) actions[clip.name] = mixer.clipAction(clip);
-      active = actions.Idle; active?.play();
+      animation = createHumanAnimation(model, gltf.animations);
       // Head-bone hair options follow animation and preserve the existing editor keys.
       headBone = model.getObjectByName("Bip01_Head") ?? model.getObjectByName("Bip01 Head");
       const head = headBone;
@@ -156,11 +154,8 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
       if (selected !== next.choice || root.userData.status === "error") void load(next.choice);
     },
     update(dt: number, speed = 0, sprint = false) {
-      const key = speed > .35 ? sprint ? "Run" : "Walk" : "Idle";
-      const action = actions[key];
-      if (action && action !== active) { active?.fadeOut(.18); action.reset().fadeIn(.18).play(); active = action; }
-      if (active) active.timeScale = key === "Idle" ? 1 : THREE.MathUtils.clamp(speed / (key === "Run" ? 7 : 4.2), .55, 1.5);
-      mixer?.update(dt); applyHeadShape(); root.userData.animation = key;
+      animation?.update(dt, speed, sprint); applyHeadShape();
+      root.userData.animation = animation?.diagnostics().gait ?? "Idle";
     },
     dispose() { disposed = true; generation++; clear(); root.removeFromParent(); },
   };

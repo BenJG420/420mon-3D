@@ -39,3 +39,11 @@
 - `public/game/characters/sources.json` records every input path/hash and the
   exact distributed GLB hashes. `scripts/convert-rocketbox.py` records conversion.
   No Adobe/Mixamo asset or animation is redistributed.
+
+### v33 animation runtime correction
+
+The same Microsoft MIT models/clips are retained unchanged. Explicit limb-chain
+and clip/bone binding checks cover both bodies and NPC clones. Only joint
+quaternions animate; avatar bind translations and editor scaling remain intact.
+Walk and Run share a normalized stride phase and continuous weights, preserving
+foot/knee phase when sprint starts or ends. No additional third-party assets.
