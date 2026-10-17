@@ -1,3 +1,10 @@
+> **v32 is DRAFT in PR #39, not deployed.** Three check rounds exhausted; CI
+> 39066240154 passed 161/162, failing only Coinwraith’s existing 15k-triangle
+> ceiling. Reduced its coins from 18 to 13 without raising that ceiling; this
+> correction and preserved editor head scaling are not re-tested. Resume and
+> finish PR #39 first. Live `/test/` remains v31 (PR #38); its human pose fix
+> is included in the open v32 package.
+
 > v32: 24 further individual source-sprite sculptures; 48 authored / 372 reconstructed.
 > Also corrects human animation rest-basis transfer found in the v31 close view.
 
@@ -480,7 +487,8 @@ quests, inventory, achievements, clothing bonuses and save slots intact:
    locomotion clips, stable visual identities and a bounded two-template cache.
    NPC interaction points, signs, quests, shops and source positions remain.
    Runtime checks/publication are recorded in the handoff.
-4. v32 adds individual original-sprite sculptures for Dex #25–48 (Coinbat to
+4. **First finish existing Draft PR #39** (final corrected mesh budget and
+   human pose/head-shape verification, then publication). v32 adds individual original-sprite sculptures for Dex #25–48 (Coinbat to
    Slagjaw): 48 preferred authored sculptures total, 372 source-pose volume
    reconstructions remain. Continue with Dex #49. Preserve the 420-source
    pipeline, bounded cache, model slots and comparison viewer; do not rebuild

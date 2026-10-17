@@ -203,8 +203,8 @@ function gratehound(){
 function coinwraith(){
   const s=new Sculpt();s.ellipsoid(0x8b693c,0,.84,.03,.27,.42,.2);s.ellipsoid(0xb78b4b,0,1.2,.07,.26,.24,.19);
   for(const sign of [-1,1]){batWing(s,sign,0x776392,0xb78a5e,.77,.96);s.cone(0x875e33,sign*.16,1.47,.03,.07,.35,0,0,-sign*.2);}
-  eyes(s,1.23,.25,.1,0xddd2a5,.055);for(let i=0;i<12;i++)coin(s,Math.sin(i*2.4)*.23,.5+(i%5)*.15,.18+Math.cos(i*2.4)*.04,.075);
-  for(let i=0;i<6;i++)coin(s,Math.sin(i*1.4)*.72,.2+(i%3)*.52,.06,.07);s.ellipsoid(0x493744,0,.38,0,.14,.19,.1);return s.finish();
+  eyes(s,1.23,.25,.1,0xddd2a5,.055);for(let i=0;i<8;i++)coin(s,Math.sin(i*2.4)*.23,.5+(i%5)*.15,.18+Math.cos(i*2.4)*.04,.075);
+  for(let i=0;i<5;i++)coin(s,Math.sin(i*1.4)*.72,.2+(i%3)*.52,.06,.07);s.ellipsoid(0x493744,0,.38,0,.14,.19,.1);return s.finish();
 }
 function slagjaw(){
   const s=new Sculpt();s.ellipsoid(0x49332e,0,.77,-.14,.49,.45,.54);s.ellipsoid(0x8d3d27,0,.87,.39,.48,.35,.34);
