@@ -23,7 +23,7 @@ type TrainerActions = { startTrainer: (mapId: string, id: string) => boolean; st
 type AchievementActions = { openCan: (obj: MapObj) => void };
 type StoryActions = {
   openFelix(obj: MapObj): void; openCrate(obj: MapObj): void; openCage(obj: MapObj): void;
-  openEddi(obj: MapObj): void; openRadio(): void;
+  openEddi(obj: MapObj): void; openRadio(): void; openSlots?(obj: MapObj): void;
 };
 
 /** Original Kapsel starter and Bolt route; all mutations use the shared save. */
@@ -110,6 +110,7 @@ export function createHomeInteractions(world: DistrictTravel, grow: GrowActions,
     ]);
   }
   function interact(obj: MapObj, mapId: string): boolean | void {
+    if (obj.id.startsWith("slot_") && story?.openSlots) { close(); story.openSlots(obj); return true; }
     if (story) {
       if (obj.id === "felix" || obj.id === "felix_body") { close(); story.openFelix(obj); return true; }
       if (obj.id === "felix_crate") { close(); story.openCrate(obj); return true; }

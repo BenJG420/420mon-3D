@@ -1,3 +1,14 @@
+> Prüfnotiz v34 Runde 2: Alle acht betroffenen Tests grün. Ein Chromium-Touch-Smoke bestätigt Keller/Kino/Neonkai, 20/5/9 Linien, Budget-Sperre, Schließen während des Drehens ohne Verlust/Doppelbuchung, Reload ohne zweite Auszahlung, Auto/Stop, kostenlose und einsatzgesperrte Freispiele inklusive Reload, Fokus, schmales Layout, HP0/XP und keine Browser-/Shaderfehler. Runde 3 CI/Pages folgt; keine zusätzliche Vollprüfung.
+
+> Prüfnotiz v34 Runde 1: Build grün, 174/175 Tests grün. Die neue Jackpot-Fixture hatte Kronen-Chips fälschlich als einzigartigen Kiez-Fund erwartet; die Original-UNIQUE_FIND-Liste schließt Kronen-Chips und Zero-Day-Samen aus. Nur diese Erwartung berichtigt, keine Auszahlungsregel geändert. Runde 2 beschränkt sich auf acht Slot-Tests und einen kurzen Browser-Smoke; keine erneute Vollsuite.
+
+# Aktueller Lauf — Spielautomaten v34
+
+- Annahme v34: Alle drei physischen Glutwalzen öffnen wie im Original denselben Wähler (420/Obststand/Freidreher). Originale Streifen, Gewinnlinien, Einsätze, Wild/Scatter, Obst-Nudge und Jackpot unverändert aus src/game/slot.ts (2D-Revision 010807da77df8468a297adf33eaf1fb5c9a61c8b).
+- Bugfix-Annahme v34: Einsatz und fertiger Gewinn werden vor der reinen Walzenanimation zusammen gespeichert; Schließen/Reload darf weder verlieren noch erneut auszahlen. Ungenutzte Freispiele bleiben am Freidreher mit festem Ursprungseinsatz/Linien gespeichert (neues isoliertes slotState); keine Übertragung auf andere Maschinen. Original-Softcash-Auszahlung ist ohne Kleider-/Fischbonus, goldEarned und Jackpot-Entdeckung werden mitgeführt. Speicherfehler rollen den vollständigen Buchungsversuch zurück, Team-/Box-/Pottreferenzen bleiben stabil.
+- Aktuell implementiert, Prüfung folgt: alle drei Automaten, animierte Walzen mit Gewinnfeldern, Gewinn-/Linientabelle, Einsatzstaffel 1–1.000.000 pro Linie, Auto/Stop, fortsetzbare Freispiele ×2, einmalige Jackpot-Buchung 10 seed_eddi + 10 chip_crown. Escape/Fokus/Touch, Ortsprüfung und Spiel-/Rivalen-/Begegnungs-Pause sind integriert. Kein Menü-Shop oder Zahlungssystem wurde aktiviert.
+- Nächstes Paket nach diesem PR: Aquarium vergrößern und eine Ansicht schwimmender eigener Fische öffnen. Weiterhin höchstens drei Runden: Tests+Build, kurzer Smoke, CI/Deployment.
+
 # Aktueller Wiedereinstieg — v33 / Bens Fix-Liste
 
 - **Fertig und veröffentlicht:** angefangener PR #39 (v32, cfb13ff) und Fix 1 als PR #40 (v33, 159f9a6). Keine offenen Draft-Arbeiten an diesen Paketen, nichts neu beginnen.

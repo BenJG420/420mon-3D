@@ -11,6 +11,7 @@ import { getSave, saveProgress } from "./game/save";
 import { createHomeInteractions } from "./game/home";
 import { createRivalSystem } from "./game/rival";
 import { createStoryEconomy } from "./game/story-economy";
+import { createSlotMachines } from "./game/slots";
 import { createRadioSystem } from "./game/radio";
 import { createMonsterViewer } from "./game/monster-viewer";
 import { createPostProcessing } from "./game/post-processing";
@@ -129,8 +130,9 @@ const fishingWorld = createFishingWorld(districtWorld);
 const achievements = createAchievementBook(districtWorld);
 const story = createStoryEconomy(districtWorld);
 const radio = createRadioSystem();
+const slots = createSlotMachines(districtWorld);
 const monsterViewer = createMonsterViewer();
-const home = createHomeInteractions(districtWorld, grow, fishing, monsterGame, achievements, { ...story, openRadio: radio.open });
+const home = createHomeInteractions(districtWorld, grow, fishing, monsterGame, achievements, { ...story, openRadio: radio.open, openSlots: slots.open });
 const rival = createRivalSystem(districtWorld, home.openNim);
 createGameSystems(districtWorld, () => grow.openShop(), achievements);
 
@@ -187,7 +189,7 @@ hud.innerHTML = `
   <div class="brand">420MON <span>LOWTOWN</span></div>
   <div class="status">DEIN ZUHAUSE IN 3D</div>
   <div class="hint">WASD / PFEILE · E INTERAGIEREN · T KLEIDUNG · SHIFT LAUFEN</div>
-  <div class="target">LOWTOWN · TESTVERSION 33</div>
+  <div class="target">LOWTOWN · TESTVERSION 34</div>
   <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
@@ -348,7 +350,7 @@ studioOpen.textContent = "✎ CHARAKTER";
 studioOpen.type = "button";
 app.appendChild(studioOpen);
 function toggleStudio(open: boolean) {
-  if (open && document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden])")) return;
+  if (open && document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])")) return;
   studioPanel.classList.toggle("is-open", open);
   document.body.classList.toggle("wardrobe-preview", open);
   if (!open && studioPanel.contains(document.activeElement)) (document.activeElement as HTMLElement)?.blur();
@@ -360,7 +362,7 @@ function toggleStudio(open: boolean) {
 window.addEventListener("420mon-preview-clothes", () => toggleStudio(true));
 window.addEventListener("keydown", event => {
   if (event.code === "Escape" && studioPanel.classList.contains("is-open")) toggleStudio(false);
-  if (event.code !== "KeyT" || event.repeat || event.defaultPrevented || (event.target as HTMLElement)?.closest("input,select,textarea,[contenteditable=true]") || document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden])")) return;
+  if (event.code !== "KeyT" || event.repeat || event.defaultPrevented || (event.target as HTMLElement)?.closest("input,select,textarea,[contenteditable=true]") || document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])")) return;
   const result = toggleBag(getSave()); if (result.ok) saveProgress();
 });
 studioOpen.addEventListener("click", () => toggleStudio(!studioPanel.classList.contains("is-open")));
@@ -445,12 +447,14 @@ window.addEventListener("blur", () => {
 
 const clock = new THREE.Clock();
 const velocity = new THREE.Vector3();
-window.addEventListener("420mon-model-opened", () => {
+function clearModalMovement() {
   for (const key of Object.keys(state)) state[key as keyof typeof state] = false;
   touch.x = 0; touch.y = 0; touch.sprint = false;
   joystickPointer = null; knob.style.transform = "translate(0px, 0px)";
   velocity.set(0, 0, 0);
-});
+}
+window.addEventListener("420mon-model-opened", clearModalMovement);
+window.addEventListener("420mon-slot-opened", clearModalMovement);
 const cameraTarget = new THREE.Vector3();
 const desiredCamera = new THREE.Vector3();
 const up = new THREE.Vector3(0, 1, 0);
@@ -535,7 +539,7 @@ function animate() {
 
   if (input.lengthSq() > 0) input.normalize();
 
-  const overlayOpen = !!document.querySelector(".systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden])");
+  const overlayOpen = !!document.querySelector(".systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])");
   const speed = monsterGame.inBattle || overlayOpen ? 0 : ((state.sprint || touch.sprint) ? 7.5 : 4.2) * fishEffectMultiplier(getSave(), "speed");
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
   blockedThisFrame = false;
