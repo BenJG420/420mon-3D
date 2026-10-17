@@ -1,3 +1,5 @@
+> Abschlusslauf PR #39: Runde 1 alle 162 Tests + Build grün; Runde 2 Coinwraith/Racklurk/Slagjaw im Originalvergleich, Drehen/Zoom/Schließen, schmaler Bildschirm und HP0/XP ohne Browser-/Shaderfehler grün. Runde 3 CI/Deployment folgt. Bens Liste ersetzt die bisherige Reihenfolge; Walk/Knie separat prüfen, nicht aus dem statischen Idle ableiten.
+
 > Nutzerauftrag 2026-10-17: PR #39 zuerst abschließen/mergen; danach Bens Fix-Liste aus docs/TEST_BUILD.md in dieser Reihenfolge und je Paket ein PR: Animations-Bug (T-Arme/Knie, Spieler + NPCs), Spielautomaten, größeres Aquarium mit schwimmenden eigenen Fischen, Gebäude-Occlusion, HD/4K-Monster (Detail/PBR/weich, keine Pixeloptik), danach übrige Arten. Ko-fi bleibt übersprungen.
 > Annahme Fortsetzung: Der ausdrückliche Abschlussauftrag erlaubt für den bestehenden PR #39 einen neuen begrenzten Abschlusslauf (max. drei Runden); die neue Walk/Knie-Korrektur folgt separat im ersten Fix-PR. Keine Neuimplementierung vorhandener Systeme.
 
