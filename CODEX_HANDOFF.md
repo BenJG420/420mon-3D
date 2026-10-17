@@ -1,3 +1,15 @@
+# Aktueller Wiedereinstieg — v33 / Bens Fix-Liste
+
+- **Fertig und veröffentlicht:** angefangener PR #39 (v32, cfb13ff) und Fix 1 als PR #40 (v33, 159f9a6). Keine offenen Draft-Arbeiten an diesen Paketen, nichts neu beginnen.
+- **Nächster Punkt:** Spielautomaten reparieren, danach größeres Aquarium mit eigener Ansicht schwimmender gefangener Fische, dann Gebäude-Transparenz/Silhouette, dann HD/4K-Monster mit Details/PBR/weicher Schattierung ohne Pixeloptik, danach restliche Arten. Je Paket ein PR; die verbindliche Reihenfolge steht in docs/TEST_BUILD.md. Ko-fi/Zahlungsserver bleiben übersprungen.
+- **Animation:** v32 überträgt absolute Posen in die korrekte Ziel-Rest-Basis; v33 prüft explizite Limb-Ketten und Clipbindungen, animiert nur Joint-Rotationen und mischt Walk/Run in gemeinsamer Schrittphase mit Gewichtssumme 1. Beide Körper und alle NPC-Klone nutzen denselben Controller. Kopf-Editor, Kleidung, Bewegung und Saves bleiben erhalten.
+- **Modellstand:** 48 eigene Skulpturen / 372 Sprite-Volumen. Der HD/PBR-Pass ist noch offen und geht vor weiteren Arten. Pipeline/Cache/Viewer behalten.
+- **Prüflimit eingehalten:** v32-Abschluss drei Runden (162 Tests+Build, kurzer Modell-Smoke, CI/Pages). v33 Runde 1: Build und 165/167; zwei neue Hautprüfungen nutzten falsche Einheiten, mit echter Mesh-Weltmatrix korrigiert. Runde 2: fünf betroffene Tests + ein Spiel-Smoke für Mann/Frau, Walk/Run/Idle, drei NPC-Rigs, Reload, schmales Layout, HP0/XP, keine Browser-/Shaderfehler. Runde 3: PR-CI 39076302644, Main-CI 39076375384 (167/167+Build), Pages 39076375374 grün. Keine zusätzliche Vollprüfung.
+- **Live:** https://benjg420.github.io/420mon-3D/test/ ; JS index-MWpIP3YV.js, SHA256 7d8cedcd6534600e60f429d7f940265af6c507b3b58b871616b8fc8daa2af067, bytegleich zum lokalen Build; beide GLB-Hashes und MIT-Datei bestätigt. Stabiler Root unverändert index-DWZ4yP_E.js. Physisches Android/4K bleibt Nutzer-/Gerätetest.
+- Diese abschließende Aktualisierung ist nur Dokumentation ([skip ci]); veröffentlichter Spielcode ist der Merge 159f9a6.
+
+## Historische Übergaben — frühere Stop-/Draft-Status sind überholt
+
 > Prüfnotiz v33 Runde 2: Betroffene fünf Tests grün. Ein Spiel-Smoke bestätigt beide Körper beim Gehen/Laufen/Stillstand, drei geladene NPC-Rigs, Neuladen mit weiblicher Auswahl, schmales Layout und unveränderte HP0/XP ohne Browser-/Shaderfehler. Geh-/Laufbilder zeigen abgesenkte Arme; vollständige Kniezyklen und Übergänge sind zusätzlich mit echten GLTF-Bones/Skins geprüft. Keine weitere lokale Vollsuite. Runde 3 CI/Deployment folgt.
 
 > Prüfnotiz v33 Runde 1: Build grün, 165/167 Tests grün. Zwei neue Haut-Budgetprüfungen verglichen FBX-Meshkoordinaten in Zentimetern mit Weltmetern; vor der Grenze wird jetzt die echte Mesh-Weltmatrix angewendet. Keine Grenzwerterhöhung. Runde 2 nur betroffene fünf Animationstests plus ein Spiel-Smoke, keine erneute volle Suite.

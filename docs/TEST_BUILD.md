@@ -1,27 +1,13 @@
-> **v32 published:** existing PR #39 merged as `cfb13ff`; 48 authored sculptures,
-> 372 source-volume reconstructions. Closing tests/build and three model smokes
-> passed. Pages run 39075552733 completed successfully (explicit dispatch because
-> the squash body retained an old skip marker). Fix 1 below now proceeds in its
-> own PR; static Idle alone does not establish correct walking knees/arms.
+> **Published v33:** PR #39 completed/merged (`cfb13ff`); Bens animation fix
+> completed/merged separately as PR #40 (`159f9a6`). Main CI 39076375384 passed
+> 167/167 tests + build; Pages 39076375374 is green. Test JS
+> `index-MWpIP3YV.js` (SHA256 `7d8cedcd6534600e60f429d7f940265af6c507b3b58b871616b8fc8daa2af067`)
+> is byte-identical to the local build; both GLB hashes and MIT license match.
+> Stable root remains `index-DWZ4yP_E.js`. Same `/test/` URL and save slots.
+> **Next: slot machines**, then aquarium, building occlusion, HD/PBR monsters,
+> then remaining species. Each package has its own PR and at most three rounds.
 
-> Current instruction: finish existing PR #39 first, then Bens Fix-Liste below.
-> Older stop/publication notes below are historical and superseded by this order.
-
-> **v32 is DRAFT in PR #39, not deployed.** Three check rounds exhausted; CI
-> 39066240154 passed 161/162, failing only Coinwraith’s existing 15k-triangle
-> ceiling. Reduced its coins from 18 to 13 without raising that ceiling; this
-> correction and preserved editor head scaling are not re-tested. Resume and
-> finish PR #39 first. Live `/test/` remains v31 (PR #38); its human pose fix
-> is included in the open v32 package.
-
-> v32: 24 further individual source-sprite sculptures; 48 authored / 372 reconstructed.
-> Also corrects human animation rest-basis transfer found in the v31 close view.
-
-> v31: Rigged NPC graphics package; v30 player published via PR #37.
-
-> v30: Licensed rigged player package; publication/check notes follow in the handoff.
-
-# Original-world test build v29
+# Original-world test build v33
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -254,9 +240,10 @@ origin's localStorage.
   selects Automatisch/Hoch/Sparsam and saves only a presentation preference.
   Pixel budgets and DPR caps avoid forced phone supersampling. DOM menus and
   existing monster/editor previews retain their own rendering.
-- Licensed rigged player and NPC replacements are deliberately next, followed
-  by individual monster refinement. No external character asset is introduced
-  here; current procedural asset provenance is in [ASSET_ATTRIBUTION.md](ASSET_ATTRIBUTION.md).
+- Player and NPCs use locally bundled MIT Rocketbox skinned models, with shared
+  explicit limb mappings, target rotations and phase-matched Idle/Walk/Run blends.
+  Source/animation licensing is in [ASSET_ATTRIBUTION.md](ASSET_ATTRIBUTION.md).
+  Further HD/PBR monster work follows Bens ordered fixes below.
 
 ## How to try it
 
@@ -333,7 +320,7 @@ origin's localStorage.
 
 22. Open the Dex and select a captured entry marked 3D ansehen. Compare the
     original pose with its model, drag to rotate, zoom, reset and close with Esc.
-    The first 24 entries use individual sculptures; other entries identify their
+    The first 48 entries use individual sculptures; other entries identify their
     source-sprite reconstruction. Return to the world to see the same creatures.
 23. In a trainer or wild battle choose 3D ansehen under either fighter portrait.
     Inspect and close: the same battle turn remains active. Continue fighting or
@@ -350,8 +337,17 @@ origin's localStorage.
 
 ## Validation
 
+v33 closing validation: the first round passed build and 165/167 tests; two
+new skin assertions compared FBX mesh centimetres to world metres. Applying
+the actual mesh world matrix fixed the fixture without relaxing the bound.
+Round 2 passed the five affected full-cycle/transition/mapping tests and one
+male/female game smoke (walk/run/idle, three NPC rigs, reload, narrow layout,
+HP0/XP unchanged, no page/shader errors). Round 3 passed PR/Main CI (167 tests),
+Pages and exact live artifact verification. No further whole smoke/test loop.
+Physical Android and native 4K remain device checks.
+
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 161 regression tests covering 420 assets, restored source hashes, battle save
+suite has 167 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
@@ -481,13 +477,14 @@ the HD/PBR pass. Historical Draft/stop notes above are superseded by this status
 
 Then deliver these playable packages in this exact order, **one PR per package**:
 
-1. **v33 implemented — publication/check result in handoff:** correct retargeting and bone mapping for walking/running
+1. **DONE — PR #40 / v33:** correct retargeting and bone mapping for walking/running
    arms (T-pose) and the incorrectly bending knee. Inspect male/female player
    and NPCs with the shared rig; verify actual animated poses, not just clip
    names or static Idle. v33 adds explicit limb mapping, rotation-only target
    animation and phase-matched sprint blends shared by player/NPCs. Real GLTF
    full-cycle/skin/transition tests and game smoke passed after correcting the
-   new skin fixture to world units; final CI/Pages follows. Movement, editor,
+   new skin fixture to world units. Final CI/Pages is recorded in the current
+   publication note. Movement, editor,
    clothes and saves remain.
 2. **NEXT — Slot machines:** repair the existing original 2D-based Spielautomaten;
    retain their authentic rules and existing save/economy semantics.

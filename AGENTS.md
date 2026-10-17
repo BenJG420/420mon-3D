@@ -19,7 +19,17 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 9. Do not overwrite or delete the original 2D repository. Preserve source attribution and be mindful that its content is private; access requires authorization.
 10. Report what is implemented, tested, missing, and deployed factually in German. Do not repeatedly ask what to work on next when the goal is clear.
 
-## Current graphics order (user instruction, 2026-10-16)
+## Current fix order (user instruction, 2026-10-17)
+
+Existing PR #39 is completed and merged; Bens animation fix is merged as PR #40.
+Continue the remaining list in `docs/TEST_BUILD.md`, one playable package / PR:
+slot machines; larger aquarium with a swimming caught-fish view; occluding
+building transparency/silhouette; detailed smooth HD/4K PBR monster pass; then
+remaining original species. Do not restart the graphics packages or create a
+replacement PR #39. Preserve all mechanics/saves; Ko-fi/payment stays skipped.
+Keep the same file-read discipline and maximum three focused check rounds.
+
+## Previous graphics order (superseded by 2026-10-17 fix list)
 
 Ko-fi and payment-server work is **skipped by user request**, not blocked or next.
 Preserve the existing game mechanics; change them only if rendering requires it.
