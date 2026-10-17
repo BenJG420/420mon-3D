@@ -34,6 +34,11 @@ export class Sculpt {
     geometry.applyQuaternion(rotation);
     return this.add(geometry, color, start.add(end).multiplyScalar(.5).toArray() as Point);
   }
+  /** Closed thin silhouette for scalloped membranes and metal/fabric plates. */
+  panel(color: THREE.ColorRepresentation, points: Point[], depth = .035) {
+    const shape = new THREE.Shape(points.map(([x, y]) => new THREE.Vector2(x, y)));
+    return this.add(new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false }), color, [0, 0, points[0][2] - depth / 2]);
+  }
   finish(): THREE.BufferGeometry {
     if (!this.parts.length) throw new Error("Ein Monster-Modell braucht seine eigene Form.");
     const geometry = mergeGeometries(this.parts, false);

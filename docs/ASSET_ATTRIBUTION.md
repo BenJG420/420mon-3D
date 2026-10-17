@@ -14,7 +14,7 @@
 - Existing original 420mon sprites and project-authored monster/clothing meshes
   remain unchanged in this package; see [MONSTER_MODELS.md](MONSTER_MODELS.md).
 
-## Rigged humans — v30 / v31
+## Rigged humans — v30 / v31 / v32
 
 - **Microsoft Rocketbox Avatar Library**, Microsoft and the Rocketbox original
   avatar team (Markus Wojcik); maintained by Mar Gonzalez-Franco and contributors.
@@ -30,8 +30,10 @@
   including the deployed asset directory. Upstream license:
   https://github.com/microsoft/Microsoft-Rocketbox/blob/0943055db6ec570bcef9f2c8b41c9e5467c808f9/LICENSE.md
 - Conversion: Blender 4.3.2, original rig/UVs retained, textures downsampled to
-  1024 pixels, bone rotations retargeted between matching Rocketbox skeletons,
-  root movement removed so gameplay controls remain authoritative. Three clips
+  1024 pixels, absolute local bone orientations transferred into each avatar rest basis,
+  root movement removed so gameplay controls remain authoritative. v32 corrects
+  the clip FBXs’ individual rest bases (copying delta quaternions alone left
+  arms spread); the default GLTF node pose also matches the first Idle sample. Three clips
   named Idle, Walk and Run. Wardrobe tint/roughness regions follow skin weights;
   head accessories and body proportions are project adaptations.
 - `public/game/characters/sources.json` records every input path/hash and the

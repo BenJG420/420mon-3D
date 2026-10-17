@@ -1,13 +1,15 @@
-> **Published:** v30 player PR #37 and v31 NPCs PR #38; same `/test/` URL.
-> Live JS `index-CZwokPcC.js`, Main/Pages green, two GLB hashes/license confirmed;
-> targeted live Can → Buch/editor/narrow layout and HP0/XP checks passed.
-> **Next: finish existing Draft PR #39**, branch `feature/source-sculpts-v32`,
-> head `351be52`. Not deployed. It contains Dex #25–48 sculptures (48 authored /
-> 372 reconstructed total) and the human animation rest-basis/head-editor fixes.
-> Three v32 rounds exhausted: CI 39066240154 passed 161/162; only Coinwraith
-> exceeded the existing 15k-triangle ceiling. Reduced its coins 18 → 13 after
-> that run; final correction is not re-tested. Continue this PR, do not create
-> a replacement. Once published, continue sculpting from Dex #49.
+> Current instruction: finish existing PR #39 first, then Bens Fix-Liste below.
+> Older stop/publication notes below are historical and superseded by this order.
+
+> **v32 is DRAFT in PR #39, not deployed.** Three check rounds exhausted; CI
+> 39066240154 passed 161/162, failing only Coinwraith’s existing 15k-triangle
+> ceiling. Reduced its coins from 18 to 13 without raising that ceiling; this
+> correction and preserved editor head scaling are not re-tested. Resume and
+> finish PR #39 first. Live `/test/` remains v31 (PR #38); its human pose fix
+> is included in the open v32 package.
+
+> v32: 24 further individual source-sprite sculptures; 48 authored / 372 reconstructed.
+> Also corrects human animation rest-basis transfer found in the v31 close view.
 
 > v31: Rigged NPC graphics package; v30 player published via PR #37.
 
@@ -465,36 +467,37 @@ relocation timed out because pagehide persistence restored the in-memory positio
 no extra smoke loop was added. Static's actual quest mutation is covered by the
 module tests; his browser interaction remains a user-check item.
 
-## Remaining work — continue in this order
+## Remaining work — Bens Fix-Liste (2026-10-17)
 
-**Übersprungen: Ko-fi und Zahlungsserver.** The owner explicitly cancelled that
-work on 2026-10-16. Do not investigate hosting, configure Ko-fi, re-enable a
-payment link or describe this as a blocker. Archived implementation and old
-payment save fields are retained only for compatibility.
+First finish and merge the **existing PR #39** (v32, Dex #25–48 and initial
+human pose transfer). Do not replace it or start another monster batch first.
+The owner explicitly requested this continuation; use at most three focused
+closing checks in this run and record their results.
 
-The owner replaced the previous work order with these graphics packages. Keep
-all existing districts, routes, combat/capture, Grow, fishing, mattress healing,
-quests, inventory, achievements, clothing bonuses and save slots intact:
+Then deliver these playable packages in this exact order, **one PR per package**:
 
-1. v29 implements district lighting, wet materials, fog, rain and
-   post-processing matching the README/visual reference. Publication and its
-   exact validation limits are recorded above. Retain these systems; device
-   performance tuning can follow actual player feedback.
-2. v30 replaces the box player with male/female MIT Rocketbox skinned models,
-   local Idle/Walk/Run clips and skin-weight wardrobe colors. Editor selections,
-   movement, collisions and saves remain. Source/license/hashes are recorded in
-   `docs/ASSET_ATTRIBUTION.md`; appearance device checks remain user feedback.
-3. v31 upgrades physical NPCs to independent Rocketbox skeletons and idle/source-
-   locomotion clips, stable visual identities and a bounded two-template cache.
-   NPC interaction points, signs, quests, shops and source positions remain.
-   Runtime checks/publication are recorded in the handoff.
-4. First finish and verify **existing Draft PR #39** (branch/head above),
-   including the remaining Coinwraith mesh-budget and human-pose corrections;
-   no new package/PR for this same work. Then continue individual 3D monster
-   models from the retained 2D sprites. v28 has
-   24 preferred sculptures and 396 source-pose volume reconstructions. Preserve
-   the 420-source pipeline, bounded cache, model slots and comparison viewer;
-   do not rebuild these systems or claim all 420 are individually sculpted.
+1. **v30 animation bug:** correct retargeting and bone mapping for walking/running
+   arms (T-pose) and the incorrectly bending knee. Inspect male/female player
+   and NPCs with the shared rig; verify actual animated poses, not just clip
+   names or static Idle. Preserve movement, editor, clothes and saves.
+2. **Slot machines:** repair the existing original 2D-based Spielautomaten;
+   retain their authentic rules and existing save/economy semantics.
+3. **Aquarium:** enlarge the physical aquarium and open a dedicated view when
+   clicked/interacted with, showing the player's caught fish swimming. Preserve
+   the 42-fish catalogue, collection, fishing and bonuses.
+4. **Occlusion:** when the player is behind a house, fade occluding buildings
+   or render a visible silhouette. Preserve camera/geometry/collision behavior.
+5. **Monster HD/4K art pass:** detailed meshes, PBR textures and smooth shading,
+   with no pixel-style world models, following the README graphics reference.
+   Then continue the remaining original-sprite monster species. Keep the 420
+   pipeline, cache, viewer and original Dex portraits. v32 aims for 48 authored
+   sculptures and 372 volume reconstructions; do not claim all 420 are sculpted
+   or HD/PBR already. Native 4K/mobile performance needs real device feedback.
+
+**Übersprungen: Ko-fi und Zahlungsserver.** Do not investigate, configure or
+re-enable payment services. Existing mechanics (districts, battles/capture,
+Grow, mattresses, fishing, NPC shops/quests, achievements and saves) remain.
+Previous v29 lighting/weather/post-processing and v30/v31 licensed rigs stay.
 
 Each package gets one PR, at most three focused validation passes, an updated
 handoff and explicit Remaining work. Do not ask routine questions; write a
