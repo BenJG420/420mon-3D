@@ -1,13 +1,11 @@
-> **Published v33:** PR #39 completed/merged (`cfb13ff`); Bens animation fix
-> completed/merged separately as PR #40 (`159f9a6`). Main CI 39076375384 passed
-> 167/167 tests + build; Pages 39076375374 is green. Test JS
-> `index-MWpIP3YV.js` (SHA256 `7d8cedcd6534600e60f429d7f940265af6c507b3b58b871616b8fc8daa2af067`)
-> is byte-identical to the local build; both GLB hashes and MIT license match.
-> Stable root remains `index-DWZ4yP_E.js`. Same `/test/` URL and save slots.
-> **Next: slot machines**, then aquarium, building occlusion, HD/PBR monsters,
-> then remaining species. Each package has its own PR and at most three rounds.
+> **v34 implemented:** physical Glutwalzen restored from the original 2D rules.
+> Local build and eight targeted tests pass; one touch smoke passed all three
+> cabinets, close/reload settlement, Auto/Stop and locked-stake free spins.
+> Final CI/publication is recorded in the handoff. Next package: aquarium,
+> then building occlusion, HD/PBR monsters and remaining species.
+> Previous published source: v33 / PR #40; stable root remains pinned.
 
-# Original-world test build v33
+# Original-world test build v34
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -26,6 +24,15 @@ legacy fields and monsters, backs up the previous save and can import an existin
 origin's localStorage.
 
 ## What is implemented
+
+- All three physical Glutwalzen open the original 420, Obststand and Freidreher
+  games. Authentic reel strips, 20/5/9 lines, original per-line stakes and
+  payouts, wild/scatter, fruit nudge and ten-seed/ten-chip jackpot are retained.
+  Auto/Stop and doubled free spins work. A single booking saves stake and
+  outcome before the visual animation; close/reload cannot replay a payout.
+  Unused free spins retain their original bet/lines. The new isolated slotState
+  leaves existing saves, references and mechanics intact. Own vector symbols,
+  winning-cell highlights and a payout/line table support keyboard and touch.
 
 - All 22 original map definitions, coordinates and routes drive the active 3D
   scene. Kapsel contains the original bed, six pots, six growboxes, starter case,
@@ -335,6 +342,13 @@ origin's localStorage.
     High enables bloom on supported hardware; automatic phones use the cheaper
     path. Menus, movement, interaction, model previews and save slots still work.
 
+26. In Rajko's cellar approach the Glutwalze to Ben's right; the other cabinets
+    are at the cinema and Neonkai. Press E/tap the interaction, choose 420,
+    Obststand or Freidreher, set stakes per line and select active lines. The
+    payout table shows original rules and line shapes. Try Auto/Stop; Escape
+    or close keeps the booked outcome and unspent locked-stake free spins.
+    Reopen/reload to read the last receipt without a second payout.
+
 ## Validation
 
 v33 closing validation: the first round passed build and 165/167 tests; two
@@ -347,7 +361,7 @@ Pages and exact live artifact verification. No further whole smoke/test loop.
 Physical Android and native 4K remain device checks.
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 167 regression tests covering 420 assets, restored source hashes, battle save
+suite has 175 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
@@ -486,9 +500,16 @@ Then deliver these playable packages in this exact order, **one PR per package**
    new skin fixture to world units. Final CI/Pages is recorded in the current
    publication note. Movement, editor,
    clothes and saves remain.
-2. **NEXT — Slot machines:** repair the existing original 2D-based Spielautomaten;
-   retain their authentic rules and existing save/economy semantics.
-3. **Aquarium:** enlarge the physical aquarium and open a dedicated view when
+2. **v34 implemented — publication/check notes follow:** the three physical
+   Glutwalzen (Keller/Kino/Neonkai) open the original 420/Obststand/Freidreher
+   games, with authentic strips, 20/5/9 lines, stakes, wild/scatter payouts,
+   fruit nudge, double free spins and jackpot (10 Zero-Day seeds + 10 crown chips).
+   Atomic booking prevents closing/reload loss or double payment. Unused free
+   spins retain their locked stake/lines in isolated slotState. Original gold
+   earnings/discovery counters and all existing saves/HP/mechanics remain.
+   Auto/Stop, winning cells/line table, keyboard/touch and interaction guards
+   are integrated. No fourth verification loop; final checks recorded below.
+3. **NEXT — Aquarium:** enlarge the physical aquarium and open a dedicated view when
    clicked/interacted with, showing the player's caught fish swimming. Preserve
    the 42-fish catalogue, collection, fishing and bonuses.
 4. **Occlusion:** when the player is behind a house, fade occluding buildings
