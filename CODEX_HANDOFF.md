@@ -1,11 +1,14 @@
-# v43 — individuelle Originalmodelle Dex 67–72 in Arbeit
+# Aktueller Wiedereinstieg — v43 / Dex 67–72 veröffentlicht
 
-Annahme v43: Sechs Arten bilden das nächste Paket, Spilleye bis Valvekoi; verdeckte Rückseiten setzen sichtbare Formen/Farben konservativ fort. Echte Erstposen bestimmen das Design, vorhandene 66 Skulpturen/PBR/Mechaniken bleiben erhalten; danach weiter ab Dex #73.
+- **Fertig, gemergt, live:** PR #50, Spielcode dbc608c90f9b6b6d92f0e5ebde94990320148162. Spilleye, Gongling, Maskwisp, Lipkrait, Magtick und Valvekoi nach echten lokalen Erstposen. Stand **72 eigene Skulpturen / 348 glatte Rekonstruktionen**. Die bisherigen 66 Geometrien, Originalsprites/Hashes, PBR/UV/Cache, Mechaniken und Saves bleiben erhalten.
+- **Dateien/Merkmale:** monster-sculpts-g.ts und monster-sculpts-g-creatures.ts: Schleimauge/Tropfen, Metallgong/Klöppel, gebrochene Maske/Rauch, eingerollte Schlange/Zunge, offenes Hufeisen-Magnetinsekt/Greifer, Koi/Flossen/Ventilrad. Zwei zusätzliche Sculpt-Helfer erzeugen glatte geschlossene Kurven und gedrehte Profile; alte Methoden bleiben unverändert. Valvekoi-Rad vor erster Prüfung geneigt und mit durchgehendem Ventilschaft verbunden.
+- **Drei Prüfblöcke abgeschlossen:** 1: 188/188 + Build. 2: ein Chromium-Touch-Smoke aller sechs neben Originalpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler; alle Screenshots angesehen. 3: PR CI 39164319743 und Main CI 39164396855 grün, Pages 39164396884 grün. Live-JS/CSS bytegleich zum lokal im Smoke geprüften Build; Dateinamen auch im Pages-Protokoll bestätigt. Keine weitere Vollschleife; physisches Android/native 4K bleibt Gerätetest.
+- **Live:** https://benjg420.github.io/420mon-3D/test/ ; JS index-C4Xwl2Ib.js, SHA256 ee64b949d34de301d374baaafb19d1ef67675eb0d830c9e72213e18305358a45; CSS index-tKfj-jno.css. Root unverändert index-DWZ4yP_E.js. Keine Behauptung, alle 420 seien individuelle HD-Modelle/native 4K geprüft.
+- **Nächstes Paket:** individuelle Originalarten **ab Dex #73**; bestehende 72 behalten. Neueste Nutzeranweisung: nach Abschluss von Dex #67–72 direkt dieses nächste Paket liefern, eigener PR/max. drei Prüfblöcke. Originalerstposen lesen; alle Mechaniken/Saves behalten; Ko-fi/Zahlungsserver übersprungen.
+- Annahme v43: Sechs Arten bilden ein Paket; verdeckte Rückseiten führen die sichtbaren Formen/Farben konservativ fort. Dieses Paket: Spilleye bis Valvekoi; nächster Einstieg Dex #73.
+- Nachweise /workspace/scratch/420mon-audit/v43-originals.png, v43-mon_*.png, v43-tests.log/build.log/smoke-results.json/deploy-proof.json und CI-Protokolle. Abschließender Dokumentationscommit ändert nur Status; veröffentlichter Spielcode bleibt dbc608c.
 
-- Neue Dateien monster-sculpts-g.ts und monster-sculpts-g-creatures.ts; Originalhashes und bevorzugter Cachepfad registriert. Zwei neue optionale Sculpt-Helfer für geschlossene Kurven und gedrehte Profile erzeugen glatte Details; bisherige Methoden/Modelle unverändert.
-- Prüfblöcke 1/2 abgeschlossen: 188/188 + Build; ein Chromium-Touch-Smoke zeigt alle sechs als sculpted neben echter Erstpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler. Bildnachweise geprüft. Block 3 CI/Pages/Live-Dateivergleich folgt; keine weitere lokale Vollprüfung. Danach laut neuester Nutzeranweisung direkt nächstes Paket ab Dex #73, eigener PR/max. drei Prüfblöcke.
-
-## Vorheriger veröffentlichter Stand
+## Historischer Verlauf — ältere Next-Angaben überholt
 
 # Aktueller Wiedereinstieg — v42 / Dex 61–66 veröffentlicht
 

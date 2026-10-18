@@ -1,17 +1,11 @@
-> **v43 in preparation:** own models Dex #67–72, Spilleye through Valvekoi.
-> Source coverage: 72 authored / 348 reconstructions. Rounds 1/2 passed:
-> 188 tests + build and one six-model touch smoke. Final CI/Pages/live artifact
-> check pending in round 3; previous live release recorded below.
-
-> **Published v42:** Originalmonster Dex #61–66 [PR #49](https://github.com/BenJG420/420mon-3D/pull/49),
-> source `b3eff54`. PR CI 39145731155 and main CI 39145817743 green
-> (188 tests + build); Pages 39145817734 green. Live asset names match the build:
-> `index-D8iUjs8C.js`, SHA256 `e8f1a31aada1fd18adf8a9b86dfe4fc1474a015f0ee2b9ffd4fb88a6b3e38e39`,
-> CSS `index-tKfj-jno.css`. Stable root remains `index-DWZ4yP_E.js`.
-> Six-model original-comparison smoke and final Harzback/Lampjell/Curbowl/Lidtoad
-> live checks passed: rotation/zoom/close/reload, HP0/XP, no browser/shader errors.
-> **NEXT: original species from Dex #67. Current coverage: 66 authored / 354
-> smooth reconstructions.** Same `/test/` URL/save slots; three check rounds used.
+> **Published v43:** Originalmonster Dex #67–72 [PR #50](https://github.com/BenJG420/420mon-3D/pull/50),
+> source `dbc608c`. PR CI 39164319743, main CI 39164396855 and Pages 39164396884
+> green (188 tests + build). Live JS/CSS byte-identical to the local smoke build:
+> `index-C4Xwl2Ib.js`, SHA256 `ee64b949d34de301d374baaafb19d1ef67675eb0d830c9e72213e18305358a45`;
+> CSS `index-tKfj-jno.css`. Stable root stays `index-DWZ4yP_E.js`.
+> One six-model original-comparison touch smoke passed: rotation/zoom/close/reload,
+> HP0/XP and narrow layout, no browser/shader errors. Three rounds completed.
+> **NEXT: Dex #73. Coverage: 72 authored / 348 smooth reconstructions.**
 
 # Original-world test build v43
 
@@ -620,9 +614,8 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-18)
 
-Current v43 source: 72 individual sculptures / 348 smooth reconstructions.
-Dex #67–72 implemented; checks/publication pending (top). Continue at Dex #73
-after publication; do not restart #67–72.
+Current v43: PR #50 is published, 72 individual sculptures / 348 smooth
+reconstructions. Continue at Dex #73; do not restart #67–72.
 
 Existing PR #39 and the HD/PBR pass #46 are merged and published. Preserve
 the authored models and rendering pipeline while completing remaining species.
@@ -733,7 +726,7 @@ Lidtoad (green crouched toad, beige throat and radial manhole lid). Each uses
 the real first pose, registered source hash and existing PBR/UV/cache path.
 Previous 60 geometries and all gameplay/save behavior remain intact.
 
-**v43 — Dex #67–72 (publication pending):** Spilleye (tapered dripping slime,
+**DONE — PR #50 / v43 Dex #67–72:** Spilleye (tapered dripping slime,
 recessed single eye), Gongling (round spun brass shell, rolled rims, carry handle,
 feet and attached striker), Maskwisp (cracked ivory mask, deep purple eye sockets
 and curling smoke), Lipkrait (coiled pink snake, segment bands, yellow eyes and
