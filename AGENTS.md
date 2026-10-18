@@ -23,9 +23,9 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 
 Existing PR #39 and Bens animation fix PR #40 are merged; slot machines are
 completed and published as PR #41; the larger aquarium and swimming caught-fish
-view are published as PR #42. Continue `docs/TEST_BUILD.md`, one package / PR:
-occluding
-building transparency/silhouette; detailed smooth HD/4K PBR monster pass; then
+view are published as PR #42; grouped building occlusion is published as PR #43.
+Continue `docs/TEST_BUILD.md`, one package / PR:
+detailed smooth HD/4K PBR monster pass; then
 remaining original species. Do not restart the graphics packages or create a
 replacement PR #39. Preserve all mechanics/saves; Ko-fi/payment stays skipped.
 Keep the same file-read discipline and maximum three focused check rounds.

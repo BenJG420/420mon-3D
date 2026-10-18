@@ -1,13 +1,12 @@
-> **v36 building occlusion:** implementation complete; publication in progress. Next: HD/PBR monsters.
-
-> **Published v35:** Aquarium-Paket [PR #42](https://github.com/BenJG420/420mon-3D/pull/42),
-> source `95e056b`. PR CI 39097040432 and main CI 39104090164: green,
-> 175/175 tests + build. Pages 39104090179 green; live JS/CSS byte-identical
-> to the local build: `index-Cs1fdZ-d.js`, SHA256
-> `733e529cda780e26c0f319c7911e178a0e0f6ffc5385a813a132b9424b6ba9be`,
+> **Published v36:** Gebäude-Verdeckung [PR #43](https://github.com/BenJG420/420mon-3D/pull/43),
+> source `3532ec2`. Final PR CI 39117667491 and main CI 39117726567 green
+> (178 tests + build); Pages 39117726554 green. Live asset filenames match the
+> Pages build: `index-Bmtng7Cy.js`, SHA256
+> `3ed33641a58320822223138317f222796b29643cc43d6ed44931a55d8d157844`,
 > CSS `index-BW3ctqqL.css`. Stable root remains `index-DWZ4yP_E.js`.
-> **Next: building occlusion**, then HD/PBR monsters and remaining species.
-> Same `/test/` URL and save slots; one PR and at most three check rounds.
+> **Next: HD/PBR monster art pass**, then remaining original species.
+> Same `/test/` URL/save slots. Three check rounds used; no further smoke loop.
+> Extra settled-camera live screenshot exceeded its budget; visual device check remains.
 
 # Original-world test build v36
 
@@ -359,12 +358,24 @@ origin's localStorage.
     or close keeps the booked outcome and unspent locked-stake free spins.
     Reopen/reload to read the last receipt without a second payout.
 
+27. Walk behind a house in Gasse A. Its walls, roof and facade should fade
+    together, leaving the player visible; move clear to restore the house.
+    Travel indoors and back: camera distance, collision and interactions stay.
+
 ## Validation
 
 v36 round 1: 178/178 tests + test-channel build green. Three new regression
 checks cover complete houses, head/shoulder coverage, camera inside a wall,
 geometry/camera preservation and exact state restoration on map replacement.
-Round 2 is one short touch smoke; round 3 is CI/Pages publication.
+Round 2 passed one touch smoke: active fades at two houses, map replacement,
+existing aquarium interaction, HP0/XP17, narrow layout and no browser/shader
+errors. Its screenshot was taken during camera approach, so is not a settled
+visual proof. Before merge, an explicit shader refresh on transparent/opaque
+transitions was added, with a regression assertion; final PR/main CI passed
+178 tests + build. Round 3 passed Pages and live filenames/content/hash checks.
+The extra live view waiting for 100 software-rendered frames was stopped after
+about 100 seconds; no retry/full smoke. Settled close-up/physical device visuals
+remain a user check; no claim of completed Android/4K verification.
 
 v35: round 1 passed all 175 tests and the test-channel build. Round 2 passed
 one Chromium touch smoke: 0/1/42 caught species, million-count bounding,
@@ -545,7 +556,7 @@ Then deliver these playable packages in this exact order, **one PR per package**
    swimmer per caught species (0–42). Catalogue/bag remain available.
    GPU resources are released on close/tab change; DPR/30fps are bounded.
    The 42-fish collection, fishing, saves and bonuses remain unchanged.
-4. **DONE — v36 Occlusion:** a body-sized visibility corridor fades occluding
+4. **DONE — PR #43 / v36 Occlusion:** a body-sized visibility corridor fades occluding
    houses as complete groups (walls, plinth, roof and facade), including a
    camera inside the structure. Short hold and smooth recovery avoid flicker.
    Faded parts stop casting dark shadows; original opacity, depth and shadows
