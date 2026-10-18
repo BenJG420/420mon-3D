@@ -101,3 +101,14 @@ foot/knee phase when sprint starts or ends. No additional third-party assets.
 - No external mesh/texture pack is introduced. Curves and revolved profiles use
   the existing Three.js MIT dependency; project PBR tiles and bounded cache
   remain. Coverage: 72 authored / 348 reconstructions; next work is Dex #73.
+
+
+## Individual monster meshes — v44
+
+- Pricecrow, Grafface, Pitmaw, Pothead, Rackfan and Matchimp geometry is authored
+  in `src/game/monster-sculpts-h.ts` and `monster-sculpts-h-objects.ts` from
+  the owner's retained original first-pose sprites. Original sprite/hash
+  references remain registered; complete source sheets are unchanged.
+- No external model/texture/font pack is added. Existing project Sculpt/PBR
+  helpers, bounded cache and Three.js MIT dependency are retained. Coverage:
+  78 authored / 342 reconstructions; next work begins at Dex #79.
