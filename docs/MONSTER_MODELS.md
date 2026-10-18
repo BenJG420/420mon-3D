@@ -1,3 +1,14 @@
+# Current authored coverage — v44
+
+78 authored species / 342 smooth reconstructions. `monster-sculpts-h.ts` and
+`monster-sculpts-h-objects.ts` add Dex #73–78 Pricecrow, Grafface, Pitmaw,
+Pothead, Rackfan and Matchimp from their retained original first poses.
+Layered crow feathers/price tag, cracked graffiti block, stone well-mouth,
+open sprout pot, deep fan housing/rotor/grille and a stick figure with a flame
+head are individual geometry. Toolkit, renderer, prior 72 geometries, source
+sheets/hashes and shared PBR/UV/cache stay intact; <30k triangles per sculpture.
+Next: original Dex #79. Hidden surfaces are conservatively completed.
+
 # Current authored coverage — v43
 
 72 authored species / 348 smooth reconstructions. `monster-sculpts-g.ts` and

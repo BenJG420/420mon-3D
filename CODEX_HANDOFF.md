@@ -1,3 +1,12 @@
+# v44 — individuelle Originalmodelle Dex 73–78 in Arbeit
+
+Annahme v44: Das nach abgeschlossenem PR #50 direkt beauftragte nächste Paket umfasst Pricecrow bis Matchimp; verdeckte Rückseiten führen die sichtbaren Formen/Farben konservativ fort. Vorhandene 72 Skulpturen/PBR/Mechaniken bleiben erhalten; danach weiter ab Dex #79.
+
+- Neue Dateien monster-sculpts-h.ts und monster-sculpts-h-objects.ts, registrierte Originalhashes und bevorzugter Cachepfad. Gefieder/Preisschild, Graffiti-Stein, vertieftes Brunnenmaul, offener Pflanztopf, Lüftergehäuse/Rotorgitter und räumliche Streichholzflamme sind eigene Geometrie. Toolkit und Renderer unverändert.
+- Prüfblöcke 1/2 abgeschlossen: 188/188 + Build und ein Chromium-Touch-Smoke aller sechs neben Erstpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler. Alle Screenshots geprüft. Pitmaws Augen nach Bildvergleich vor CI in der Mulde höher/nach hinten gesetzt, damit der vordere Steinrand beide frei lässt. Finale CI/Pages und gezielter Liveblick in Block 3 folgen; keine weitere lokale Vollprüfung.
+
+## Vorheriger veröffentlichter Stand
+
 # Aktueller Wiedereinstieg — v43 / Dex 67–72 veröffentlicht
 
 - **Fertig, gemergt, live:** PR #50, Spielcode dbc608c90f9b6b6d92f0e5ebde94990320148162. Spilleye, Gongling, Maskwisp, Lipkrait, Magtick und Valvekoi nach echten lokalen Erstposen. Stand **72 eigene Skulpturen / 348 glatte Rekonstruktionen**. Die bisherigen 66 Geometrien, Originalsprites/Hashes, PBR/UV/Cache, Mechaniken und Saves bleiben erhalten.

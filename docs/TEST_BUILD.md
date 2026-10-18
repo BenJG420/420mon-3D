@@ -1,3 +1,8 @@
+> **v44 in preparation:** own models Dex #73–78, Pricecrow through Matchimp.
+> Source coverage: 78 authored / 342 reconstructions. Rounds 1/2 green:
+> 188 tests + build and one six-model touch smoke. Pitmaw eye correction awaits
+> final CI/Pages/live view in round 3; previous live release recorded below.
+
 > **Published v43:** Originalmonster Dex #67–72 [PR #50](https://github.com/BenJG420/420mon-3D/pull/50),
 > source `dbc608c`. PR CI 39164319743, main CI 39164396855 and Pages 39164396884
 > green (188 tests + build). Live JS/CSS byte-identical to the local smoke build:
@@ -7,7 +12,7 @@
 > HP0/XP and narrow layout, no browser/shader errors. Three rounds completed.
 > **NEXT: Dex #73. Coverage: 72 authored / 348 smooth reconstructions.**
 
-# Original-world test build v43
+# Original-world test build v44
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -614,8 +619,9 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-18)
 
-Current v43: PR #50 is published, 72 individual sculptures / 348 smooth
-reconstructions. Continue at Dex #73; do not restart #67–72.
+Current v44 source: 78 individual sculptures / 342 smooth reconstructions.
+Dex #73–78 implemented; checks/publication pending (top). Continue at Dex #79
+after publication; do not restart #73–78.
 
 Existing PR #39 and the HD/PBR pass #46 are merged and published. Preserve
 the authored models and rendering pipeline while completing remaining species.
@@ -735,9 +741,18 @@ and electric forearms), Valvekoi (orange-white koi, layered fins and valve wheel
 Each retains its actual first-pose reference/hash and existing PBR/UV/cache path.
 Previous 66 geometries and all gameplay/save behavior remain intact.
 
-**NEXT:** individual anatomy/detail work for the remaining **348 original
-species, starting Dex #73**, following the 2D artwork and reference. Current
-coverage is 72 authored / 348 smooth reconstructions.
+**v44 — Dex #73–78 (publication pending):** Pricecrow (layered dark feathers,
+hooked beak, gripping toes and hanging price tag), Grafface (chipped concrete,
+cracked capstones and dripping X-eye graffiti), Pitmaw (separate rim stones,
+deep violet mouth bowl, inset eyes and inward fangs), Pothead (open terracotta
+pot, soil, two-leaf sprout, eyes and feet), Rackfan (deep cabinet, blades behind
+a grille, magenta windings and hub eyes), Matchimp (thin wooden limbs and
+layered pointed flame head). Original first-pose/hash references and existing
+PBR/UV/cache are preserved; previous 72 geometries and gameplay/saves remain.
+
+**NEXT:** individual anatomy/detail work for the remaining **342 original
+species, starting Dex #79**, following the 2D artwork and reference. Current
+coverage is 78 authored / 342 smooth reconstructions.
 This pass does not claim 420 individually sculpted/production-4K creatures.
 Physical Android/native 4K visual/performance verification remains a device test.
 
