@@ -4,7 +4,8 @@
 > Pages build: `index-Bmtng7Cy.js`, SHA256
 > `3ed33641a58320822223138317f222796b29643cc43d6ed44931a55d8d157844`,
 > CSS `index-BW3ctqqL.css`. Stable root remains `index-DWZ4yP_E.js`.
-> **Next: HD/PBR monster art pass**, then remaining original species.
+> **Next: Joint/Bud consumption (6)**, then original menu/inventory (7),
+> then HD/PBR monster art (5) and remaining original species.
 > Same `/test/` URL/save slots. Three check rounds used; no further smoke loop.
 > Extra settled-camera live screenshot exceeded its budget; visual device check remains.
 
@@ -525,13 +526,15 @@ relocation timed out because pagehide persistence restored the in-memory positio
 no extra smoke loop was added. Static's actual quest mutation is covered by the
 module tests; his browser interaction remains a user-check item.
 
-## Remaining work — Bens Fix-Liste (2026-10-17)
+## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-18)
 
 Existing PR #39 is merged and published. Keep its 48 authored/372 reconstructed
 models. Continue Bens packages below; do not start another monster batch before
 the HD/PBR pass. Historical Draft/stop notes above are superseded by this status.
 
-Then deliver these playable packages in this exact order, **one PR per package**:
+Then deliver these playable packages in this exact order, **one PR per package**.
+Latest user order after completed occlusion: **6 → 7 → 5**, then remaining species.
+Numbers retain Bens package IDs; packages 6/7 precede the monster art pass.
 
 1. **DONE — PR #40 / v33:** correct retargeting and bone mapping for walking/running
    arms (T-pose) and the incorrectly bending knee. Inspect male/female player
@@ -562,7 +565,26 @@ Then deliver these playable packages in this exact order, **one PR per package**
    Faded parts stop casting dark shadows; original opacity, depth and shadows
    return when clear or on map replacement. Camera, geometry, collision and
    all gameplay/save behavior remain unchanged.
-5. **NEXT — Monster HD/4K art pass:** detailed meshes, PBR textures and smooth shading,
+
+### 6) NEXT — Joint und Bud konsumieren
+
+Joint und Bud lassen sich derzeit nicht konsumieren. Konsum und zugehörige
+Effekte anhand von **BenJG420/420mon** umsetzen; Originalbedingungen,
+Verbrauchsmengen, Zielauswahl und Effekte direkt aus der 2D-Implementierung
+übernehmen. Bestehende Items, Speicherstände und die bewusste HP0-/Matratzenregel
+behalten. Ein fertiges spielbares Paket, ein PR.
+
+### 7) Danach — Menü und Inventar wie im 2D-Original
+
+**BenJG420/420mon** als Vorlage für Aussehen und Funktion verwenden: gleiche
+Menüstruktur und Itemdarstellung mit originalen Kategorien, Reihenfolge,
+Anzahl und Benutzen-Aktionen. Bestehende Funktionen/Items/Saves erhalten und
+an die Originalstruktur anbinden; Tastatur und Touch weiter unterstützen.
+Ein separates fertiges Paket, ein PR.
+
+### 5) Danach — Monster HD/4K art pass
+
+Detailed meshes, PBR textures and smooth shading,
    with no pixel-style world models, following the README graphics reference.
    Then continue the remaining original-sprite monster species. Keep the 420
    pipeline, cache, viewer and original Dex portraits. v32 aims for 48 authored

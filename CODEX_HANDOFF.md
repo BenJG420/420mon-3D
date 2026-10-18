@@ -1,3 +1,9 @@
+# Neue Reihenfolge — Nutzerauftrag 2026-10-18
+
+- Gebäude-Verdeckung ist abgeschlossen (PR #43, live v36). Nächstes Paket **6: Joint und Bud konsumierbar machen, mit Effekten aus BenJG420/420mon**. Danach **7: Menü/Inventar optisch und funktional nach 2D** (gleiche Struktur, Kategorien, Reihenfolge, Anzahl, Benutzen). Erst danach **5: HD/PBR-Monster**, dann restliche Arten. Je spielbarem Paket ein separater PR; keine neue Implementierung in dieser reinen Planaktualisierung.
+- Annahme Reihenfolge: Die IDs 6/7 bleiben zur Zuordnung erhalten und werden vor den bisherigen Monster-Punkt 5 gezogen; aktuelle Nutzerreihenfolge hat Vorrang vor älteren Next-Angaben.
+- Regeln bleiben: zuerst nur die drei Übergabedateien, dann nur benötigte Original-/Zieldateien; keine Rückfragen; höchstens drei Prüfrunden pro Paket. Spielstände und bewusste HP0-/Matratzen-Ausnahme behalten. Ko-fi/Zahlungsserver weiter übersprungen.
+
 # Aktueller Wiedereinstieg — v36 / Gebäude-Verdeckung veröffentlicht
 
 - **Fertig, gemergt, live:** PR #43, Spielcode 3532ec2a2acaf427d0b556628a3445dca5f994e1. Zusammengehörige Wände/Sockel/Dach/Fassade blenden weich auf 6% Deckkraft aus, sobald der Sichtkorridor Kopf/Rumpf/Füße/Schultern trifft. Kamera innerhalb eines Hauses wird erkannt. Kurze Haltezeit verhindert Flackern; originale Material-/Schattenwerte kehren zurück, wenn der Weg frei wird oder die Karte wechselt.
@@ -5,7 +11,7 @@
 - **Drei Runden abgeschlossen:** 1: 178/178 + Build. 2: ein Chromium-Touch-Smoke bestätigt aktive Ausblendung an zwei Häusern, Kapsel/Gasse-Wechsel, Aquarium, HP0/XP17, Layout ohne Browser-/Shaderfehler. Das frühe Bild entstand im Kamera-Anlauf. 3: finale PR-CI 39117667491, Main-CI 39117726567 und Pages 39117726554 grün; Live-Dateinamen passen zum Pages-Log, Inhalt/Hashes bestätigt. Kein weiterer Testlauf.
 - **Offene Sichtprüfung:** zusätzliche Live-Nahansicht wartete auf 100 Software-Frames und wurde nach etwa 100 Sekunden beendet; kein belastbares ruhiges Livebild, kein Retry. Nutzer-/Gerätetest für Sichtqualität an Hauskanten sowie physisches Android/native 4K bleibt. Automatische Gruppen-/Korridor-/Rückstelltests und lokaler Touch-Smoke sind grün.
 - **Live:** https://benjg420.github.io/420mon-3D/test/ ; JS index-Bmtng7Cy.js SHA256 3ed33641a58320822223138317f222796b29643cc43d6ed44931a55d8d157844; CSS index-BW3ctqqL.css. Root unverändert index-DWZ4yP_E.js. Nicht als bytegleich zum früheren lokalen Build behaupten: finale Shaderkorrektur wurde in CI gebaut.
-- **Nächstes Paket:** HD/4K-Pass für Monster (detaillierte Meshes, PBR, weiche Schattierung, keine Pixel-Weltoptik), dann restliche Originalarten. Vorhandene Pipeline/48 Skulpturen/372 Rekonstruktionen/Dex-Bilder behalten. Kein neues Spiel, keine weiteren Aquarium-/Slot-Pakete. Ko-fi/Zahlungsserver bleiben übersprungen. Ein PR und max. drei Prüfrunden pro Paket.
+- **Bisherige Reihenfolge (durch Auftrag oben überholt):** HD/4K-Pass für Monster (detaillierte Meshes, PBR, weiche Schattierung, keine Pixel-Weltoptik), dann restliche Originalarten. Vorhandene Pipeline/48 Skulpturen/372 Rekonstruktionen/Dex-Bilder behalten. Kein neues Spiel, keine weiteren Aquarium-/Slot-Pakete. Ko-fi/Zahlungsserver bleiben übersprungen. Ein PR und max. drei Prüfrunden pro Paket.
 - Abschließender Dokumentationscommit aktualisiert nur Status; veröffentlichter Spielcode bleibt 3532ec2.
 
 ## Historischer Verlauf — ältere Next-/Stop-Angaben überholt
