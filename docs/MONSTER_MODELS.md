@@ -1,3 +1,20 @@
+# Current runtime surface pipeline — v39
+
+PR #46 retains the 48 authored designs, with finer curves under 30k triangles.
+For the other 372 species, monster-smooth.ts samples the original volume records
+into a continuous marching-cubes surface with smooth normals and bilinear source
+colors (under 24k triangles). These are still reconstructions, not newly sculpted
+anatomies. Runtime kind is smooth-volume; source voxel JSON remains intact for
+provenance and compatibility, and buildMonsterGeometry remains the legacy helper.
+
+monster-surface.ts adds UVs, shared normal/roughness maps, organic/wet/metal PBR
+variants and smooth shading. The temporary viewer owns/disposes its studio PMREM
+reflection. Cache/lease ownership and authentic source hashes remain. Original
+sprites and first-frame Dex portraits are unchanged. Next: individually author
+species from Dex #49; do not replace this pipeline or claim 420 detailed sculpts.
+
+## Historical asset construction and source provenance
+
 # Source-derived monster models (v28 / v32)
 
 Every one of the 420 runtime species has its own local, colored 3D voxel volume.

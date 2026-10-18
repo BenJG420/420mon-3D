@@ -1,14 +1,12 @@
-> **v39 monster surface pass:** implementation complete; validation/publication in progress.
-
-> **Published v38:** Menü-/Inventar-Paket [PR #45](https://github.com/BenJG420/420mon-3D/pull/45),
-> merge `49c45ae`; final source `d647027` includes the small Dex-Escape follow-up.
-> PR CI 39127549873 and final main CI 39127707317 green (185 tests + build);
-> Pages 39127707316 green. Live asset names match the Pages build:
-> `index-CwOCArVd.js`, SHA256 `5bb3baf5da4f56472be387b5d1f6e58c73e6d8122490ddd43453ba8754eb6f92`,
+> **Published v39:** Monster-Oberflächen/PBR [PR #46](https://github.com/BenJG420/420mon-3D/pull/46),
+> source `89291cc`. PR CI 39132161513 and main CI 39132260503 green
+> (188 tests + build); Pages 39132260547 green. Live asset names match the build:
+> `index-yFr7TIgT.js`, SHA256 `bf28748298bdbd5823ac2abe07ce0d23b04ffbd1e4adb205bf48c91266f75d16`,
 > CSS `index-tKfj-jno.css`. Stable root remains `index-DWZ4yP_E.js`.
-> Final targeted live check passed panel bounds, inventory T and Dex Escape.
-> **Next: HD/PBR monster art (5)**, then remaining species. Same `/test/` URL/save slots.
-> Online menu entries explicitly link to the 2D original; no 3D online server.
+> Final live check: smooth reconstruction, rotation/zoom/close/reload, HP0/XP intact,
+> no browser/shader errors. Same `/test/` URL/save slots; three rounds completed.
+> **NEXT: individually sculpt remaining species from Dex #49.** 48 authored / 372
+> smooth reconstructions; do not claim 420 detailed HD anatomies or native 4K verification.
 
 # Original-world test build v39
 
@@ -378,6 +376,13 @@ origin's localStorage.
     the original inventory. Dex → 3D ansehen must close correctly with Esc.
     Online menu entries open the 2D original in another tab, without save transfer.
 
+30. In Dex or battle, inspect an authored model (Budling/Coinwraith) and a later
+    reconstruction (Hawkerfox). Curved silhouettes now shade smoothly, surfaces
+    use PBR normal/roughness detail and the studio has reflections. Rotate/zoom,
+    close and reload. Reconstruction labels remain explicit: individual anatomy,
+    eyes and accessories for those 372 species are still next work. Native 4K
+    and physical Android appearance/performance remain user/device checks.
+
 ## Validation
 
 v39 round 1 passed 185 tests + build. Round 2 passed three focused new checks
@@ -386,7 +391,9 @@ cleanup) + build; one touch model smoke passed Budling/Coinwraith/Hawkerfox, rot
 zoom/close/reload, HP0/XP17, narrow layout and no browser/shader errors. The
 reconstruction remains visibly simpler than a sculpture. Final bilinear color
 sampling preserves markings better than the first Gaussian color blur; round 3
-CI/Pages checks the final state, without another local full smoke/test loop.
+CI/Pages passed the final state (188 tests/build); live names/hash/content
+confirmed. One targeted live reconstruction check passed rotation/zoom/close,
+reload and HP0/XP without browser/shader errors. No further local full loop.
 The sculpture triangle budget changes explicitly from 15k to 30k for finer
 curves; reconstructed surfaces are bounded at 24k. Source data validation and
 legacy voxel budget checks remain unchanged.
@@ -641,7 +648,7 @@ Unbekannte Legacy-Items bleiben unter Sonstiges sichtbar. Originalpalette und
 2D-Original; kein eigener 3D-Chat-/Nachrichten-/Authserver und kein Save-Transfer.
 Bestehende Spielmechaniken/Speicherplätze bleiben, Shop nur am physischen NPC.
 
-### 5) v39 — Monster surface/PBR pass; individual remaining species follow
+### 5) DONE — PR #46 / v39 surface/PBR pass; individual remaining species NEXT
 
 The rendering pass applies smooth, filtered PBR surfaces to all 420 models.
 48 authored sculptures retain their distinct anatomy with denser curved parts
