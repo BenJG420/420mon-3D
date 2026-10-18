@@ -1,3 +1,5 @@
+> v40 vor Merge: Studio-Renderer nutzt ACES-Tonemapping gegen überstrahlte helle PBR-Flächen. Finale CI/Pages und ein gezieltes Livebild prüfen dies im dritten Block; keine weitere lokale Vollsuite. Vorherige 48 Geometrien bleiben unverändert.
+
 # v40 — individuelle Modelle Dex 49–54
 
 Annahme v40: Ein fertiges Artenpaket umfasst die nächsten sechs Originalarten (Hawkerfox, Kiefhound, Puffwraith, Blazetail, Rootroach, Crackveil); verborgenes Volumen wird konservativ ergänzt. Die echten Erstposen bestimmen Anatomie, Gesichter, Farben und Accessoires; bestehende 48 Skulpturen/PBR/Mechaniken bleiben unverändert. Danach ab Dex #55.

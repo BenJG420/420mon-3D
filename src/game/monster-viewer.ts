@@ -259,6 +259,8 @@ export function createMonsterViewer(): MonsterViewer {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "low-power" });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1;
       renderer.setClearColor(0x081619);
       const canvas = renderer.domElement;
       canvas.className = "monster-model-canvas";
