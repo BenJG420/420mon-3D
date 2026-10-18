@@ -362,13 +362,15 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const outside = !active.indoor && !edge && r.w >= 56 && r.h >= 56;
       const height = edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : outside ? 3.7 + seeded(i + 17) * 4.8 : 2.25;
       const m = region(r, height, mat(outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : palette.plaster, "plaster"));
+      const firstPart = occluders.length;
       m.name = `original-wall:${i}`; occluder(m);
       // Dark plinth and narrow cap keep the rooms readable as a cutaway diorama.
-      region(r, .16, mat(palette.stone, "stone"), .08);
-      region(r, .1, mat(outside ? 0x626c6b : 0x7d8681, "stone"), height + .02);
+      occluder(region(r, .16, mat(palette.stone, "stone"), .08));
+      occluder(region(r, .1, mat(outside ? 0x626c6b : 0x7d8681, "stone"), height + .02));
       if (outside && r.w > 100 && r.h > 80) {
         buildingDetails(r, height, i, building?.name);
       }
+      for (const part of occluders.slice(firstPart)) part.userData.occlusionGroup = m.uuid;
     }
   }
 

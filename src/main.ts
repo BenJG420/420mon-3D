@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { createPlayerOcclusion } from "./game/occlusion";
 import { createMonsterGame } from "./game/monsters";
 import { createGameSystems } from "./game/systems";
 import { createDistrictWorld } from "./game/world";
@@ -459,7 +460,7 @@ window.addEventListener("420mon-fish-opened", clearModalMovement);
 const cameraTarget = new THREE.Vector3();
 const desiredCamera = new THREE.Vector3();
 const up = new THREE.Vector3(0, 1, 0);
-const cameraRaycaster = new THREE.Raycaster();
+const playerOcclusion = createPlayerOcclusion();
 const cameraDirection = new THREE.Vector3();
 const cameraOffset = new THREE.Vector3(8, 13, 12);
 const cameraMinDistance = 8;
@@ -592,20 +593,8 @@ function animate() {
     camera.position.copy(cameraTarget).add(cameraDirection.normalize().multiplyScalar(minCameraDistance));
   }
   camera.lookAt(cameraTarget);
-  cameraDirection.subVectors(camera.position, cameraTarget);
-  const cameraDistance = cameraDirection.length();
-  cameraDirection.normalize();
-  cameraRaycaster.set(cameraTarget, cameraDirection);
-  cameraRaycaster.far = cameraDistance;
-  const blocks = districtWorld.getOccluders();
-  const occluded = new Set(cameraRaycaster.intersectObjects(blocks, false).map(hit => hit.object));
-  for (const building of blocks) {
-    const material = building.material as THREE.MeshStandardMaterial;
-    const hidden = occluded.has(building);
-    material.transparent = hidden;
-    material.opacity = hidden ? 0.12 : 1;
-    material.depthWrite = !hidden;
-  }
+  const faded = playerOcclusion.update(districtWorld.getOccluders(), camera.position, player.position, dt);
+  renderer.domElement.dataset.occludedBuildings = String(faded);
 
   if (!monsterViewer.isOpen() && !document.querySelector('.fish-overlay[data-aquarium="open"]')) postProcessing.render(dt);
   const graphicsState = postProcessing.getDiagnostics();

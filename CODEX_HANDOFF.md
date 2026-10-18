@@ -1,3 +1,9 @@
+# v36 — Gebäude-Verdeckung
+
+Annahme v36: Zusammengehörige Wand-, Sockel-, Dach- und Fassadenteile werden als ein Haus weich ausgeblendet, sobald der Sichtkorridor Kopf/Rumpf/Füße verdeckt; Geometrie, Kamera, Kollision und Saves bleiben unverändert.
+
+- Prüfung 1: 178/178 Tests + Build grün. Prüfung 2: ein Touch-Smoke bestätigt aktive Ausblendung an zwei Häusern, Kartenwechsel Kapsel/Gasse, Aquarium weiterhin erreichbar, HP0/XP17 und kein Layout-/Browser-/Shaderfehler. Das erste Bild entstand während des Kamera-Anlaufs und ist kein belastbarer Nahbildnachweis; in Runde 3 gezielte Live-Ansicht nach Kameraberuhigung prüfen. Keine weitere Voll-Smoke-Schleife. Nächstes Paket: HD/PBR-Monster.
+
 # Aktueller Wiedereinstieg — v35 / Aquarium fertig
 
 - **Fertig, gemergt, veröffentlicht:** PR #42, Spielcode 95e056b8096779f82d5aa8b32929357dc5f718cd. Höheres physisches Aquarium bei gleicher Grundfläche/Kollision; Interaktion öffnet beleuchtete 3D-Ansicht mit schwimmenden Originalsprites aller gefangenen Arten (maximal 42). Kein neues Fischmodell-Asset oder geänderte Spielregel. Katalog/Fischbeutel bleiben erreichbar, Grow-Vollbonus und Fänge erhalten.
