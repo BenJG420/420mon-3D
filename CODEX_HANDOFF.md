@@ -1,3 +1,11 @@
+> v40 vor Merge: Studio-Renderer nutzt ACES-Tonemapping gegen überstrahlte helle PBR-Flächen. Finale CI/Pages und ein gezieltes Livebild prüfen dies im dritten Block; keine weitere lokale Vollsuite. Vorherige 48 Geometrien bleiben unverändert.
+
+# v40 — individuelle Modelle Dex 49–54
+
+Annahme v40: Ein fertiges Artenpaket umfasst die nächsten sechs Originalarten (Hawkerfox, Kiefhound, Puffwraith, Blazetail, Rootroach, Crackveil); verborgenes Volumen wird konservativ ergänzt. Die echten Erstposen bestimmen Anatomie, Gesichter, Farben und Accessoires; bestehende 48 Skulpturen/PBR/Mechaniken bleiben unverändert. Danach ab Dex #55.
+
+- v40 Prüfungen 1/2: 188/188 + Build grün; ein Chromium-Touch-Smoke zeigt alle sechs als sculpted neben echter Erstpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler. Aktuell 54 Skulpturen/366 Rekonstruktionen. Runde 3 CI/Pages folgt; keine weitere lokale Vollprüfung. Weiter ab Dex #55.
+
 # Aktueller Wiedereinstieg — v39 / Monster-Oberflächen/PBR veröffentlicht
 
 - **Fertig, gemergt, live:** PR #46, Spielcode 89291ccadcb37fabcb535904182c223133ba0e3a. Vorhandene 48 Skulpturen bekommen feinere Rundungen (12×8 Kugeln, 10er Kegel/Stäbe, unter 30k Dreiecken). Alle übrigen 372 laden glatte Marching-Cubes-Oberflächen aus den vorhandenen Original-Silhouetten-/Tiefendaten statt Pixel-Säulen (max.24k Dreiecke). Originalsprites, Quellenhashes, Legacy-Volumendateien und Dex-Porträts bleiben erhalten.

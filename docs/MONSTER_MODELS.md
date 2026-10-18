@@ -1,3 +1,12 @@
+# Current authored coverage — v40
+
+54 authored species / 366 smooth reconstructions. `monster-sculpts-d.ts` adds
+Dex #49–54 Hawkerfox, Kiefhound, Puffwraith, Blazetail, Rootroach and Crackveil,
+individually built from the retained original first poses. Each retains its
+source hash, preferred cache path, PBR UVs/material and <30k-triangle budget.
+The previous 48 designs and all source sheets/data are preserved. Next: Dex #55.
+Hidden surfaces are conservatively completed, not a claim of canonical 2D backs.
+
 # Current runtime surface pipeline — v39
 
 PR #46 retains the 48 authored designs, with finer curves under 30k triangles.
