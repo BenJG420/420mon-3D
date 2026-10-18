@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { DEX, dexNum } from "./data/dex";
 import { createMonsterArt, disposeMonsterArt } from "./monster-art";
 import { spriteUrl } from "./sprites";
@@ -15,6 +16,7 @@ export function createMonsterViewer(): MonsterViewer {
   let overlay: HTMLDivElement | undefined;
   let renderer: THREE.WebGLRenderer | undefined;
   let scene: THREE.Scene | undefined;
+  let reflection: THREE.WebGLRenderTarget | undefined;
   let camera: THREE.PerspectiveCamera | undefined;
   let monster: THREE.Group | undefined;
   let viewport: HTMLDivElement | undefined;
@@ -86,9 +88,9 @@ export function createMonsterViewer(): MonsterViewer {
     overlay.dataset.modelKind = modelKind;
     overlay.dataset.modelStatus = modelState;
     status.textContent = modelKind === "sculpted"
-      ? "3D-Modell · nach dem Original gestaltet"
-      : modelKind === "voxel-volume"
-        ? "Aus dem Originalsprite geformt"
+      ? "Eigene Skulptur · PBR-Oberfläche"
+      : modelKind === "smooth-volume"
+        ? "Glatte 3D-Rekonstruktion · PBR-Oberfläche"
         : modelState === "error" ? "Originalbild · 3D-Modell gerade nicht verfügbar" : "Originalbild · Modell lädt";
     fitModel();
   }
@@ -155,6 +157,7 @@ export function createMonsterViewer(): MonsterViewer {
     monster = undefined;
     for (const resource of stageResources) resource.dispose();
     stageResources.length = 0;
+    reflection?.dispose(); reflection = undefined;
     scene?.clear();
     renderer?.dispose();
     renderer?.forceContextLoss();
@@ -286,6 +289,9 @@ export function createMonsterViewer(): MonsterViewer {
       canvas.addEventListener("pointercancel", endDrag);
       canvas.addEventListener("lostpointercapture", () => { pointerId = undefined; });
       scene = new THREE.Scene();
+      const room = new RoomEnvironment(), generator = new THREE.PMREMGenerator(renderer);
+      try { reflection = generator.fromScene(room, .05); scene.environment = reflection.texture; scene.environmentIntensity = .75; }
+      finally { room.dispose(); generator.dispose(); }
       camera = new THREE.PerspectiveCamera(38, 1, 0.01, 100);
       scene.add(new THREE.HemisphereLight(0xe9fff7, 0x284348, 2.3));
       const key = new THREE.DirectionalLight(0xffffff, 3.3);

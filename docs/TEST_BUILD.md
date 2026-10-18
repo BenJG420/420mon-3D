@@ -1,3 +1,5 @@
+> **v39 monster surface pass:** implementation complete; validation/publication in progress.
+
 > **Published v38:** Menü-/Inventar-Paket [PR #45](https://github.com/BenJG420/420mon-3D/pull/45),
 > merge `49c45ae`; final source `d647027` includes the small Dex-Escape follow-up.
 > PR CI 39127549873 and final main CI 39127707317 green (185 tests + build);
@@ -8,7 +10,7 @@
 > **Next: HD/PBR monster art (5)**, then remaining species. Same `/test/` URL/save slots.
 > Online menu entries explicitly link to the 2D original; no 3D online server.
 
-# Original-world test build v38
+# Original-world test build v39
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -378,6 +380,18 @@ origin's localStorage.
 
 ## Validation
 
+v39 round 1 passed 185 tests + build. Round 2 passed three focused new checks
+(all 372 smooth reconstructions, 48 authored meshes/UVs/budgets, PBR maps and
+cleanup) + build; one touch model smoke passed Budling/Coinwraith/Hawkerfox, rotation,
+zoom/close/reload, HP0/XP17, narrow layout and no browser/shader errors. The
+reconstruction remains visibly simpler than a sculpture. Final bilinear color
+sampling preserves markings better than the first Gaussian color blur; round 3
+CI/Pages checks the final state, without another local full smoke/test loop.
+The sculpture triangle budget changes explicitly from 15k to 30k for finer
+curves; reconstructed surfaces are bounded at 24k. Source data validation and
+legacy voxel budget checks remain unchanged.
+
+
 v38 round 1: 182 existing tests + build passed. Round 2: three targeted new
 inventory/menu tests + build and one touch smoke passed (categories/quantities,
 explicit healing with KO protected, consumption, Party/Box, shortcuts, modal
@@ -438,7 +452,7 @@ Pages and exact live artifact verification. No further whole smoke/test loop.
 Physical Android and native 4K remain device checks.
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 185 regression tests covering 420 assets, restored source hashes, battle save
+suite has 188 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
@@ -627,14 +641,27 @@ Unbekannte Legacy-Items bleiben unter Sonstiges sichtbar. Originalpalette und
 2D-Original; kein eigener 3D-Chat-/Nachrichten-/Authserver und kein Save-Transfer.
 Bestehende Spielmechaniken/Speicherplätze bleiben, Shop nur am physischen NPC.
 
-### 5) NEXT — Monster HD/4K art pass
+### 5) v39 — Monster surface/PBR pass; individual remaining species follow
 
-Detailed meshes, PBR textures and smooth shading,
-   with no pixel-style world models, following the README graphics reference.
-   Then continue the remaining original-sprite monster species. Keep the 420
-   pipeline, cache, viewer and original Dex portraits. v32 aims for 48 authored
-   sculptures and 372 volume reconstructions; do not claim all 420 are sculpted
-   or HD/PBR already. Native 4K/mobile performance needs real device feedback.
+The rendering pass applies smooth, filtered PBR surfaces to all 420 models.
+48 authored sculptures retain their distinct anatomy with denser curved parts
+and a 30k-triangle ceiling. The remaining 372 render continuous marching-cubes
+surfaces from their original silhouette/depth/color data, with smoothly
+interpolated colors and normals, up to 24k triangles; they are explicitly
+**reconstructions, not individually sculpted HD anatomy**. The retained voxel
+files remain source/compatibility data; runtime rendering no longer emits
+pixel-column faces. Original sprites and first-frame Dex portraits are intact.
+
+Own deterministic normal/roughness tiles (1024 desktop / 512 mobile), projected
+UVs and organic/wet/oxidized-metal variants support existing district reflections;
+the temporary model viewer now has owned PMREM studio reflections. No forced
+4K DPR/textures on phones. Existing bounded model cache, async/error/fallback
+ownership and original source hashes remain. No mechanics or saves changed.
+
+**NEXT after this package:** individual anatomy/detail work for the remaining
+372 original species (start Dex #49), following the 2D artwork and reference.
+This pass does not claim 420 individually sculpted/production-4K creatures.
+Physical Android/native 4K visual/performance verification remains a device test.
 
 **Übersprungen: Ko-fi und Zahlungsserver.** Do not investigate, configure or
 re-enable payment services. Existing mechanics (districts, battles/capture,

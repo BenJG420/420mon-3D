@@ -47,3 +47,15 @@ and clip/bone binding checks cover both bodies and NPC clones. Only joint
 quaternions animate; avatar bind translations and editor scaling remain intact.
 Walk and Run share a normalized stride phase and continuous weights, preserving
 foot/knee phase when sprint starts or ends. No additional third-party assets.
+
+## Monster surface pass — v39
+
+- Deterministic PBR normal/roughness tiles and organic/wet/oxidized-metal
+  presets are authored procedurally in `src/game/monster-surface.ts`. No
+  downloaded texture pack, HDR photo or new externally licensed art is bundled.
+- Continuous surfaces reuse the retained original 2D first-pose colors,
+  silhouette/depth records and source hashes; original sprite files are intact.
+  48 existing authored sculptures remain; 372 surfaces remain reconstructions.
+- Three.js `MarchingCubes` and `RoomEnvironment`/PMREM addons use the existing
+  Three.js MIT dependency/license above. Viewer reflection resources are owned
+  by the temporary studio and released on close.

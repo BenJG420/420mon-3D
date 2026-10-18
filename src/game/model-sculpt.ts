@@ -18,18 +18,18 @@ export class Sculpt {
     return this;
   }
   ellipsoid(color: THREE.ColorRepresentation, x: number, y: number, z: number, sx: number, sy: number, sz: number) {
-    return this.add(new THREE.SphereGeometry(1, 10, 6), color, [x, y, z], [sx, sy, sz]);
+    return this.add(new THREE.SphereGeometry(1, 12, 8), color, [x, y, z], [sx, sy, sz]);
   }
   box(color: THREE.ColorRepresentation, x: number, y: number, z: number, sx: number, sy: number, sz: number, rx = 0, ry = 0, rz = 0) {
     return this.add(new THREE.BoxGeometry(1, 1, 1), color, [x, y, z], [sx, sy, sz], [rx, ry, rz]);
   }
   cone(color: THREE.ColorRepresentation, x: number, y: number, z: number, radius: number, height: number, rx = 0, ry = 0, rz = 0) {
-    return this.add(new THREE.ConeGeometry(radius, height, 6), color, [x, y, z], [1, 1, 1], [rx, ry, rz]);
+    return this.add(new THREE.ConeGeometry(radius, height, 10), color, [x, y, z], [1, 1, 1], [rx, ry, rz]);
   }
   rod(color: THREE.ColorRepresentation, from: Point, to: Point, radius = .04) {
     const start = new THREE.Vector3(...from), end = new THREE.Vector3(...to), direction = end.clone().sub(start);
     if (direction.lengthSq() < .000001) return this;
-    const geometry = new THREE.CylinderGeometry(radius, radius, direction.length(), 6);
+    const geometry = new THREE.CylinderGeometry(radius, radius, direction.length(), 10);
     const rotation = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
     geometry.applyQuaternion(rotation);
     return this.add(geometry, color, start.add(end).multiplyScalar(.5).toArray() as Point);

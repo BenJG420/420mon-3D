@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { buildSmoothMonsterGeometry } from "./monster-smooth";
+import { addMonsterSurfaceUvs } from "./monster-surface";
 import { DEX } from "./data/dex";
 import { authoredMonsterGeometry } from "./monster-authored";
 
@@ -78,7 +80,7 @@ export function buildMonsterGeometry(input: MonsterModelData): THREE.BufferGeome
 
 export const MONSTER_MODEL_CACHE_UNUSED_LIMIT = 24;
 type ModelInfo = Pick<MonsterModelData, "id" | "sourceSprite" | "sourceHash">;
-type ModelKind = "sculpted" | "voxel-volume";
+type ModelKind = "sculpted" | "smooth-volume";
 type ModelEntry = { refs: number; used: number; geometry?: THREE.BufferGeometry; data?: ModelInfo; kind?: ModelKind; promise: Promise<void> };
 const models = new Map<string, ModelEntry>();
 let clock = 0;
@@ -102,7 +104,7 @@ export async function acquireMonsterModel(speciesId: string): Promise<MonsterMod
     created.promise = (async () => {
       const authored = authoredMonsterGeometry(speciesId);
       if (authored) {
-        created.geometry = authored;
+        created.geometry = addMonsterSurfaceUvs(authored);
         created.data = { id: speciesId, sourceSprite: species.sprite, sourceHash: String(authored.userData.sourceHash ?? "") };
         created.kind = "sculpted";
         return;
@@ -114,7 +116,7 @@ export async function acquireMonsterModel(speciesId: string): Promise<MonsterMod
         if (!response.ok) throw new Error(`Monster-Modell nicht erreichbar: ${response.status}`);
         const data = validateMonsterModel(await response.json());
         if (data.id !== speciesId || data.sourceSprite !== species.sprite) throw new Error("Monster-Modell gehört zu anderer Art");
-        created.geometry = buildMonsterGeometry(data); created.data = data; created.kind = "voxel-volume";
+        created.geometry = buildSmoothMonsterGeometry(data); created.data = data; created.kind = "smooth-volume";
       } finally { clearTimeout(timeout); }
     })().catch(error => { if (models.get(speciesId) === created) models.delete(speciesId); throw error; });
     entry = created;

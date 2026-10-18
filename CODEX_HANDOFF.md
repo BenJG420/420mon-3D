@@ -1,3 +1,9 @@
+# v39 — HD/PBR-Monster-Pass
+
+Annahme v39: Ein kompletter Rendering-Pass ergänzt alle 420 Modelle um glatte Oberflächen und eigene PBR-Texturen; 48 Skulpturen werden höher aufgelöst, 372 bleiben ehrlich als glatte Original-Silhouettenrekonstruktionen gekennzeichnet. Individuelle Anatomie aller übrigen Arten bleibt das Folgepaket; HD/4K bedeutet keine pauschale 4K-Textur-/DPR-Pflicht auf Handys.
+
+- v39 Runde 1: 185/185 + Build grün. Runde 2: drei neue Tests (alle 372 glatten Rekonstruktionen, 48 Skulpturen/UV/Budget, Texturen/Varianten/Dispose) + Build und ein Touch-Modell-Smoke Budling/Coinwraith/Hawkerfox inklusive Drehen/Zoom/Schließen/Reload/HP0/XP17 ohne Browser-/Shaderfehler grün. Bildvergleich zeigt die Rekonstruktion weiter deutlich einfacher als eine Skulptur; vor CI Farbabtastung auf bilinear umgestellt, um Augen/Zeichnungen weniger zu verwaschen. Keine weitere lokale Vollprüfung; finaler CI-/Deploy-Check folgt.
+
 # Aktueller Wiedereinstieg — v38 / Menü-Inventar Paket 7 veröffentlicht
 
 - **Fertig, gemergt, live:** PR #45 (Merge 49c45aea0bf32c1a569c30edd44c95ea8f8ee4fb), finale Spielquelle d647027b92da544a4603cfb7f3071af5f1a6abe0 mit kleinem Escape-Follow-up auf main. Originalvorlage: overlays.tsx Pause/Inventory + src/styles.css, 2D-Revision 010807da77df8468a297adf33eaf1fb5c9a61c8b.

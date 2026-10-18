@@ -217,7 +217,7 @@ test("48 authored source species have individual mesh geometry, honest metadata 
       assert.equal(geometry.userData.sourceHash, byId.get(id).data.sourceHash);
       for (const attribute of ["position", "normal", "color"]) for (const value of geometry.getAttribute(attribute).array) assert.ok(Number.isFinite(value), `${id}: finite ${attribute}`);
       const count = geometry.index?.count ?? geometry.getAttribute("position").count;
-      assert.ok(count / 3 < 15000, `${id}: single bounded mesh`);
+      assert.ok(count / 3 < 30000, `${id}: single bounded mesh`);
       signatures.add(geometryHash(geometry));
     } finally { geometry.dispose(); }
   }
@@ -243,7 +243,7 @@ test("the shared geometry cache deduplicates loads, retains active consumers and
     const [a, b] = await Promise.all([models.acquireMonsterModel(ids[0]), models.acquireMonsterModel(ids[0])]);
     leases.push(a, b);
     assert.strictEqual(a.geometry, b.geometry);
-    assert.equal(a.kind, "voxel-volume");
+    assert.equal(a.kind, "smooth-volume");
     assert.equal(requests.get(ids[0]), 1);
     let activeDisposals = 0, evictedDisposals = 0;
     a.geometry.addEventListener("dispose", () => activeDisposals++);
@@ -325,7 +325,7 @@ test("failed or mismatched model downloads retain a clearly marked single origin
     assert.equal(group.userData.modelStatus, "error", "a different species payload cannot impersonate this monster");
     globalThis.fetch = async () => ({ ok: true, json: async () => structuredClone(byId.get(ids[0]).data) });
     art.setMonsterArt(group, ids[0]); await flush();
-    assert.equal(group.userData.modelStatus, "ready"); assert.equal(group.userData.modelKind, "voxel-volume");
+    assert.equal(group.userData.modelStatus, "ready"); assert.equal(group.userData.modelKind, "smooth-volume");
     assert.ok(group.children[0].children[0].isMesh);
     assert.equal(group.userData.sourceHash, byId.get(ids[0]).data.sourceHash);
   } finally { groups.forEach(group => art.disposeMonsterArt(group)); globalThis.fetch = originalFetch; THREE.TextureLoader.prototype.load = originalLoad; }
