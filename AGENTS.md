@@ -28,9 +28,9 @@ Joint/Bud consumption (package 6) is published as PR #44; original menu/inventor
 (package 7) is published as PR #45 (online entries explicitly link to 2D).
 Continue `docs/TEST_BUILD.md`, one package / PR:
 Monster surface/PBR pass (5) is published as PR #46; Dex #49–54 sculptures are
-published as PR #47. Current coverage: 54 authored / 366 smooth reconstructions.
-Next individually sculpt remaining original species from Dex #55, retaining
-the PBR pipeline/cache. Do not claim the 366
+published as PR #47 and Dex #55–60 as PR #48. Current coverage: 60 authored / 360
+smooth reconstructions. Next individually sculpt remaining original species
+from Dex #61, retaining the PBR pipeline/cache. Do not claim the 360
 reconstructions are individually detailed HD anatomies or native 4K verified. Read BenJG420/420mon as the source for 6/7. Do not restart the graphics packages or create a
 replacement PR #39. Preserve all mechanics/saves; Ko-fi/payment stays skipped.
 Keep the same file-read discipline and maximum three focused check rounds.

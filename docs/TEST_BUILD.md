@@ -1,13 +1,11 @@
-> **v41 Dex 55–60:** implemented; validation/publication in progress.
-
-> **Published v40:** Originalmonster Dex #49–54 [PR #47](https://github.com/BenJG420/420mon-3D/pull/47),
-> source `9ffca8d`. Final PR CI 39136428487 and main CI 39136524912 green
-> (188 tests + build); Pages 39136524933 green. Live asset names match the build:
-> `index-BD6a5M5q.js`, SHA256 `fe210d67957f7424d24b6bc89521db255e3402ebc4e4860fa38d16952f4e6f4d`,
+> **Published v41:** Originalmonster Dex #55–60 [PR #48](https://github.com/BenJG420/420mon-3D/pull/48),
+> source `21ad071`. PR CI 39140950620 and main CI 39141065969 green
+> (188 tests + build); Pages 39141065725 green. Live asset names match the build:
+> `index-VN5AuQnw.js`, SHA256 `fb72bd5ea8c863fb2d8641eea9a55a18180d3967f9f0769e646d22bc9ba59270`,
 > CSS `index-tKfj-jno.css`. Stable root remains `index-DWZ4yP_E.js`.
-> One six-model original-comparison smoke and final targeted live studio check
-> passed, including HP0/XP preservation and no browser/shader errors.
-> **NEXT: original species from Dex #55. Current coverage: 54 authored / 366
+> Six-model original-comparison smoke and final Rustmaw/Fogbank live checks passed,
+> including rotation/zoom/close/reload, HP0/XP and no browser/shader errors.
+> **NEXT: original species from Dex #61. Current coverage: 60 authored / 360
 > smooth reconstructions.** Same `/test/` URL/save slots; three check rounds used.
 
 # Original-world test build v41
@@ -391,6 +389,12 @@ origin's localStorage.
     surfaces use ACES tonemapping; all 54 authored models retain PBR and cache
     ownership. Dex #55 onward remains explicitly marked smooth reconstruction.
 
+32. Inspect Dex #55–60 Portwolf, Fogbank, Dockclaw, Flaskwyrm, Velourfox and
+    Rustmaw when owned/in battle. Each now uses its own source-based sculpture.
+    Compare the first pose, rotate/zoom, close and reload. Rustmaw has separated
+    tooth jaws with a recessed mouth interior; Fogbank retains hanging wisps.
+    Current coverage is 60 authored; Dex #61 onward remains smooth reconstruction.
+
 ## Validation
 
 v41 round 1: 188/188 tests + build passed. Existing real geometry/provenance/
@@ -398,8 +402,11 @@ normal/UV/budget/cache checks now cover 60 authored and 360 reconstructed specie
 Round 2 passed one original-comparison touch smoke for all six: sculpted status,
 rotate/zoom/close/reload, HP0/XP17, narrow layout and no browser/shader errors.
 Image review led to a recessed mouth back wall for Rustmaw and staggered Fogbank
-puffs before final CI/deploy (round 3); no additional local full loop or tests
-that merely mirror cosmetic definitions.
+puffs before final CI/deploy (round 3). Final PR/main CI and Pages passed;
+live asset names/content/hash and targeted final Rustmaw/Fogbank views passed,
+including rotation/zoom/close/reload, HP0/XP and no browser/shader errors. No
+additional local full loop or tests merely mirroring cosmetic definitions.
+Physical Android/native 4K remains a user/device check.
 
 
 v40 round 1: 188/188 tests + build passed. Existing real geometry/provenance/
@@ -608,8 +615,8 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-18)
 
-Current v40: PR #47 is published, 54 individual sculptures / 366 smooth
-reconstructions. Continue original species at Dex #55; do not restart #49–54.
+Current v41: PR #48 is published, 60 individual sculptures / 360 smooth
+reconstructions. Continue original species at Dex #61; do not restart #55–60.
 
 Existing PR #39 is merged and published. Keep its 48 authored/372 reconstructed
 models. Continue Bens packages below; do not start another monster batch before
@@ -702,7 +709,7 @@ its own geometry from the retained first pose and original source hash, uses the
 existing PBR/UV/cache integration and stays below 30k triangles. Original 48
 sculptures and all gameplay/save behavior remain unchanged.
 
-**v41 — Dex #55–60 implemented:** Portwolf (howling open jaws, layered mane,
+**DONE — PR #48 / v41 Dex #55–60:** Portwolf (howling open jaws, layered mane,
 cable loops), Fogbank (mist canopy, recessed yellow eyes, hanging wisps),
 Dockclaw (cargo shell, red lights, jointed legs and open pincers), Flaskwyrm
 (lime segmented caterpillar, bubble helmet/brim with drips), Velourfox
