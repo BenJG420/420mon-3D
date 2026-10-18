@@ -1,3 +1,15 @@
+# Current authored coverage — v43
+
+72 authored species / 348 smooth reconstructions. `monster-sculpts-g.ts` and
+`monster-sculpts-g-creatures.ts` add Dex #67–72 Spilleye, Gongling, Maskwisp,
+Lipkrait, Magtick and Valvekoi from their retained original first poses.
+A single-eyed dripping spill, spun gong/striker, cracked mask/wisp, coiled snake,
+open horseshoe magnet insect and koi/valve wheel are individual geometry.
+Two optional Sculpt helpers make smooth closed cords and revolved profiles;
+previous methods and all 66 earlier geometries are unchanged. Source hashes,
+PBR/UV/cache ownership and <30k triangles remain. Next: original Dex #73.
+Hidden surfaces are conservatively completed; no canonical back views claimed.
+
 # Current authored coverage — v42
 
 66 authored species / 354 smooth reconstructions. `monster-sculpts-f.ts` and

@@ -25,6 +25,17 @@ export class Sculpt {
     this.add(new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), color, [x, y, z], [sx, sy, sz]);
     return this.add(new THREE.CircleGeometry(1, 24), color, [x, y, z], [sx, sz, 1], [Math.PI / 2, 0, 0]);
   }
+  /** Smooth curved cord with round, closed ends; existing rod geometry is unchanged. */
+  tube(color: THREE.ColorRepresentation, points: Point[], radius = .02, segments = 32) {
+    const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(...p)));
+    this.add(new THREE.TubeGeometry(curve, segments, radius, 10, false), color, [0, 0, 0]);
+    for (const p of [points[0], points[points.length - 1]]) this.ellipsoid(color, ...p, radius, radius, radius);
+    return this;
+  }
+  /** Revolved profile; start/end at radius zero to close a solid, or repeat a ring profile. */
+  lathe(color: THREE.ColorRepresentation, profile: [number, number][], x: number, y: number, z: number, rx = 0, ry = 0, rz = 0) {
+    return this.add(new THREE.LatheGeometry(profile.map(p => new THREE.Vector2(...p)), 32), color, [x, y, z], [1, 1, 1], [rx, ry, rz]);
+  }
   box(color: THREE.ColorRepresentation, x: number, y: number, z: number, sx: number, sy: number, sz: number, rx = 0, ry = 0, rz = 0) {
     return this.add(new THREE.BoxGeometry(1, 1, 1), color, [x, y, z], [sx, sy, sz], [rx, ry, rz]);
   }

@@ -1,3 +1,12 @@
+# v43 — individuelle Originalmodelle Dex 67–72 in Arbeit
+
+Annahme v43: Sechs Arten bilden das nächste Paket, Spilleye bis Valvekoi; verdeckte Rückseiten setzen sichtbare Formen/Farben konservativ fort. Echte Erstposen bestimmen das Design, vorhandene 66 Skulpturen/PBR/Mechaniken bleiben erhalten; danach weiter ab Dex #73.
+
+- Neue Dateien monster-sculpts-g.ts und monster-sculpts-g-creatures.ts; Originalhashes und bevorzugter Cachepfad registriert. Zwei neue optionale Sculpt-Helfer für geschlossene Kurven und gedrehte Profile erzeugen glatte Details; bisherige Methoden/Modelle unverändert.
+- Prüfblöcke 1/2 abgeschlossen: 188/188 + Build; ein Chromium-Touch-Smoke zeigt alle sechs als sculpted neben echter Erstpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler. Bildnachweise geprüft. Block 3 CI/Pages/Live-Dateivergleich folgt; keine weitere lokale Vollprüfung. Danach laut neuester Nutzeranweisung direkt nächstes Paket ab Dex #73, eigener PR/max. drei Prüfblöcke.
+
+## Vorheriger veröffentlichter Stand
+
 # Aktueller Wiedereinstieg — v42 / Dex 61–66 veröffentlicht
 
 - **Fertig, gemergt, live:** PR #49, Spielcode b3eff54157f6683a007147a5ad98cd98e230147c. Sechs eigene Modelle nach echten lokalen Erstposen: Harzback, Lampjell, Curbowl, Tarslug, Plugeel und Lidtoad. Stand **66 eigene Skulpturen / 354 glatte Rekonstruktionen**. Die bisherigen 60 Geometrien, Originalsprites/Hashes, PBR/UV/Cache sowie sämtliche Mechaniken/Saves bleiben erhalten. Keine Behauptung, alle 420 seien individuelle HD-Modelle oder native 4K geprüft.
