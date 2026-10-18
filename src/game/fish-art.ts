@@ -136,11 +136,11 @@ export function createFishingWorld(world: FishingWorld): { update: (dt: number) 
     if (!tank) return;
     const center = world.toWorld(tank.x + tank.w / 2, tank.y + tank.h / 2);
     const scale = world.getMapInfo().scale;
-    // The collection UI contains all 42 species; the small tank shows up to 16
+    // The collection UI contains all 42 species; the enlarged tank shows all 42
     // distinct caught species to keep the water readable and draw calls bounded.
-    for (const [index, fish] of species.slice(0, 16).entries()) {
+    for (const [index, fish] of species.entries()) {
       const sprite = new THREE.Sprite(fishMaterial(fish, false));
-      sprite.scale.setScalar(.6 + index % 3 * .055);
+      sprite.scale.setScalar(.4 + index % 3 * .035);
       const holder = new THREE.Group(); holder.position.copy(center); holder.add(sprite); root.add(holder);
       swimmers.push({ sprite, fish, index, width: tank.w * scale * .39, depth: tank.h * scale * .25 });
     }
@@ -157,7 +157,7 @@ export function createFishingWorld(world: FishingWorld): { update: (dt: number) 
     for (const swimmer of swimmers) {
       const { sprite, fish, index, width, depth } = swimmer;
       const phase = elapsed * (.24 + index % 4 * .025) + index * 2.4;
-      sprite.position.set(Math.sin(phase) * width, 1.03 + Math.sin(phase * 1.7 + index) * .07,
+      sprite.position.set(Math.sin(phase) * width, .65 + index % 5 * .27 + Math.sin(phase * 1.7 + index) * .06,
         Math.cos(phase * .7 + index) * depth);
       sprite.material = fishMaterial(fish, Math.cos(phase) > 0);
     }

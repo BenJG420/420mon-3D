@@ -1,3 +1,9 @@
+# Aquarium v35 — fertig, Veröffentlichung folgt
+
+Annahme v35: Das Aquarium wird bei gleicher Grundfläche höher; ursprüngliche Kollision und Interaktion bleiben erhalten. Eine Art pro Fangnachweis schwimmt sichtbar, unabhängig von der Fangmenge; Originalsprites und alle 42 Regeln/Bonusse bleiben erhalten.
+
+- v35 Prüfung 1: 175/175 Tests und Build grün. Prüfung 2: ein Chromium-Touch-Smoke bestätigt 0/1/42 Arten, begrenzte Schwimmer trotz Millionen-Fangzahl, Katalog/Vollbonus, Tab-Wechsel/Wiederöffnen, schmales Layout, HP0/XP17; keine Browser-/Shaderfehler. Physisches Android nicht geprüft. Prüfung 3: PR/Main/Pages folgt. Nächstes Paket: Gebäude-Occlusion.
+
 # Aktueller Wiedereinstieg — v34 / Spielautomaten fertig
 
 - **Fertig, gemergt und veröffentlicht:** PR #41, Spielcode a587f9945e6919230beacbcb1ac6f5176931e2b7. Alle drei physischen Glutwalzen (Keller/Kino/Neonkai) öffnen jetzt 420, Obststand und Freidreher; vorher war es nur Platzhaltertext. Keine offenen Draft-Arbeiten an v34.

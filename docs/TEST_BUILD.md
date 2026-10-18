@@ -1,3 +1,5 @@
+> **v35 aquarium:** implementation complete; validation/publication in progress. Next package: building occlusion.
+
 > **Published v34:** Spielautomaten-Paket [PR #41](https://github.com/BenJG420/420mon-3D/pull/41),
 > source `a587f99`. Main CI 39079548638: 175/175 tests + build; Pages
 > 39079548649 green. Live `index-CwP6WDhZ.js`, SHA256
@@ -7,7 +9,7 @@
 > **Next: aquarium**, then building occlusion, HD/PBR monsters and remaining
 > species. One PR and at most three focused check rounds per package.
 
-# Original-world test build v34
+# Original-world test build v35
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -26,6 +28,9 @@ legacy fields and monsters, backs up the previous save and can import an existin
 origin's localStorage.
 
 ## What is implemented
+
+- Larger aquarium and dedicated swimming caught-fish view, with empty-state
+  guidance and direct catalogue/bag tabs. Same original collection and bonuses.
 
 - All three physical Glutwalzen open the original 420, Obststand and Freidreher
   games. Authentic reel strips, 20/5/9 lines, original per-line stakes and
@@ -353,6 +358,9 @@ origin's localStorage.
 
 ## Validation
 
+v35: round 1 passed all 175 tests and the test-channel build. Round 2: short
+Chromium touch smoke; round 3: PR/main CI and Pages (publication noted above).
+
 v34: round 1 passed build and 174/175 tests; one new fixture wrongly expected
 crown chips to count as unique Kiez finds. The source list excludes these items,
 so only the fixture changed. Round 2 passed eight targeted tests and one
@@ -521,10 +529,12 @@ Then deliver these playable packages in this exact order, **one PR per package**
    earnings/discovery counters and all existing saves/HP/mechanics remain.
    Auto/Stop, winning cells/line table, keyboard/touch and interaction guards
    are integrated. Three rounds completed; publication/checks recorded above.
-3. **NEXT — Aquarium:** enlarge the physical aquarium and open a dedicated view when
-   clicked/interacted with, showing the player's caught fish swimming. Preserve
-   the 42-fish catalogue, collection, fishing and bonuses.
-4. **Occlusion:** when the player is behind a house, fade occluding buildings
+3. **DONE — v35 Aquarium:** taller physical aquarium on its original footprint;
+   interaction opens a lit 3D tank with swimming original fish artwork, one
+   swimmer per caught species (0–42). Catalogue/bag remain available.
+   GPU resources are released on close/tab change; DPR/30fps are bounded.
+   The 42-fish collection, fishing, saves and bonuses remain unchanged.
+4. **NEXT — Occlusion:** when the player is behind a house, fade occluding buildings
    or render a visible silhouette. Preserve camera/geometry/collision behavior.
 5. **Monster HD/4K art pass:** detailed meshes, PBR textures and smooth shading,
    with no pixel-style world models, following the README graphics reference.

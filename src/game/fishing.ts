@@ -7,6 +7,7 @@ import { activeFishEffects, consumeFish } from "./fish-consumption";
 import type { DistrictTravel } from "./world";
 import type { MapObj } from "./data/maps";
 import "./fishing.css";
+import { mountAquarium } from "./aquarium-view";
 
 /** Fishing and the aquarium share the original catalogue and the existing save. */
 export function createFishingSystem(world: DistrictTravel) {
@@ -14,18 +15,21 @@ export function createFishingSystem(world: DistrictTravel) {
   if (recoverInterruptedCast(state)) saveProgress();
   const host = document.createElement("section"); host.className = "fish-overlay"; host.hidden = true;
   host.setAttribute("role", "dialog"); host.setAttribute("aria-modal", "true"); host.setAttribute("aria-labelledby", "fish-title");
-  host.innerHTML = `<div class="fish-panel"><header><div><span class="fish-eyebrow">LOWTOWN · AM WASSER</span><h2 id="fish-title">Neonkai</h2></div><button class="fish-close" aria-label="Schließen">✕</button></header><nav class="fish-tabs"><button data-tab="cast">ANGELN</button><button data-tab="catalog">KATALOG</button><button data-tab="bag">FISCHBEUTEL</button></nav><div class="fish-content"></div><footer class="fish-note" aria-live="polite"></footer></div>`;
+  host.innerHTML = `<div class="fish-panel"><header><div><span class="fish-eyebrow">LOWTOWN · AM WASSER</span><h2 id="fish-title">Neonkai</h2></div><button class="fish-close" aria-label="Schließen">✕</button></header><nav class="fish-tabs"><button data-tab="tank" hidden>BECKEN</button><button data-tab="cast">ANGELN</button><button data-tab="catalog">KATALOG</button><button data-tab="bag">FISCHBEUTEL</button></nav><div class="fish-content"></div><footer class="fish-note" aria-live="polite"></footer></div>`;
   document.querySelector("#app")!.appendChild(host);
   const content = host.querySelector<HTMLElement>(".fish-content")!;
   const note = host.querySelector<HTMLElement>(".fish-note")!;
-  let session = createFishSession(), tab: "cast" | "catalog" | "bag" = "cast";
+  let session = createFishSession(), tab: "cast" | "catalog" | "bag" | "tank" = "cast";
   let location = "", tank = false, ownSave = false, lastFocus: HTMLElement | null = null;
   let shownPosition = 0, lastBuffSecond = -1;
   const esc = (value: string) => value.replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[c]!);
   const persist = () => { ownSave = true; const saved = saveProgress(); ownSave = false; return saved; };
   const running = () => session.phase === "wait" || session.phase === "wheel";
   const say = (lines: string[]) => { note.textContent = lines.join(" "); };
+  let disposeAquarium: (() => void) | undefined;
+  function clearAquarium() { disposeAquarium?.(); disposeAquarium = undefined; delete host.dataset.aquarium; }
   function close() {
+    clearAquarium();
     const result = abortFish(state, session);
     if (result.changed) persist();
     host.hidden = true; lastFocus?.focus();
@@ -79,12 +83,20 @@ export function createFishingSystem(world: DistrictTravel) {
     content.appendChild(wrap); shownPosition = 0;
   }
   function render() {
+    clearAquarium();
     content.replaceChildren();
     const count = tankSpecies(state.fishCaught as Record<string, number>).length;
     host.querySelector("h2")!.textContent = tank ? `Dein Becken · ${count}/42 Arten` : "Neonkai";
     host.querySelector<HTMLButtonElement>('[data-tab="cast"]')!.hidden = tank;
     host.querySelectorAll<HTMLButtonElement>("[data-tab]").forEach(button => { button.classList.toggle("selected", button.dataset.tab === tab); button.disabled = running(); });
-    if (tab === "cast") {
+    host.querySelector<HTMLButtonElement>('[data-tab="tank"]')!.hidden = !tank;
+    if (tab === "tank") {
+      const stage = document.createElement("div"); stage.className = "aquarium-stage"; content.append(stage);
+      host.dataset.aquarium = "open";
+      disposeAquarium = mountAquarium(stage, state.fishCaught as Record<string, unknown>);
+      const hint = document.createElement("p"); hint.className = "fish-intro";
+      hint.textContent = count ? "Jede gefangene Art schwimmt hier einmal. Katalog und Fischbeutel bleiben oben erreichbar." : "Dein Becken wartet auf die ersten Fänge vom Neonkai."; content.append(hint);
+    } else if (tab === "cast") {
       if (session.phase === "wait") {
         const wait = document.createElement("div"); wait.className = "fish-wait";
         wait.innerHTML = `<div class="fish-water"><i></i><span class="fish-float"></span><b class="fish-wait-number"></b></div><p>Die Rute steht. Gleich beißt es.</p><button type="button" data-abort>Einholen · Samen zurück</button>`;
@@ -134,12 +146,19 @@ export function createFishingSystem(world: DistrictTravel) {
     if (aquarium ? world.current() !== "capsule" || obj.id !== "tank" : world.current() !== "kai" || !obj.id.startsWith("kai_cast")) return;
     if (world.getMapInfo().map.objs.every(item => item.id !== obj.id)) return;
     lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    tank = aquarium; location = obj.id; session = createFishSession(); tab = tank ? "catalog" : "cast";
+    tank = aquarium; location = obj.id; session = createFishSession(); tab = tank ? "tank" : "cast";
     say([tank ? "Deine Fänge schwimmen im Glas. Der Katalog zählt Arten, der Beutel einzelne Fische." : "Wähle einen Weed-Samen als Köder."]); host.hidden = false; render();
+    window.dispatchEvent(new CustomEvent("420mon-fish-opened"));
     host.querySelector<HTMLButtonElement>(".fish-close")!.focus();
   }
   window.addEventListener("keydown", event => {
     if (host.hidden || event.defaultPrevented || event.repeat) return;
+    if (event.key === "Tab") {
+      const buttons = [...host.querySelectorAll<HTMLButtonElement>("button:not([disabled])")].filter(b => b.getClientRects().length);
+      const first = buttons[0], last = buttons[buttons.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    }
     const target = event.target as HTMLElement | null;
     if (target?.closest("input,select,textarea")) return;
     if (event.code === "Escape") { event.preventDefault(); close(); }
@@ -147,7 +166,7 @@ export function createFishingSystem(world: DistrictTravel) {
   });
   window.addEventListener("420mon-save-changed", () => { if (!ownSave && !host.hidden && !running()) render(); });
   window.addEventListener("420mon-district-change", () => { if (!host.hidden) close(); });
-  window.addEventListener("pagehide", () => { if (abortFish(state, session).changed) persist(); });
+  window.addEventListener("pagehide", () => { clearAquarium(); if (abortFish(state, session).changed) persist(); });
   document.addEventListener("visibilitychange", () => { if (document.hidden && !host.hidden) { const result = abortFish(state, session); if(result.changed){persist();say(result.lines);render();} } });
   return {
     openFishing: (obj: MapObj) => open(obj), openTank: (obj: MapObj) => open(obj, true),
