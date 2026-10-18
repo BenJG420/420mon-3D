@@ -1,17 +1,11 @@
-> **v42 in preparation:** six individual models for Dex #61–66, Harzback through
-> Lidtoad. Source coverage: 66 authored / 354 smooth reconstructions. Three
-> rounds: 188/188 tests + build and one six-model touch smoke passed. Final
-> visual corrections await CI/Pages/live verification in round 3; last live
-> release recorded below.
-
-> **Published v41:** Originalmonster Dex #55–60 [PR #48](https://github.com/BenJG420/420mon-3D/pull/48),
-> source `21ad071`. PR CI 39140950620 and main CI 39141065969 green
-> (188 tests + build); Pages 39141065725 green. Live asset names match the build:
-> `index-VN5AuQnw.js`, SHA256 `fb72bd5ea8c863fb2d8641eea9a55a18180d3967f9f0769e646d22bc9ba59270`,
+> **Published v42:** Originalmonster Dex #61–66 [PR #49](https://github.com/BenJG420/420mon-3D/pull/49),
+> source `b3eff54`. PR CI 39145731155 and main CI 39145817743 green
+> (188 tests + build); Pages 39145817734 green. Live asset names match the build:
+> `index-D8iUjs8C.js`, SHA256 `e8f1a31aada1fd18adf8a9b86dfe4fc1474a015f0ee2b9ffd4fb88a6b3e38e39`,
 > CSS `index-tKfj-jno.css`. Stable root remains `index-DWZ4yP_E.js`.
-> Six-model original-comparison smoke and final Rustmaw/Fogbank live checks passed,
-> including rotation/zoom/close/reload, HP0/XP and no browser/shader errors.
-> **NEXT: original species from Dex #61. Current coverage: 60 authored / 360
+> Six-model original-comparison smoke and final Harzback/Lampjell/Curbowl/Lidtoad
+> live checks passed: rotation/zoom/close/reload, HP0/XP, no browser/shader errors.
+> **NEXT: original species from Dex #67. Current coverage: 66 authored / 354
 > smooth reconstructions.** Same `/test/` URL/save slots; three check rounds used.
 
 # Original-world test build v42
@@ -621,13 +615,12 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-18)
 
-Current v42 source: 66 individual sculptures / 354 smooth reconstructions.
-Dex #61–66 implemented; rounds 1/2 passed, final CI/publication pending (top). Continue
-original species at Dex #67 after publication; do not restart #61–66.
+Current v42: PR #49 is published, 66 individual sculptures / 354 smooth
+reconstructions. Continue original species at Dex #67; do not restart #61–66.
 
-Existing PR #39 is merged and published. Keep its 48 authored/372 reconstructed
-models. Continue Bens packages below; do not start another monster batch before
-the HD/PBR pass. Historical Draft/stop notes above are superseded by this status.
+Existing PR #39 and the HD/PBR pass #46 are merged and published. Preserve
+the authored models and rendering pipeline while completing remaining species.
+Historical Draft/stop notes above are superseded by this status.
 
 Then deliver these playable packages in this exact order, **one PR per package**.
 Latest user order after completed occlusion: **6 → 7 → 5**, then remaining species.
@@ -725,7 +718,7 @@ Dockclaw (cargo shell, red lights, jointed legs and open pincers), Flaskwyrm
 Each is its own source-based mesh with original hash and existing PBR/UV/cache
 integration; previous 54 sculptures and gameplay/saves remain unchanged.
 
-**v42 — Dex #61–66 (publication pending):** Harzback (amber resin shell,
+**DONE — PR #49 / v42 Dex #61–66:** Harzback (amber resin shell,
 leaf crown, pointed mask and purple roots), Lampjell (closed amber bell, lamp
 eyes and violet tentacles), Curbowl (carved feather layers, round yellow eyes
 and hooked beak), Tarslug (tar mound, eye stalks and orange fissures), Plugeel
