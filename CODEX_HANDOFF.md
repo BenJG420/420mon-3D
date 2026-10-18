@@ -1,3 +1,9 @@
+# v37 — Konsum-Paket 6
+
+Annahme v37: Die bestehende gemeinsame Fisch-/Rausch-Effektbasis wird nach runtime.useItem/applySmoke (2D 010807da77df8468a297adf33eaf1fb5c9a61c8b) für Joint/Bud ergänzt; mehr Wild wird im vorhandenen 3D-Habitat als entsprechend schnellerer Wild-Respawn umgesetzt, statt Begegnungsmechanik neu zu bauen. Konsum im Kampf kostet originalgetreu keinen Zug; HP0 bleibt unverändert.
+
+- v37 Runde 1: 182/182 Tests + Build grün. Runde 2: ein Chromium-Touch-Smoke bestätigt Joint/Bud-Verbrauch, stärksten gestapelten Fangbonus, Reload, Kampfkonsum ohne Zug/HP-Verlust, HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler. Runde 3 CI/Pages folgt; kein weiterer Voll-Smoke. Nächstes Paket: 7 Menü/Inventar nach 2D.
+
 # Neue Reihenfolge — Nutzerauftrag 2026-10-18
 
 - Gebäude-Verdeckung ist abgeschlossen (PR #43, live v36). Nächstes Paket **6: Joint und Bud konsumierbar machen, mit Effekten aus BenJG420/420mon**. Danach **7: Menü/Inventar optisch und funktional nach 2D** (gleiche Struktur, Kategorien, Reihenfolge, Anzahl, Benutzen). Erst danach **5: HD/PBR-Monster**, dann restliche Arten. Je spielbarem Paket ein separater PR; keine neue Implementierung in dieser reinen Planaktualisierung.

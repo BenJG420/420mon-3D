@@ -3,7 +3,7 @@ import { DEX, DEX_ORDER, dexNum, speciesById } from "./data/dex";
 import { DISTRICTS } from "./data/zones";
 import { ITEMS, SHOP, STALL_CHIPS, STALL_THREADS, STALL_FENCE } from "./data/items";
 import { xpToNext } from "./data/progress";
-import { consumeFish, activeFishEffects } from "./fish-consumption";
+import { consumeFish, consumeSmoke, activeFishEffects } from "./fish-consumption";
 import { questProgress } from "./quests";
 import { salePrice, sellMerchantItem } from "./merchant-state";
 import { QUEST_DEFS } from "./data/quests";
@@ -143,6 +143,10 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
         row(it.name + " ×" + amount, it.cat === "fish" ? () => {
           if (document.querySelector(".monster-battle:not([hidden])")) { note("Fisch nach dem Kampf essen."); return; }
           const result = consumeFish(s, id); if (result.ok) { save(s); render(); } note(result.lines.join(" "));
+        } : it.use === "smoke" && ["smoke", "bud"].includes(it.cat) ? () => {
+          if (document.querySelector(".monster-battle:not([hidden])")) { note("Im Kampf über Items konsumieren."); return; }
+          const result = consumeSmoke(s, id, () => saveProgress(s));
+          if (result.ok) render(); note(result.lines.join(" "));
         } : it.use === "heal" || it.use === "heal_all" ? () => {
           if (document.querySelector(".monster-battle:not([hidden])")) { note("Im Kampf nicht verfügbar."); return; }
           const living = s.team.filter(mon => mon.hp > 0 && mon.hp < maxHp(mon));
@@ -155,7 +159,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
           const result = toggleClothing(s, id);
           if (result.ok) { save(s); render(); }
           note(result.lines.join(" "));
-        } : undefined, it.desc + (it.use === "wear" ? (clothingId(s.outfit) === id ? " · Angelegt · Antippen: ablegen" : " · Antippen: anziehen") : ""));
+        } : undefined, it.desc + (it.use === "smoke" ? " · Antippen: konsumieren" : "") + (it.use === "wear" ? (clothingId(s.outfit) === id ? " · Angelegt · Antippen: ablegen" : " · Antippen: anziehen") : ""));
       }
     } else if (tab === "shop") {
       title(merchant.toUpperCase() + " · " + s.gold + " ₲");
