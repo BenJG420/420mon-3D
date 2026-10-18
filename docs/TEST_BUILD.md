@@ -1,3 +1,5 @@
+> **v41 Dex 55–60:** implemented; validation/publication in progress.
+
 > **Published v40:** Originalmonster Dex #49–54 [PR #47](https://github.com/BenJG420/420mon-3D/pull/47),
 > source `9ffca8d`. Final PR CI 39136428487 and main CI 39136524912 green
 > (188 tests + build); Pages 39136524933 green. Live asset names match the build:
@@ -8,7 +10,7 @@
 > **NEXT: original species from Dex #55. Current coverage: 54 authored / 366
 > smooth reconstructions.** Same `/test/` URL/save slots; three check rounds used.
 
-# Original-world test build v40
+# Original-world test build v41
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -336,7 +338,7 @@ origin's localStorage.
 
 22. Open the Dex and select a captured entry marked 3D ansehen. Compare the
     original pose with its model, drag to rotate, zoom, reset and close with Esc.
-    The first 54 entries use individual sculptures; other entries identify their
+    The first 60 entries use individual sculptures; other entries identify their
     source-sprite reconstruction. Return to the world to see the same creatures.
 23. In a trainer or wild battle choose 3D ansehen under either fighter portrait.
     Inspect and close: the same battle turn remains active. Continue fighting or
@@ -380,7 +382,7 @@ origin's localStorage.
     reconstruction (Hawkerfox). Curved silhouettes now shade smoothly, surfaces
     use PBR normal/roughness detail and the studio has reflections. Rotate/zoom,
     close and reload. Reconstruction labels remain explicit: individual anatomy,
-    eyes and accessories for the remaining 366 species are still next work. Native 4K
+    eyes and accessories for the remaining 360 species are still next work. Native 4K
     and physical Android appearance/performance remain user/device checks.
 
 31. Inspect Dex #49–54 Hawkerfox, Kiefhound, Puffwraith, Blazetail, Rootroach and
@@ -390,6 +392,15 @@ origin's localStorage.
     ownership. Dex #55 onward remains explicitly marked smooth reconstruction.
 
 ## Validation
+
+v41 round 1: 188/188 tests + build passed. Existing real geometry/provenance/
+normal/UV/budget/cache checks now cover 60 authored and 360 reconstructed species.
+Round 2 passed one original-comparison touch smoke for all six: sculpted status,
+rotate/zoom/close/reload, HP0/XP17, narrow layout and no browser/shader errors.
+Image review led to a recessed mouth back wall for Rustmaw and staggered Fogbank
+puffs before final CI/deploy (round 3); no additional local full loop or tests
+that merely mirror cosmetic definitions.
+
 
 v40 round 1: 188/188 tests + build passed. Existing real geometry/provenance/
 normal/UV/budget/cache tests now cover 54 authored and 366 reconstructed species.
@@ -691,9 +702,18 @@ its own geometry from the retained first pose and original source hash, uses the
 existing PBR/UV/cache integration and stays below 30k triangles. Original 48
 sculptures and all gameplay/save behavior remain unchanged.
 
-**NEXT:** individual anatomy/detail work for the remaining **366 original
-species, starting Dex #55**, following the 2D artwork and reference. Current
-coverage is 54 authored / 366 smooth reconstructions.
+**v41 — Dex #55–60 implemented:** Portwolf (howling open jaws, layered mane,
+cable loops), Fogbank (mist canopy, recessed yellow eyes, hanging wisps),
+Dockclaw (cargo shell, red lights, jointed legs and open pincers), Flaskwyrm
+(lime segmented caterpillar, bubble helmet/brim with drips), Velourfox
+(seated purple fox, dark hood, gold crest/rings, curled lap tail), Rustmaw
+(riveted rust plates, piston legs, mechanical eyes and separated toothed jaws).
+Each is its own source-based mesh with original hash and existing PBR/UV/cache
+integration; previous 54 sculptures and gameplay/saves remain unchanged.
+
+**NEXT:** individual anatomy/detail work for the remaining **360 original
+species, starting Dex #61**, following the 2D artwork and reference. Current
+coverage is 60 authored / 360 smooth reconstructions.
 This pass does not claim 420 individually sculpted/production-4K creatures.
 Physical Android/native 4K visual/performance verification remains a device test.
 

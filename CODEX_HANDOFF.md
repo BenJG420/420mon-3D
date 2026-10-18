@@ -1,3 +1,9 @@
+# v41 — individuelle Originalmodelle Dex 55–60
+
+Annahme v41: Das nächste fertige Artenpaket umfasst sechs Arten, Portwolf bis Rustmaw; verdeckte Rückseiten werden konservativ ergänzt. Die echten Erstposen bestimmen Formen, Farben und Merkmale; bestehende 54 Skulpturen, PBR und Mechaniken bleiben erhalten. Weiter ab Dex #61.
+
+- v41 Runden 1/2: 188/188 Tests + Build und ein Touch-Smoke aller sechs als sculpted neben Erstpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 ohne Browser-/Shaderfehler grün. Bildvergleich: Rustmaws Innenraum vor CI als zurückgesetzte Maulrückwand statt glänzender Kugel korrigiert; Fogbank-Wolken leicht versetzt. Endstand folgt in Runde 3 CI/Deploy, keine weitere lokale Vollschleife. Stand 60/360, weiter Dex #61.
+
 # Aktueller Wiedereinstieg — v40 / Dex 49–54 veröffentlicht
 
 - **Fertig, gemergt, live:** PR #47, Spielcode 9ffca8db35b4b0244079fee49ce5224ce1427cb2. Sechs eigene Modelle aus den echten lokalen Erstposen: Hawkerfox, Kiefhound, Puffwraith, Blazetail, Rootroach, Crackveil. Source-Hashes, vollständige Sprites, bisherigen 48 Skulpturen, PBR/UV/Cache und alle Mechaniken/Saves bleiben erhalten. Stand **54 eigene Skulpturen / 366 glatte Rekonstruktionen**; keine Behauptung, alle 420 seien individuell oder in 4K geprüft.
