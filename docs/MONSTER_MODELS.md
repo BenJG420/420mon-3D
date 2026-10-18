@@ -1,3 +1,12 @@
+# Current authored coverage — v41
+
+60 authored species / 360 smooth reconstructions. `monster-sculpts-e.ts` adds
+Dex #55–60 Portwolf, Fogbank, Dockclaw, Flaskwyrm, Velourfox and Rustmaw from
+their retained original first poses. Source hashes, PBR UVs/materials, preferred
+bounded cache path and <30k-triangle budget remain. Previous 54 designs and
+original sheets/data are unchanged. Next: original species from Dex #61.
+Hidden surfaces are conservatively completed; no canonical back views claimed.
+
 # Current authored coverage — v40
 
 54 authored species / 366 smooth reconstructions. `monster-sculpts-d.ts` adds

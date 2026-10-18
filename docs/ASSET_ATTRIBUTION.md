@@ -69,3 +69,13 @@ foot/knee phase when sprint starts or ends. No additional third-party assets.
 - No external mesh/texture pack is introduced. The existing project PBR tiles
   and Three.js MIT rendering dependency are reused. Coverage: 54 authored
   sculptures, 366 smooth reconstructions; next work starts at Dex #55.
+
+## Individual monster meshes — v41
+
+- Portwolf, Fogbank, Dockclaw, Flaskwyrm, Velourfox and Rustmaw geometry is
+  authored in `src/game/monster-sculpts-e.ts` using the owner's retained
+  original first-pose sprites. `monster-authored.ts` keeps original source
+  sprite/hash references; full original sheets remain untouched.
+- No external model/texture pack is added. Existing PBR tiles, Three.js MIT
+  dependency and cache remain. Coverage: 60 authored / 360 reconstructions;
+  next work starts at Dex #61.
