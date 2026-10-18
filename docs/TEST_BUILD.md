@@ -1,3 +1,5 @@
+> **v36 building occlusion:** implementation complete; publication in progress. Next: HD/PBR monsters.
+
 > **Published v35:** Aquarium-Paket [PR #42](https://github.com/BenJG420/420mon-3D/pull/42),
 > source `95e056b`. PR CI 39097040432 and main CI 39104090164: green,
 > 175/175 tests + build. Pages 39104090179 green; live JS/CSS byte-identical
@@ -7,7 +9,7 @@
 > **Next: building occlusion**, then HD/PBR monsters and remaining species.
 > Same `/test/` URL and save slots; one PR and at most three check rounds.
 
-# Original-world test build v35
+# Original-world test build v36
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -26,6 +28,9 @@ legacy fields and monsters, backs up the previous save and can import an existin
 origin's localStorage.
 
 ## What is implemented
+
+- Grouped building occlusion keeps the player visible behind architecture,
+  using head/torso/feet/shoulder samples and smoothly restoring clear buildings.
 
 - Larger aquarium and dedicated swimming caught-fish view, with empty-state
   guidance and direct catalogue/bag tabs. Same original collection and bonuses.
@@ -356,6 +361,11 @@ origin's localStorage.
 
 ## Validation
 
+v36 round 1: 178/178 tests + test-channel build green. Three new regression
+checks cover complete houses, head/shoulder coverage, camera inside a wall,
+geometry/camera preservation and exact state restoration on map replacement.
+Round 2 is one short touch smoke; round 3 is CI/Pages publication.
+
 v35: round 1 passed all 175 tests and the test-channel build. Round 2 passed
 one Chromium touch smoke: 0/1/42 caught species, million-count bounding,
 catalogue/full bonus, tab switching/reopening, narrow layout and HP0/XP17;
@@ -382,7 +392,7 @@ Pages and exact live artifact verification. No further whole smoke/test loop.
 Physical Android and native 4K remain device checks.
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 175 regression tests covering 420 assets, restored source hashes, battle save
+suite has 178 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
@@ -535,9 +545,13 @@ Then deliver these playable packages in this exact order, **one PR per package**
    swimmer per caught species (0–42). Catalogue/bag remain available.
    GPU resources are released on close/tab change; DPR/30fps are bounded.
    The 42-fish collection, fishing, saves and bonuses remain unchanged.
-4. **NEXT — Occlusion:** when the player is behind a house, fade occluding buildings
-   or render a visible silhouette. Preserve camera/geometry/collision behavior.
-5. **Monster HD/4K art pass:** detailed meshes, PBR textures and smooth shading,
+4. **DONE — v36 Occlusion:** a body-sized visibility corridor fades occluding
+   houses as complete groups (walls, plinth, roof and facade), including a
+   camera inside the structure. Short hold and smooth recovery avoid flicker.
+   Faded parts stop casting dark shadows; original opacity, depth and shadows
+   return when clear or on map replacement. Camera, geometry, collision and
+   all gameplay/save behavior remain unchanged.
+5. **NEXT — Monster HD/4K art pass:** detailed meshes, PBR textures and smooth shading,
    with no pixel-style world models, following the README graphics reference.
    Then continue the remaining original-sprite monster species. Keep the 420
    pipeline, cache, viewer and original Dex portraits. v32 aims for 48 authored
