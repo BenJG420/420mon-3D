@@ -457,6 +457,7 @@ function clearModalMovement() {
 window.addEventListener("420mon-model-opened", clearModalMovement);
 window.addEventListener("420mon-slot-opened", clearModalMovement);
 window.addEventListener("420mon-fish-opened", clearModalMovement);
+window.addEventListener("420mon-menu-opened", clearModalMovement);
 const cameraTarget = new THREE.Vector3();
 const desiredCamera = new THREE.Vector3();
 const up = new THREE.Vector3(0, 1, 0);

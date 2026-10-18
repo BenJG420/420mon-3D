@@ -1,3 +1,5 @@
+> **v38 original menu/inventory:** implemented; final CI/publication in progress. Next: HD/PBR monsters.
+
 > **Published v37:** Joint-/Bud-Konsum [PR #44](https://github.com/BenJG420/420mon-3D/pull/44),
 > source `43f9f74`. PR CI 39123262088 and main CI 39123329918 green
 > (182 tests + build); Pages 39123329846 green. Live JS/CSS byte-identical to
@@ -7,7 +9,7 @@
 > **Next: original menu/inventory (7)**, then HD/PBR monsters (5) and remaining species.
 > Same `/test/` URL/save slots. Three check rounds completed, no extra smoke.
 
-# Original-world test build v37
+# Original-world test build v38
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -369,6 +371,14 @@ origin's localStorage.
 
 ## Validation
 
+v38 round 1: 182 existing tests + build passed. Round 2: three targeted new
+inventory/menu tests + build and one touch smoke passed (categories/quantities,
+explicit healing with KO protected, consumption, Party/Box, shortcuts, modal
+Escape, reload/unknown items, narrow layout, no browser/shader errors). Final
+CSS panel sizes and inventory T shortcut are checked in round 3 CI/deployment;
+no repeated local full test/smoke. Online pages remain links to the 2D version.
+
+
 v37 round 1: 182/182 tests and build green. Four new checks cover all original
 Joint/Bud items, exact consumption, stacking/cap/expiry, hybrid selection,
 Zero-Day, XP/reward consumers, legacy clocks, fish coexistence, storage rollback
@@ -417,7 +427,7 @@ Pages and exact live artifact verification. No further whole smoke/test loop.
 Physical Android and native 4K remain device checks.
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 182 regression tests covering 420 assets, restored source hashes, battle save
+suite has 185 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
@@ -591,15 +601,22 @@ für gewöhnliche Wildmonster. Kein neuer Begegnungsmodus. Konsum im Kampf koste
 keinen Zug; HP0/Team/Collection bleiben erhalten. Speicherfehler rollen Joint-/
 Bud-Verbrauch und Effekte zurück. Ein Paket/PR; Prüfung/Veröffentlichung oben.
 
-### 7) NEXT — Menü und Inventar wie im 2D-Original
+### 7) DONE — v38 Menü und Inventar nach dem 2D-Original
 
-**BenJG420/420mon** als Vorlage für Aussehen und Funktion verwenden: gleiche
-Menüstruktur und Itemdarstellung mit originalen Kategorien, Reihenfolge,
-Anzahl und Benutzen-Aktionen. Bestehende Funktionen/Items/Saves erhalten und
-an die Originalstruktur anbinden; Tastatur und Touch weiter unterstützen.
-Ein separates fertiges Paket, ein PR.
+Pause-Menü nach originaler Reihenfolge (Hilfe, Leute/Chat, Nachrichten,
+Änderungen, Inventar, Dex, Quests, Erfolge, Party, Weltkarte, Kapsel, Feedback,
+Ton/Teilen/Konto/Weiter), bestehende 3D-Grafikeinstellung und Box/Editor erreichbar.
+Inventar verwendet originale groupedInv/CAT_ORDER/CAT_LABEL/itemUseLabel:
+einklappbare Kategorien, deutsche Namenssortierung, Arten-/Gesamtanzahl,
+Einzelmengen, Itembeschreibung und separate Benutzen-Knöpfe. Heilitems öffnen
+originalgetreu eine Partnerauswahl; k.o./volle Partner sind deaktiviert.
+Unbekannte Legacy-Items bleiben unter Sonstiges sichtbar. Originalpalette und
+360/520px/80dvh-Menürahmen; Tastatur I/B/M/H/T/Escape, Fokus und Touch bleiben.
+**Online-Abgrenzung:** Leute/Chat, Nachrichten und Konto öffnen ausdrücklich das
+2D-Original; kein eigener 3D-Chat-/Nachrichten-/Authserver und kein Save-Transfer.
+Bestehende Spielmechaniken/Speicherplätze bleiben, Shop nur am physischen NPC.
 
-### 5) Danach — Monster HD/4K art pass
+### 5) NEXT — Monster HD/4K art pass
 
 Detailed meshes, PBR textures and smooth shading,
    with no pixel-style world models, following the README graphics reference.

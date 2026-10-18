@@ -1,0 +1,40 @@
+/* Source palette/layout: original src/styles.css and overlays.tsx MenuShell/Inventory. */
+.systems-panel.original-menu { max-width:720px; inset:16px; border:1px solid #303035; border-radius:14px; background:#121416f7; color:#e8e8ea; box-shadow:0 12px 40px #0009; }
+.systems-panel.original-menu header {background:none;color:#e8e8ea;border-bottom:1px solid #303035;letter-spacing:.03em;}
+.systems-panel.original-menu h3 {color:#e8e8ea;font:700 16px ui-monospace,monospace;}
+.systems-panel.original-menu button {border-color:#303035;background:#1b1e20;color:#e8e8ea;min-height:44px;}
+.systems-panel.original-menu button:hover {border-color:#7cff6b;}
+.systems-panel.original-menu button:focus-visible,.original-menu a:focus-visible {outline:2px solid #7cff6b;outline-offset:2px;}
+.systems-panel.original-menu button:disabled {opacity:.4;}
+.systems-panel.original-menu nav {border-color:#303035;padding:8px 16px;}
+.systems-panel.original-menu .systems-content {padding:8px 16px 16px;}
+.systems-panel.original-menu .systems-row {border-radius:8px;background:#1b1e20;}
+.systems-panel.original-menu .systems-row small,.original-menu p {color:#8a8a90;line-height:1.6;}
+.systems-panel.original-menu footer {background:#121416;border-top:1px solid #303035;color:#7cff6b;}
+.systems-panel.original-menu a {color:#7cff6b;display:inline-block;padding:12px 0;}
+.inventory-category {border:1px solid #303035;background:#1b1e20;border-radius:10px;overflow:hidden;margin:8px 0;}
+.inventory-category .inventory-category-toggle {width:100%;text-align:left;border:0;border-radius:0;font:600 11px ui-monospace,monospace;color:#7cff6b;padding:12px;}
+.inventory-category ul {list-style:none;padding:8px;margin:0;border-top:1px solid #303035;}
+.inventory-category li {display:flex;align-items:center;gap:10px;padding:8px 2px;}
+.inventory-category li>div {flex:1;min-width:0;}
+.inventory-category strong {display:block;font-size:13px;overflow-wrap:anywhere;}
+.inventory-category small {display:block;color:#8a8a90;font-size:11px;line-height:1.5;margin-top:4px;}
+.inventory-category li button {padding:8px;font-size:11px;flex-shrink:0;}
+.inventory-glyph {width:26px;text-align:center;font-size:22px;color:#7cff6b;flex-shrink:0;}
+.inventory-legacy {margin-top:18px;color:#8a8a90;font-size:12px;}
+.inventory-legacy summary {cursor:pointer;min-height:44px;display:flex;align-items:center;}
+.menu-display {display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;min-height:44px;}
+.menu-display select {background:#1b1e20;color:#e8e8ea;border:1px solid #303035;padding:8px;}
+@media(min-width:760px){.systems-panel.original-menu {inset:5vh 16px;}}
+
+.systems-scrim {display:none;position:absolute;inset:0;background:#0009;pointer-events:auto;}
+.systems-root:has(.systems-panel:not([hidden])) .systems-scrim {display:block;}
+
+/* Match MenuShell's 360/520px panels and bounded, centered scroll region. */
+.systems-panel.original-menu {inset:0;width:min(520px,92vw);max-height:min(80dvh,40rem);height:fit-content;min-height:200px;margin:auto;}
+.systems-panel.original-menu[data-view="pause"] {width:min(360px,92vw);}
+.inventory-category[data-category="smoke"] .inventory-category-toggle,
+.inventory-category[data-category="key"] .inventory-category-toggle {color:#ffbe55;}
+.inventory-category[data-category="chip"] .inventory-category-toggle {color:#55d9ff;}
+.inventory-category[data-category="fert"] .inventory-category-toggle {color:#b99bff;}
+.inventory-category[data-category="wear"] .inventory-category-toggle {color:#8a8a90;}

@@ -1,3 +1,9 @@
+# v38 — Menü/Inventar Paket 7
+
+Annahme v38: 2D-Pause-Reihenfolge und Inventar aus overlays.tsx werden übernommen; bestehende Box/3D-Editor/Kapseln bleiben als Unteraktionen erreichbar. Leute/Chat und Nachrichten verweisen ausdrücklich auf das 2D-Original, weil der 3D-Port keinen Online-Server hat; kein neuer Server/Auth-/Zahlungsumfang.
+
+- Prüfung v38: Runde 1 182/182 + Build. Runde 2 drei neue gezielte Tests + Build und ein Touch-Smoke grün: originale Reihenfolge, Kategorien/Anzahl/Benutzen, Zielheilung/HP0, Konsum, Lagerbox, I/Escape, Fremdmodal, Reload/Legacy-Item und schmales Layout ohne Browser-/Shaderfehler. Vor CI noch CSS-Fenstermaße an 360/520px/80dvh angeglichen und T-Tütenkürzel im Inventar freigegeben; finaler CI-/Deploy-Check prüft endgültigen Stand, keine weitere lokale Vollrunde.
+
 # Aktueller Wiedereinstieg — v37 / Konsum-Paket 6 fertig
 
 - **Fertig, gemergt, veröffentlicht:** PR #44, Spielcode 43f9f741be087bb28814283e79d9949c41086dee. Joint/Bud sind im Inventar und im Kampf nutzbar. Authentisches runtime.useItem/applySmoke (2D 010807da77df8468a297adf33eaf1fb5c9a61c8b): genau ein Item, stärkster Wert, unabhängige Spielzeit-Uhren, 600s Verlängerungs-Cap; Hybrid 1/2 verschiedene Zufallseffekte, Zero-Day Fang/Tempo/Gold. Konsum kostet im Kampf keinen Zug; HP0/EP/Teamreferenzen bleiben erhalten.
