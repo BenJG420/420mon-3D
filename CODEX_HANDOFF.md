@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v35 / Aquarium fertig
+
+- **Fertig, gemergt, veröffentlicht:** PR #42, Spielcode 95e056b8096779f82d5aa8b32929357dc5f718cd. Höheres physisches Aquarium bei gleicher Grundfläche/Kollision; Interaktion öffnet beleuchtete 3D-Ansicht mit schwimmenden Originalsprites aller gefangenen Arten (maximal 42). Kein neues Fischmodell-Asset oder geänderte Spielregel. Katalog/Fischbeutel bleiben erreichbar, Grow-Vollbonus und Fänge erhalten.
+- **Nächster Punkt:** verdeckende Gebäude transparent machen oder Spieler-Silhouette. Danach HD/4K-PBR-Monster und restliche Arten. Ein PR pro Paket. Ko-fi/Zahlungen bleiben übersprungen.
+- **Drei Prüfrunden abgeschlossen:** 175/175 + Build; ein Chromium-Touch-Smoke (0/1/42 Arten, Millionen-Fangzahl begrenzt, Katalog/Vollbonus, Tabs/Wiederöffnen, Layout, HP0/XP17, keine Browser-/Shaderfehler); PR CI 39097040432, Main CI 39104090164 und Pages 39104090179 grün. Live-JS/CSS bytegleich zum lokalen Build. Kein vierter Prüflauf; physisches Android/4K bleibt Gerätetest.
+- **Live:** https://benjg420.github.io/420mon-3D/test/ ; index-Cs1fdZ-d.js SHA256 733e529cda780e26c0f319c7911e178a0e0f6ffc5385a813a132b9424b6ba9be; CSS index-BW3ctqqL.css. Root unverändert index-DWZ4yP_E.js. Alle Speicherplätze bleiben erhalten.
+- Rendering: aquarium-view.ts besitzt temporären Renderer/Materialien/Geometrien/Texturen, 30fps/DPR1.5-Limit; dispose bei Schließen/Tabwechsel, Haupt-Rendering währenddessen pausiert. Gemeinsame Spritesheets bleiben im vorhandenen Cache. Grafik verwendet Original-Fischbilder auf Sprites, keine individuellen Fisch-Meshes.
+- Abschließender Dokumentationscommit ist nur Status; veröffentlichter Spielcode ist 95e056b.
+
+## Historischer Verlauf — ältere Next-/Stop-Angaben überholt
+
 # Aquarium v35 — fertig, Veröffentlichung folgt
 
 Annahme v35: Das Aquarium wird bei gleicher Grundfläche höher; ursprüngliche Kollision und Interaktion bleiben erhalten. Eine Art pro Fangnachweis schwimmt sichtbar, unabhängig von der Fangmenge; Originalsprites und alle 42 Regeln/Bonusse bleiben erhalten.

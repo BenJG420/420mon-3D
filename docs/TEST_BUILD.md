@@ -1,13 +1,11 @@
-> **v35 aquarium:** implementation complete; validation/publication in progress. Next package: building occlusion.
-
-> **Published v34:** Spielautomaten-Paket [PR #41](https://github.com/BenJG420/420mon-3D/pull/41),
-> source `a587f99`. Main CI 39079548638: 175/175 tests + build; Pages
-> 39079548649 green. Live `index-CwP6WDhZ.js`, SHA256
-> `115bfe8bd1119077fcd7af7eab6230a95791f0f428335cac53ecf09fb1d95cca`,
-> CSS `index-Cf6YlD54.css`, both byte-identical to the local build.
-> Stable root remains `index-DWZ4yP_E.js`; same `/test/` URL and save slots.
-> **Next: aquarium**, then building occlusion, HD/PBR monsters and remaining
-> species. One PR and at most three focused check rounds per package.
+> **Published v35:** Aquarium-Paket [PR #42](https://github.com/BenJG420/420mon-3D/pull/42),
+> source `95e056b`. PR CI 39097040432 and main CI 39104090164: green,
+> 175/175 tests + build. Pages 39104090179 green; live JS/CSS byte-identical
+> to the local build: `index-Cs1fdZ-d.js`, SHA256
+> `733e529cda780e26c0f319c7911e178a0e0f6ffc5385a813a132b9424b6ba9be`,
+> CSS `index-BW3ctqqL.css`. Stable root remains `index-DWZ4yP_E.js`.
+> **Next: building occlusion**, then HD/PBR monsters and remaining species.
+> Same `/test/` URL and save slots; one PR and at most three check rounds.
 
 # Original-world test build v35
 
@@ -358,8 +356,11 @@ origin's localStorage.
 
 ## Validation
 
-v35: round 1 passed all 175 tests and the test-channel build. Round 2: short
-Chromium touch smoke; round 3: PR/main CI and Pages (publication noted above).
+v35: round 1 passed all 175 tests and the test-channel build. Round 2 passed
+one Chromium touch smoke: 0/1/42 caught species, million-count bounding,
+catalogue/full bonus, tab switching/reopening, narrow layout and HP0/XP17;
+no browser/shader errors. Round 3 passed PR/main CI, Pages and exact live
+JS/CSS verification. No fourth check. Physical Android remains a device test.
 
 v34: round 1 passed build and 174/175 tests; one new fixture wrongly expected
 crown chips to count as unique Kiez finds. The source list excludes these items,

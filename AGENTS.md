@@ -22,8 +22,9 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 ## Current fix order (user instruction, 2026-10-17)
 
 Existing PR #39 and Bens animation fix PR #40 are merged; slot machines are
-completed and published as PR #41. Continue `docs/TEST_BUILD.md`, one package / PR:
-larger aquarium with a swimming caught-fish view; occluding
+completed and published as PR #41; the larger aquarium and swimming caught-fish
+view are published as PR #42. Continue `docs/TEST_BUILD.md`, one package / PR:
+occluding
 building transparency/silhouette; detailed smooth HD/4K PBR monster pass; then
 remaining original species. Do not restart the graphics packages or create a
 replacement PR #39. Preserve all mechanics/saves; Ko-fi/payment stays skipped.
