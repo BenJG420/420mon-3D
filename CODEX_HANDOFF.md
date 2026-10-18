@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v37 / Konsum-Paket 6 fertig
+
+- **Fertig, gemergt, veröffentlicht:** PR #44, Spielcode 43f9f741be087bb28814283e79d9949c41086dee. Joint/Bud sind im Inventar und im Kampf nutzbar. Authentisches runtime.useItem/applySmoke (2D 010807da77df8468a297adf33eaf1fb5c9a61c8b): genau ein Item, stärkster Wert, unabhängige Spielzeit-Uhren, 600s Verlängerungs-Cap; Hybrid 1/2 verschiedene Zufallseffekte, Zero-Day Fang/Tempo/Gold. Konsum kostet im Kampf keinen Zug; HP0/EP/Teamreferenzen bleiben erhalten.
+- **Integration:** fish-consumption.ts teilt die vorhandene Effektbasis; consumeSmoke persistiert einmal und rollt bei Speicherfehlern Verbrauch/Effektfelder zurück. Fang-, Tempo-, Gold-, Loot- und EP-Verbraucher verwenden vorhandene high*-Felder. Mehr Wild im existierenden 3D-Habitat = entsprechend schnellerer gewöhnlicher Wild-Respawn, kein neu gebautes Begegnungssystem. systems.ts Inventar + monsters.ts Kampf-Items öffnen denselben Konsum. Bestehende Fischboni/Sammlung bleiben erhalten.
+- **Drei Prüfrunden abgeschlossen:** 1: 182/182 Tests + Build. Vier neue Prüfungen für alle Joint/Bud-Items, Dauer/Stärke/Cap/Ablauf, Hybrid, Zero-Day, XP/Gold, Legacy-Uhren, Fisch-Koexistenz, Speicherrollback und HP0/Referenzen. 2: ein Chromium-Touch-Smoke bestätigt Joint/Bud, stärksten Fangbonus, Reload, Kampf ohne Zug/HP-Verlust, HP0/XP17, schmales Layout ohne Browser-/Shaderfehler. 3: PR CI 39123262088, Main CI 39123329918 und Pages 39123329846 grün; Live-JS/CSS bytegleich zum lokalen Build. Kein vierter Lauf; physisches Android/4K bleibt Gerätetest.
+- **Live:** https://benjg420.github.io/420mon-3D/test/ ; JS index-CYah1Lss.js SHA256 bcbf4f4c11c0a9ddd5abe7d2d1c0e8f2d9aa51ea9018b9e7f1a78fe17207dfe5; CSS index-BW3ctqqL.css. Root unverändert index-DWZ4yP_E.js; Speicherplätze behalten.
+- **Nächstes Paket 7:** Menü und Inventar optisch/funktional direkt nach BenJG420/420mon (gleiche Menüstruktur, Kategorien, Reihenfolge, Anzahl, Benutzen). Danach Paket 5 HD/PBR-Monster, dann restliche Arten. Vorhandene Mechaniken, 48 Skulpturen/372 Rekonstruktionen, Cache/Pipeline und Originalporträts behalten. Ko-fi/Zahlungen übersprungen. Ein PR und max. drei Prüfrunden je Paket.
+- Abschließender Dokumentationscommit ist nur Status; veröffentlichter Spielcode bleibt 43f9f74.
+
+## Historischer Verlauf — ältere Next-Angaben überholt
+
 # v37 — Konsum-Paket 6
 
 Annahme v37: Die bestehende gemeinsame Fisch-/Rausch-Effektbasis wird nach runtime.useItem/applySmoke (2D 010807da77df8468a297adf33eaf1fb5c9a61c8b) für Joint/Bud ergänzt; mehr Wild wird im vorhandenen 3D-Habitat als entsprechend schnellerer Wild-Respawn umgesetzt, statt Begegnungsmechanik neu zu bauen. Konsum im Kampf kostet originalgetreu keinen Zug; HP0 bleibt unverändert.

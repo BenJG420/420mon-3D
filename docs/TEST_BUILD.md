@@ -1,15 +1,11 @@
-> **v37 consumption:** implementation complete; publication in progress. Next: original menu/inventory (7).
-
-> **Published v36:** Gebäude-Verdeckung [PR #43](https://github.com/BenJG420/420mon-3D/pull/43),
-> source `3532ec2`. Final PR CI 39117667491 and main CI 39117726567 green
-> (178 tests + build); Pages 39117726554 green. Live asset filenames match the
-> Pages build: `index-Bmtng7Cy.js`, SHA256
-> `3ed33641a58320822223138317f222796b29643cc43d6ed44931a55d8d157844`,
+> **Published v37:** Joint-/Bud-Konsum [PR #44](https://github.com/BenJG420/420mon-3D/pull/44),
+> source `43f9f74`. PR CI 39123262088 and main CI 39123329918 green
+> (182 tests + build); Pages 39123329846 green. Live JS/CSS byte-identical to
+> the local checked build: `index-CYah1Lss.js`, SHA256
+> `bcbf4f4c11c0a9ddd5abe7d2d1c0e8f2d9aa51ea9018b9e7f1a78fe17207dfe5`,
 > CSS `index-BW3ctqqL.css`. Stable root remains `index-DWZ4yP_E.js`.
-> **Next: Joint/Bud consumption (6)**, then original menu/inventory (7),
-> then HD/PBR monster art (5) and remaining original species.
-> Same `/test/` URL/save slots. Three check rounds used; no further smoke loop.
-> Extra settled-camera live screenshot exceeded its budget; visual device check remains.
+> **Next: original menu/inventory (7)**, then HD/PBR monsters (5) and remaining species.
+> Same `/test/` URL/save slots. Three check rounds completed, no extra smoke.
 
 # Original-world test build v37
 
@@ -365,6 +361,12 @@ origin's localStorage.
     together, leaving the player visible; move clear to restore the house.
     Travel indoors and back: camera distance, collision and interactions stay.
 
+28. Open Inventar with an owned Joint/Bud and tap its row. One item is consumed;
+    active effect values/time appear above. Stack a weaker Joint: the stronger
+    value stays and time extends (600s cap). Reload to check persistence. In a
+    battle use Items to consume one: enemy HP/turn/partner HP must not change.
+    Defeated partners remain at zero HP until physical mattress rest.
+
 ## Validation
 
 v37 round 1: 182/182 tests and build green. Four new checks cover all original
@@ -372,7 +374,8 @@ Joint/Bud items, exact consumption, stacking/cap/expiry, hybrid selection,
 Zero-Day, XP/reward consumers, legacy clocks, fish coexistence, storage rollback
 and HP0/reference preservation. Round 2 passed one touch smoke: Joint/Bud consumption, strongest stacked catch
 bonus, reload, combat use without a turn/HP loss, HP0/XP17 and narrow layout
-without browser/shader errors. Round 3: CI/Pages.
+without browser/shader errors. Round 3 passed PR/main CI, Pages and exact live JS/CSS comparison. No fourth
+check; physical Android/4K remains a device test.
 
 
 v36 round 1: 178/178 tests + test-channel build green. Three new regression
@@ -576,7 +579,7 @@ Numbers retain Bens package IDs; packages 6/7 precede the monster art pass.
    return when clear or on map replacement. Camera, geometry, collision and
    all gameplay/save behavior remain unchanged.
 
-### 6) DONE — v37 Joint und Bud konsumieren
+### 6) DONE — PR #44 / v37 Joint und Bud konsumieren
 
 Joint und Bud lassen sich im Inventar und im Kampf konsumieren. Originale
 runtime.useItem/applySmoke-Regeln aus BenJG420/420mon (010807da77df8468a297adf33eaf1fb5c9a61c8b):

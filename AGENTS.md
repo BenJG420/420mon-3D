@@ -24,8 +24,8 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 Existing PR #39 and Bens animation fix PR #40 are merged; slot machines are
 completed and published as PR #41; the larger aquarium and swimming caught-fish
 view are published as PR #42; grouped building occlusion is published as PR #43.
+Joint/Bud consumption (package 6) is published as PR #44.
 Continue `docs/TEST_BUILD.md`, one package / PR:
-(6) Joint/Bud consumption with authentic original 2D effects;
 (7) original 2D menu/inventory appearance and behavior (structure, categories,
 order, quantities, use); then (5) detailed smooth HD/4K PBR monster pass and
 remaining original species. Read BenJG420/420mon as the source for 6/7. Do not restart the graphics packages or create a
