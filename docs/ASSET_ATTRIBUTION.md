@@ -79,3 +79,14 @@ foot/knee phase when sprint starts or ends. No additional third-party assets.
 - No external model/texture pack is added. Existing PBR tiles, Three.js MIT
   dependency and cache remain. Coverage: 60 authored / 360 reconstructions;
   next work starts at Dex #61.
+
+
+## Individual monster meshes — v42
+
+- Harzback, Lampjell, Curbowl, Tarslug, Plugeel and Lidtoad geometry is authored
+  in `src/game/monster-sculpts-f.ts` and `monster-sculpts-f-aquatic.ts` from
+  the owner's retained original first-pose sprites. Original source hashes
+  remain registered in `monster-authored.ts`; complete sheets stay intact.
+- No external model or texture pack is introduced. Existing project PBR tiles,
+  Three.js MIT dependency and bounded geometry cache are reused. Coverage:
+  66 authored / 354 smooth reconstructions; next work starts at Dex #67.

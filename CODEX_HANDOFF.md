@@ -1,3 +1,12 @@
+# v42 — individuelle Originalmodelle Dex 61–66 in Arbeit
+
+Annahme v42: Das nächste fertige Artenpaket umfasst Harzback, Lampjell, Curbowl, Tarslug, Plugeel und Lidtoad; verdeckte Rückseiten werden konservativ ergänzt. Echte Erstposen bestimmen Formen/Farben, vorhandene 60 Skulpturen/PBR/Mechaniken bleiben erhalten; danach weiter ab Dex #67.
+
+- Neue Dateien monster-sculpts-f.ts und monster-sculpts-f-aquatic.ts; Source-Hashes und bevorzugten Cachepfad registriert. Ein zusätzlicher geschlossener Halbkugel-Baustein formt Lampjells Glocke, ohne bestehende Formen zu verändern.
+- Prüfblöcke 1/2 abgeschlossen: 188/188 Tests + Build und ein Chromium-Touch-Smoke aller sechs als sculpted neben echter Erstpose, Drehen/Zoom/Schließen/Reload/HP0/XP17, schmales Layout ohne Browser-/Shaderfehler. Nach Bildvergleich vor CI Goldtöne vertieft, Lampjells Tentakel dünner/rund verbunden, Curbowls Stirnrillen an Kopfwölbung gelegt und Lidtoads Deckel geneigt/abgesenkt. Endstand folgt in Block 3 CI/Pages/gezielter Livevergleich; keine weitere lokale Vollprüfung.
+
+## Vorheriger veröffentlichter Stand
+
 # Aktueller Wiedereinstieg — v41 / Dex 55–60 veröffentlicht
 
 - **Fertig, gemergt, live:** PR #48, Spielcode 21ad071fbb83e525cafcf8f7cf35ca74ba037dc5. Sechs eigene Modelle nach echten lokalen Erstposen: Portwolf, Fogbank, Dockclaw, Flaskwyrm, Velourfox, Rustmaw. Stand **60 eigene Skulpturen / 360 glatte Rekonstruktionen**. Vorherige 54 Geometrien, Originalsprites/Hashes, PBR/UV/Cache und sämtliche Mechaniken/Saves bleiben erhalten. Keine Behauptung, alle 420 seien individuelle HD-Modelle oder native 4K geprüft.
