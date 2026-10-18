@@ -221,10 +221,10 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const w = Math.max(.7, obj.w * WORLD_SCALE), d = Math.max(.6, obj.h * WORLD_SCALE);
     if (obj.id === "tank") {
       box(g, w, .35, d, mat(palette.wood, "wood"));
-      box(g, w, .08, d, mat(palette.brass, "metal"), 0, 1.4);
+      box(g, w, .08, d, mat(palette.brass, "metal"), 0, 2.2);
       const glass = new THREE.MeshPhysicalMaterial({ color: 0x79a399, transparent: true, opacity: .22, roughness: .2, metalness: .05, side: THREE.DoubleSide }); glass.userData.local = true;
-      box(g, w - .08, 1, d - .08, glass, 0, .86);
-      box(g, w - .14, .05, d - .14, mat(0x355b50, undefined, 0x234b39), 0, .8);
+      box(g, w - .08, 1.8, d - .08, glass, 0, 1.26);
+      box(g, w - .14, .05, d - .14, mat(0x355b50, undefined, 0x234b39), 0, .4);
       for (let i = 0; i < 7; i++) {
         const plant = cylinder(g, .02, .045, .45 + (i % 3) * .14, mat(0x406e44), -w * .4 + i * w * .12, .63, (i % 2 - .5) * d * .3);
         plant.rotation.z = (seeded(i) - .5) * .3;

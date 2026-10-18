@@ -455,6 +455,7 @@ function clearModalMovement() {
 }
 window.addEventListener("420mon-model-opened", clearModalMovement);
 window.addEventListener("420mon-slot-opened", clearModalMovement);
+window.addEventListener("420mon-fish-opened", clearModalMovement);
 const cameraTarget = new THREE.Vector3();
 const desiredCamera = new THREE.Vector3();
 const up = new THREE.Vector3(0, 1, 0);
@@ -606,7 +607,7 @@ function animate() {
     material.depthWrite = !hidden;
   }
 
-  if (!monsterViewer.isOpen()) postProcessing.render(dt);
+  if (!monsterViewer.isOpen() && !document.querySelector('.fish-overlay[data-aquarium="open"]')) postProcessing.render(dt);
   const graphicsState = postProcessing.getDiagnostics();
   renderer.domElement.dataset.graphics = graphicsState.mode;
   renderer.domElement.dataset.bloom = String(graphicsState.bloom);

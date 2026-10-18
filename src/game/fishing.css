@@ -54,3 +54,6 @@
 .fish-food button { flex:1; }
 .fish-active-effects { color:#dec993; font-size:12px; line-height:1.6; }
 @media(max-width:680px) { .fish-overlay {padding:8px;} .fish-panel {max-height:calc(100dvh - 16px);} .fish-panel header {padding:15px 16px 13px;} .fish-panel h2 {font-size:24px;} .fish-tabs {padding:0 14px 12px;} .fish-content {padding:15px;} .fish-note {padding:11px 15px;} .fish-catalog {grid-template-columns:1fr;} }
+
+.aquarium-stage { height: min(52dvh, 390px); min-height: 200px; width: 100%; border: 1px solid #9ab89580; border-radius: 8px; overflow: hidden; margin-bottom: 14px; background: #081e27; }
+.aquarium-stage canvas { width: 100%; height: 100%; display: block; }
