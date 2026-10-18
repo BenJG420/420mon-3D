@@ -90,3 +90,14 @@ foot/knee phase when sprint starts or ends. No additional third-party assets.
 - No external model or texture pack is introduced. Existing project PBR tiles,
   Three.js MIT dependency and bounded geometry cache are reused. Coverage:
   66 authored / 354 smooth reconstructions; next work starts at Dex #67.
+
+
+## Individual monster meshes — v43
+
+- Spilleye, Gongling, Maskwisp, Lipkrait, Magtick and Valvekoi geometry is
+  authored in `src/game/monster-sculpts-g.ts` and `monster-sculpts-g-creatures.ts`
+  from the owner's retained original first-pose sprites. Original source/hash
+  references stay in `monster-authored.ts`; full original sheets remain intact.
+- No external mesh/texture pack is introduced. Curves and revolved profiles use
+  the existing Three.js MIT dependency; project PBR tiles and bounded cache
+  remain. Coverage: 72 authored / 348 reconstructions; next work is Dex #73.

@@ -1,3 +1,8 @@
+> **v43 in preparation:** own models Dex #67–72, Spilleye through Valvekoi.
+> Source coverage: 72 authored / 348 reconstructions. Rounds 1/2 passed:
+> 188 tests + build and one six-model touch smoke. Final CI/Pages/live artifact
+> check pending in round 3; previous live release recorded below.
+
 > **Published v42:** Originalmonster Dex #61–66 [PR #49](https://github.com/BenJG420/420mon-3D/pull/49),
 > source `b3eff54`. PR CI 39145731155 and main CI 39145817743 green
 > (188 tests + build); Pages 39145817734 green. Live asset names match the build:
@@ -8,7 +13,7 @@
 > **NEXT: original species from Dex #67. Current coverage: 66 authored / 354
 > smooth reconstructions.** Same `/test/` URL/save slots; three check rounds used.
 
-# Original-world test build v42
+# Original-world test build v43
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -615,8 +620,9 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-18)
 
-Current v42: PR #49 is published, 66 individual sculptures / 354 smooth
-reconstructions. Continue original species at Dex #67; do not restart #61–66.
+Current v43 source: 72 individual sculptures / 348 smooth reconstructions.
+Dex #67–72 implemented; checks/publication pending (top). Continue at Dex #73
+after publication; do not restart #67–72.
 
 Existing PR #39 and the HD/PBR pass #46 are merged and published. Preserve
 the authored models and rendering pipeline while completing remaining species.
@@ -727,9 +733,18 @@ Lidtoad (green crouched toad, beige throat and radial manhole lid). Each uses
 the real first pose, registered source hash and existing PBR/UV/cache path.
 Previous 60 geometries and all gameplay/save behavior remain intact.
 
-**NEXT:** individual anatomy/detail work for the remaining **354 original
-species, starting Dex #67**, following the 2D artwork and reference. Current
-coverage is 66 authored / 354 smooth reconstructions.
+**v43 — Dex #67–72 (publication pending):** Spilleye (tapered dripping slime,
+recessed single eye), Gongling (round spun brass shell, rolled rims, carry handle,
+feet and attached striker), Maskwisp (cracked ivory mask, deep purple eye sockets
+and curling smoke), Lipkrait (coiled pink snake, segment bands, yellow eyes and
+forked tongue), Magtick (open horseshoe magnet, rivets, inset eyes, jointed legs
+and electric forearms), Valvekoi (orange-white koi, layered fins and valve wheel).
+Each retains its actual first-pose reference/hash and existing PBR/UV/cache path.
+Previous 66 geometries and all gameplay/save behavior remain intact.
+
+**NEXT:** individual anatomy/detail work for the remaining **348 original
+species, starting Dex #73**, following the 2D artwork and reference. Current
+coverage is 72 authored / 348 smooth reconstructions.
 This pass does not claim 420 individually sculpted/production-4K creatures.
 Physical Android/native 4K visual/performance verification remains a device test.
 
