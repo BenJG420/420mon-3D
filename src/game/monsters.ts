@@ -7,6 +7,7 @@ import { getSave, saveProgress, healLiving, maxHp, type Partner } from "./save";
 import { createMonsterArt, setMonsterArt, disposeMonsterArt } from "./monster-art";
 import type { DistrictTravel } from "./world";
 import { legendByMon, windowOpen } from "./data/legend";
+import { consumeSmoke, consumeFish, fishEffectMultiplier } from "./fish-consumption";
 import { ITEMS } from "./data/items";
 import { spriteUrl } from "./sprites";
 import { makeInst, toFighter, turnSpe, execMove, tickStatus, pickEnemyMove, xpFor, tryLevel, tryTrainerLevel, catchChance, statusName, ivScore, type Fighter } from "./battle";
@@ -457,12 +458,17 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
     if (!active || phase !== "choose") return;
     get("monster-party-list").hidden = true;
     const host = get("monster-item-list"); host.hidden = !host.hidden; host.replaceChildren();
-    const items = Object.keys(saved.inventory).filter(id => saved.inventory[id] >= 1 && ["heal", "heal_all"].includes(ITEMS[id]?.use ?? ""));
-    if (!items.length) { const empty = document.createElement("p"); empty.textContent = "Keine Heilitems im Inventar. Händler verkaufen Nachschub."; host.appendChild(empty); }
+    const items = Object.keys(saved.inventory).filter(id => saved.inventory[id] >= 1 && ["heal", "heal_all", "smoke"].includes(ITEMS[id]?.use ?? ""));
+    if (!items.length) { const empty = document.createElement("p"); empty.textContent = "Keine konsumierbaren Items im Inventar. Händler verkaufen Nachschub."; host.appendChild(empty); }
     for (const id of items) {
       const it = ITEMS[id], button = document.createElement("button"); button.type = "button"; button.textContent = `${it.name} ×${saved.inventory[id]} · ${it.desc}`;
       button.addEventListener("click", () => {
         if (phase !== "choose" || saved.inventory[id] < 1) return;
+        if (it.use === "smoke") {
+          const result = it.cat === "fish" ? consumeFish(saved, id) : consumeSmoke(saved, id, saveProgress);
+          if (it.cat === "fish" && result.ok) save();
+          closeSubmenus(); addLog(result.lines.join(" ")); updateBattle(); return;
+        }
         syncFighters();
         const living = saved.team.filter(mon => mon.hp > 0 && mon.hp < maxHp(mon));
         const targets = it.use === "heal_all" ? living : living.sort((a, b) => (maxHp(b) - b.hp) - (maxHp(a) - a.hp)).slice(0, 1);
@@ -511,7 +517,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
         if (!mon.alive) {
           if (mon === active) continue;
           if (!mon.respawnAllowed) continue;
-          mon.respawn += dt;
+          mon.respawn += dt * fishEffectMultiplier(saved, "catch");
           if (mon.respawn >= 90) {
             // A fresh wild individual enters the habitat; defeated team HP stays zero.
             const picked = pickEncounter(mon.pool);

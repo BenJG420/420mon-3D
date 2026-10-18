@@ -50,13 +50,13 @@ export function fishEffectMultiplier(s: Save, effect: FishEffectId): number {
 }
 
 /** Consume an owned catalogue fish once. Catch history and party HP are untouched. */
-export function consumeFish(s: Save, id: string): { ok: boolean; lines: string[] } {
+function consumeBuffItem(s: Save, id: string, smoke: boolean, random = Math.random): { ok: boolean; lines: string[] } {
   const item = ITEMS[id];
-  if (!Object.prototype.hasOwnProperty.call(FISH_BY_ID, id) || item?.cat !== "fish" || item.use !== "smoke") {
-    return { ok: false, lines: ["Das ist kein essbarer Fisch."] };
+  if (smoke ? !item || !["smoke", "bud"].includes(item.cat) || item.use !== "smoke" : !Object.prototype.hasOwnProperty.call(FISH_BY_ID, id) || item?.cat !== "fish" || item.use !== "smoke") {
+    return { ok: false, lines: ["Dieses Item ist hier nicht konsumierbar."] };
   }
   const owned = finite(s.inventory[id], 0);
-  if (owned < 1) return { ok: false, lines: ["Diesen Fisch hast du nicht im Beutel."] };
+  if (owned < 1) return { ok: false, lines: ["Dieses Item hast du nicht im Beutel."] };
 
   const time = now(s);
   // Materialize separate legacy deadlines before highUntil is recomputed.
@@ -80,9 +80,22 @@ export function consumeFish(s: Save, id: string): { ok: boolean; lines: string[]
     const left = Math.max(1, Math.ceil(finite(s[`${effect.key}Until`], 0) - time));
     applied.push(`${effect.name} +${Math.round((finite(s[effect.key], 1) - 1) * 100)}% ${left}s`);
   };
-  for (const effect of EFFECTS) {
-    const value = finite(item[effect.item], 1);
-    if (value > 1) add(effect, value);
+  if (smoke && item.strain === "hybrid") {
+    const choices = [...EFFECTS.slice(0, 4)];
+    if ((item.hybridRolls ?? 1) < 3) {
+      for (let i = choices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.max(0, Math.min(1 - Number.EPSILON, finite(random(), 0))) * (i + 1));
+        [choices[i], choices[j]] = [choices[j], choices[i]];
+      }
+    }
+    const count = (item.hybridRolls ?? 1) >= 3 ? 3 : Math.max(1, Math.min(4, item.hybridRolls ?? 1));
+    const defaults = [1.4, 1.2, 1.18, 1.2];
+    for (const effect of choices.slice(0, count)) add(effect, finite(item[effect.item], defaults[EFFECTS.indexOf(effect)]));
+  } else {
+    for (const effect of EFFECTS) {
+      const value = finite(item[effect.item], 1);
+      if (value > 1) add(effect, value);
+    }
   }
   // Matches applySmoke's catch fallback; every original fish has explicit buffs.
   if (!applied.length) add(EFFECTS[0], 1.4);
@@ -91,5 +104,23 @@ export function consumeFish(s: Save, id: string): { ok: boolean; lines: string[]
   if (owned === 1) delete s.inventory[id];
   else s.inventory[id] = owned - 1;
   const catchNote = applied.some(line => line.startsWith("Fang")) ? " Mehr Wild auf der Straße." : "";
-  return { ok: true, lines: [`${item.name} gegessen. ${applied.join(" · ")}.${catchNote}`] };
+  return { ok: true, lines: [`${item.name} ${smoke ? "geraucht" : "gegessen"}. ${applied.join(" · ")}.${catchNote}`] };
 }
+
+/** Original runtime.useItem/applySmoke, revision 010807da77df8468a297adf33eaf1fb5c9a61c8b. */
+export function consumeSmoke(s: Save, id: string, persist: () => boolean = () => true, random = Math.random) {
+  const fields = ["highMul", "highUntil", ...EFFECTS.flatMap(e => [e.key, `${e.key}Until`])];
+  const before = new Map(fields.map(key => [key, s[key]]));
+  const owned = s.inventory[id];
+  const result = consumeBuffItem(s, id, true, random);
+  if (!result.ok) return result;
+  let saved = false;
+  try { saved = persist(); } catch { /* Roll back consumption if storage is unavailable. */ }
+  if (!saved) {
+    for (const [key, value] of before) { if (value === undefined) delete s[key]; else s[key] = value; }
+    if (owned === undefined) delete s.inventory[id]; else s.inventory[id] = owned;
+    return { ok: false, lines: ["Speichern fehlgeschlagen. Das Item bleibt erhalten."] };
+  }
+  return result;
+}
+export function consumeFish(s: Save, id: string) { return consumeBuffItem(s, id, false); }

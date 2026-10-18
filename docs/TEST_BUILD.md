@@ -1,3 +1,5 @@
+> **v37 consumption:** implementation complete; publication in progress. Next: original menu/inventory (7).
+
 > **Published v36:** Gebäude-Verdeckung [PR #43](https://github.com/BenJG420/420mon-3D/pull/43),
 > source `3532ec2`. Final PR CI 39117667491 and main CI 39117726567 green
 > (178 tests + build); Pages 39117726554 green. Live asset filenames match the
@@ -9,7 +11,7 @@
 > Same `/test/` URL/save slots. Three check rounds used; no further smoke loop.
 > Extra settled-camera live screenshot exceeded its budget; visual device check remains.
 
-# Original-world test build v36
+# Original-world test build v37
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -365,6 +367,14 @@ origin's localStorage.
 
 ## Validation
 
+v37 round 1: 182/182 tests and build green. Four new checks cover all original
+Joint/Bud items, exact consumption, stacking/cap/expiry, hybrid selection,
+Zero-Day, XP/reward consumers, legacy clocks, fish coexistence, storage rollback
+and HP0/reference preservation. Round 2 passed one touch smoke: Joint/Bud consumption, strongest stacked catch
+bonus, reload, combat use without a turn/HP loss, HP0/XP17 and narrow layout
+without browser/shader errors. Round 3: CI/Pages.
+
+
 v36 round 1: 178/178 tests + test-channel build green. Three new regression
 checks cover complete houses, head/shoulder coverage, camera inside a wall,
 geometry/camera preservation and exact state restoration on map replacement.
@@ -404,7 +414,7 @@ Pages and exact live artifact verification. No further whole smoke/test loop.
 Physical Android and native 4K remain device checks.
 
 `npm test` runs real TypeScript modules through Node's test runner. The current
-suite has 178 regression tests covering 420 assets, restored source hashes, battle save
+suite has 182 regression tests covering 420 assets, restored source hashes, battle save
 references, defeated HP, capture overflow, legacy/original save migration, Grow
 rules, offline progress, all original map coordinates/68 transitions and world
 interaction/resource ownership, source combat formulas/status/evolution and
@@ -566,15 +576,19 @@ Numbers retain Bens package IDs; packages 6/7 precede the monster art pass.
    return when clear or on map replacement. Camera, geometry, collision and
    all gameplay/save behavior remain unchanged.
 
-### 6) NEXT — Joint und Bud konsumieren
+### 6) DONE — v37 Joint und Bud konsumieren
 
-Joint und Bud lassen sich derzeit nicht konsumieren. Konsum und zugehörige
-Effekte anhand von **BenJG420/420mon** umsetzen; Originalbedingungen,
-Verbrauchsmengen, Zielauswahl und Effekte direkt aus der 2D-Implementierung
-übernehmen. Bestehende Items, Speicherstände und die bewusste HP0-/Matratzenregel
-behalten. Ein fertiges spielbares Paket, ein PR.
+Joint und Bud lassen sich im Inventar und im Kampf konsumieren. Originale
+runtime.useItem/applySmoke-Regeln aus BenJG420/420mon (010807da77df8468a297adf33eaf1fb5c9a61c8b):
+ein Item, stärkster Wert, getrennte Spielzeit-Uhren, maximal 600s Verlängerung;
+Hybrid würfelt unterschiedliche Effekte, Zero-Day gewährt Fang/Tempo/Gold.
+Vorhandene Fang-, Lauf-, Gold-, Loot- und EP-Verbraucher nutzen dieselben Felder
+wie Fischboni. Mehr Wild bedeutet im vorhandenen 3D-Habitat kürzere Respawnzeit
+für gewöhnliche Wildmonster. Kein neuer Begegnungsmodus. Konsum im Kampf kostet
+keinen Zug; HP0/Team/Collection bleiben erhalten. Speicherfehler rollen Joint-/
+Bud-Verbrauch und Effekte zurück. Ein Paket/PR; Prüfung/Veröffentlichung oben.
 
-### 7) Danach — Menü und Inventar wie im 2D-Original
+### 7) NEXT — Menü und Inventar wie im 2D-Original
 
 **BenJG420/420mon** als Vorlage für Aussehen und Funktion verwenden: gleiche
 Menüstruktur und Itemdarstellung mit originalen Kategorien, Reihenfolge,
