@@ -1,13 +1,12 @@
-> **v38 original menu/inventory:** implemented; final CI/publication in progress. Next: HD/PBR monsters.
-
-> **Published v37:** Joint-/Bud-Konsum [PR #44](https://github.com/BenJG420/420mon-3D/pull/44),
-> source `43f9f74`. PR CI 39123262088 and main CI 39123329918 green
-> (182 tests + build); Pages 39123329846 green. Live JS/CSS byte-identical to
-> the local checked build: `index-CYah1Lss.js`, SHA256
-> `bcbf4f4c11c0a9ddd5abe7d2d1c0e8f2d9aa51ea9018b9e7f1a78fe17207dfe5`,
-> CSS `index-BW3ctqqL.css`. Stable root remains `index-DWZ4yP_E.js`.
-> **Next: original menu/inventory (7)**, then HD/PBR monsters (5) and remaining species.
-> Same `/test/` URL/save slots. Three check rounds completed, no extra smoke.
+> **Published v38:** Menü-/Inventar-Paket [PR #45](https://github.com/BenJG420/420mon-3D/pull/45),
+> merge `49c45ae`; final source `d647027` includes the small Dex-Escape follow-up.
+> PR CI 39127549873 and final main CI 39127707317 green (185 tests + build);
+> Pages 39127707316 green. Live asset names match the Pages build:
+> `index-CwOCArVd.js`, SHA256 `5bb3baf5da4f56472be387b5d1f6e58c73e6d8122490ddd43453ba8754eb6f92`,
+> CSS `index-tKfj-jno.css`. Stable root remains `index-DWZ4yP_E.js`.
+> Final targeted live check passed panel bounds, inventory T and Dex Escape.
+> **Next: HD/PBR monster art (5)**, then remaining species. Same `/test/` URL/save slots.
+> Online menu entries explicitly link to the 2D original; no 3D online server.
 
 # Original-world test build v38
 
@@ -369,14 +368,26 @@ origin's localStorage.
     battle use Items to consume one: enemy HP/turn/partner HP must not change.
     Defeated partners remain at zero HP until physical mattress rest.
 
+29. Open Menü: Pause lists destinations in the 2D order. Choose Inventar, open
+    categories and use their separate action buttons. Healing opens the partner
+    picker; KO/full entries are disabled. I toggles inventory, T switches the
+    original trashbag shortcut, Esc returns/back/closes. Unknown saved items
+    remain under Sonstiges. Party retains Box access; 3D equipment is below
+    the original inventory. Dex → 3D ansehen must close correctly with Esc.
+    Online menu entries open the 2D original in another tab, without save transfer.
+
 ## Validation
 
 v38 round 1: 182 existing tests + build passed. Round 2: three targeted new
 inventory/menu tests + build and one touch smoke passed (categories/quantities,
 explicit healing with KO protected, consumption, Party/Box, shortcuts, modal
 Escape, reload/unknown items, narrow layout, no browser/shader errors). Final
-CSS panel sizes and inventory T shortcut are checked in round 3 CI/deployment;
-no repeated local full test/smoke. Online pages remain links to the 2D version.
+CSS panel sizes, inventory T shortcut and a follow-up guard letting the overlaid
+Dex studio handle Escape were checked in round 3: final CI passed all 185 tests
+and build; Pages and live artifact names/hash passed. A targeted live check
+confirmed final bounds/T/Dex Escape with no browser/shader errors. No repeated
+local full test/smoke. Online pages remain links to the 2D version; physical
+Android/native 4K remain device checks.
 
 
 v37 round 1: 182/182 tests and build green. Four new checks cover all original
@@ -601,7 +612,7 @@ für gewöhnliche Wildmonster. Kein neuer Begegnungsmodus. Konsum im Kampf koste
 keinen Zug; HP0/Team/Collection bleiben erhalten. Speicherfehler rollen Joint-/
 Bud-Verbrauch und Effekte zurück. Ein Paket/PR; Prüfung/Veröffentlichung oben.
 
-### 7) DONE — v38 Menü und Inventar nach dem 2D-Original
+### 7) DONE — PR #45 / v38 Menü und Inventar nach dem 2D-Original
 
 Pause-Menü nach originaler Reihenfolge (Hilfe, Leute/Chat, Nachrichten,
 Änderungen, Inventar, Dex, Quests, Erfolge, Party, Weltkarte, Kapsel, Feedback,
