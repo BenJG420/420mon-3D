@@ -1,3 +1,5 @@
+> v36 Abschlusskorrektur vor Merge: Wechsel opaque/transparent setzt explizit material.needsUpdate für die passende Three.js-Shader-Variante (auch bei Wiederherstellung); keine Vector3-Allokationen im Sichtkorridor. Dritter CI-/Deploy-Check prüft den endgültigen Stand, keine neue lokale Vollsuite.
+
 # v36 — Gebäude-Verdeckung
 
 Annahme v36: Zusammengehörige Wand-, Sockel-, Dach- und Fassadenteile werden als ein Haus weich ausgeblendet, sobald der Sichtkorridor Kopf/Rumpf/Füße verdeckt; Geometrie, Kamera, Kollision und Saves bleiben unverändert.

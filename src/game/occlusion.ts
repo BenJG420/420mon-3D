@@ -12,7 +12,7 @@ export function createPlayerOcclusion() {
   const samples = [[0, .25, 0], [0, 1, 0], [0, 1.75, 0], [-.38, 1.1, 0], [.38, 1.1, 0]];
   function restore() {
     for (const block of blocks) {
-      block.surfaces.forEach(s => { s.material.opacity = s.opacity; s.material.transparent = s.transparent; s.material.depthWrite = s.depthWrite; });
+      block.surfaces.forEach(s => { s.material.opacity = s.opacity; if (s.material.transparent !== s.transparent) { s.material.transparent = s.transparent; s.material.needsUpdate = true; } s.material.depthWrite = s.depthWrite; });
       block.meshes.forEach((mesh, i) => { mesh.castShadow = block.shadows[i]; });
     }
     blocks = []; source = undefined;
@@ -41,7 +41,7 @@ export function createPlayerOcclusion() {
       let count = 0;
       for (const block of blocks) {
         const blocked = samples.some(([x, y, z]) => {
-          target.copy(player).add(new THREE.Vector3(x, y, z));
+          target.set(player.x + x, player.y + y, player.z + z);
           direction.subVectors(target, camera); const distance = direction.length();
           if (distance < .01) return false;
           ray.set(camera, direction.multiplyScalar(1 / distance));
@@ -54,7 +54,8 @@ export function createPlayerOcclusion() {
         if (block.fade > .001) count++;
         for (const s of block.surfaces) {
           s.material.opacity = s.opacity * (1 - .94 * block.fade);
-          s.material.transparent = s.transparent || block.fade > 0;
+          const transparent = s.transparent || block.fade > 0;
+          if (s.material.transparent !== transparent) { s.material.transparent = transparent; s.material.needsUpdate = true; }
           s.material.depthWrite = block.fade > 0 ? false : s.depthWrite;
         }
         block.meshes.forEach((mesh, i) => { mesh.castShadow = block.fade > .05 ? false : block.shadows[i]; });

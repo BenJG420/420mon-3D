@@ -10,8 +10,9 @@ function mesh(x,y,z,w=3,h=4,d=1){const m=new THREE.Mesh(new THREE.BoxGeometry(w,
 function settle(controller,blocks,camera,player,n=60){let count;for(let i=0;i<n;i++)count=controller.update(blocks,camera,player,1/60);return count;}
 test('whole house fades including roof trim; unrelated houses and camera/collision geometry stay intact',()=>{
  const wall=mesh(0,2,3),trim=mesh(0,4.5,3),other=mesh(12,2,3);wall.userData.occlusionGroup=trim.userData.occlusionGroup='house';
+ const materialVersion=wall.material.version;
  const blocks=[wall,trim,other],c=createPlayerOcclusion(),camera=v(0,3,8),player=v(0,0,0),before=wall.geometry.attributes.position.array.slice();
- assert.equal(settle(c,blocks,camera,player),1);assert.ok(wall.material.opacity<.07);assert.equal(trim.material.opacity,wall.material.opacity);assert.equal(other.material.opacity,1);assert.equal(wall.castShadow,false);assert.equal(wall.material.depthWrite,false);assert.deepEqual(wall.geometry.attributes.position.array,before);assert.deepEqual(camera,v(0,3,8));
+ assert.equal(settle(c,blocks,camera,player),1);assert.ok(wall.material.opacity<.07);assert.equal(trim.material.opacity,wall.material.opacity);assert.equal(other.material.opacity,1);assert.ok(wall.material.version>materialVersion, "transparent transition recompiles the opaque shader variant");assert.equal(wall.castShadow,false);assert.equal(wall.material.depthWrite,false);assert.deepEqual(wall.geometry.attributes.position.array,before);assert.deepEqual(camera,v(0,3,8));
  settle(c,blocks,v(8,3,0),player);assert.equal(wall.material.opacity,1);assert.equal(wall.material.transparent,false);assert.equal(wall.castShadow,true);c.dispose();
 });
 test('head/shoulder corridor and camera inside a building are detected; geometry behind the player is ignored',()=>{
