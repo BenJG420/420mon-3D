@@ -1,9 +1,14 @@
 import * as THREE from "three";
+import { createMonsterSurface } from "./monster-surface";
 import { DEX } from "./data/dex";
 import { SPRITE_FRAME, spriteUrl } from "./sprites";
 import { acquireMonsterModel, type MonsterModelLease } from "./monster-models";
 
-const modelMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .84, metalness: .025, flatShading: true });
+const surface = createMonsterSurface(typeof navigator !== "undefined" && /Android|iPhone|iPad/i.test(navigator.userAgent) ? 512 : 1024);
+function materialFor(id: string) {
+  const types=DEX[id]?.types ?? [];
+  return types.includes("steel") ? surface.metal : types.some(t=>t==="water"||t==="poison") ? surface.wet : surface.material;
+}
 const shadowGeometry = new THREE.CircleGeometry(.48, 20);
 const haloGeometry = new THREE.TorusGeometry(.57, .012, 4, 32);
 const loader = new THREE.TextureLoader();
@@ -97,7 +102,7 @@ export function setMonsterArt(group: THREE.Group, speciesId: string, glow = 0x56
   void acquireMonsterModel(speciesId).then(lease => {
     if (state.disposed || state.generation !== generation) { lease.release(); return; }
     clearArt(state); state.lease = lease;
-    const mesh = new THREE.Mesh(lease.geometry, modelMaterial);
+    const mesh = new THREE.Mesh(lease.geometry, materialFor(speciesId));
     mesh.name = `monster-model-${speciesId}`; mesh.castShadow = true; mesh.receiveShadow = false;
     state.pivot.add(mesh);
     Object.assign(group.userData, { modelStatus: "ready", mode: "source-volume", modelKind: lease.kind, sourceSprite: lease.data.sourceSprite, sourceHash: lease.data.sourceHash });
