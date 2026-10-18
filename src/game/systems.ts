@@ -293,6 +293,8 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
   q("systems-close").onclick = close;
   host.querySelector<HTMLElement>(".systems-scrim")!.onclick = close;
   window.addEventListener("keydown", event => {
+    // The Dex model studio owns Escape/focus while it sits above this menu.
+    if (!panel.hidden && document.querySelector(".monster-model-overlay:not([hidden])")) return;
     if (event.repeat || event.defaultPrevented) return;
     if ((event.target as HTMLElement)?.closest("input,select,textarea,[contenteditable=true]") && event.code !== "Escape" && event.key !== "Tab") return;
     if (!panel.hidden) {
