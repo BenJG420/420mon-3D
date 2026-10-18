@@ -1,3 +1,5 @@
+> **v40 individual models Dex 49–54:** implemented; checks/publication in progress.
+
 > **Published v39:** Monster-Oberflächen/PBR [PR #46](https://github.com/BenJG420/420mon-3D/pull/46),
 > source `89291cc`. PR CI 39132161513 and main CI 39132260503 green
 > (188 tests + build); Pages 39132260547 green. Live asset names match the build:
@@ -8,7 +10,7 @@
 > **NEXT: individually sculpt remaining species from Dex #49.** 48 authored / 372
 > smooth reconstructions; do not claim 420 detailed HD anatomies or native 4K verification.
 
-# Original-world test build v39
+# Original-world test build v40
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -336,7 +338,7 @@ origin's localStorage.
 
 22. Open the Dex and select a captured entry marked 3D ansehen. Compare the
     original pose with its model, drag to rotate, zoom, reset and close with Esc.
-    The first 48 entries use individual sculptures; other entries identify their
+    The first 54 entries use individual sculptures; other entries identify their
     source-sprite reconstruction. Return to the world to see the same creatures.
 23. In a trainer or wild battle choose 3D ansehen under either fighter portrait.
     Inspect and close: the same battle turn remains active. Continue fighting or
@@ -380,10 +382,18 @@ origin's localStorage.
     reconstruction (Hawkerfox). Curved silhouettes now shade smoothly, surfaces
     use PBR normal/roughness detail and the studio has reflections. Rotate/zoom,
     close and reload. Reconstruction labels remain explicit: individual anatomy,
-    eyes and accessories for those 372 species are still next work. Native 4K
+    eyes and accessories for the remaining 366 species are still next work. Native 4K
     and physical Android appearance/performance remain user/device checks.
 
 ## Validation
+
+v40 round 1: 188/188 tests + build passed. Existing real geometry/provenance/
+normal/UV/budget/cache tests now cover 54 authored and 366 reconstructed species.
+Round 2 passed one original-comparison touch model smoke for all six species:
+sculpted status, rotate/zoom/close/reload, HP0/XP17 and narrow layout with no
+browser/shader errors. Round 3 is CI/Pages. No extra tests merely duplicate
+the model definitions.
+
 
 v39 round 1 passed 185 tests + build. Round 2 passed three focused new checks
 (all 372 smooth reconstructions, 48 authored meshes/UVs/budgets, PBR maps and
@@ -665,8 +675,18 @@ the temporary model viewer now has owned PMREM studio reflections. No forced
 4K DPR/textures on phones. Existing bounded model cache, async/error/fallback
 ownership and original source hashes remain. No mechanics or saves changed.
 
-**NEXT after this package:** individual anatomy/detail work for the remaining
-372 original species (start Dex #49), following the 2D artwork and reference.
+**v40 — Dex #49–54 implemented:** Hawkerfox (orange fox face, torn purple mantle,
+gold collar/amulet), Kiefhound (low quadruped with moss ridges/red eyes), Puffwraith
+(skull cloud, curled smoke arms and wisp), Blazetail (scaled lizard with raised
+layered flame tail), Rootroach (ribbed domed shell, six jointed legs, purple ports),
+Crackveil (split luminous heart, fractured dark veil, zigzag lightning). Each has
+its own geometry from the retained first pose and original source hash, uses the
+existing PBR/UV/cache integration and stays below 30k triangles. Original 48
+sculptures and all gameplay/save behavior remain unchanged.
+
+**NEXT:** individual anatomy/detail work for the remaining **366 original
+species, starting Dex #55**, following the 2D artwork and reference. Current
+coverage is 54 authored / 366 smooth reconstructions.
 This pass does not claim 420 individually sculpted/production-4K creatures.
 Physical Android/native 4K visual/performance verification remains a device test.
 

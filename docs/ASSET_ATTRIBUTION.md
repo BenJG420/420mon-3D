@@ -59,3 +59,13 @@ foot/knee phase when sprint starts or ends. No additional third-party assets.
 - Three.js `MarchingCubes` and `RoomEnvironment`/PMREM addons use the existing
   Three.js MIT dependency/license above. Viewer reflection resources are owned
   by the temporary studio and released on close.
+
+## Individual monster meshes — v40
+
+- Hawkerfox, Kiefhound, Puffwraith, Blazetail, Rootroach and Crackveil geometry
+  is authored in `src/game/monster-sculpts-d.ts` from the owner's retained
+  original first-frame sprites. Source sprite/hash references are preserved
+  in `monster-authored.ts`; full original sheets remain untouched.
+- No external mesh/texture pack is introduced. The existing project PBR tiles
+  and Three.js MIT rendering dependency are reused. Coverage: 54 authored
+  sculptures, 366 smooth reconstructions; next work starts at Dex #55.
