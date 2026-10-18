@@ -1,3 +1,9 @@
+> **v42 in preparation:** six individual models for Dex #61–66, Harzback through
+> Lidtoad. Source coverage: 66 authored / 354 smooth reconstructions. Three
+> rounds: 188/188 tests + build and one six-model touch smoke passed. Final
+> visual corrections await CI/Pages/live verification in round 3; last live
+> release recorded below.
+
 > **Published v41:** Originalmonster Dex #55–60 [PR #48](https://github.com/BenJG420/420mon-3D/pull/48),
 > source `21ad071`. PR CI 39140950620 and main CI 39141065969 green
 > (188 tests + build); Pages 39141065725 green. Live asset names match the build:
@@ -8,7 +14,7 @@
 > **NEXT: original species from Dex #61. Current coverage: 60 authored / 360
 > smooth reconstructions.** Same `/test/` URL/save slots; three check rounds used.
 
-# Original-world test build v41
+# Original-world test build v42
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -615,8 +621,9 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-18)
 
-Current v41: PR #48 is published, 60 individual sculptures / 360 smooth
-reconstructions. Continue original species at Dex #61; do not restart #55–60.
+Current v42 source: 66 individual sculptures / 354 smooth reconstructions.
+Dex #61–66 implemented; rounds 1/2 passed, final CI/publication pending (top). Continue
+original species at Dex #67 after publication; do not restart #61–66.
 
 Existing PR #39 is merged and published. Keep its 48 authored/372 reconstructed
 models. Continue Bens packages below; do not start another monster batch before
@@ -718,9 +725,18 @@ Dockclaw (cargo shell, red lights, jointed legs and open pincers), Flaskwyrm
 Each is its own source-based mesh with original hash and existing PBR/UV/cache
 integration; previous 54 sculptures and gameplay/saves remain unchanged.
 
-**NEXT:** individual anatomy/detail work for the remaining **360 original
-species, starting Dex #61**, following the 2D artwork and reference. Current
-coverage is 60 authored / 360 smooth reconstructions.
+**v42 — Dex #61–66 (publication pending):** Harzback (amber resin shell,
+leaf crown, pointed mask and purple roots), Lampjell (closed amber bell, lamp
+eyes and violet tentacles), Curbowl (carved feather layers, round yellow eyes
+and hooked beak), Tarslug (tar mound, eye stalks and orange fissures), Plugeel
+(copper segments, pronged head, cyan eyes and yellow electric underside),
+Lidtoad (green crouched toad, beige throat and radial manhole lid). Each uses
+the real first pose, registered source hash and existing PBR/UV/cache path.
+Previous 60 geometries and all gameplay/save behavior remain intact.
+
+**NEXT:** individual anatomy/detail work for the remaining **354 original
+species, starting Dex #67**, following the 2D artwork and reference. Current
+coverage is 66 authored / 354 smooth reconstructions.
 This pass does not claim 420 individually sculpted/production-4K creatures.
 Physical Android/native 4K visual/performance verification remains a device test.
 

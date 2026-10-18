@@ -20,6 +20,11 @@ export class Sculpt {
   ellipsoid(color: THREE.ColorRepresentation, x: number, y: number, z: number, sx: number, sy: number, sz: number) {
     return this.add(new THREE.SphereGeometry(1, 12, 8), color, [x, y, z], [sx, sy, sz]);
   }
+  /** Closed upper half-ellipsoid: a smooth bell with a flat underside. */
+  dome(color: THREE.ColorRepresentation, x: number, y: number, z: number, sx: number, sy: number, sz: number) {
+    this.add(new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), color, [x, y, z], [sx, sy, sz]);
+    return this.add(new THREE.CircleGeometry(1, 24), color, [x, y, z], [sx, sz, 1], [Math.PI / 2, 0, 0]);
+  }
   box(color: THREE.ColorRepresentation, x: number, y: number, z: number, sx: number, sy: number, sz: number, rx = 0, ry = 0, rz = 0) {
     return this.add(new THREE.BoxGeometry(1, 1, 1), color, [x, y, z], [sx, sy, sz], [rx, ry, rz]);
   }

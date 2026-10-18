@@ -1,3 +1,14 @@
+# Current authored coverage — v42
+
+66 authored species / 354 smooth reconstructions. `monster-sculpts-f.ts` and
+`monster-sculpts-f-aquatic.ts` add Dex #61–66 Harzback, Lampjell, Curbowl,
+Tarslug, Plugeel and Lidtoad using their original first poses. Resin scales and
+roots, a closed jellyfish bell/tendrils, carved owl feathers, tar fissures,
+a segmented plug eel and a toad with a radial manhole lid are individual geometry.
+Source hashes, shared PBR/UV/cache and the <30k-triangle budget remain.
+The previous 60 sculptures and original sheets/data are unchanged. Next: Dex #67.
+Hidden surfaces are conservatively completed; no canonical back views claimed.
+
 # Current authored coverage — v41
 
 60 authored species / 360 smooth reconstructions. `monster-sculpts-e.ts` adds
