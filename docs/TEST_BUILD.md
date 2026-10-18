@@ -1,14 +1,12 @@
-> **v40 individual models Dex 49–54:** implemented; checks/publication in progress.
-
-> **Published v39:** Monster-Oberflächen/PBR [PR #46](https://github.com/BenJG420/420mon-3D/pull/46),
-> source `89291cc`. PR CI 39132161513 and main CI 39132260503 green
-> (188 tests + build); Pages 39132260547 green. Live asset names match the build:
-> `index-yFr7TIgT.js`, SHA256 `bf28748298bdbd5823ac2abe07ce0d23b04ffbd1e4adb205bf48c91266f75d16`,
+> **Published v40:** Originalmonster Dex #49–54 [PR #47](https://github.com/BenJG420/420mon-3D/pull/47),
+> source `9ffca8d`. Final PR CI 39136428487 and main CI 39136524912 green
+> (188 tests + build); Pages 39136524933 green. Live asset names match the build:
+> `index-BD6a5M5q.js`, SHA256 `fe210d67957f7424d24b6bc89521db255e3402ebc4e4860fa38d16952f4e6f4d`,
 > CSS `index-tKfj-jno.css`. Stable root remains `index-DWZ4yP_E.js`.
-> Final live check: smooth reconstruction, rotation/zoom/close/reload, HP0/XP intact,
-> no browser/shader errors. Same `/test/` URL/save slots; three rounds completed.
-> **NEXT: individually sculpt remaining species from Dex #49.** 48 authored / 372
-> smooth reconstructions; do not claim 420 detailed HD anatomies or native 4K verification.
+> One six-model original-comparison smoke and final targeted live studio check
+> passed, including HP0/XP preservation and no browser/shader errors.
+> **NEXT: original species from Dex #55. Current coverage: 54 authored / 366
+> smooth reconstructions.** Same `/test/` URL/save slots; three check rounds used.
 
 # Original-world test build v40
 
@@ -385,6 +383,12 @@ origin's localStorage.
     eyes and accessories for the remaining 366 species are still next work. Native 4K
     and physical Android appearance/performance remain user/device checks.
 
+31. Inspect Dex #49–54 Hawkerfox, Kiefhound, Puffwraith, Blazetail, Rootroach and
+    Crackveil when owned/in battle: each now uses its individual sculpture.
+    Compare the original first pose, rotate/zoom and close. Bright studio
+    surfaces use ACES tonemapping; all 54 authored models retain PBR and cache
+    ownership. Dex #55 onward remains explicitly marked smooth reconstruction.
+
 ## Validation
 
 v40 round 1: 188/188 tests + build passed. Existing real geometry/provenance/
@@ -593,6 +597,9 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-18)
 
+Current v40: PR #47 is published, 54 individual sculptures / 366 smooth
+reconstructions. Continue original species at Dex #55; do not restart #49–54.
+
 Existing PR #39 is merged and published. Keep its 48 authored/372 reconstructed
 models. Continue Bens packages below; do not start another monster batch before
 the HD/PBR pass. Historical Draft/stop notes above are superseded by this status.
@@ -675,7 +682,7 @@ the temporary model viewer now has owned PMREM studio reflections. No forced
 4K DPR/textures on phones. Existing bounded model cache, async/error/fallback
 ownership and original source hashes remain. No mechanics or saves changed.
 
-**v40 — Dex #49–54 implemented:** Hawkerfox (orange fox face, torn purple mantle,
+**DONE — PR #47 / v40 Dex #49–54:** Hawkerfox (orange fox face, torn purple mantle,
 gold collar/amulet), Kiefhound (low quadruped with moss ridges/red eyes), Puffwraith
 (skull cloud, curled smoke arms and wisp), Blazetail (scaled lizard with raised
 layered flame tail), Rootroach (ribbed domed shell, six jointed legs, purple ports),

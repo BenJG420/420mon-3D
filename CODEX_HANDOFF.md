@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v40 / Dex 49–54 veröffentlicht
+
+- **Fertig, gemergt, live:** PR #47, Spielcode 9ffca8db35b4b0244079fee49ce5224ce1427cb2. Sechs eigene Modelle aus den echten lokalen Erstposen: Hawkerfox, Kiefhound, Puffwraith, Blazetail, Rootroach, Crackveil. Source-Hashes, vollständige Sprites, bisherigen 48 Skulpturen, PBR/UV/Cache und alle Mechaniken/Saves bleiben erhalten. Stand **54 eigene Skulpturen / 366 glatte Rekonstruktionen**; keine Behauptung, alle 420 seien individuell oder in 4K geprüft.
+- **Dateien:** monster-sculpts-d.ts enthält die sechs individuellen Formen; monster-authored.ts bevorzugt sie und führt deren Original-Hashes. Fuchsgesicht/Mantel/Kragen, Moos-Vierbeiner/rote Augen, Wolkenschädel/Raucharme, geschuppte Echse/Flammenschwanz, gerippter Sechsbein-Panzer/Ports, gespaltenes Leuchtherz/Schleier/Blitze sind echte Geometrie, unter 30k Dreiecken. Verdeckte Rückseiten konservativ ergänzt. Studio bekam vor Merge ACES-Tonemapping gegen ausgebrannte helle PBR-Flächen.
+- **Drei Prüfblöcke abgeschlossen:** 1: 188/188 Tests + Build. 2: ein Chromium-Touch-Smoke für alle sechs als sculpted neben echter Erstpose, Drehen/Zoom/Schließen/Reload, HP0/XP17, schmales Layout ohne Browser-/Shaderfehler. Bestehende echte Geometrie-/Normal-/UV-/Budget-/Quellen-/Cachetests erfassen alle 54/366; keine reinen Definitionsspiegeltests ergänzt. 3: finale PR CI 39136428487, Main CI 39136524912 grün (188 + Build), Pages 39136524933 grün, Live-Dateinamen/Inhalt/Hash bestätigt. Gezielter Live-Puffwraith-Check nach Tonemapping grün. Keine weitere Vollschleife; Android/native 4K bleibt Gerätetest.
+- **Live:** https://benjg420.github.io/420mon-3D/test/ ; JS index-BD6a5M5q.js SHA256 fe210d67957f7424d24b6bc89521db255e3402ebc4e4860fa38d16952f4e6f4d; CSS index-tKfj-jno.css. Root unverändert index-DWZ4yP_E.js. Nicht als bytegleich zum ersten lokalen Build behaupten: finale Tonemapping-Zeilen wurden in CI gebaut.
+- **Nächstes Paket:** individuelle Originalarten **ab Dex #55**, davor 54 Skulpturen nicht neu bauen. Echte Erstposen lesen, Anatomie/Gesichter/Accessoires nach Vorlage erstellen und PBR/UV/Cache behalten. v40-Annahme: sechs Arten bilden ein fertiges Paket; keine Pflicht, wieder 24 auf einmal zu machen. Ein PR, max. drei Prüfblöcke, keine Rückfragen. Alle Bezirke/Mechaniken/Speicherstände und übersprungene Ko-fi/Zahlungsserver behalten.
+- Bildnachweise /workspace/scratch/420mon-audit/v40-mon_*.png, Originalkontaktbogen v40-originals.png und v40-live-mon_puffwraith.png. Abschließender Dokumentationscommit ändert nur Status; veröffentlichter Spielcode bleibt 9ffca8d.
+
+## Historischer Verlauf — ältere Next-Angaben überholt
+
 > v40 vor Merge: Studio-Renderer nutzt ACES-Tonemapping gegen überstrahlte helle PBR-Flächen. Finale CI/Pages und ein gezieltes Livebild prüfen dies im dritten Block; keine weitere lokale Vollsuite. Vorherige 48 Geometrien bleiben unverändert.
 
 # v40 — individuelle Modelle Dex 49–54
