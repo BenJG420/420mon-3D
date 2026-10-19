@@ -1,16 +1,12 @@
-> **v44 in preparation:** own models Dex #73–78, Pricecrow through Matchimp.
-> Source coverage: 78 authored / 342 reconstructions. Rounds 1/2 green:
-> 188 tests + build and one six-model touch smoke. Pitmaw eye correction awaits
-> final CI/Pages/live view in round 3; previous live release recorded below.
-
-> **Published v43:** Originalmonster Dex #67–72 [PR #50](https://github.com/BenJG420/420mon-3D/pull/50),
-> source `dbc608c`. PR CI 39164319743, main CI 39164396855 and Pages 39164396884
-> green (188 tests + build). Live JS/CSS byte-identical to the local smoke build:
-> `index-C4Xwl2Ib.js`, SHA256 `ee64b949d34de301d374baaafb19d1ef67675eb0d830c9e72213e18305358a45`;
+> **Published v44:** Originalmonster Dex #73–78 [PR #51](https://github.com/BenJG420/420mon-3D/pull/51),
+> source `9cbb0cf`. PR CI 39165042607, main CI 39165152120 and Pages 39165152009
+> green (188 tests + build). Live asset names/content/hashes verified:
+> `index-CnlEILwF.js`, SHA256 `bf6d2dd88f7eae045455e722f727381bf69ed2a910c0df7ae4589035e5e5003e`;
 > CSS `index-tKfj-jno.css`. Stable root stays `index-DWZ4yP_E.js`.
-> One six-model original-comparison touch smoke passed: rotation/zoom/close/reload,
-> HP0/XP and narrow layout, no browser/shader errors. Three rounds completed.
-> **NEXT: Dex #73. Coverage: 72 authored / 348 smooth reconstructions.**
+> Six-model original-comparison touch smoke and final Pitmaw live check passed:
+> rotation/zoom/close/reload, HP0/XP, narrow layout, no browser/shader errors.
+> **NEXT: Dex #79. Coverage: 78 authored / 342 smooth reconstructions.**
+> Three rounds completed; same test URL and save slots.
 
 # Original-world test build v44
 
@@ -617,11 +613,10 @@ relocation timed out because pagehide persistence restored the in-memory positio
 no extra smoke loop was added. Static's actual quest mutation is covered by the
 module tests; his browser interaction remains a user-check item.
 
-## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-18)
+## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-19)
 
-Current v44 source: 78 individual sculptures / 342 smooth reconstructions.
-Dex #73–78 implemented; checks/publication pending (top). Continue at Dex #79
-after publication; do not restart #73–78.
+Current v44: PR #51 is published, 78 individual sculptures / 342 smooth
+reconstructions. Continue at Dex #79; do not restart #73–78.
 
 Existing PR #39 and the HD/PBR pass #46 are merged and published. Preserve
 the authored models and rendering pipeline while completing remaining species.
@@ -741,7 +736,7 @@ and electric forearms), Valvekoi (orange-white koi, layered fins and valve wheel
 Each retains its actual first-pose reference/hash and existing PBR/UV/cache path.
 Previous 66 geometries and all gameplay/save behavior remain intact.
 
-**v44 — Dex #73–78 (publication pending):** Pricecrow (layered dark feathers,
+**DONE — PR #51 / v44 Dex #73–78:** Pricecrow (layered dark feathers,
 hooked beak, gripping toes and hanging price tag), Grafface (chipped concrete,
 cracked capstones and dripping X-eye graffiti), Pitmaw (separate rim stones,
 deep violet mouth bowl, inset eyes and inward fangs), Pothead (open terracotta

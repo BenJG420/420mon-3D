@@ -1,11 +1,14 @@
-# v44 — individuelle Originalmodelle Dex 73–78 in Arbeit
+# Aktueller Wiedereinstieg — v44 / Dex 73–78 veröffentlicht
 
-Annahme v44: Das nach abgeschlossenem PR #50 direkt beauftragte nächste Paket umfasst Pricecrow bis Matchimp; verdeckte Rückseiten führen die sichtbaren Formen/Farben konservativ fort. Vorhandene 72 Skulpturen/PBR/Mechaniken bleiben erhalten; danach weiter ab Dex #79.
+- **Fertig, gemergt, live:** PR #51, Spielcode 9cbb0cfbf1ee0e058b7f4c29b03f1f0fbdc5ac0e. Pricecrow, Grafface, Pitmaw, Pothead, Rackfan und Matchimp aus den echten lokalen Erstposen. Stand **78 eigene Skulpturen / 342 glatte Rekonstruktionen**. Die vorherigen 72 Geometrien, Originalsprites/Hashes, PBR/UV/Cache, Toolkit, Renderer, Mechaniken und Saves bleiben erhalten. Zuvor wurde Dex #67–72 vollständig als PR #50 veröffentlicht.
+- **Dateien/Merkmale:** monster-sculpts-h.ts und monster-sculpts-h-objects.ts: Gefieder/Preisschild, rissiger Graffiti-Stein, vertieftes Brunnenmaul/Zähne, offener Pflanztopf/Erde/Sprössling, Lüftergehäuse/Rotor/Gitter und Streichholzfigur/Flammenkopf. Nach Bildvergleich vor CI Pitmaws Augen innerhalb der Mulde versetzt, sodass der vordere Steinrand beide frei lässt; finaler Liveblick bestätigt die sichtbaren Augen.
+- **Drei Prüfblöcke abgeschlossen:** 1: 188/188 + Build. 2: ein Chromium-Touch-Smoke aller sechs neben Originalpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler; sechs Screenshots angesehen. 3: finale PR CI 39165042607 und Main CI 39165152120 grün (188 + Build), Pages 39165152009 grün. Live-Dateinamen/Inhalt/Hashes bestätigt; gezielter finaler Pitmaw-Liveblick samt Drehen/Zoom/Schließen/Reload/HP0/XP ohne Browser-/Shaderfehler grün. Ergebnisse über Umgebungspause erhalten; keine Prüfungen wiederholt. Physisches Android/native 4K bleibt Gerätetest.
+- **Live:** https://benjg420.github.io/420mon-3D/test/ ; JS index-CnlEILwF.js, SHA256 bf6d2dd88f7eae045455e722f727381bf69ed2a910c0df7ae4589035e5e5003e; CSS index-tKfj-jno.css. Root unverändert index-DWZ4yP_E.js. Nicht als bytegleich zum ersten lokalen Build behaupten: finale Augenpositionen wurden in CI gebaut.
+- **Nächstes Paket:** individuelle Originalarten **ab Dex #79**, vorhandene 78 behalten. Neueste Nutzeranweisung (2026-10-19): nächsten offenen Punkt mit gleichen Regeln fortsetzen. Echte Erstposen lesen, je Paket ein PR/max. drei fokussierte Prüfblöcke, keine Rückfragen. Mechaniken/Saves bleiben; Ko-fi/Zahlungsserver übersprungen.
+- Annahme v44: Sechs Arten bilden ein fertiges Paket; verdeckte Rückseiten führen sichtbare Formen/Farben konservativ fort. Dieses Paket: Pricecrow bis Matchimp; nächster Einstieg Dex #79.
+- Nachweise /workspace/scratch/420mon-audit/v44-originals.png, v44-mon_*.png, v44-live-mon_pitmaw.png und v44-tests/build/smoke/live/deploy/CI-Protokolle. Abschließender Dokumentationscommit ändert nur Status; veröffentlichter Spielcode bleibt 9cbb0cf.
 
-- Neue Dateien monster-sculpts-h.ts und monster-sculpts-h-objects.ts, registrierte Originalhashes und bevorzugter Cachepfad. Gefieder/Preisschild, Graffiti-Stein, vertieftes Brunnenmaul, offener Pflanztopf, Lüftergehäuse/Rotorgitter und räumliche Streichholzflamme sind eigene Geometrie. Toolkit und Renderer unverändert.
-- Prüfblöcke 1/2 abgeschlossen: 188/188 + Build und ein Chromium-Touch-Smoke aller sechs neben Erstpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler. Alle Screenshots geprüft. Pitmaws Augen nach Bildvergleich vor CI in der Mulde höher/nach hinten gesetzt, damit der vordere Steinrand beide frei lässt. Finale CI/Pages und gezielter Liveblick in Block 3 folgen; keine weitere lokale Vollprüfung.
-
-## Vorheriger veröffentlichter Stand
+## Historischer Verlauf — ältere Next-Angaben überholt
 
 # Aktueller Wiedereinstieg — v43 / Dex 67–72 veröffentlicht
 
