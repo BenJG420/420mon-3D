@@ -1,11 +1,16 @@
-> **v46 in preparation:** own models Dex #85–90, Bubstack through Heatsink.
-> Source coverage: 90 authored / 330 reconstructions. Round 1: build green,
-> 186/188 tests; both failures concerned Bubstack exceeding 30k triangles.
-> Its small details are reduced; round 2 budget check and corrected build passed.
-> One six-model original-comparison touch smoke passed (rotate/zoom/close/reload,
-> HP0/XP17, narrow layout, no browser/shader errors). Round 3 CI/Pages pending.
+> **Published v46:** Originalmonster Dex #85–90 [PR #53](https://github.com/BenJG420/420mon-3D/pull/53),
+> source `0829c76`. Three rounds complete: first build green, 186/188 tests
+> (both failures: Bubstack triangle budget); reduced small details, all-six budget
+> check + corrected build + one original-comparison touch smoke passed. Rotate,
+> zoom, close, reload, HP0/XP17 and narrow layout passed without browser/shader errors.
+> Final PR CI 39217287883 and main CI 39217407067 green (188 + build), Pages
+> 39217407079 green. Live JS/CSS byte-identical to the corrected smoke build:
+> `index-DKWyXFaG.js`, SHA256 `429be189d6260988d5795925ff71671f1d63511752336ccc9a2bce28129b48fe`;
+> CSS `index-tKfj-jno.css`. Stable root stays `index-DWZ4yP_E.js`.
+> **NEXT: Dex #91. Coverage: 90 authored / 330 smooth reconstructions.**
+> Same test URL and save slots; physical Android/native 4K remain device checks.
 
-> **Published v45:** Originalmonster Dex #79–84 [PR #52](https://github.com/BenJG420/420mon-3D/pull/52),
+> **Historical v45:** Originalmonster Dex #79–84 [PR #52](https://github.com/BenJG420/420mon-3D/pull/52),
 > source `a26c28c`. Three rounds complete: 188/188 tests + build; one six-model
 > original-comparison touch smoke (rotate/zoom/close/reload, HP0/XP17, narrow
 > layout, no browser/shader errors); PR CI 39190885592, main CI 39190979906
@@ -632,9 +637,9 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-19)
 
-Current v46 source: 90 individual sculptures / 330 smooth reconstructions.
-Dex #85–90 in progress; checks/publication pending (top). Continue at Dex #91
-after publication; do not restart #85–90.
+Published v46 / PR #53: 90 individual sculptures / 330 smooth reconstructions.
+Dex #85–90 are complete and live; three check rounds finished (top).
+Continue at Dex #91; do not restart #85–90.
 
 Existing PR #39 and the HD/PBR pass #46 are merged and published. Preserve
 the authored models and rendering pipeline while completing remaining species.
@@ -771,7 +776,7 @@ scalloped gold cords), Anvilant (six jointed legs, antennae and rusted anvil).
 Original first-pose references/hashes and the shared PBR/UV/cache path remain;
 previous 78 geometries, toolkit, renderer and gameplay/saves are unchanged.
 
-**v46 — Dex #85–90 (publication pending):** Bubstack (stacked pale bubbles,
+**DONE — PR #53 / v46 Dex #85–90:** Bubstack (stacked pale bubbles,
 drips and eyes), Hangscale (hook, circular dial, chains and hollow pans),
 Curbcone (orange cone, white band, purple eyes and worn foot), Neonarrow
 (magenta sign with cyan/white neon tubes), Clipin (wooden peg, visible spring

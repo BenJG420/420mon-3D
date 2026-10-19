@@ -1,12 +1,14 @@
-# v46 — individuelle Originalmodelle Dex 85–90 in Arbeit
+# Aktueller Wiedereinstieg — v46 / Dex 85–90 veröffentlicht
 
-Annahme v46: Sechs Arten bilden das nächste Paket, Bubstack bis Heatsink; verdeckte Rückseiten führen sichtbare Formen/Farben konservativ fort. Echte Erstposen bestimmen das Design, vorhandene 84 Skulpturen/PBR/Mechaniken bleiben erhalten; danach weiter ab Dex #91.
+- **Fertig, gemergt, live:** PR #53, Spielcode 0829c7690eb74a597ace5c61d232e0a627ae92a8. Bubstack, Hangscale, Curbcone, Neonarrow, Clipin und Heatsink nach echten lokalen Erstposen. Stand **90 eigene Skulpturen / 330 glatte Rekonstruktionen**. Vorherige 84 Geometrien, Quellen/Hashes, PBR/UV/Cache, Toolkit, Renderer und sämtliche Mechaniken/Saves bleiben erhalten.
+- **Dateien/Merkmale:** monster-sculpts-j.ts registriert monster-sculpts-j-props.ts und monster-sculpts-j-creatures.ts. Vier tropfende Blasenschichten, offene Waage/Haken/Ketten, Kegel mit Wickelband, Neonröhren-Pfeil, Holzklammer/Feder/Blatt, Kühlkörper/Lamellen/Entladungen. Alle unter 30k Dreiecken; keine Geometrieänderung nach Browser-Smoke.
+- **Drei Prüfblöcke abgeschlossen:** 1: Build grün, 186/188 Tests; beide Fehler betrafen Bubstacks 30k-Budget. Kleine Blasen/Tropfen reduziert. 2: Budget aller sechs und korrigierter Build grün (Bubstack 27408, Hangscale 29528); ein Chromium-Touch-Smoke aller sechs neben Originalpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler; sechs Bilder geprüft. 3: finale PR CI 39217287883 und Main CI 39217407067 grün (188 + Build), Pages 39217407079 grün. Live-JS/CSS bytegleich zum korrigierten Smoke-Build, Namen im Pages-Protokoll bestätigt. Keine weitere Vollschleife; physisches Android/native 4K bleibt Gerätetest.
+- **Live:** https://benjg420.github.io/420mon-3D/test/ ; JS index-DKWyXFaG.js, SHA256 429be189d6260988d5795925ff71671f1d63511752336ccc9a2bce28129b48fe; CSS index-tKfj-jno.css. Root unverändert index-DWZ4yP_E.js. Keine Behauptung, übrige 330 Rekonstruktionen seien individuelle HD-Anatomien.
+- **Nächstes Paket:** individuelle Originalarten **ab Dex #91**, vorhandene 90 behalten. Neueste Nutzeranweisung: nach Abschluss von #85–90 direkt nächstes offenes Paket liefern, eigener PR/max. drei fokussierte Prüfblöcke, keine Rückfragen. Mechaniken/Saves bleiben; Ko-fi/Zahlungsserver übersprungen.
+- Annahme v46: Sechs Arten bilden ein fertiges Paket; verdeckte Rückseiten führen sichtbare Formen/Farben konservativ fort. Echte Erstposen bestimmen das Design. Dieses Paket Bubstack bis Heatsink, danach weiter ab Dex #91.
+- Nachweise /workspace/scratch/420mon-audit/v46-originals.png, v46-mon_*.png, v46-tests/build/budget/smoke/CI/Pages-Protokolle und v46-deploy-proof.json. Abschließender Dokumentationscommit ändert nur Status; veröffentlichter Spielcode bleibt 0829c76.
 
-- Neue Dateien monster-sculpts-j.ts, monster-sculpts-j-props.ts und monster-sculpts-j-creatures.ts; Originalhashes registriert, bestehender bevorzugter Cachepfad. Blasenstapel, Hängewaage, Verkehrskegel, Neonpfeil, Holzklammer und Kühlkörper. Toolkit/Renderer bleiben unverändert.
-- Prüfblock 1: Build grün, 186/188 Tests; beide Fehler betrafen Bubstacks 30k-Geometriebudget. Kleine Blasen/Tropfen reduziert. Block 2: alle sechs gezielt unter 30k bestätigt (Bubstack 27408, Hangscale 29528), korrigierter Build grün; einmaliger Chromium-Touch-Smoke aller sechs neben Originalpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler grün; sechs Bilder geprüft. Danach keine Geometrieänderung. Block 3 bleibt finale CI/Pages/Deploy; keine weitere lokale Vollsuite.
-- Neueste Nutzeranweisung: Dieses Paket vollständig veröffentlichen, danach direkt das nächste offene Paket ab Dex #91 mit eigenem PR liefern.
-
-## Vorheriger veröffentlichter Stand
+## Historischer Verlauf — ältere Next-Angaben überholt
 
 # Aktueller Wiedereinstieg — v45 / Dex 79–84 veröffentlicht
 
