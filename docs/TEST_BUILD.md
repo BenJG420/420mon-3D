@@ -1,10 +1,14 @@
-> **v45 in preparation:** own models Dex #79–84, Fatcandle through Anvilant.
-> Source coverage: 84 authored / 336 reconstructions. Round 1 passed:
-> 188/188 tests + test-channel build. Round 2: six-model original-comparison
-> touch smoke passed (rotate/zoom/close/reload, HP0/XP17, narrow layout, no
-> browser/shader errors). Round 3 CI/Pages/publication pending.
+> **Published v45:** Originalmonster Dex #79–84 [PR #52](https://github.com/BenJG420/420mon-3D/pull/52),
+> source `a26c28c`. Three rounds complete: 188/188 tests + build; one six-model
+> original-comparison touch smoke (rotate/zoom/close/reload, HP0/XP17, narrow
+> layout, no browser/shader errors); PR CI 39190885592, main CI 39190979906
+> and Pages 39190979866 green. Live JS/CSS byte-identical to the local smoke build:
+> `index-DLI_qK9P.js`, SHA256 `1e08da89be982c1cb8e362eb5828261e216b1d133e92aef646a772d92d768390`;
+> CSS `index-tKfj-jno.css`. Stable root stays `index-DWZ4yP_E.js`.
+> **NEXT: Dex #85. Coverage: 84 authored / 336 smooth reconstructions.**
+> Same test URL and save slots. Physical Android/native 4K remain device checks.
 
-> **Published v44:** Originalmonster Dex #73–78 [PR #51](https://github.com/BenJG420/420mon-3D/pull/51),
+> **Historical v44:** Originalmonster Dex #73–78 [PR #51](https://github.com/BenJG420/420mon-3D/pull/51),
 > source `9cbb0cf`. PR CI 39165042607, main CI 39165152120 and Pages 39165152009
 > green (188 tests + build). Live asset names/content/hashes verified:
 > `index-CnlEILwF.js`, SHA256 `bf6d2dd88f7eae045455e722f727381bf69ed2a910c0df7ae4589035e5e5003e`;
@@ -621,9 +625,9 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-19)
 
-Current v45 source: 84 individual sculptures / 336 smooth reconstructions.
-Dex #79–84 in progress; checks/publication pending (top). Continue at Dex #85
-after publication; do not restart #79–84.
+Published v45 / PR #52: 84 individual sculptures / 336 smooth reconstructions.
+Dex #79–84 are complete and live; three check rounds passed (top).
+Continue at Dex #85; do not restart #79–84.
 
 Existing PR #39 and the HD/PBR pass #46 are merged and published. Preserve
 the authored models and rendering pipeline while completing remaining species.
@@ -752,7 +756,7 @@ a grille, magenta windings and hub eyes), Matchimp (thin wooden limbs and
 layered pointed flame head). Original first-pose/hash references and existing
 PBR/UV/cache are preserved; previous 72 geometries and gameplay/saves remain.
 
-**v45 — Dex #79–84 (publication pending):** Fatcandle (thick wax, drips, wick
+**DONE — PR #52 / v45 Dex #79–84:** Fatcandle (thick wax, drips, wick
 and flame), Fizzcap (green crown/cap, gold rim, eyes, feet and bubbles), Stoolpad
 (red padded stool, narrowed eyes, metal legs and braces), Keywisp (gray keyhole
 frame, purple spirit and bottom teeth), Boothdrape (magenta folds, eyes and

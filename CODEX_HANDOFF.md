@@ -1,11 +1,14 @@
-# v45 — individuelle Originalmodelle Dex 79–84 in Arbeit
+# Aktueller Wiedereinstieg — v45 / Dex 79–84 veröffentlicht
 
-Annahme v45: Sechs Arten bilden das nächste Paket, Fatcandle bis Anvilant; verdeckte Rückseiten führen die sichtbaren Formen/Farben konservativ fort. Echte Erstposen bestimmen das Design, vorhandene 78 Skulpturen/PBR/Mechaniken bleiben erhalten; danach weiter ab Dex #85.
+- **Fertig, gemergt, live:** PR #52, Spielcode a26c28c0dd0da3d90262914917be1b83f69b4f2e. Fatcandle, Fizzcap, Stoolpad, Keywisp, Boothdrape und Anvilant nach echten lokalen Erstposen. Stand **84 eigene Skulpturen / 336 glatte Rekonstruktionen**. Vorherige 78 Geometrien, Quellen/Hashes, PBR/UV/Cache, Toolkit, Renderer und sämtliche Mechaniken/Saves bleiben erhalten.
+- **Dateien/Merkmale:** monster-sculpts-i.ts registriert monster-sculpts-i-props.ts und monster-sculpts-i-creatures.ts. Wachs/Drips/Flamme, sprudelnde Kappe, gepolsterter Hocker, vertiefter Schlüsselgeist, Vorhangfalten/Goldschnüre und sechsbeinige Ambossameise. Alle unter 30k Dreiecken. Keine Geometrieänderungen nach lokalem Bildvergleich.
+- **Drei Prüfblöcke abgeschlossen:** 1: 188/188 Tests + Testkanal-Build. 2: ein Chromium-Touch-Smoke aller sechs neben Originalpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler; sechs Screenshots geprüft. 3: PR CI 39190885592, Main CI 39190979906 und Pages 39190979866 grün. Live-JS/CSS bytegleich zum lokal im Smoke geprüften Build und Dateinamen im Pages-Protokoll bestätigt. Keine weitere Vollschleife; physisches Android/native 4K bleibt Gerätetest.
+- **Live:** https://benjg420.github.io/420mon-3D/test/ ; JS index-DLI_qK9P.js, SHA256 1e08da89be982c1cb8e362eb5828261e216b1d133e92aef646a772d92d768390; CSS index-tKfj-jno.css. Root unverändert index-DWZ4yP_E.js. Keine Behauptung, die übrigen 336 Rekonstruktionen seien individuelle HD-Anatomien.
+- **Nächstes Paket:** individuelle Originalarten **ab Dex #85**, vorhandene 84 behalten. Ein PR/max. drei fokussierte Prüfblöcke, keine Rückfragen. Mechaniken/Saves bleiben; Ko-fi/Zahlungsserver übersprungen.
+- Annahme v45: Sechs Arten bilden ein fertiges Paket; verdeckte Rückseiten führen die sichtbaren Formen/Farben konservativ fort. Echte Erstposen bestimmen das Design. Dieses Paket Fatcandle bis Anvilant, danach weiter ab Dex #85.
+- Nachweise /workspace/scratch/420mon-audit/v45-originals.png, v45-mon_*.png, v45-tests/build/smoke/CI/Pages-Protokolle und v45-deploy-proof.json. Abschließender Dokumentationscommit ändert nur Status; veröffentlichter Spielcode bleibt a26c28c.
 
-- Neue Dateien monster-sculpts-i.ts, monster-sculpts-i-props.ts und monster-sculpts-i-creatures.ts; Originalhashes registriert, bestehender bevorzugter Cachepfad. Eigenständige Wachs-/Kappen-/Hockerformen, Schlüsselgeist, Vorhanggesicht und Ambossameise. Toolkit/Renderer bleiben unverändert.
-- Prüfblöcke 1/2 abgeschlossen: 188/188 Tests + Testkanal-Build; ein Chromium-Touch-Smoke aller sechs neben Originalpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler. Sechs Screenshots geprüft, keine nachträglichen Geometrieänderungen. Block 3 CI/Pages/Deploy steht aus. Keine weitere lokale Vollschleife.
-
-## Vorheriger veröffentlichter Stand
+## Historischer Verlauf — ältere Next-Angaben überholt
 
 # Aktueller Wiedereinstieg — v44 / Dex 73–78 veröffentlicht
 
