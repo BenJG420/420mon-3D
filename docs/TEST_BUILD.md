@@ -1,3 +1,10 @@
+> **v46 in preparation:** own models Dex #85–90, Bubstack through Heatsink.
+> Source coverage: 90 authored / 330 reconstructions. Round 1: build green,
+> 186/188 tests; both failures concerned Bubstack exceeding 30k triangles.
+> Its small details are reduced; round 2 budget check and corrected build passed.
+> One six-model original-comparison touch smoke passed (rotate/zoom/close/reload,
+> HP0/XP17, narrow layout, no browser/shader errors). Round 3 CI/Pages pending.
+
 > **Published v45:** Originalmonster Dex #79–84 [PR #52](https://github.com/BenJG420/420mon-3D/pull/52),
 > source `a26c28c`. Three rounds complete: 188/188 tests + build; one six-model
 > original-comparison touch smoke (rotate/zoom/close/reload, HP0/XP17, narrow
@@ -18,7 +25,7 @@
 > **NEXT: Dex #79. Coverage: 78 authored / 342 smooth reconstructions.**
 > Three rounds completed; same test URL and save slots.
 
-# Original-world test build v45
+# Original-world test build v46
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -625,9 +632,9 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-19)
 
-Published v45 / PR #52: 84 individual sculptures / 336 smooth reconstructions.
-Dex #79–84 are complete and live; three check rounds passed (top).
-Continue at Dex #85; do not restart #79–84.
+Current v46 source: 90 individual sculptures / 330 smooth reconstructions.
+Dex #85–90 in progress; checks/publication pending (top). Continue at Dex #91
+after publication; do not restart #85–90.
 
 Existing PR #39 and the HD/PBR pass #46 are merged and published. Preserve
 the authored models and rendering pipeline while completing remaining species.
@@ -764,9 +771,17 @@ scalloped gold cords), Anvilant (six jointed legs, antennae and rusted anvil).
 Original first-pose references/hashes and the shared PBR/UV/cache path remain;
 previous 78 geometries, toolkit, renderer and gameplay/saves are unchanged.
 
-**NEXT:** individual anatomy/detail work for the remaining **336 original
-species, starting Dex #85**, following the 2D artwork and reference. Current
-coverage is 84 authored / 336 smooth reconstructions.
+**v46 — Dex #85–90 (publication pending):** Bubstack (stacked pale bubbles,
+drips and eyes), Hangscale (hook, circular dial, chains and hollow pans),
+Curbcone (orange cone, white band, purple eyes and worn foot), Neonarrow
+(magenta sign with cyan/white neon tubes), Clipin (wooden peg, visible spring
+and green leaf), Heatsink (deep metal fins, orange eyes and violet arcs).
+Original references/hashes and shared PBR/UV/cache remain; previous 84
+geometries, toolkit, renderer and gameplay/saves are unchanged.
+
+**NEXT:** individual anatomy/detail work for the remaining **330 original
+species, starting Dex #91**, following the 2D artwork and reference. Current
+coverage is 90 authored / 330 smooth reconstructions.
 This pass does not claim 420 individually sculpted/production-4K creatures.
 Physical Android/native 4K visual/performance verification remains a device test.
 
