@@ -1,11 +1,17 @@
-> **v47 in preparation:** own models Dex #91–96, Ashpan through Spotlamp.
-> Source coverage: 96 authored / 324 reconstructions. Round 1 passed:
-> 188/188 tests + test-channel build. One six-model touch smoke passed
-> (original comparison, rotate/zoom/close/reload, HP0/XP17, narrow layout, no
-> browser/shader errors). Ypipe branches and Taperoll pitched forward after
-> image review to expose openings; final CI/Pages and focused live view pending.
+> **Published v47:** Originalmonster Dex #91–96 [PR #54](https://github.com/BenJG420/420mon-3D/pull/54),
+> source `1e46dcd`. Three rounds complete: 188/188 tests + build; one six-model
+> original-comparison touch smoke; final PR CI 39218634304, main CI 39253739794
+> and Pages 39253739612 green. Ypipe/Taperoll tilted after image review;
+> focused final live interaction passed (rotation/zoom/close/reload, HP0/XP17,
+> narrow layout, no browser/shader errors). Taperoll core visible; Ypipe still
+> partially hides its eyes behind the pipes in the initial view (visual follow-up). Live names/content/hashes verified:
+> `index-dJgNAn4W.js`, SHA256 `53ee7409945212a459e4c2e3b62bd41b6c44f44c222165f40329b4b803ed1ba4`;
+> CSS `index-tKfj-jno.css`. Stable root stays `index-DWZ4yP_E.js`.
+> **NEXT: freely combinable clothing slots. Remaining monster sculpts deferred.**
+> Coverage: 96 authored / 324 smooth reconstructions; same test URL/save slots.
+> Physical Android/native 4K remain device checks.
 
-> **Published v46:** Originalmonster Dex #85–90 [PR #53](https://github.com/BenJG420/420mon-3D/pull/53),
+> **Historical v46:** Originalmonster Dex #85–90 [PR #53](https://github.com/BenJG420/420mon-3D/pull/53),
 > source `0829c76`. Three rounds complete: first build green, 186/188 tests
 > (both failures: Bubstack triangle budget); reduced small details, all-six budget
 > check + corrected build + one original-comparison touch smoke passed. Rotate,
@@ -642,19 +648,39 @@ relocation timed out because pagehide persistence restored the in-memory positio
 no extra smoke loop was added. Static's actual quest mutation is covered by the
 module tests; his browser interaction remains a user-check item.
 
-## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-19)
+## Remaining work — Bens neue Prioritäten (2026-10-19)
 
-Current v47 source: 96 individual sculptures / 324 smooth reconstructions.
-Dex #91–96 in progress; checks/publication pending (top). Continue at Dex #97
-after publication; do not restart #91–96.
+PR #54 / v47 is complete, merged and live. Coverage is 96 individual sculptures /
+324 smooth reconstructions. The new owner order below supersedes every older
+NEXT/order note. One complete playable package per PR, maximum three check rounds.
 
-Existing PR #39 and the HD/PBR pass #46 are merged and published. Preserve
-the authored models and rendering pipeline while completing remaining species.
-Historical Draft/stop notes above are superseded by this status.
+1. **NEXT — Kleidung:** separate freely combinable slots for **Oberteil, Jacke,
+   Hose, Schuhe, Kopf, Accessoires**, including Latzhose with Lederjacke. Swapping
+   must remove the old parts without duplicates, clipping or missing pieces;
+   fitted to the existing rigs and persisted. **Test every supported combination.**
+   Preserve existing player/NPC rigs and legacy saves; use the original clothing
+   as the starting point. Combination cases belong within the three check rounds.
+2. **GUI:** declutter HUD and menus, clear hierarchy, consistent style, fewer
+   overlaps and readable desktop/touch layouts.
+3. **Performance:** measure FPS before and after; improve stable frame rates
+   through appropriate instancing, LOD, culling, texture/shader optimization and
+   a shadow budget. Record measurement scene, device/emulation and settings.
+4. **District detail — one PR per district:** preserve each original 2D layout,
+   add substantially richer visual detail matching the reference. Give roofs
+   their own tile/metal/felt materials, edges and gutters instead of floor textures.
+   Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
+   vegetation and PBR materials; improve lighting, fog and post-processing.
+   **Do not change players or NPCs in these district packages.**
+5. **DEFERRED — remaining original monster sculpts and visual follow-up:** resume at **Dex #97** only
+   after the priorities above. Preserve the 96 authored models and PBR/UV/cache.
+   Known v47 visual follow-up: Ypipe branches partly cover its eyes in the initial
+   viewer angle; the right opening is shallow at that angle. Three check rounds
+   are exhausted; no fourth loop. Rotation works, no gameplay/save error found.
 
-Then deliver these playable packages in this exact order, **one PR per package**.
-Latest user order after completed occlusion: **6 → 7 → 5**, then remaining species.
-Numbers retain Bens package IDs; packages 6/7 precede the monster art pass.
+Ko-fi and payment servers stay skipped. Preserve gameplay, saves and the stable
+root release; test URL remains https://benjg420.github.io/420mon-3D/test/.
+
+### Completed packages — historical order superseded above
 
 1. **DONE — PR #40 / v33:** correct retargeting and bone mapping for walking/running
    arms (T-pose) and the incorrectly bending knee. Inspect male/female player
@@ -791,7 +817,7 @@ and green leaf), Heatsink (deep metal fins, orange eyes and violet arcs).
 Original references/hashes and shared PBR/UV/cache remain; previous 84
 geometries, toolkit, renderer and gameplay/saves are unchanged.
 
-**v47 — Dex #91–96 (publication pending):** Ashpan (hollow metal ashtray,
+**DONE — PR #54 / v47 Dex #91–96:** Ashpan (hollow metal ashtray,
 ash, cigarette ends and sleepy eyes), Ypipe (open forked pipe, collars and bolts),
 Glovepair (two yellow gloves with separate fingers and cuff eyes), Taperoll
 (open cardboard core, white roll and loose tape), Deadend (weathered red-white
@@ -799,8 +825,9 @@ sign and post), Spotlamp (round lens, magenta housing, neck and tripod).
 Original references/hashes and shared PBR/UV/cache remain; previous 90
 geometries, toolkit, renderer and gameplay/saves are unchanged.
 
-**NEXT:** individual anatomy/detail work for the remaining **324 original
-species, starting Dex #97**, following the 2D artwork and reference. Current
+**DEFERRED until after clothing, GUI, performance and district detail:** individual
+anatomy/detail work for the remaining **324 original species, starting Dex #97**,
+following the 2D artwork and reference. Current
 coverage is 96 authored / 324 smooth reconstructions.
 This pass does not claim 420 individually sculpted/production-4K creatures.
 Physical Android/native 4K visual/performance verification remains a device test.

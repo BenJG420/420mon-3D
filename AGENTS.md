@@ -19,24 +19,28 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 9. Do not overwrite or delete the original 2D repository. Preserve source attribution and be mindful that its content is private; access requires authorization.
 10. Report what is implemented, tested, missing, and deployed factually in German. Do not repeatedly ask what to work on next when the goal is clear.
 
-## Current fix order (user instruction, updated 2026-10-19)
+## Current priority order (user instruction, 2026-10-19)
 
-Existing PR #39 and Bens animation fix PR #40 are merged; slot machines are
-completed and published as PR #41; the larger aquarium and swimming caught-fish
-view are published as PR #42; grouped building occlusion is published as PR #43.
-Joint/Bud consumption (package 6) is published as PR #44; original menu/inventory
-(package 7) is published as PR #45 (online entries explicitly link to 2D).
-Continue `docs/TEST_BUILD.md`, one package / PR:
-Monster surface/PBR pass (5) is published as PR #46; Dex #49–54 sculptures are
-published as PR #47, Dex #55–60 as PR #48 and Dex #61–66 as PR #49.
-Dex #67–72 are published as PR #50 and Dex #73–78 as PR #51.
-Dex #79–84 are published as PR #52 / v45. Dex #85–90 are published as PR #53 / v46. v47 adds Dex #91–96
-(publication status in TEST_BUILD.md). Current source coverage: 96 authored /
-324 smooth reconstructions. Next individually sculpt remaining
-original species from Dex #97, retaining the PBR pipeline/cache. Do not claim the 324
-reconstructions are individually detailed HD anatomies or native 4K verified. Read BenJG420/420mon as the source for 6/7. Do not restart the graphics packages or create a
-replacement PR #39. Preserve all mechanics/saves; Ko-fi/payment stays skipped.
-Keep the same file-read discipline and maximum three focused check rounds.
+PR #54 / v47 (Dex #91–96) is merged and published. Coverage is 96 authored /
+324 smooth reconstructions. Remaining monsters from Dex #97 are **deferred**.
+Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds:
+1. Freely combinable clothing slots: Oberteil, Jacke, Hose, Schuhe, Kopf,
+   Accessoires, including Latzhose + Lederjacke. Correct replacement without
+   duplicate/missing parts or clipping, fitted to existing rigs and persisted.
+   Test every supported combination within the existing three-check budget.
+2. Clean up HUD/menus: hierarchy, consistent style, readability, desktop/touch.
+3. Performance: measure FPS before/after; instancing, LOD, culling, textures,
+   shaders and a shadow budget as appropriate.
+4. Detail districts one by one, one PR each: preserve 2D structure, independent
+   roof materials (tile/metal/felt), edges/gutters, facades/windows/doors/signs,
+   neon/trash/cables/puddles/props/vegetation/PBR, lighting/fog/post-processing.
+   Do not change player/NPC assets or behavior in district packages.
+5. Then resume original monster sculpts at #97, retaining the 96 existing models
+   and shared PBR/cache. Do not claim 324 reconstructions are authored HD anatomy.
+No new game or restarted old packages. Preserve gameplay/saves and licensed rigs.
+Ko-fi/payment stays skipped. Read only relevant files; no routine questions;
+record assumptions in one handoff line and continue. Existing fixes PR #40–53
+are complete; detailed publication history is in TEST_BUILD.md.
 
 ## Previous graphics order (superseded by 2026-10-17 fix list)
 

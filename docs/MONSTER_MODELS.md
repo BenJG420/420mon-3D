@@ -5,7 +5,10 @@
 Ashpan, Ypipe, Glovepair, Taperoll, Deadend and Spotlamp. Open ashtray, forked
 pipe, paired gloves, tape roll, weathered sign and round spotlight use the
 retained original first poses. Original sources/hashes, previous 90 geometries,
-toolkit, renderer and shared PBR/UV/cache remain intact. Next: original Dex #97.
+toolkit, renderer and shared PBR/UV/cache remain intact. Original Dex #97 is
+deferred until after clothing, GUI, performance and district detail. Ypipe
+partly hides its eyes in the default viewer angle; visual follow-up is recorded
+in TEST_BUILD.md after the three completed v47 check rounds.
 Hidden surfaces conservatively continue the visible forms.
 
 # Historical authored coverage — v46
