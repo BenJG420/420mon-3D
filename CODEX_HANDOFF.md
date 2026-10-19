@@ -1,3 +1,13 @@
+# v46 — individuelle Originalmodelle Dex 85–90 in Arbeit
+
+Annahme v46: Sechs Arten bilden das nächste Paket, Bubstack bis Heatsink; verdeckte Rückseiten führen sichtbare Formen/Farben konservativ fort. Echte Erstposen bestimmen das Design, vorhandene 84 Skulpturen/PBR/Mechaniken bleiben erhalten; danach weiter ab Dex #91.
+
+- Neue Dateien monster-sculpts-j.ts, monster-sculpts-j-props.ts und monster-sculpts-j-creatures.ts; Originalhashes registriert, bestehender bevorzugter Cachepfad. Blasenstapel, Hängewaage, Verkehrskegel, Neonpfeil, Holzklammer und Kühlkörper. Toolkit/Renderer bleiben unverändert.
+- Prüfblock 1: Build grün, 186/188 Tests; beide Fehler betrafen Bubstacks 30k-Geometriebudget. Kleine Blasen/Tropfen reduziert. Block 2: alle sechs gezielt unter 30k bestätigt (Bubstack 27408, Hangscale 29528), korrigierter Build grün; einmaliger Chromium-Touch-Smoke aller sechs neben Originalpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler grün; sechs Bilder geprüft. Danach keine Geometrieänderung. Block 3 bleibt finale CI/Pages/Deploy; keine weitere lokale Vollsuite.
+- Neueste Nutzeranweisung: Dieses Paket vollständig veröffentlichen, danach direkt das nächste offene Paket ab Dex #91 mit eigenem PR liefern.
+
+## Vorheriger veröffentlichter Stand
+
 # Aktueller Wiedereinstieg — v45 / Dex 79–84 veröffentlicht
 
 - **Fertig, gemergt, live:** PR #52, Spielcode a26c28c0dd0da3d90262914917be1b83f69b4f2e. Fatcandle, Fizzcap, Stoolpad, Keywisp, Boothdrape und Anvilant nach echten lokalen Erstposen. Stand **84 eigene Skulpturen / 336 glatte Rekonstruktionen**. Vorherige 78 Geometrien, Quellen/Hashes, PBR/UV/Cache, Toolkit, Renderer und sämtliche Mechaniken/Saves bleiben erhalten.

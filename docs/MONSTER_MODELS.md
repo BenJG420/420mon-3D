@@ -1,4 +1,14 @@
-# Current authored coverage — v45
+# Current authored coverage — v46
+
+90 authored species / 330 smooth reconstructions. `monster-sculpts-j.ts` registers
+`monster-sculpts-j-props.ts` and `monster-sculpts-j-creatures.ts`: Dex #85–90
+Bubstack, Hangscale, Curbcone, Neonarrow, Clipin and Heatsink. Stacked bubbles,
+hanging scales, traffic cone, neon arrow, wooden peg and finned heat sink use
+the retained original first poses. Original sources/hashes, previous 84
+geometries, toolkit, renderer and shared PBR/UV/cache remain intact. Next:
+original Dex #91. Hidden surfaces conservatively continue the visible forms.
+
+# Historical authored coverage — v45
 
 84 authored species / 336 smooth reconstructions. `monster-sculpts-i.ts` registers
 `monster-sculpts-i-props.ts` and `monster-sculpts-i-creatures.ts`: Dex #79–84

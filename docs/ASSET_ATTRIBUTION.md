@@ -124,3 +124,15 @@ foot/knee phase when sprint starts or ends. No additional third-party assets.
 - No external mesh/texture pack is added. Existing project Sculpt/PBR helpers,
   bounded cache and Three.js MIT dependency remain. Coverage: 84 authored /
   336 reconstructions; next work begins at Dex #85.
+
+
+## Individual monster meshes — v46
+
+- Bubstack, Hangscale, Curbcone, Neonarrow, Clipin and Heatsink geometry is
+  authored in `src/game/monster-sculpts-j-props.ts` and
+  `monster-sculpts-j-creatures.ts`, registered by `monster-sculpts-j.ts`, using
+  the owner's retained original first-pose sprites. Full sheets are unchanged;
+  source sprite/hash references remain in `monster-authored.ts`.
+- No external mesh/texture pack is added. Existing project Sculpt/PBR helpers,
+  bounded cache and Three.js MIT dependency remain. Coverage: 90 authored /
+  330 reconstructions; next work begins at Dex #91.
