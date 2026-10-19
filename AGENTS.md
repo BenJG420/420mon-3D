@@ -19,7 +19,7 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 9. Do not overwrite or delete the original 2D repository. Preserve source attribution and be mindful that its content is private; access requires authorization.
 10. Report what is implemented, tested, missing, and deployed factually in German. Do not repeatedly ask what to work on next when the goal is clear.
 
-## Current fix order (user instruction, updated 2026-10-18)
+## Current fix order (user instruction, updated 2026-10-19)
 
 Existing PR #39 and Bens animation fix PR #40 are merged; slot machines are
 completed and published as PR #41; the larger aquarium and swimming caught-fish
@@ -30,9 +30,9 @@ Continue `docs/TEST_BUILD.md`, one package / PR:
 Monster surface/PBR pass (5) is published as PR #46; Dex #49–54 sculptures are
 published as PR #47, Dex #55–60 as PR #48 and Dex #61–66 as PR #49.
 Dex #67–72 are published as PR #50 and Dex #73–78 as PR #51.
-Current coverage: 78 authored / 342 smooth reconstructions.
-Next individually sculpt remaining original species from Dex #79, retaining the
-PBR pipeline/cache. Do not claim the 342
+v45 adds Dex #79–84 (publication status in TEST_BUILD.md). Current source coverage:
+84 authored / 336 smooth reconstructions. Next individually sculpt remaining
+original species from Dex #85, retaining the PBR pipeline/cache. Do not claim the 336
 reconstructions are individually detailed HD anatomies or native 4K verified. Read BenJG420/420mon as the source for 6/7. Do not restart the graphics packages or create a
 replacement PR #39. Preserve all mechanics/saves; Ko-fi/payment stays skipped.
 Keep the same file-read discipline and maximum three focused check rounds.
