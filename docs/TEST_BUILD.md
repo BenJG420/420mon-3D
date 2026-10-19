@@ -1,3 +1,9 @@
+> **v45 in preparation:** own models Dex #79–84, Fatcandle through Anvilant.
+> Source coverage: 84 authored / 336 reconstructions. Round 1 passed:
+> 188/188 tests + test-channel build. Round 2: six-model original-comparison
+> touch smoke passed (rotate/zoom/close/reload, HP0/XP17, narrow layout, no
+> browser/shader errors). Round 3 CI/Pages/publication pending.
+
 > **Published v44:** Originalmonster Dex #73–78 [PR #51](https://github.com/BenJG420/420mon-3D/pull/51),
 > source `9cbb0cf`. PR CI 39165042607, main CI 39165152120 and Pages 39165152009
 > green (188 tests + build). Live asset names/content/hashes verified:
@@ -8,7 +14,7 @@
 > **NEXT: Dex #79. Coverage: 78 authored / 342 smooth reconstructions.**
 > Three rounds completed; same test URL and save slots.
 
-# Original-world test build v44
+# Original-world test build v45
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -615,8 +621,9 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-19)
 
-Current v44: PR #51 is published, 78 individual sculptures / 342 smooth
-reconstructions. Continue at Dex #79; do not restart #73–78.
+Current v45 source: 84 individual sculptures / 336 smooth reconstructions.
+Dex #79–84 in progress; checks/publication pending (top). Continue at Dex #85
+after publication; do not restart #79–84.
 
 Existing PR #39 and the HD/PBR pass #46 are merged and published. Preserve
 the authored models and rendering pipeline while completing remaining species.
@@ -745,9 +752,17 @@ a grille, magenta windings and hub eyes), Matchimp (thin wooden limbs and
 layered pointed flame head). Original first-pose/hash references and existing
 PBR/UV/cache are preserved; previous 72 geometries and gameplay/saves remain.
 
-**NEXT:** individual anatomy/detail work for the remaining **342 original
-species, starting Dex #79**, following the 2D artwork and reference. Current
-coverage is 78 authored / 342 smooth reconstructions.
+**v45 — Dex #79–84 (publication pending):** Fatcandle (thick wax, drips, wick
+and flame), Fizzcap (green crown/cap, gold rim, eyes, feet and bubbles), Stoolpad
+(red padded stool, narrowed eyes, metal legs and braces), Keywisp (gray keyhole
+frame, purple spirit and bottom teeth), Boothdrape (magenta folds, eyes and
+scalloped gold cords), Anvilant (six jointed legs, antennae and rusted anvil).
+Original first-pose references/hashes and the shared PBR/UV/cache path remain;
+previous 78 geometries, toolkit, renderer and gameplay/saves are unchanged.
+
+**NEXT:** individual anatomy/detail work for the remaining **336 original
+species, starting Dex #85**, following the 2D artwork and reference. Current
+coverage is 84 authored / 336 smooth reconstructions.
 This pass does not claim 420 individually sculpted/production-4K creatures.
 Physical Android/native 4K visual/performance verification remains a device test.
 

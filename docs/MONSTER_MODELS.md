@@ -1,3 +1,14 @@
+# Current authored coverage — v45
+
+84 authored species / 336 smooth reconstructions. `monster-sculpts-i.ts` registers
+`monster-sculpts-i-props.ts` and `monster-sculpts-i-creatures.ts`: Dex #79–84
+Fatcandle, Fizzcap, Stoolpad, Keywisp, Boothdrape and Anvilant. Wax/drips/flame,
+fizzy cap, padded stool, keyhole spirit, folded stage drapery and anvil ant are
+individual geometry from retained original first poses. Original sources/hashes,
+previous 78 geometries, toolkit, renderer and shared PBR/UV/cache remain intact.
+Each stays under 30k triangles. Next: original Dex #85. Hidden surfaces are
+conservatively completed; no canonical back views claimed.
+
 # Current authored coverage — v44
 
 78 authored species / 342 smooth reconstructions. `monster-sculpts-h.ts` and

@@ -112,3 +112,15 @@ foot/knee phase when sprint starts or ends. No additional third-party assets.
 - No external model/texture/font pack is added. Existing project Sculpt/PBR
   helpers, bounded cache and Three.js MIT dependency are retained. Coverage:
   78 authored / 342 reconstructions; next work begins at Dex #79.
+
+
+## Individual monster meshes — v45
+
+- Fatcandle, Fizzcap, Stoolpad, Keywisp, Boothdrape and Anvilant geometry is
+  authored in `src/game/monster-sculpts-i-props.ts` and
+  `monster-sculpts-i-creatures.ts`, registered by `monster-sculpts-i.ts`, using
+  the owner's retained original first-pose sprites. Full sheets are unchanged;
+  source sprite/hash references remain in `monster-authored.ts`.
+- No external mesh/texture pack is added. Existing project Sculpt/PBR helpers,
+  bounded cache and Three.js MIT dependency remain. Coverage: 84 authored /
+  336 reconstructions; next work begins at Dex #85.

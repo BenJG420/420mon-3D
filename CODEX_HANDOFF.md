@@ -1,3 +1,12 @@
+# v45 — individuelle Originalmodelle Dex 79–84 in Arbeit
+
+Annahme v45: Sechs Arten bilden das nächste Paket, Fatcandle bis Anvilant; verdeckte Rückseiten führen die sichtbaren Formen/Farben konservativ fort. Echte Erstposen bestimmen das Design, vorhandene 78 Skulpturen/PBR/Mechaniken bleiben erhalten; danach weiter ab Dex #85.
+
+- Neue Dateien monster-sculpts-i.ts, monster-sculpts-i-props.ts und monster-sculpts-i-creatures.ts; Originalhashes registriert, bestehender bevorzugter Cachepfad. Eigenständige Wachs-/Kappen-/Hockerformen, Schlüsselgeist, Vorhanggesicht und Ambossameise. Toolkit/Renderer bleiben unverändert.
+- Prüfblöcke 1/2 abgeschlossen: 188/188 Tests + Testkanal-Build; ein Chromium-Touch-Smoke aller sechs neben Originalpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler. Sechs Screenshots geprüft, keine nachträglichen Geometrieänderungen. Block 3 CI/Pages/Deploy steht aus. Keine weitere lokale Vollschleife.
+
+## Vorheriger veröffentlichter Stand
+
 # Aktueller Wiedereinstieg — v44 / Dex 73–78 veröffentlicht
 
 - **Fertig, gemergt, live:** PR #51, Spielcode 9cbb0cfbf1ee0e058b7f4c29b03f1f0fbdc5ac0e. Pricecrow, Grafface, Pitmaw, Pothead, Rackfan und Matchimp aus den echten lokalen Erstposen. Stand **78 eigene Skulpturen / 342 glatte Rekonstruktionen**. Die vorherigen 72 Geometrien, Originalsprites/Hashes, PBR/UV/Cache, Toolkit, Renderer, Mechaniken und Saves bleiben erhalten. Zuvor wurde Dex #67–72 vollständig als PR #50 veröffentlicht.
