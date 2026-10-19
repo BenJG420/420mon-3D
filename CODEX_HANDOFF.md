@@ -1,3 +1,12 @@
+# v47 — individuelle Originalmodelle Dex 91–96 in Arbeit
+
+Annahme v47: Sechs Arten bilden das nächste Paket, Ashpan bis Spotlamp; verdeckte Rückseiten führen sichtbare Formen/Farben konservativ fort. Echte Erstposen bestimmen das Design, vorhandene 90 Skulpturen/PBR/Mechaniken bleiben erhalten; danach weiter ab Dex #97.
+
+- Neue Dateien monster-sculpts-k.ts, monster-sculpts-k-props.ts und monster-sculpts-k-creatures.ts; Originalhashes registriert, bestehender bevorzugter Cachepfad. Ascher, Y-Rohr, Handschuhpaar, Bandrolle, Sackgassenschild und Scheinwerfer. Toolkit/Renderer bleiben unverändert.
+- Prüfblöcke 1/2 abgeschlossen: 188/188 Tests + Testkanal-Build; ein Chromium-Touch-Smoke aller sechs neben Originalpose, Drehen/Zoom/Schließen/Reload/HP0/XP17 und schmales Layout ohne Browser-/Shaderfehler; sechs Bilder geprüft. Nach Bildvergleich Ypipe-Zweige und Taperoll-Gesamtform vorwärts geneigt, damit beide Rohröffnungen und der Pappkern in der Ausgangsansicht sichtbar werden. Block 3 finale CI/Pages/Deploy samt gezieltem Liveblick dieser zwei Korrekturen steht aus; keine weitere lokale Vollsuite. Nutzerauftrag: nach abgeschlossenem #85–90 dieses Folgepaket vollständig liefern, eigener PR.
+
+## Vorheriger veröffentlichter Stand
+
 # Aktueller Wiedereinstieg — v46 / Dex 85–90 veröffentlicht
 
 - **Fertig, gemergt, live:** PR #53, Spielcode 0829c7690eb74a597ace5c61d232e0a627ae92a8. Bubstack, Hangscale, Curbcone, Neonarrow, Clipin und Heatsink nach echten lokalen Erstposen. Stand **90 eigene Skulpturen / 330 glatte Rekonstruktionen**. Vorherige 84 Geometrien, Quellen/Hashes, PBR/UV/Cache, Toolkit, Renderer und sämtliche Mechaniken/Saves bleiben erhalten.
