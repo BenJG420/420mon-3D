@@ -30,9 +30,10 @@ Continue `docs/TEST_BUILD.md`, one package / PR:
 Monster surface/PBR pass (5) is published as PR #46; Dex #49–54 sculptures are
 published as PR #47, Dex #55–60 as PR #48 and Dex #61–66 as PR #49.
 Dex #67–72 are published as PR #50 and Dex #73–78 as PR #51.
-Dex #79–84 are published as PR #52 / v45. Dex #85–90 are published as PR #53 / v46. Current published
-coverage: 90 authored / 330 smooth reconstructions. Next individually sculpt remaining
-original species from Dex #91, retaining the PBR pipeline/cache. Do not claim the 330
+Dex #79–84 are published as PR #52 / v45. Dex #85–90 are published as PR #53 / v46. v47 adds Dex #91–96
+(publication status in TEST_BUILD.md). Current source coverage: 96 authored /
+324 smooth reconstructions. Next individually sculpt remaining
+original species from Dex #97, retaining the PBR pipeline/cache. Do not claim the 324
 reconstructions are individually detailed HD anatomies or native 4K verified. Read BenJG420/420mon as the source for 6/7. Do not restart the graphics packages or create a
 replacement PR #39. Preserve all mechanics/saves; Ko-fi/payment stays skipped.
 Keep the same file-read discipline and maximum three focused check rounds.

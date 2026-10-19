@@ -136,3 +136,15 @@ foot/knee phase when sprint starts or ends. No additional third-party assets.
 - No external mesh/texture pack is added. Existing project Sculpt/PBR helpers,
   bounded cache and Three.js MIT dependency remain. Coverage: 90 authored /
   330 reconstructions; next work begins at Dex #91.
+
+
+## Individual monster meshes — v47
+
+- Ashpan, Ypipe, Glovepair, Taperoll, Deadend and Spotlamp geometry is authored
+  in `src/game/monster-sculpts-k-props.ts` and `monster-sculpts-k-creatures.ts`,
+  registered by `monster-sculpts-k.ts`, using the owner's retained original
+  first-pose sprites. Full sheets are unchanged; source sprite/hash references
+  remain in `monster-authored.ts`.
+- No external mesh/texture pack is added. Existing project Sculpt/PBR helpers,
+  bounded cache and Three.js MIT dependency remain. Coverage: 96 authored /
+  324 reconstructions; next work begins at Dex #97.

@@ -1,3 +1,10 @@
+> **v47 in preparation:** own models Dex #91–96, Ashpan through Spotlamp.
+> Source coverage: 96 authored / 324 reconstructions. Round 1 passed:
+> 188/188 tests + test-channel build. One six-model touch smoke passed
+> (original comparison, rotate/zoom/close/reload, HP0/XP17, narrow layout, no
+> browser/shader errors). Ypipe branches and Taperoll pitched forward after
+> image review to expose openings; final CI/Pages and focused live view pending.
+
 > **Published v46:** Originalmonster Dex #85–90 [PR #53](https://github.com/BenJG420/420mon-3D/pull/53),
 > source `0829c76`. Three rounds complete: first build green, 186/188 tests
 > (both failures: Bubstack triangle budget); reduced small details, all-six budget
@@ -30,7 +37,7 @@
 > **NEXT: Dex #79. Coverage: 78 authored / 342 smooth reconstructions.**
 > Three rounds completed; same test URL and save slots.
 
-# Original-world test build v46
+# Original-world test build v47
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -637,9 +644,9 @@ module tests; his browser interaction remains a user-check item.
 
 ## Remaining work — Bens Fix-Liste (aktualisiert 2026-10-19)
 
-Published v46 / PR #53: 90 individual sculptures / 330 smooth reconstructions.
-Dex #85–90 are complete and live; three check rounds finished (top).
-Continue at Dex #91; do not restart #85–90.
+Current v47 source: 96 individual sculptures / 324 smooth reconstructions.
+Dex #91–96 in progress; checks/publication pending (top). Continue at Dex #97
+after publication; do not restart #91–96.
 
 Existing PR #39 and the HD/PBR pass #46 are merged and published. Preserve
 the authored models and rendering pipeline while completing remaining species.
@@ -784,9 +791,17 @@ and green leaf), Heatsink (deep metal fins, orange eyes and violet arcs).
 Original references/hashes and shared PBR/UV/cache remain; previous 84
 geometries, toolkit, renderer and gameplay/saves are unchanged.
 
-**NEXT:** individual anatomy/detail work for the remaining **330 original
-species, starting Dex #91**, following the 2D artwork and reference. Current
-coverage is 90 authored / 330 smooth reconstructions.
+**v47 — Dex #91–96 (publication pending):** Ashpan (hollow metal ashtray,
+ash, cigarette ends and sleepy eyes), Ypipe (open forked pipe, collars and bolts),
+Glovepair (two yellow gloves with separate fingers and cuff eyes), Taperoll
+(open cardboard core, white roll and loose tape), Deadend (weathered red-white
+sign and post), Spotlamp (round lens, magenta housing, neck and tripod).
+Original references/hashes and shared PBR/UV/cache remain; previous 90
+geometries, toolkit, renderer and gameplay/saves are unchanged.
+
+**NEXT:** individual anatomy/detail work for the remaining **324 original
+species, starting Dex #97**, following the 2D artwork and reference. Current
+coverage is 96 authored / 324 smooth reconstructions.
 This pass does not claim 420 individually sculpted/production-4K creatures.
 Physical Android/native 4K visual/performance verification remains a device test.
 

@@ -1,4 +1,14 @@
-# Current authored coverage — v46
+# Current authored coverage — v47
+
+96 authored species / 324 smooth reconstructions. `monster-sculpts-k.ts` registers
+`monster-sculpts-k-props.ts` and `monster-sculpts-k-creatures.ts`: Dex #91–96
+Ashpan, Ypipe, Glovepair, Taperoll, Deadend and Spotlamp. Open ashtray, forked
+pipe, paired gloves, tape roll, weathered sign and round spotlight use the
+retained original first poses. Original sources/hashes, previous 90 geometries,
+toolkit, renderer and shared PBR/UV/cache remain intact. Next: original Dex #97.
+Hidden surfaces conservatively continue the visible forms.
+
+# Historical authored coverage — v46
 
 90 authored species / 330 smooth reconstructions. `monster-sculpts-j.ts` registers
 `monster-sculpts-j-props.ts` and `monster-sculpts-j-creatures.ts`: Dex #85–90
