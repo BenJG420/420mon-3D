@@ -4,6 +4,7 @@ import { ensureFishState } from "./fishing-state";
 import { syncQuests } from "./quests";
 import { syncAchievements } from "./achievements";
 import { normalizeClothing } from "./clothing-state";
+import type { Wardrobe } from "./wardrobe";
 import { makeInst, rollIvs } from "./battle";
 import { GROW_SLOTS, POT_START, POT_MAX, BOX_MAX } from "./data/items";
 
@@ -65,6 +66,7 @@ export type Save = {
   growInitialized?: boolean;
   eddiSeed?: boolean;
   outfit?: string;
+  wardrobe?: Wardrobe;
   flagLowtown?: boolean;
   deadWild: string[];
   fishCaught?: Record<string, number>;

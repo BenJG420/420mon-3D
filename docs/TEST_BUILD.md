@@ -1,4 +1,21 @@
-> **Published v47:** Originalmonster Dex #91–96 [PR #54](https://github.com/BenJG420/420mon-3D/pull/54),
+> **v48 — clothing package, publication pending:** Six independently saved slots
+> for top, jacket, pants, shoes, head and accessory. Owned original items unlock
+> their parts; overalls and leather jacket combine, old saves migrate, one original
+> bonus stays active, and failed writes restore the previous appearance.
+> Round 1 passed: **201/201 tests + build**. All **2,304 combinations** checked for
+> state persistence, fallback slot replacement and both real GLBs' exclusive
+> triangle coverage, bone weights/UVs, three animation samples and body extremes.
+> Round 2: preview-path and selector harness failures corrected; actual smoke
+> passed slots/migration/swaps/failed-save rollback and captured five images.
+> It stopped at a Walk assertion (Idle at the obstructed cellar position).
+> Room furniture hid the preview and garment borders were coarse; correcting
+> those before final CI/Pages and a focused live view. No further local smoke.
+> Existing MIT rigs/animations and NPC appearance preserved. Automated coverage
+> is not an exhaustive visual inspection of all combinations on every device.
+> **After clothing: bulk buying/selling, starter case, GUI, performance, district
+> detail, then remaining monster sculpts.** Each package gets its own PR.
+
+> **Historical v47:** Originalmonster Dex #91–96 [PR #54](https://github.com/BenJG420/420mon-3D/pull/54),
 > source `1e46dcd`. Three rounds complete: 188/188 tests + build; one six-model
 > original-comparison touch smoke; final PR CI 39218634304, main CI 39253739794
 > and Pages 39253739612 green. Ypipe/Taperoll tilted after image review;
@@ -43,7 +60,7 @@
 > **NEXT: Dex #79. Coverage: 78 authored / 342 smooth reconstructions.**
 > Three rounds completed; same test URL and save slots.
 
-# Original-world test build v47
+# Original-world test build v48
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -648,7 +665,7 @@ relocation timed out because pagehide persistence restored the in-memory positio
 no extra smoke loop was added. Static's actual quest mutation is covered by the
 module tests; his browser interaction remains a user-check item.
 
-## Remaining work — Bens neue Prioritäten (2026-10-19)
+## Remaining work — Bens neue Prioritäten (2026-10-21)
 
 PR #54 / v47 is complete, merged and live. Coverage is 96 individual sculptures /
 324 smooth reconstructions. The new owner order below supersedes every older
@@ -660,18 +677,24 @@ NEXT/order note. One complete playable package per PR, maximum three check round
    fitted to the existing rigs and persisted. **Test every supported combination.**
    Preserve existing player/NPC rigs and legacy saves; use the original clothing
    as the starting point. Combination cases belong within the three check rounds.
-2. **GUI:** declutter HUD and menus, clear hierarchy, consistent style, fewer
+2. **Bulk buying/selling — own PR:** add quantity selection with slider or
+   +/- controls, Max and a numeric input. Show the total price live and confirm
+   the full selected quantity in one transaction. Support desktop/touch; test
+   stock, funds, bounds and save integrity. Preserve original prices and rules.
+3. **Starter case — own PR:** remove the case from the room once a starter has
+   been chosen. Keep it absent after reload and in existing saves; add a test.
+4. **GUI:** declutter HUD and menus, clear hierarchy, consistent style, fewer
    overlaps and readable desktop/touch layouts.
-3. **Performance:** measure FPS before and after; improve stable frame rates
+5. **Performance:** measure FPS before and after; improve stable frame rates
    through appropriate instancing, LOD, culling, texture/shader optimization and
    a shadow budget. Record measurement scene, device/emulation and settings.
-4. **District detail — one PR per district:** preserve each original 2D layout,
+6. **District detail — one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
    vegetation and PBR materials; improve lighting, fog and post-processing.
    **Do not change players or NPCs in these district packages.**
-5. **DEFERRED — remaining original monster sculpts and visual follow-up:** resume at **Dex #97** only
+7. **DEFERRED — remaining original monster sculpts and visual follow-up:** resume at **Dex #97** only
    after the priorities above. Preserve the 96 authored models and PBR/UV/cache.
    Known v47 visual follow-up: Ypipe branches partly cover its eyes in the initial
    viewer angle; the right opening is shallow at that angle. Three check rounds

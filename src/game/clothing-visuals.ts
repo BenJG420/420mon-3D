@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { normalizeWardrobe, legacyWardrobe, wardrobeKey, type Wardrobe } from "./wardrobe";
 
 type ClothingRig = {
   character: THREE.Group;
@@ -15,321 +16,225 @@ type ClothingRig = {
   shoulderTrim: THREE.Object3D;
   jacketAccent: THREE.Object3D;
   belt: THREE.Object3D;
+  leftBoot?: THREE.Object3D;
+  rightBoot?: THREE.Object3D;
+  /** Hair or old hats only: the head/face must remain visible under open hats. */
+  headParts?: THREE.Object3D[];
 };
+type Part = "body" | "leftArm" | "rightArm" | "leftLeg" | "rightLeg";
+type Layer = Record<Part, THREE.Group> & { id: string; slot: keyof Wardrobe };
+const parts: Part[] = ["body", "leftArm", "rightArm", "leftLeg", "rightLeg"];
+const legacyIds = ["nude", "wear_trashbag", "wear_collar", "wear_jacket", "wear_vest", "wear_coat", "wear_hoodie", "wear_track", "wear_rain", "wear_overalls", "wear_lack"];
 
-type Layers = {
-  id: string;
-  body: THREE.Group;
-  leftArm: THREE.Group;
-  rightArm: THREE.Group;
-  leftLeg: THREE.Group;
-  rightLeg: THREE.Group;
-  shirt: THREE.Material | THREE.Material[];
-  pants: THREE.Material | THREE.Material[];
-  bareLegs: boolean;
-};
-
-/** Source-sheet clothes fitted to the existing animated rig; owns only its layers. */
+/** Six cached, independently fitted slots for the loading/error fallback rig. */
 export function createClothingVisuals(rig: ClothingRig) {
   const geometries = new Set<THREE.BufferGeometry>();
   const materials = new Set<THREE.Material>();
   const originalMeshes = [rig.torso, rig.leftArmMesh, rig.rightArmMesh, rig.leftLegMesh, rig.rightLegMesh]
     .map(mesh => ({ mesh, material: mesh.material, visible: mesh.visible }));
-  const originalTrim = [rig.shoulderTrim, rig.jacketAccent, rig.belt]
-    .map(object => ({ object, visible: object.visible }));
-  const layers = new Map<string, Layers>();
-  let outfit = "nude";
+  const originalTrim = [rig.shoulderTrim, rig.jacketAccent, rig.belt, rig.leftBoot, rig.rightBoot]
+    .filter((object): object is THREE.Object3D => !!object).map(object => ({ object, visible: object.visible }));
+  const originalHead = (rig.headParts ?? []).map(object => ({ object, visible: object.visible }));
+  const layers = new Map<string, Layer>();
+  const topMaterials = new Map<string, THREE.Material | THREE.Material[]>();
+  const pantsMaterials = new Map<string, THREE.Material>();
+  const topDetails: THREE.Object3D[] = [];
+  const foldedHoods: THREE.Object3D[] = [];
+  const outerLegStripes: THREE.Object3D[] = [];
+  let wardrobe = normalizeWardrobe(null);
   let disposed = false;
 
-  function ownGeometry<T extends THREE.BufferGeometry>(geometry: T): T {
-    geometries.add(geometry);
-    return geometry;
-  }
+  function ownGeometry<T extends THREE.BufferGeometry>(geometry: T): T { geometries.add(geometry); return geometry; }
   const cube = ownGeometry(new THREE.BoxGeometry(1, 1, 1));
-  const cylinder = ownGeometry(new THREE.CylinderGeometry(1, 1, 1, 10));
+  const cylinder = ownGeometry(new THREE.CylinderGeometry(1, 1, 1, 12));
+  const sphere = ownGeometry(new THREE.SphereGeometry(1, 16, 10));
   const ring = ownGeometry(new THREE.TorusGeometry(.064, .015, 6, 12));
   function cloth(color: number, roughness = .88, metalness = 0) {
     const material = new THREE.MeshStandardMaterial({ color, roughness, metalness });
-    materials.add(material);
-    return material;
+    materials.add(material); return material;
   }
-  // The actual original sheets guide these colors, including the cyan Lackjacke.
-  const black = cloth(0x181818);
-  const charcoal = cloth(0x303030);
-  const asphalt = cloth(0x303048);
-  const olive = cloth(0x607848);
-  const green = cloth(0x306030);
-  const lime = cloth(0x60b818);
-  const seam = cloth(0xc5c6bd);
-  const navy = cloth(0x181830);
-  const stripe = cloth(0x60c030);
-  const yellow = cloth(0xf0c018, .55);
-  const brown = cloth(0x603018);
-  const brownLight = cloth(0x784830);
-  const leather = cloth(0x202023, .59, .08);
-  const cyan = cloth(0x30a8c0, .17, .46);
-  const gold = cloth(0xc8a84a, .42, .55);
-  const silver = cloth(0xb0b5b7, .35, .6);
-
   function mesh(parent: THREE.Object3D, geometry: THREE.BufferGeometry, material: THREE.Material,
     size: [number, number, number], position: [number, number, number], name: string) {
     const part = new THREE.Mesh(geometry, material);
-    part.name = name;
-    part.scale.set(...size);
-    part.position.set(...position);
-    part.castShadow = true;
-    parent.add(part);
-    return part;
+    part.name = name; part.scale.set(...size); part.position.set(...position); part.castShadow = true;
+    parent.add(part); return part;
   }
   function box(parent: THREE.Object3D, material: THREE.Material, size: [number, number, number],
-    position: [number, number, number], name: string) {
-    return mesh(parent, cube, material, size, position, name);
-  }
-  function make(id: string, shirt: THREE.Material | THREE.Material[], pants: THREE.Material | THREE.Material[], bareLegs = false) {
-    const layer = { id, shirt, pants, bareLegs } as Layers;
-    for (const key of ["body", "leftArm", "rightArm", "leftLeg", "rightLeg"] as const) {
+    position: [number, number, number], name: string) { return mesh(parent, cube, material, size, position, name); }
+  function make(slot: keyof Wardrobe, id: string) {
+    const layer = { id, slot } as Layer;
+    for (const key of parts) {
       const group = new THREE.Group();
       group.name = `clothing-${id}-${key}`;
-      group.userData.clothingOutfit = id;
-      group.userData.clothingPart = key;
-      group.visible = false;
-      (key === "body" ? rig.character : rig[key]).add(group);
-      layer[key] = group;
+      group.userData.clothingSlot = slot; group.userData.clothingGarment = id; group.userData.clothingPart = key;
+      group.visible = false; (key === "body" ? rig.character : rig[key]).add(group); layer[key] = group;
     }
-    layers.set(id, layer);
-    return layer;
+    layers.set(id, layer); return layer;
   }
-  function sleeves(layer: Layers, material: THREE.Material, width = .26, length = .69) {
-    for (const side of ["leftArm", "rightArm"] as const) {
-      box(layer[side], material, [width, length, .32], [0, -length / 2, 0], "sleeve");
-    }
+  function sleeves(layer: Layer, material: THREE.Material, width = .25, length = .66, depth = .3) {
+    for (const side of ["leftArm", "rightArm"] as const)
+      box(layer[side], material, [width, length, depth], [0, -length / 2, 0], "sleeve");
   }
-  function cuffs(layer: Layers, material: THREE.Material) {
-    for (const side of ["leftArm", "rightArm"] as const) {
-      box(layer[side], material, [.275, .09, .335], [0, -.665, 0], "cuff");
-    }
+  function cuffs(layer: Layer, material: THREE.Material) {
+    for (const side of ["leftArm", "rightArm"] as const)
+      box(layer[side], material, [.305, .085, .36], [0, -.655, 0], "cuff");
   }
-  function shorts(layer: Layers) {
-    for (const side of ["leftLeg", "rightLeg"] as const) {
-      const material = side === "leftLeg" ? originalMeshes[3].material : originalMeshes[4].material;
-      const part = new THREE.Mesh(cube, material);
-      part.name = "shorts";
-      part.scale.set(.315, .265, .34);
-      part.position.y = -.13;
-      part.castShadow = true;
-      layer[side].add(part);
-      box(layer[side], seam, [.319, .025, .345], [0, -.26, 0], "shorts-hem");
-    }
-  }
-  function openJacket(layer: Layers, material: THREE.Material, width = .87, height = .88) {
-    const y = 1.36;
-    box(layer.body, material, [width, height, .12], [0, y, -.245], "jacket-back");
-    box(layer.body, material, [.115, height, .48], [-width / 2 + .04, y, 0], "jacket-side");
-    box(layer.body, material, [.115, height, .48], [width / 2 - .04, y, 0], "jacket-side");
+  function openJacket(layer: Layer, material: THREE.Material, seam: THREE.Material, height = .89) {
+    // Top -> bib -> jacket are separate depth bands. The broad opening leaves the bib visible.
+    box(layer.body, material, [.92, height, .075], [0, 1.36, -.295], "jacket-back");
     for (const sign of [-1, 1]) {
-      box(layer.body, material, [.28, height, .085], [sign * (width / 2 - .15), y, .255], "open-front");
-      const lapel = box(layer.body, seam, [.035, height * .84, .02], [sign * .14, y + .015, .31], "jacket-seam");
-      lapel.rotation.z = sign * -.04;
+      box(layer.body, material, [.075, height, .6], [sign * .43, 1.36, 0], "jacket-side");
+      box(layer.body, material, [.23, height, .065], [sign * .345, 1.36, .325], "open-front");
+      box(layer.body, seam, [.018, height * .85, .018], [sign * .232, 1.38, .366], "jacket-seam");
     }
   }
-  function waistBelt(layer: Layers) {
-    box(layer.body, black, [.83, .085, .49], [0, .98, 0], "belt");
-    box(layer.body, silver, [.14, .11, .025], [0, .98, .26], "buckle");
-  }
-  function bootLaces(layer: Layers, material: THREE.Material) {
-    for (const side of ["leftLeg", "rightLeg"] as const) {
-      for (const y of [-.69, -.74, -.79]) box(layer[side], material, [.15, .018, .025], [0, y, .31], "boot-lace");
-    }
-  }
-  function restingHood(layer: Layers, material: THREE.Material) {
-    // The original hood lies behind the neck, so the player's face/hair stay free.
-    box(layer.body, material, [.69, .2, .22], [0, 1.85, -.29], "folded-hood-back");
-    for (const sign of [-1, 1]) {
-      const side = box(layer.body, material, [.17, .17, .37], [sign * .27, 1.84, -.12], "folded-hood-side");
-      side.rotation.z = sign * -.2;
-    }
-  }
-  function zip(layer: Layers, material: THREE.Material, y = 1.36, height = .83, z = .285) {
-    box(layer.body, material, [.025, height, .025], [0, y, z], "zip");
-    box(layer.body, silver, [.06, .08, .035], [0, y + height * .3, z + .02], "zip-pull");
-  }
-  function raggedPanel(width: number, height: number, holes: boolean) {
+  function raggedPanel() {
     const shape = new THREE.Shape();
-    shape.moveTo(-width / 2, height / 2);
-    shape.lineTo(width / 2, height / 2);
-    shape.lineTo(width / 2, -height / 2 + .09);
-    shape.lineTo(width * .2, -height / 2);
-    shape.lineTo(0, -height / 2 + .18);
-    shape.lineTo(-width * .2, -height / 2 + .04);
-    shape.lineTo(-width / 2, -height / 2 + .16);
-    shape.closePath();
-    if (holes) {
-      const hole = new THREE.Path();
-      hole.moveTo(-width * .22, -.08);
-      hole.lineTo(-width * .18, -.25);
-      hole.lineTo(width * .15, -.23);
-      hole.lineTo(width * .2, -.1);
-      hole.closePath();
-      shape.holes.push(hole);
-    }
-    return ownGeometry(new THREE.ExtrudeGeometry(shape, { depth: .045, bevelEnabled: false }));
+    shape.moveTo(-.115, .44); shape.lineTo(.115, .44); shape.lineTo(.115, -.52);
+    shape.lineTo(.04, -.65); shape.lineTo(-.03, -.46); shape.lineTo(-.115, -.6); shape.closePath();
+    const hole = new THREE.Path();
+    hole.moveTo(-.06, -.08); hole.lineTo(-.04, -.25); hole.lineTo(.04, -.23); hole.lineTo(.06, -.1); hole.closePath();
+    shape.holes.push(hole);
+    return ownGeometry(new THREE.ExtrudeGeometry(shape, { depth: .04, bevelEnabled: false }));
   }
 
-  const tanktop = make("nude", originalMeshes[0].material, black, true);
-  shorts(tanktop);
-  // Small wrist bands distinguish source Tanktop from the jacket sleeve rig.
-  cuffs(tanktop, black);
-
-  const bag = make("wear_trashbag", olive, black, true);
-  shorts(bag);
-  sleeves(bag, charcoal, .27, .63);
-  box(bag.body, charcoal, [.85, .88, .12], [0, 1.35, -.25], "ragged-back");
-  for (const sign of [-1, 1]) {
-    mesh(bag.body, raggedPanel(.31, 1.27, true), charcoal, [1, 1, 1], [sign * .29, 1.16, .24], "torn-open-front");
-    const strip = box(bag.body, seam, [.027, .91, .025], [sign * .155, 1.31, .3], "frayed-edge");
-    strip.rotation.z = sign * -.06;
-    const tail = box(bag.body, charcoal, [.2, .55, .13], [sign * .35, .69, -.2], "uneven-tail");
-    tail.rotation.z = sign * -.13;
-  }
-
-  const collar = make("wear_collar", olive, black, true);
-  shorts(collar);
-  sleeves(collar, green);
-  openJacket(collar, green, .84, .85);
-  mesh(collar.body, cylinder, black, [.146, .085, .146], [0, 1.91, 0], "choker");
-  mesh(collar.body, ring, silver, [1, 1, 1], [0, 1.9, .154], "collar-ring");
-
-  const jacket = make("wear_jacket", black, black);
-  openJacket(jacket, lime);
-  sleeves(jacket, lime, .28);
-  cuffs(jacket, charcoal);
-  box(jacket.body, charcoal, [.88, .095, .49], [0, .94, 0], "bomber-hem");
-  bootLaces(jacket, stripe);
-
-  const vest = make("wear_vest", black, black);
-  sleeves(vest, black, .245);
-  openJacket(vest, leather, .84, .83);
-  waistBelt(vest);
-  for (const sign of [-1, 1]) {
-    const lapel = box(vest.body, charcoal, [.14, .34, .05], [sign * .22, 1.61, .31], "leather-lapel");
-    lapel.rotation.z = sign * -.25;
-    for (const y of [1.38, 1.58]) box(vest.body, silver, [.04, .04, .03], [sign * .33, y, .32], "leather-stud");
-  }
-
-  const coat = make("wear_coat", black, black);
-  openJacket(coat, asphalt, .89, .9);
-  sleeves(coat, asphalt, .27);
-  for (const sign of [-1, 1]) {
-    const front = box(coat.body, asphalt, [.33, .76, .1], [sign * .285, .55, .24], "split-coat-front");
-    front.rotation.z = sign * -.065;
-    const back = box(coat.body, asphalt, [.39, .84, .14], [sign * .22, .51, -.24], "split-coat-tail");
-    back.rotation.z = sign * -.035;
-    box(coat.body, seam, [.025, 1.43, .025], [sign * .135, .99, .31], "long-coat-seam");
-    box(coat.body, charcoal, [.21, .2, .1], [sign * .35, .95, .3], "coat-pouch");
-  }
-  waistBelt(coat);
-
-  const hoodie = make("wear_hoodie", black, black);
-  box(hoodie.body, black, [.91, .97, .51], [0, 1.33, 0], "oversized-hoodie");
-  sleeves(hoodie, black, .32, .7);
-  cuffs(hoodie, seam);
-  restingHood(hoodie, black);
-  box(hoodie.body, charcoal, [.56, .23, .045], [0, 1.14, .28], "kangaroo-pocket");
-  box(hoodie.body, seam, [.92, .065, .52], [0, .89, 0], "hoodie-hem");
-  for (const sign of [-1, 1]) box(hoodie.body, seam, [.026, .29, .025], [sign * .12, 1.62, .28], "hood-drawstring");
-
-  const track = make("wear_track", navy, navy);
-  box(track.body, navy, [.85, .9, .48], [0, 1.36, 0], "track-top");
-  sleeves(track, navy, .27);
-  zip(track, seam, 1.36, .85, .255);
+  // Each slot owns its palette. Applying another slot never recolors its neighbors.
+  const topBlack = cloth(0x181818), topOlive = cloth(0x607848), topNavy = cloth(0x181830);
+  const topSeam = cloth(0xc5c6bd), topStripe = cloth(0x60c030), pocket = cloth(0x303030);
+  topMaterials.set("top_tanktop", originalMeshes[0].material);
+  topMaterials.set("top_shirt", topOlive); topMaterials.set("top_hoodie", topBlack); topMaterials.set("top_track", topNavy);
+  make("top", "top_tanktop");
+  const shirt = make("top", "top_shirt"); sleeves(shirt, topOlive, .25, .32);
+  const hoodie = make("top", "top_hoodie"); sleeves(hoodie, topBlack);
+  topDetails.push(box(hoodie.body, pocket, [.56, .22, .035], [0, 1.14, .226], "kangaroo-pocket"));
+  for (const sign of [-1, 1]) topDetails.push(box(hoodie.body, topSeam, [.02, .27, .018], [sign * .12, 1.65, .215], "hood-drawstring"));
+  foldedHoods.push(box(hoodie.body, topBlack, [.68, .17, .2], [0, 1.85, -.25], "folded-hood-back"));
+  for (const sign of [-1, 1]) foldedHoods.push(box(hoodie.body, topBlack, [.15, .15, .28], [sign * .27, 1.84, -.1], "folded-hood-side"));
+  const track = make("top", "top_track"); sleeves(track, topNavy);
+  topDetails.push(box(track.body, topSeam, [.02, .8, .018], [0, 1.36, .214], "track-zip"));
   for (const sign of [-1, 1]) {
     const arm = sign < 0 ? track.leftArm : track.rightArm;
-    const leg = sign < 0 ? track.leftLeg : track.rightLeg;
-    box(track.body, stripe, [.28, .055, .49], [sign * .31, 1.78, 0], "track-shoulder-stripe");
-    box(arm, stripe, [.035, .69, .33], [sign * .139, -.345, 0], "track-sleeve-stripe");
-    box(leg, stripe, [.03, .7, .315], [sign * .15, -.35, 0], "track-leg-stripe");
-    box(leg, seam, [.34, .065, .49], [0, -.855, .07], "trainer-sole");
+    box(arm, topStripe, [.02, .65, .307], [sign * .13, -.325, 0], "track-sleeve-stripe");
   }
 
-  const rain = make("wear_rain", black, black);
-  openJacket(rain, yellow, .91, .9);
-  sleeves(rain, yellow, .3);
-  cuffs(rain, charcoal);
-  restingHood(rain, yellow);
-  zip(rain, black, 1.36, .86, .315);
-  for (const sign of [-1, 1]) {
-    const pocket = box(rain.body, charcoal, [.19, .025, .025], [sign * .3, 1.18, .31], "rain-pocket-zip");
-    pocket.rotation.z = sign * .45;
-    const leg = sign < 0 ? rain.leftLeg : rain.rightLeg;
-    box(leg, charcoal, [.055, .22, .29], [sign * .16, -.25, 0], "cargo-pocket");
-    box(rain.body, black, [.023, .25, .026], [sign * .17, 1.62, .31], "rain-drawstring");
-  }
-
-  const overalls = make("wear_overalls", charcoal, brown);
-  sleeves(overalls, charcoal, .25);
-  box(overalls.body, brown, [.82, .28, .47], [0, 1.01, 0], "overall-waist");
-  box(overalls.body, brown, [.61, .65, .085], [0, 1.35, .25], "work-bib");
-  box(overalls.body, brownLight, [.33, .21, .035], [0, 1.37, .308], "bib-pocket");
-  for (const sign of [-1, 1]) {
-    box(overalls.body, brownLight, [.115, .58, .055], [sign * .24, 1.59, .248], "overall-strap");
-    box(overalls.body, brownLight, [.115, .82, .055], [sign * .24, 1.42, -.23], "overall-back-strap");
-    box(overalls.body, gold, [.065, .065, .025], [sign * .24, 1.66, .292], "overall-clasp");
-    const leg = sign < 0 ? overalls.leftLeg : overalls.rightLeg;
-    box(leg, brownLight, [.29, .25, .025], [0, -.39, .163], "work-knee-patch");
-    box(leg, brownLight, [.335, .205, .48], [0, -.76, .075], "work-boot");
-  }
-
-  const lack = make("wear_lack", black, black);
-  openJacket(lack, cyan, .87, .88);
-  sleeves(lack, cyan, .28);
-  cuffs(lack, black);
-  box(lack.body, black, [.88, .08, .49], [0, .94, 0], "lacquer-hem");
-  for (const sign of [-1, 1]) {
-    const lapel = box(lack.body, leather, [.13, .48, .05], [sign * .2, 1.57, .31], "lacquer-lapel");
-    lapel.rotation.z = sign * -.18;
-    box(lack.body, gold, [.018, .8, .025], [sign * .14, 1.35, .34], "gold-seam");
-    box(lack.body, cyan, [.045, .9, .055], [sign * .405, 1.36, .255], "cyan-edge");
-  }
-  bootLaces(lack, stripe);
-
-  function normalize(id: string) {
-    if (id === "bag") return "wear_trashbag";
-    return layers.has(id) ? id : "nude";
-  }
-  function apply(id: string, bodyWidth = 1) {
-    if (disposed) return;
-    outfit = normalize(id);
-    const active = layers.get(outfit)!;
-    const width = Number.isFinite(bodyWidth) ? THREE.MathUtils.clamp(bodyWidth, .65, 1.25) : 1;
-    for (const layer of layers.values()) {
-      layer.body.scale.x = width;
-      for (const key of ["body", "leftArm", "rightArm", "leftLeg", "rightLeg"] as const) layer[key].visible = layer === active;
+  const pantsBlack = cloth(0x181818), pantsNavy = cloth(0x181830), brown = cloth(0x603018);
+  const brownLight = cloth(0x784830), pantsSeam = cloth(0xc5c6bd), pantsStripe = cloth(0x60c030), gold = cloth(0xc8a84a, .42, .55);
+  pantsMaterials.set("pants_shorts", pantsBlack); pantsMaterials.set("pants_plain", pantsBlack);
+  pantsMaterials.set("pants_track", pantsNavy); pantsMaterials.set("pants_overalls", brown);
+  for (const id of ["pants_shorts", "pants_plain", "pants_track", "pants_overalls"]) {
+    const layer = make("pants", id);
+    const material = pantsMaterials.get(id)!;
+    box(layer.body, material, [.8, .12, .43], [0, .97, 0], "trouser-waist");
+    if (id === "pants_shorts") for (const side of ["leftLeg", "rightLeg"] as const) {
+      box(layer[side], material, [.315, .265, .34], [0, -.13, 0], "shorts");
+      box(layer[side], pantsSeam, [.319, .025, .345], [0, -.26, 0], "shorts-hem");
     }
-    rig.torso.material = active.shirt;
-    rig.leftArmMesh.material = rig.skin;
-    rig.rightArmMesh.material = rig.skin;
-    rig.leftLegMesh.material = active.bareLegs ? rig.skin : active.pants;
-    rig.rightLegMesh.material = active.bareLegs ? rig.skin : active.pants;
-    for (const trim of originalTrim) trim.object.visible = false;
+    if (id === "pants_track") for (const sign of [-1, 1]) {
+      const leg = sign < 0 ? layer.leftLeg : layer.rightLeg;
+      outerLegStripes.push(box(leg, pantsStripe, [.02, .66, .309], [sign * .148, -.35, 0], "track-leg-stripe"));
+    }
+    if (id === "pants_overalls") {
+      box(layer.body, brown, [.8, .24, .47], [0, 1.03, 0], "overall-waist");
+      box(layer.body, brown, [.61, .57, .045], [0, 1.36, .259], "work-bib");
+      box(layer.body, brownLight, [.32, .19, .025], [0, 1.36, .295], "bib-pocket");
+      for (const sign of [-1, 1]) {
+        box(layer.body, brownLight, [.1, .57, .035], [sign * .24, 1.59, .247], "overall-strap");
+        box(layer.body, brownLight, [.1, .79, .035], [sign * .24, 1.43, -.235], "overall-back-strap");
+        box(layer.body, gold, [.06, .06, .018], [sign * .24, 1.66, .276], "overall-clasp");
+        box(sign < 0 ? layer.leftLeg : layer.rightLeg, brownLight, [.281, .24, .025], [0, -.39, .167], "work-knee-patch");
+      }
+    }
   }
 
+  const jacketBlack = cloth(0x181818), jacketCharcoal = cloth(0x303030), asphalt = cloth(0x303048);
+  const lime = cloth(0x60b818), leather = cloth(0x202023, .59, .08), yellow = cloth(0xf0c018, .55);
+  const cyan = cloth(0x30a8c0, .17, .46), jacketSeam = cloth(0xc5c6bd), silver = cloth(0xb0b5b7, .35, .6);
+  make("jacket", "jacket_none");
+  const jacketColors = { jacket_trashbag: jacketCharcoal, jacket_bomber: lime, jacket_vest: leather,
+    jacket_leather: leather, jacket_coat: asphalt, jacket_rain: yellow, jacket_lack: cyan };
+  for (const [id, color] of Object.entries(jacketColors)) {
+    const layer = make("jacket", id);
+    openJacket(layer, color, jacketSeam);
+    if (id !== "jacket_vest") { sleeves(layer, color, .3, .69, .35); cuffs(layer, jacketBlack); }
+    if (id === "jacket_trashbag") {
+      for (const child of layer.body.children) if (child.name === "open-front") child.visible = false;
+      for (const sign of [-1, 1]) mesh(layer.body, raggedPanel(), color, [1, 1, 1], [sign * .345, 1.36, .32], "torn-open-front");
+    }
+    if (id === "jacket_vest" || id === "jacket_leather" || id === "jacket_lack") for (const sign of [-1, 1]) {
+      const lapel = box(layer.body, id === "jacket_lack" ? leather : jacketCharcoal, [.09, .32, .025], [sign * .29, 1.62, .375], "jacket-lapel");
+      lapel.rotation.z = sign * -.18;
+      for (const y of [1.39, 1.59]) box(layer.body, silver, [.033, .033, .018], [sign * .4, y, .37], "jacket-stud");
+    }
+    if (id === "jacket_coat") for (const sign of [-1, 1]) {
+      // Split tails follow each leg, so walking cannot push a knee through a static coat.
+      const leg = sign < 0 ? layer.leftLeg : layer.rightLeg;
+      box(leg, color, [.37, .72, .06], [0, -.34, -.24], "split-coat-tail");
+      box(leg, color, [.07, .72, .48], [sign * .18, -.34, 0], "split-coat-side");
+      box(leg, color, [.12, .68, .06], [sign * .135, -.32, .245], "split-coat-front");
+    }
+    if (id === "jacket_rain") for (const sign of [-1, 1])
+      box(layer.body, jacketBlack, [.14, .023, .02], [sign * .35, 1.18, .373], "rain-pocket-zip");
+  }
+
+  const shoeBlack = cloth(0x181818), shoeBrown = cloth(0x784830), shoeSeam = cloth(0xc5c6bd), shoeStripe = cloth(0x60c030);
+  for (const id of ["shoes_basic", "shoes_trainers", "shoes_work"]) {
+    const layer = make("shoes", id), color = id === "shoes_work" ? shoeBrown : shoeBlack;
+    for (const side of ["leftLeg", "rightLeg"] as const) {
+      box(layer[side], color, [.34, .22, .49], [0, -.765, .075], id === "shoes_work" ? "work-boot" : "shoe");
+      box(layer[side], id === "shoes_trainers" ? shoeSeam : shoeBlack, [.345, .045, .5], [0, -.87, .075], "shoe-sole");
+      if (id !== "shoes_basic") for (const y of [-.72, -.77, -.82])
+        box(layer[side], id === "shoes_trainers" ? shoeStripe : shoeSeam, [.16, .018, .018], [0, y, .329], "shoe-lace");
+    }
+  }
+
+  const headBlack = cloth(0x202023), headYellow = cloth(0xf0c018, .55);
+  make("head", "head_none");
+  const beanie = make("head", "head_beanie");
+  mesh(beanie.body, sphere, headBlack, [.34, .21, .29], [0, 2.42, -.015], "beanie-crown");
+  box(beanie.body, headBlack, [.67, .12, .56], [0, 2.36, -.015], "beanie-band");
+  const hood = make("head", "head_rainhood");
+  box(hood.body, headYellow, [.72, .66, .09], [0, 2.2, -.335], "rainhood-back");
+  box(hood.body, headYellow, [.72, .095, .59], [0, 2.51, -.045], "rainhood-top");
+  for (const sign of [-1, 1]) box(hood.body, headYellow, [.09, .6, .61], [sign * .33, 2.2, -.045], "rainhood-side");
+  const accessoryBlack = cloth(0x181818), accessorySilver = cloth(0xb0b5b7, .35, .6);
+  make("accessory", "accessory_none");
+  const collar = make("accessory", "accessory_collar");
+  mesh(collar.body, cylinder, accessoryBlack, [.15, .08, .15], [0, 1.93, 0], "choker");
+  mesh(collar.body, ring, accessorySilver, [1, 1, 1], [0, 1.925, .158], "collar-ring");
+
+  function apply(value: string | Wardrobe, bodyWidth = 1) {
+    if (disposed) return;
+    wardrobe = typeof value === "string" ? legacyWardrobe(value) : normalizeWardrobe(value);
+    const width = Number.isFinite(bodyWidth) ? THREE.MathUtils.clamp(bodyWidth, .65, 1.25) : 1;
+    const jacketSleeves = wardrobe.jacket !== "jacket_none" && wardrobe.jacket !== "jacket_vest";
+    for (const layer of layers.values()) {
+      layer.body.scale.x = layer.slot === "head" || layer.slot === "accessory" ? 1 : width;
+      for (const key of parts) layer[key].visible = wardrobe[layer.slot] === layer.id
+        && !(layer.slot === "top" && (key === "leftArm" || key === "rightArm") && jacketSleeves);
+    }
+    for (const part of topDetails) part.visible = wardrobe.pants !== "pants_overalls";
+    for (const part of foldedHoods) part.visible = wardrobe.head !== "head_rainhood";
+    for (const part of outerLegStripes) part.visible = wardrobe.jacket !== "jacket_coat";
+    rig.torso.material = topMaterials.get(wardrobe.top)!;
+    rig.leftArmMesh.material = rig.skin; rig.rightArmMesh.material = rig.skin;
+    rig.leftLegMesh.material = wardrobe.pants === "pants_shorts" ? rig.skin : pantsMaterials.get(wardrobe.pants)!;
+    rig.rightLegMesh.material = rig.leftLegMesh.material;
+    for (const trim of originalTrim) trim.object.visible = false;
+    // The host reapplies the current hairstyle before clothing; preserve new style choices.
+    if (wardrobe.head !== "head_none") for (const part of originalHead) part.object.visible = false;
+  }
   apply("nude");
   return {
     apply,
-    current: () => outfit,
+    current: () => legacyIds.find(id => wardrobeKey(legacyWardrobe(id)) === wardrobeKey(wardrobe)) ?? "custom",
+    currentWardrobe: () => ({ ...wardrobe }),
     dispose() {
-      if (disposed) return;
-      disposed = true;
-      for (const layer of layers.values()) {
-        for (const key of ["body", "leftArm", "rightArm", "leftLeg", "rightLeg"] as const) layer[key].removeFromParent();
-      }
+      if (disposed) return; disposed = true;
+      for (const layer of layers.values()) for (const key of parts) layer[key].removeFromParent();
       for (const geometry of geometries) geometry.dispose();
       for (const material of materials) material.dispose();
-      for (const original of originalMeshes) {
-        original.mesh.material = original.material;
-        original.mesh.visible = original.visible;
-      }
-      for (const trim of originalTrim) trim.object.visible = trim.visible;
+      for (const original of originalMeshes) { original.mesh.material = original.material; original.mesh.visible = original.visible; }
+      for (const trim of [...originalTrim, ...originalHead]) trim.object.visible = trim.visible;
     },
   };
 }
