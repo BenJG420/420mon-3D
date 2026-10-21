@@ -48,6 +48,18 @@ quaternions animate; avatar bind translations and editor scaling remain intact.
 Walk and Run share a normalized stride phase and continuous weights, preserving
 foot/knee phase when sprint starts or ends. No additional third-party assets.
 
+## Independent wardrobe slots — v48
+
+- The same pinned Microsoft Rocketbox MIT GLBs, embedded textures, skeletons
+  and animation clips are retained. The distributed files and their hashes do
+  not change; the upstream notice remains in `public/game/characters/LICENSE.txt`.
+- `src/game/wardrobe-rig.ts` adapts the player body at runtime: subdivided original
+  skin triangles use exclusive clothing material regions, preserving source UVs,
+  normals and bone influences. Project-authored headwear and collar use that same
+  skeleton. NPCs retain their previous appearance path.
+- Garment designs, palettes, garment catalogue and fallback meshes are authored
+  in this repository. No additional model, texture pack or external license is added.
+
 ## Monster surface pass — v39
 
 - Deterministic PBR normal/roughness tiles and organic/wet/oxidized-metal

@@ -20,9 +20,11 @@ import { graphicsPixelRatio, type GraphicsQuality } from "./game/graphics-profil
 import { createAchievementBook } from "./game/achievement-book";
 import { syncAchievements } from "./game/achievements";
 import { recordAchievementActivity } from "./game/achievement-activity";
-import { clothingId, clothingLabel, CLOTHING_IDS, toggleClothing, toggleBag } from "./game/clothing-state";
+import { clothingId, clothingLabel, wardrobeForSave, wardrobeChoices, equipGarment, persistClothingChange, toggleBag } from "./game/clothing-state";
+import { WARDROBE_SLOTS, WARDROBE_SLOT_LABELS, wardrobeKey, type WardrobeSlot } from "./game/wardrobe";
 import { createHumanoid } from "./game/humanoid";
 import { createClothingVisuals } from "./game/clothing-visuals";
+import { createWardrobePreview } from "./game/wardrobe-preview";
 import "./styles.css";
 import "./home.css";
 import "./clothing.css";
@@ -118,6 +120,7 @@ let walkCycle = 0;
 const human = createHumanoid(player, ready => {
   character.visible = !ready;
   renderer.domElement.dataset.playerModel = ready ? "rocketbox-rigged" : "fallback";
+  renderer.domElement.dataset.playerChoice = characterChoice;
 });
 
 const playerRadius = 0.4;
@@ -266,11 +269,16 @@ const hairBack = part(character, new THREE.BoxGeometry(0.53, 0.68, 0.2), hairMat
 const mohawk = part(character, new THREE.BoxGeometry(0.14, 0.28, 0.49), hairMaterial, 0, 2.47, 0);
 const jacketAccent = part(character, new THREE.BoxGeometry(0.07, 0.7, 0.03), trim, 0, 1.37, 0.22);
 const belt = part(character, new THREE.BoxGeometry(0.61, 0.08, 0.46), trim, 0, 0.97, 0);
-const clothes = createClothingVisuals({ character, torso, leftArm, rightArm, leftLeg, rightLeg, leftArmMesh, rightArmMesh, leftLegMesh, rightLegMesh, skin, shoulderTrim, jacketAccent, belt });
+const clothes = createClothingVisuals({ character, torso, leftArm, rightArm, leftLeg, rightLeg, leftArmMesh, rightArmMesh, leftLegMesh, rightLegMesh, skin, shoulderTrim, jacketAccent, belt, leftBoot, rightBoot, headParts: [hair, ponytail, hairBack, mohawk] });
 function syncClothes() {
-  clothes.apply(clothingId(getSave().outfit), studio.choice === "woman" ? .83 : 1);
-  renderer.domElement.dataset.outfit = clothes.current();
-  human.setLook(studio, clothes.current());
+  const wardrobe = wardrobeForSave(getSave());
+  hair.visible = studio.hairStyle !== "mohawk";
+  ponytail.visible = hairBack.visible = studio.hairStyle === "long";
+  mohawk.visible = studio.hairStyle === "mohawk";
+  clothes.apply(wardrobe, studio.choice === "woman" ? .83 : 1);
+  renderer.domElement.dataset.outfit = clothingId(getSave().outfit);
+  renderer.domElement.dataset.wardrobe = wardrobeKey(wardrobe);
+  human.setLook(studio, wardrobe);
 }
 function applyStudio() {
   applyCharacterChoice(studio.choice);
@@ -304,8 +312,10 @@ studioPanel.className = "studio-panel";
 studioPanel.setAttribute("aria-label", "Charaktereditor");
 studioPanel.innerHTML = `
   <div class="studio-heading"><strong>CHARAKTER & KLEIDUNG</strong><button type="button" id="studio-close" aria-label="Editor schließen">✕</button></div>
-  <div class="studio-wardrobe"><label for="wardrobe-outfit">Angelegte Kleidung</label><select id="wardrobe-outfit" aria-label="Angelegte Kleidung"></select><div><button type="button" id="wardrobe-turn">Ansicht drehen ↻</button><span id="wardrobe-status" role="status"></span></div></div>
+  <div class="studio-wardrobe"><div><button type="button" id="wardrobe-turn">Ansicht drehen ↻</button><span id="wardrobe-status" role="status" aria-live="polite"></span></div></div>
   <div class="studio-scroll">
+    <fieldset class="wardrobe-slots"><legend>Kleidung kombinieren</legend>${WARDROBE_SLOTS.map(slot => `<label for="wardrobe-${slot}">${WARDROBE_SLOT_LABELS[slot]}<select id="wardrobe-${slot}" data-wardrobe="${slot}"></select></label>`).join("")}</fieldset>
+    <p id="wardrobe-bonus" class="wardrobe-bonus"></p>
     <label>Charakter<select data-studio="choice"><option value="man">Mann</option><option value="woman">Frau</option></select></label>
     <label>Frisur<select data-studio="hairStyle"><option value="short">Kurz</option><option value="long">Lang / Zopf</option><option value="mohawk">Irokesenschnitt</option></select></label>
     <label>Gesichtsform<select data-studio="face"><option value="classic">Klassisch</option><option value="soft">Weich</option><option value="sharp">Markant</option></select></label>
@@ -320,28 +330,34 @@ studioPanel.innerHTML = `
   </div>
   <div class="studio-actions"><button type="button" id="studio-reset">Zurücksetzen</button><button type="button" id="studio-done">Fertig ✓</button></div>`;
 app.appendChild(studioPanel);
+const wardrobePreview = createWardrobePreview(renderer, player);
 let previewTurn = 0;
 let wardrobeSignature = "";
-const wardrobeSelect = studioPanel.querySelector<HTMLSelectElement>("#wardrobe-outfit")!;
 function syncWardrobe() {
-  const s = getSave(), current = clothingId(s.outfit);
-  const ids = ["nude", ...CLOTHING_IDS.filter(id => s.inventory[id] >= 1 || current === id)];
-  const signature = [current, ...ids].join("|");
+  const s = getSave(), wardrobe = wardrobeForSave(s);
+  const choices = WARDROBE_SLOTS.map(slot => wardrobeChoices(s, slot));
+  const signature = [wardrobeKey(wardrobe), clothingId(s.outfit), ...choices.flatMap(list => list.map(g => g.id))].join("|");
   if (signature === wardrobeSignature) return;
   wardrobeSignature = signature;
-  wardrobeSelect.replaceChildren();
-  for (const id of ids) {
-    const option = document.createElement("option"); option.value = id; option.textContent = clothingLabel(id); wardrobeSelect.append(option);
-  }
-  wardrobeSelect.value = current;
-  studioPanel.querySelector("#wardrobe-status")!.textContent = clothingLabel(current);
+  WARDROBE_SLOTS.forEach((slot, index) => {
+    const select = studioPanel.querySelector<HTMLSelectElement>(`#wardrobe-${slot}`)!;
+    select.replaceChildren(...choices[index].map(garment => {
+      const option = document.createElement("option"); option.value = garment.id; option.textContent = garment.label; return option;
+    }));
+    select.value = wardrobe[slot];
+  });
+  studioPanel.querySelector("#wardrobe-bonus")!.textContent = s.outfit === "nude"
+    ? "Grundkleidung · Originalbonus für Tanktop aktiv."
+    : `Aktiver Originalbonus: ${clothingLabel(s.outfit)}. Es gilt immer nur ein Kleidungsbonus.`;
+  studioPanel.querySelector("#wardrobe-status")!.textContent = "Jeden Slot einzeln kombinieren.";
 }
-wardrobeSelect.addEventListener("change", () => {
-  if (wardrobeSelect.value === clothingId(getSave().outfit)) return;
-  const result = toggleClothing(getSave(), wardrobeSelect.value);
-  if (result.ok) saveProgress();
-  syncWardrobe(); studioPanel.querySelector("#wardrobe-status")!.textContent = result.lines.join(" ");
-});
+studioPanel.querySelectorAll<HTMLSelectElement>("[data-wardrobe]").forEach(select => select.addEventListener("change", () => {
+  const s = getSave(), slot = select.dataset.wardrobe as WardrobeSlot;
+  const result = persistClothingChange(s, () => equipGarment(s, slot, select.value), () => saveProgress());
+  wardrobeSignature = "";
+  syncClothes(); syncWardrobe();
+  studioPanel.querySelector("#wardrobe-status")!.textContent = result.lines.join(" ");
+}));
 studioPanel.querySelector("#wardrobe-turn")!.addEventListener("click", () => { previewTurn += Math.PI / 2; });
 window.addEventListener("420mon-save-changed", () => { syncClothes(); syncWardrobe(); });
 syncWardrobe();
@@ -364,7 +380,7 @@ window.addEventListener("420mon-preview-clothes", () => toggleStudio(true));
 window.addEventListener("keydown", event => {
   if (event.code === "Escape" && studioPanel.classList.contains("is-open")) toggleStudio(false);
   if (event.code !== "KeyT" || event.repeat || event.defaultPrevented || (event.target as HTMLElement)?.closest("input,select,textarea,[contenteditable=true]") || document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])")) return;
-  const result = toggleBag(getSave()); if (result.ok) saveProgress();
+  const s = getSave(); persistClothingChange(s, () => toggleBag(s), () => saveProgress());
 });
 studioOpen.addEventListener("click", () => toggleStudio(!studioPanel.classList.contains("is-open")));
 studioPanel.querySelector("#studio-close")!.addEventListener("click", () => toggleStudio(false));
@@ -597,7 +613,8 @@ function animate() {
   const faded = playerOcclusion.update(districtWorld.getOccluders(), camera.position, player.position, dt);
   renderer.domElement.dataset.occludedBuildings = String(faded);
 
-  if (!monsterViewer.isOpen() && !document.querySelector('.fish-overlay[data-aquarium="open"]')) postProcessing.render(dt);
+  if (editing) wardrobePreview.render(previewTurn, window.innerWidth, window.innerHeight, studioPanel.getBoundingClientRect().width);
+  else if (!monsterViewer.isOpen() && !document.querySelector('.fish-overlay[data-aquarium="open"]')) postProcessing.render(dt);
   const graphicsState = postProcessing.getDiagnostics();
   renderer.domElement.dataset.graphics = graphicsState.mode;
   renderer.domElement.dataset.bloom = String(graphicsState.bloom);

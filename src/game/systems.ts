@@ -12,7 +12,7 @@ import { getSave, saveProgress, maxHp, healLiving, type Save } from "./save";
 import { ensureIvs, ivScore, statsFor, statusName } from "./battle";
 import { getMove } from "./data/moves";
 import { spriteUrl } from "./sprites";
-import { clothingId, clothingLabel, toggleClothing, toggleBag } from "./clothing-state";
+import { clothingId, wardrobeLabel, clothingInventoryAction, persistClothingChange, toggleClothing, toggleBag } from "./clothing-state";
 import { healInventoryItem, PAUSE_ENTRIES } from "./inventory-actions";
 import "./inventory-menu.css";
 const load = getSave;
@@ -185,7 +185,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
         } else if (it.use === "smoke") {
           const result = consumeSmoke(s,id,() => saveProgress(s)); if (result.ok) render(); note(result.lines.join(" "));
         } else if (it.use === "wear") {
-          const result = toggleClothing(s,id); if (result.ok) { save(s); render(); } note(result.lines.join(" "));
+          const result = persistClothingChange(s, () => toggleClothing(s,id), () => saveProgress(s)); if (result.ok) render(); note(result.lines.join(" "));
         }
       };
       if (healPick && !ITEMS[healPick]) healPick = "";
@@ -211,7 +211,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
               const glyph = document.createElement("span"); glyph.className = "inventory-glyph"; glyph.setAttribute("aria-hidden","true"); glyph.textContent = ({heal:"✚",smoke:"≈",bud:"♧",fish:"◁",wear:"♙",chip:"◉",seed:"•",fert:"▧",key:"⚿",misc:"◇"})[group.cat];
               const info = document.createElement("div"), name = document.createElement("strong"), desc = document.createElement("small");
               name.textContent = `${def.name} ×${n}`; desc.textContent = def.desc + (def.where ? ` · ${def.where}` : ""); info.append(name,desc); li.append(glyph,info);
-              const action = itemUseLabel(def,clothingId(s.outfit));
+              const action = def.use === "wear" ? clothingInventoryAction(s,id) : itemUseLabel(def,clothingId(s.outfit));
               if (action) { const button = document.createElement("button"); button.textContent = action; button.setAttribute("aria-label",`${def.name}: ${action}`); button.onclick = () => use(id); li.append(button); }
               list.append(li);
             }
@@ -221,7 +221,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
         }
         const extra = document.createElement("details"); extra.className = "inventory-legacy";
         const summary = document.createElement("summary"); summary.textContent = "3D-Ausrüstung"; extra.append(summary);
-        const capsule = document.createElement("p"); capsule.textContent = `Standard-Kapsel ×${s.balls} · Angelegt: ${clothingLabel(s.outfit)}`; extra.append(capsule);
+        const capsule = document.createElement("p"); capsule.textContent = `Standard-Kapsel ×${s.balls} · Angelegt: ${wardrobeLabel(s)}`; extra.append(capsule);
         const preview = document.createElement("button"); preview.textContent = "Charakter ansehen"; preview.onclick = () => { close(); window.dispatchEvent(new Event("420mon-preview-clothes")); }; extra.append(preview); body.append(extra);
       }
     } else if (tab === "shop") {
@@ -306,7 +306,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
         else if (!event.shiftKey && document.activeElement === last) {event.preventDefault();first?.focus();}
       }
       if (event.code === "Escape") { event.preventDefault(); if (healPick) { healPick="";render(); } else if (tab!=="pause") {tab="pause";render();} else close(); }
-      else if (event.code === "KeyT") {event.preventDefault();const result=toggleBag(load());if(result.ok){saveProgress();render();}note(result.lines.join(" "));}
+      else if (event.code === "KeyT") {event.preventDefault();const s=load();const result=persistClothingChange(s,()=>toggleBag(s),()=>saveProgress(s));if(result.ok){render();}note(result.lines.join(" "));}
       else if (event.code === "KeyI") {event.preventDefault();if(tab==="bag")close();else{tab="bag";healPick="";render();}}
       return;
     }

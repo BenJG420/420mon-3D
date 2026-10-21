@@ -1,3 +1,12 @@
+# v48 — kombinierbare Kleidungsslots in Arbeit
+
+Annahme v48: Vorhandene Kleidungsitems schalten passende Einzelteile frei; sechs Slots kombinieren sie auf den bestehenden Rigs. Alte Outfits werden in Slots überführt, Originalboni bleiben bei einem aktiven Kleidungsitem ohne Addition; keine neuen Käufe oder Änderungen an NPCs/Animationen.
+
+- Paket 1 der neuen Priorität: Oberteil, Jacke, Hose, Schuhe, Kopf, Accessoires inklusive Latzhose + Lederjacke, persistenter Tausch, Passform und Tests aller unterstützten Kombinationen. Prüfblock 1 grün: 201/201 Tests + Testkanal-Build. Prüfblock 2 beendet: zwei Start-/Selektorfehler im Prüfharness korrigiert; eigentlicher Smoke bestätigt Slots, Migration, Einzeltäusche und Speicherfehler-Rollback, fünf Desktop/Touch-Bilder gesehen. Stop bei Walk-Erwartung (Kellerposition blieb Idle), keine Browser-/Shaderfehler. Verdeckte Vorschau und grobe Kleidungsränder werden korrigiert; anschließend ausschließlich CI/Deploy plus gezielter Liveblick, kein weiterer lokaler Test/Smoke. Max. drei gemeinsame Prüfblöcke.
+- PR #54 ist abgeschlossen und live. Restmonster samt Ypipe-Ansichtsnotiz bleiben zurückgestellt; nach Kleidung folgen Mengenwahl beim Kaufen/Verkaufen und Starter-Koffer entfernen, jeweils eigener PR, dann GUI.
+
+## Vorheriger veröffentlichter Stand
+
 # Aktueller Wiedereinstieg — v47 veröffentlicht; NEU Kleidung vor weiteren Monstern
 
 - **Fertig, gemergt, live:** PR #54, Spielcode 1e46dcd91dd7e1db31d4cf32c9f39de2a5cf4324. Ashpan, Ypipe, Glovepair, Taperoll, Deadend und Spotlamp nach echten lokalen Erstposen. Stand **96 eigene Skulpturen / 324 glatte Rekonstruktionen**. Zuvor Dex #85–90 als PR #53 vollständig veröffentlicht. Vorherige 90 Geometrien, Quellen/Hashes, PBR/UV/Cache, Toolkit, Renderer und sämtliche Mechaniken/Saves bleiben erhalten.

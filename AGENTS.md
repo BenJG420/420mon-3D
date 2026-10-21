@@ -19,7 +19,7 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 9. Do not overwrite or delete the original 2D repository. Preserve source attribution and be mindful that its content is private; access requires authorization.
 10. Report what is implemented, tested, missing, and deployed factually in German. Do not repeatedly ask what to work on next when the goal is clear.
 
-## Current priority order (user instruction, 2026-10-19)
+## Current priority order (user instruction, 2026-10-21)
 
 PR #54 / v47 (Dex #91–96) is merged and published. Coverage is 96 authored /
 324 smooth reconstructions. Remaining monsters from Dex #97 are **deferred**.
@@ -28,14 +28,18 @@ Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds
    Accessoires, including Latzhose + Lederjacke. Correct replacement without
    duplicate/missing parts or clipping, fitted to existing rigs and persisted.
    Test every supported combination within the existing three-check budget.
-2. Clean up HUD/menus: hierarchy, consistent style, readability, desktop/touch.
-3. Performance: measure FPS before/after; instancing, LOD, culling, textures,
+2. Bulk buying/selling: quantity slider or +/-/Max/input, live total, one full
+   transaction confirmation, desktop/touch and tests. Own PR.
+3. Hide the starter case after choosing, including reload and old saves; test.
+   Own PR.
+4. Clean up HUD/menus: hierarchy, consistent style, readability, desktop/touch.
+5. Performance: measure FPS before/after; instancing, LOD, culling, textures,
    shaders and a shadow budget as appropriate.
-4. Detail districts one by one, one PR each: preserve 2D structure, independent
+6. Detail districts one by one, one PR each: preserve 2D structure, independent
    roof materials (tile/metal/felt), edges/gutters, facades/windows/doors/signs,
    neon/trash/cables/puddles/props/vegetation/PBR, lighting/fog/post-processing.
    Do not change player/NPC assets or behavior in district packages.
-5. Then resume original monster sculpts at #97, retaining the 96 existing models
+7. Then resume original monster sculpts at #97, retaining the 96 existing models
    and shared PBR/cache. Do not claim 324 reconstructions are authored HD anatomy.
 No new game or restarted old packages. Preserve gameplay/saves and licensed rigs.
 Ko-fi/payment stays skipped. Read only relevant files; no routine questions;

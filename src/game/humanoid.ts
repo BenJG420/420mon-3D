@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { createHumanAnimation } from "./human-animation";
+import { createRigWardrobe } from "./wardrobe-rig";
+import { normalizeWardrobe, type Wardrobe } from "./wardrobe";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
 
 export type HumanLook = {
@@ -46,11 +48,14 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
   let model: THREE.Object3D | undefined;
   let animation: ReturnType<typeof createHumanAnimation> | undefined;
   let headBone: THREE.Object3D | undefined;
+  let wardrobe: Wardrobe | undefined;
+  let rigWardrobe: ReturnType<typeof createRigWardrobe> | undefined;
   const ownedMaterials: { material: THREE.MeshStandardMaterial; region: Region; base: THREE.Texture | null }[] = [];
   const ownedGeometry: THREE.BufferGeometry[] = [];
   const hairAccessories: THREE.Mesh[] = [];
   function clear() {
     animation?.dispose(); animation = undefined;
+    rigWardrobe?.dispose(); rigWardrobe = undefined;
     model?.traverse(o => { if (o instanceof THREE.SkinnedMesh) o.skeleton.dispose(); });
     for (const item of ownedMaterials) item.material.dispose(); ownedMaterials.length = 0;
     for (const g of ownedGeometry) g.dispose(); ownedGeometry.length = 0;
@@ -75,11 +80,13 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
     }
     root.scale.set(look.build * (look.choice === "woman" ? .94 : 1), look.height, look.build);
     for (const accessory of hairAccessories) {
-      accessory.visible = accessory.name === look.hairStyle;
+      accessory.visible = accessory.name === look.hairStyle && (!wardrobe || wardrobe.head === "head_none");
       (accessory.material as THREE.MeshStandardMaterial).color.set(look.hair);
     }
+    if (wardrobe) rigWardrobe?.apply(wardrobe, look);
     applyHeadShape();
     root.userData.outfit = outfit;
+    if (wardrobe) root.userData.wardrobe = { ...wardrobe };
   }
   function applyHeadShape() {
     if (headBone && look) headBone.scale.set(look.face === "soft" ? 1.04 : look.face === "sharp" ? .95 : 1, look.face === "sharp" ? 1.04 : 1, 1);
@@ -108,6 +115,8 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
           ownedMaterials.push({ material, region: baseRegion, base: material.map });
           return;
         }
+        if (wardrobe) return; // The player uses exclusive independently selectable layers.
+        // NPCs retain their existing skin-weight palette and material groups.
         // Reassign triangles by weighted bone influence, preserving UVs and skinning.
         const geometry = o.geometry.clone(); ownedGeometry.push(geometry); o.geometry = geometry;
         const idx = geometry.index, skinIndex = geometry.getAttribute("skinIndex"), weight = geometry.getAttribute("skinWeight");
@@ -131,6 +140,7 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
         indices.forEach((part, i) => { geometry.addGroup(offset, part.length, i); offset += part.length; combined.push(...part); });
         geometry.setIndex(combined); o.material = materials;
       });
+      if (wardrobe) rigWardrobe = createRigWardrobe(model);
       animation = createHumanAnimation(model, gltf.animations);
       // Head-bone hair options follow animation and preserve the existing editor keys.
       headBone = model.getObjectByName("Bip01_Head") ?? model.getObjectByName("Bip01 Head");
@@ -149,9 +159,12 @@ export function createHumanoid(parent: THREE.Object3D, onReady?: (ready: boolean
   }
   return {
     root,
-    setLook(next: HumanLook, nextOutfit: string) {
-      look = next; outfit = nextOutfit; applyAppearance();
-      if (selected !== next.choice || root.userData.status === "error") void load(next.choice);
+    setLook(next: HumanLook, nextOutfit: string | Wardrobe) {
+      const wasNpc = outfit === "npc", isNpc = nextOutfit === "npc";
+      look = next; outfit = typeof nextOutfit === "string" ? nextOutfit : "wardrobe";
+      wardrobe = isNpc ? undefined : normalizeWardrobe(typeof nextOutfit === "object" ? nextOutfit : undefined, nextOutfit);
+      applyAppearance();
+      if (selected !== next.choice || wasNpc !== isNpc || root.userData.status === "error") void load(next.choice);
     },
     update(dt: number, speed = 0, sprint = false) {
       animation?.update(dt, speed, sprint); applyHeadShape();
