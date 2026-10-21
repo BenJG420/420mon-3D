@@ -24,11 +24,12 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 PR #54 / v47 (Dex #91–96) is merged and published. Coverage is 96 authored /
 324 smooth reconstructions. Remaining monsters from Dex #97 are **deferred**.
 Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds:
-1. Freely combinable clothing slots: Oberteil, Jacke, Hose, Schuhe, Kopf,
+1. DONE — PR #55 / v48, merged and published: freely combinable clothing slots: Oberteil, Jacke, Hose, Schuhe, Kopf,
    Accessoires, including Latzhose + Lederjacke. Correct replacement without
    duplicate/missing parts or clipping, fitted to existing rigs and persisted.
-   Test every supported combination within the existing three-check budget.
-2. Bulk buying/selling: quantity slider or +/-/Max/input, live total, one full
+   All 2,304 combinations tested within the three-check budget; final live
+   desktop/touch preview and persistence checks passed. See TEST_BUILD.md.
+2. NEXT — Bulk buying/selling: quantity slider or +/-/Max/input, live total, one full
    transaction confirmation, desktop/touch and tests. Own PR.
 3. Hide the starter case after choosing, including reload and old saves; test.
    Own PR.
