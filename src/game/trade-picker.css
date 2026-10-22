@@ -1,0 +1,22 @@
+.trade-picker,.trade-picker * { box-sizing:border-box; }
+.trade-picker { min-width:0; width:100%; padding:16px; border:1px solid #414c42; border-radius:12px; background:#141c19; color:#edf1e8; font:14px/1.45 system-ui,sans-serif; }
+.trade-picker h3 { margin:0 0 8px; overflow-wrap:anywhere; font:700 17px/1.4 system-ui,sans-serif; }
+.trade-picker .trade-picker-unit,.trade-picker .trade-picker-limit { margin:6px 0 14px; color:#b4c2b0; font:13px/1.5 system-ui,sans-serif; }
+.trade-picker label { display:block; margin-bottom:7px; color:#edf1e8; font-weight:650; }
+.trade-picker-controls { display:grid; grid-template-columns:44px minmax(0,1fr) 44px 52px; gap:7px; }
+.trade-picker button,.trade-picker input[type="number"] { min-width:0; min-height:44px; border:1px solid #52644e; border-radius:8px; background:#26372b; color:#f0f4eb; font:600 15px system-ui,sans-serif; }
+.trade-picker button { padding:10px 8px; cursor:pointer; touch-action:manipulation; overflow-wrap:anywhere; }
+.trade-picker input[type="number"] { width:100%; padding:8px; text-align:center; font-variant-numeric:tabular-nums; }
+.trade-picker input[type="range"] { display:block; width:100%; min-width:0; height:44px; margin:8px 0 0; accent-color:#a8dd83; touch-action:pan-y; }
+.trade-picker button:focus-visible,.trade-picker input:focus-visible { outline:2px solid #b7ec94; outline-offset:2px; }
+.trade-picker input[aria-invalid="true"] { border-color:#d7a064; }
+.trade-picker button:disabled,.trade-picker input:disabled { opacity:.45; cursor:default; }
+.trade-picker-total { display:block; margin:16px 0 6px; color:#d2efb9; font-weight:750; font-size:18px; overflow-wrap:anywhere; }
+.trade-picker .trade-picker-status { min-height:2.9em; margin:6px 0 14px; color:#c1cdbb; font:13px/1.45 system-ui,sans-serif; overflow-wrap:anywhere; }
+.trade-picker-actions { display:grid; gap:8px; }
+.trade-picker-actions .trade-picker-confirm { width:100%; background:#a8dd83; border-color:#b5e592; color:#142511; }
+.trade-picker-actions .trade-picker-cancel { background:transparent; color:#d2ddcc; }
+@media(max-width:380px) { .trade-picker { padding:12px; } .trade-picker-controls { grid-template-columns:44px minmax(0,1fr) 44px; } .trade-picker [data-trade-max] { grid-column:1/-1; } }
+/* Host menu rules must not override the quantity controls or confirmation. */
+.systems-panel.original-menu .trade-picker-controls button,.grow-panel .trade-picker-controls button { padding:10px 6px; white-space:nowrap; }
+.systems-panel.original-menu .trade-picker-confirm,.grow-panel .trade-picker-confirm { background:#a8dd83; border-color:#b5e592; color:#142511; }

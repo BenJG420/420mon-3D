@@ -202,10 +202,14 @@ export function recordGrowCare(s: GrowState, index: number, hits: number, finish
   return true;
 }
 
-export function buyGrowItem(s: GrowState, id: string): boolean {
-  const def = ITEMS[id];
-  if (!STALL_GROW.includes(id) || !def?.buy || !Number.isFinite(s.gold) || s.gold < def.buy) return false;
-  s.gold -= def.buy; addItem(s, id, 1);
+export function buyGrowItem(s: GrowState, id: string, quantity = 1): boolean {
+  const def = Object.hasOwn(ITEMS, id) ? ITEMS[id] : undefined;
+  const count = Object.hasOwn(s.inventory, id) ? s.inventory[id] : 0;
+  const total = (def?.buy ?? 0) * quantity;
+  if (!STALL_GROW.includes(id) || !def?.buy || !Number.isSafeInteger(quantity) || quantity < 1
+    || !Number.isSafeInteger(total) || total <= 0 || !Number.isSafeInteger(s.gold) || s.gold < total
+    || !Number.isSafeInteger(count) || count < 0 || !Number.isSafeInteger(count + quantity)) return false;
+  s.gold -= total; addItem(s, id, quantity);
   return true;
 }
 
@@ -217,13 +221,18 @@ export function buyNextSlot(s: GrowState, box: boolean): boolean {
   return true;
 }
 
-export function sellGrowBud(s: GrowState, id: string): number {
-  const def = ITEMS[id];
-  if (def?.cat !== "bud" || !def.sell || !hasItem(s, id) || !Number.isFinite(s.gold)) return 0;
-  // Original Grow-shop sell multiplier, rounded the same as the original shop.
-  const price = Math.max(1, Math.round(def.sell * .95));
-  s.inventory[id]--; s.gold += price;
-  s.stats.budsSold = (s.stats.budsSold ?? 0) + 1;
-  s.stats.goldEarned = (s.stats.goldEarned ?? 0) + price;
-  return price;
+export function sellGrowBud(s: GrowState, id: string, quantity = 1): number {
+  const def = Object.hasOwn(ITEMS, id) ? ITEMS[id] : undefined;
+  if (def?.cat !== "bud" || !def.sell || !Number.isSafeInteger(quantity) || quantity < 1
+    || !Number.isSafeInteger(s.inventory[id]) || s.inventory[id] < quantity || !Number.isSafeInteger(s.gold) || s.gold < 0) return 0;
+  // Preserve original per-piece rounding before multiplying the confirmed quantity.
+  const price = Math.max(1, Math.round(def.sell * .95)), total = price * quantity;
+  const buds = s.stats.budsSold ?? 0, earned = s.stats.goldEarned ?? 0;
+  if (!Number.isSafeInteger(total) || !Number.isSafeInteger(s.gold + total)
+    || !Number.isSafeInteger(buds) || buds < 0 || !Number.isSafeInteger(buds + quantity)
+    || !Number.isSafeInteger(earned) || earned < 0 || !Number.isSafeInteger(earned + total)) return 0;
+  s.inventory[id] -= quantity; s.gold += total;
+  s.stats.budsSold = buds + quantity;
+  s.stats.goldEarned = earned + total;
+  return total;
 }

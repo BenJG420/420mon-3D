@@ -1,3 +1,13 @@
+> **v49 — bulk trade ready for publication:** NPC shops, capsules and Grow shop
+> share slider, +/−, Max, numeric input and live total with one explicit booking.
+> Original per-unit prices/bonuses, stock limits, saved counters and rollback on
+> failed persistence are preserved. Block 1: 211/211 tests + build passed.
+> Block 2: desktop NPC buy/sell, bounds, cancel, save failure/retry and focus passed;
+> image reviewed. Grow touch segment stopped because the harness changed saved
+> coordinates before pagehide wrote the current position back. No browser/shader
+> errors. Max wrapping/confirmation contrast corrected. Block 3: final CI/deploy
+> and focused Grow touch verification pending. No additional full local run.
+
 > **Published v48 — clothing:** [PR #55](https://github.com/BenJG420/420mon-3D/pull/55),
 > source `8e21282`. Six independent slots: top, jacket, pants, shoes, head and
 > accessory; overalls + leather jacket, old-save migration, reusable owned pieces,
@@ -22,7 +32,8 @@
 > CSS `index--XBrvHKG.css`. Names/content/hashes match Pages; stable root stays
 > `index-DWZ4yP_E.js`. Final source differs from the earlier local smoke build.
 > **NEXT: bulk buying/selling, then starter case, GUI, performance, district detail,
-> then remaining monster sculpts. Each package gets its own PR.**
+> then **Monster erst nach Freigabe** — explicit permission from Ben required.
+> Each package gets its own PR.**
 
 > **Historical v47:** Originalmonster Dex #91–96 [PR #54](https://github.com/BenJG420/420mon-3D/pull/54),
 > source `1e46dcd`. Three rounds complete: 188/188 tests + build; one six-model
@@ -69,7 +80,7 @@
 > **NEXT: Dex #79. Coverage: 78 authored / 342 smooth reconstructions.**
 > Three rounds completed; same test URL and save slots.
 
-# Original-world test build v48
+# Original-world test build v49
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -674,7 +685,7 @@ relocation timed out because pagehide persistence restored the in-memory positio
 no extra smoke loop was added. Static's actual quest mutation is covered by the
 module tests; his browser interaction remains a user-check item.
 
-## Remaining work — Bens neue Prioritäten (2026-10-21)
+## Remaining work — Bens neue Prioritäten (2026-10-22)
 
 PR #54 / v47 is complete, merged and live. Coverage is 96 individual sculptures /
 324 smooth reconstructions. The new owner order below supersedes every older
@@ -693,8 +704,11 @@ NEXT/order note. One complete playable package per PR, maximum three check round
    stock, funds, bounds and save integrity. Preserve original prices and rules.
 3. **Starter case — own PR:** remove the case from the room once a starter has
    been chosen. Keep it absent after reload and in existing saves; add a test.
-4. **GUI:** declutter HUD and menus, clear hierarchy, consistent style, fewer
-   overlaps and readable desktop/touch layouts.
+4. **GUI:** use the running 2D version at https://coral-nova-gem-pearl.grok.me/
+   as the menu, inventory and HUD reference. Inspect its guest start (no email),
+   reproduce the observed hierarchy/appearance/behavior and record findings here.
+   Declutter overlaps and keep desktop/touch readable. Existing 2D saves originated
+   there; preserve their import, never write to or reset that original save.
 5. **Performance:** measure FPS before and after; improve stable frame rates
    through appropriate instancing, LOD, culling, texture/shader optimization and
    a shadow budget. Record measurement scene, device/emulation and settings.
@@ -704,8 +718,9 @@ NEXT/order note. One complete playable package per PR, maximum three check round
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
    vegetation and PBR materials; improve lighting, fog and post-processing.
    **Do not change players or NPCs in these district packages.**
-7. **DEFERRED — remaining original monster sculpts and visual follow-up:** resume at **Dex #97** only
-   after the priorities above. Preserve the 96 authored models and PBR/UV/cache.
+7. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up
+   from **Dex #97 require Ben’s explicit approval**. Finishing fixes, performance
+   and all district graphics/details does not itself grant that approval. Preserve the 96 authored models and PBR/UV/cache.
    Known v47 visual follow-up: Ypipe branches partly cover its eyes in the initial
    viewer angle; the right opening is shallow at that angle. Three check rounds
    are exhausted; no fourth loop. Rotation works, no gameplay/save error found.

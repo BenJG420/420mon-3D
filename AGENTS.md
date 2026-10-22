@@ -19,10 +19,11 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 9. Do not overwrite or delete the original 2D repository. Preserve source attribution and be mindful that its content is private; access requires authorization.
 10. Report what is implemented, tested, missing, and deployed factually in German. Do not repeatedly ask what to work on next when the goal is clear.
 
-## Current priority order (user instruction, 2026-10-21)
+## Current priority order (user instruction, 2026-10-22)
 
 PR #54 / v47 (Dex #91–96) is merged and published. Coverage is 96 authored /
-324 smooth reconstructions. Remaining monsters from Dex #97 are **deferred**.
+324 smooth reconstructions. **Monster erst nach Freigabe**: remaining sculpts
+from Dex #97 require Ben’s explicit approval, even after all other work.
 Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds:
 1. DONE — PR #55 / v48, merged and published: freely combinable clothing slots: Oberteil, Jacke, Hose, Schuhe, Kopf,
    Accessoires, including Latzhose + Lederjacke. Correct replacement without
@@ -33,14 +34,17 @@ Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds
    transaction confirmation, desktop/touch and tests. Own PR.
 3. Hide the starter case after choosing, including reload and old saves; test.
    Own PR.
-4. Clean up HUD/menus: hierarchy, consistent style, readability, desktop/touch.
+4. GUI reference: inspect and reproduce menu/inventory/HUD from the running
+   2D game https://coral-nova-gem-pearl.grok.me/ (guest start, no email). Record
+   actual observations in TEST_BUILD.md; desktop/touch clarity and less overlap.
 5. Performance: measure FPS before/after; instancing, LOD, culling, textures,
    shaders and a shadow budget as appropriate.
 6. Detail districts one by one, one PR each: preserve 2D structure, independent
    roof materials (tile/metal/felt), edges/gutters, facades/windows/doors/signs,
    neon/trash/cables/puddles/props/vegetation/PBR, lighting/fog/post-processing.
    Do not change player/NPC assets or behavior in district packages.
-7. Then resume original monster sculpts at #97, retaining the 96 existing models
+7. Monster erst nach Freigabe: only resume sculpts at #97 after Ben explicitly
+   approves. First finish fixes and all district graphics/details. Retain the 96 existing models
    and shared PBR/cache. Do not claim 324 reconstructions are authored HD anatomy.
 No new game or restarted old packages. Preserve gameplay/saves and licensed rigs.
 Ko-fi/payment stays skipped. Read only relevant files; no routine questions;
