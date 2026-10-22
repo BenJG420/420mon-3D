@@ -1,40 +1,106 @@
-/* Source palette/layout: original src/styles.css and overlays.tsx MenuShell/Inventory. */
-.systems-panel.original-menu { max-width:720px; inset:16px; border:1px solid #303035; border-radius:14px; background:#121416f7; color:#e8e8ea; box-shadow:0 12px 40px #0009; }
-.systems-panel.original-menu header {background:none;color:#e8e8ea;border-bottom:1px solid #303035;letter-spacing:.03em;}
-.systems-panel.original-menu h3 {color:#e8e8ea;font:700 16px ui-monospace,monospace;}
-.systems-panel.original-menu button {border-color:#303035;background:#1b1e20;color:#e8e8ea;min-height:44px;}
+/* Live 2D MenuShell reference: 360/520px panels, one scroll region, fixed footer. */
+.systems-panel.original-menu {
+  box-sizing:border-box; inset:0; margin:auto; width:min(520px,calc(100vw - 24px)); max-width:520px;
+  height:fit-content; min-height:200px; max-height:min(80dvh,640px); display:flex; flex-direction:column;
+  overflow:hidden; border:1px solid #2a2a30; border-radius:16px; background:#121416f2; color:#e8e8ea;
+  box-shadow:0 12px 40px #0009; font:14px/1.5 "IBM Plex Sans",system-ui,sans-serif; text-align:left;
+}
+.systems-panel.original-menu[data-view="pause"] {width:min(360px,calc(100vw - 24px));}
+.systems-panel.original-menu header {
+  display:flex; align-items:flex-start; gap:12px; flex:0 0 auto; padding:16px 16px 8px;
+  border:0; background:none; color:#e8e8ea; letter-spacing:normal;
+}
+.original-menu .systems-heading {flex:1; min-width:0; padding-top:2px;}
+.original-menu #systems-title {
+  margin:0; color:#7cff6b; font:400 10px/2 "Press Start 2P",ui-monospace,monospace;
+  overflow-wrap:anywhere;
+}
+.original-menu #systems-subtitle {margin:8px 0 0; color:#8a8a90; font-size:14px; line-height:1.5; overflow-wrap:anywhere;}
+.systems-panel.original-menu button {
+  box-sizing:border-box; min-height:48px; border:1px solid #2a2a30; border-radius:8px;
+  padding:10px 12px; background:#1a1c20; color:#e8e8ea; font:inherit; cursor:pointer; touch-action:manipulation;
+}
 .systems-panel.original-menu button:hover {border-color:#7cff6b;}
-.systems-panel.original-menu button:focus-visible,.original-menu a:focus-visible {outline:2px solid #7cff6b;outline-offset:2px;}
-.systems-panel.original-menu button:disabled {opacity:.4;}
-.systems-panel.original-menu nav {border-color:#303035;padding:8px 16px;}
-.systems-panel.original-menu .systems-content {padding:8px 16px 16px;}
-.systems-panel.original-menu .systems-row {border-radius:8px;background:#1b1e20;}
-.systems-panel.original-menu .systems-row small,.original-menu p {color:#8a8a90;line-height:1.6;}
-.systems-panel.original-menu footer {background:#121416;border-top:1px solid #303035;color:#7cff6b;}
-.systems-panel.original-menu a {color:#7cff6b;display:inline-block;padding:12px 0;}
-.inventory-category {border:1px solid #303035;background:#1b1e20;border-radius:10px;overflow:hidden;margin:8px 0;}
-.inventory-category .inventory-category-toggle {width:100%;text-align:left;border:0;border-radius:0;font:600 11px ui-monospace,monospace;color:#7cff6b;padding:12px;}
-.inventory-category ul {list-style:none;padding:8px;margin:0;border-top:1px solid #303035;}
-.inventory-category li {display:flex;align-items:center;gap:10px;padding:8px 2px;}
-.inventory-category li>div {flex:1;min-width:0;}
-.inventory-category strong {display:block;font-size:13px;overflow-wrap:anywhere;}
-.inventory-category small {display:block;color:#8a8a90;font-size:11px;line-height:1.5;margin-top:4px;}
-.inventory-category li button {padding:8px;font-size:11px;flex-shrink:0;}
-.inventory-glyph {width:26px;text-align:center;font-size:22px;color:#7cff6b;flex-shrink:0;}
-.inventory-legacy {margin-top:18px;color:#8a8a90;font-size:12px;}
-.inventory-legacy summary {cursor:pointer;min-height:44px;display:flex;align-items:center;}
-.menu-display {display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;min-height:44px;}
-.menu-display select {background:#1b1e20;color:#e8e8ea;border:1px solid #303035;padding:8px;}
-@media(min-width:760px){.systems-panel.original-menu {inset:5vh 16px;}}
+.systems-panel.original-menu :is(button,a,select,input,summary):focus-visible {outline:2px solid #7cff6b; outline-offset:-3px;}
+.systems-panel.original-menu button:disabled {opacity:.5; cursor:default;}
+.systems-panel.original-menu #systems-close {flex:0 0 44px; width:44px; min-height:44px; padding:8px; margin-top:-8px; background:transparent; color:#8a8a90; border-color:transparent;}
+.systems-panel.original-menu .systems-content {
+  flex:1 1 auto; min-height:0; min-width:0; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain;
+  padding:12px 16px 16px; scrollbar-width:thin; scrollbar-color:#41434b transparent;
+}
+.systems-panel.original-menu .systems-row {
+  display:flex; width:100%; min-width:0; align-items:flex-start; flex-direction:column; gap:4px;
+  margin:0 0 8px; border-radius:8px; background:#1a1c20; text-align:left; line-height:1.5; overflow-wrap:anywhere;
+}
+.original-menu .systems-row strong {font-weight:500;}
+.systems-panel.original-menu .systems-row:disabled {opacity:1; cursor:default;}
+.systems-panel.original-menu .systems-row small {color:#8a8a90; font-size:12px; line-height:1.5;}
+.original-menu p {color:#8a8a90; line-height:1.5;}
+.systems-panel.original-menu footer {
+  flex:0 0 auto; padding:12px 16px 16px; border-top:1px solid #2a2a30; background:#121416;
+  min-height:0; color:#e8e8ea; font-size:14px;
+}
+.original-menu #systems-back {width:100%; text-align:left; background:transparent;}
+.original-menu #systems-status {max-height:4.5em; overflow-y:auto; margin:0 0 10px; color:#d4e4ca; font-size:12px; overflow-wrap:anywhere;}
+.systems-panel.original-menu #systems-back.menu-primary,
+.systems-panel.original-menu .inventory-use,
+.systems-panel.original-menu .menu-display-modes button[aria-pressed="true"] {background:#7cff6b; border-color:#7cff6b; color:#070708;}
+.systems-panel.original-menu a {display:inline-block; padding:12px 0; color:#7cff6b; overflow-wrap:anywhere;}
+.systems-panel.original-menu .menu-section-title {margin:20px 0 10px; color:#e8e8ea; font:500 14px/1.5 "IBM Plex Sans",system-ui,sans-serif;}
+.original-menu .menu-keyboard-hint,.original-menu .menu-inventory-hint {margin:14px 0 0; color:#8a8a90; font-size:12px; line-height:1.6;}
 
-.systems-scrim {display:none;position:absolute;inset:0;background:#0009;pointer-events:auto;}
+.original-menu .menu-display {display:block; min-width:0; margin:0 0 12px; padding:8px; border:1px solid #2a2a30; border-radius:8px; background:#070708;}
+.original-menu .menu-display legend {padding:0 4px; color:#8a8a90; font-size:12px;}
+.original-menu .menu-display-modes {display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.original-menu .menu-display p {margin:8px 0 0; color:#8a8a90; font-size:12px;}
+.original-menu .menu-graphics {display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 0 12px; color:#8a8a90; font-size:12px;}
+.original-menu .menu-graphics select {box-sizing:border-box; min-height:44px; max-width:60%; padding:8px; border:1px solid #2a2a30; border-radius:8px; background:#1a1c20; color:#e8e8ea; font:14px "IBM Plex Sans",system-ui,sans-serif;}
+
+.inventory-category {margin:0 0 8px; overflow:hidden; border:1px solid #2a2a30; border-radius:10px; background:#1a1c20;}
+.systems-panel.original-menu .inventory-category-toggle {display:flex; align-items:center; gap:8px; width:100%; min-height:44px; text-align:left; border:0; border-radius:0; padding:12px; color:#7cff6b;}
+.inventory-category .inventory-category-name {flex:1; min-width:0; font:400 10px/2 "Press Start 2P",ui-monospace,monospace; overflow-wrap:anywhere;}
+.inventory-category-count {flex:0 0 auto; color:#8a8a90; font-size:12px; font-variant-numeric:tabular-nums;}
+.inventory-category-arrow {flex:0 0 auto; color:#e8e8ea; font-size:12px;}
+.inventory-category ul {margin:0; padding:0; list-style:none; border-top:1px solid #2a2a30;}
+.inventory-category li {display:grid; grid-template-columns:56px minmax(0,1fr) auto auto; align-items:center; gap:10px; padding:12px;}
+.inventory-category li:not(:has(.inventory-use)) {grid-template-columns:56px minmax(0,1fr) auto;}
+.inventory-category li+li {border-top:1px solid #2a2a30;}
+.inventory-category .inventory-item-info {min-width:0;}
+.inventory-category strong {display:block; font-size:14px; font-weight:500; overflow-wrap:anywhere;}
+.inventory-category small {display:block; margin-top:3px; color:#8a8a90; font-size:12px; line-height:1.45; overflow-wrap:anywhere;}
+.inventory-item-count {color:#8a8a90; font-size:14px; white-space:nowrap; font-variant-numeric:tabular-nums;}
+.inventory-category .inventory-use {padding:10px 12px; font-size:14px; white-space:normal; overflow-wrap:anywhere;}
+.inventory-glyph {box-sizing:border-box; display:flex; align-items:center; justify-content:center; width:56px; height:56px; border:1px solid #2a2a30; border-radius:12px; background:#101113; color:#7cff6b; font-size:28px;}
+.inventory-legacy {margin-top:16px; color:#8a8a90; font-size:13px;}
+.inventory-legacy summary {display:flex; align-items:center; min-height:44px; cursor:pointer; color:#e8e8ea;}
+.inventory-legacy summary::before {content:"▸"; margin-right:8px; color:#8a8a90;}
+.inventory-legacy[open] summary::before {content:"▾";}
+.inventory-legacy p {margin:8px 0 12px;}
+.inventory-category[data-category="smoke"] .inventory-category-name,
+.inventory-category[data-category="key"] .inventory-category-name {color:#e8b45a;}
+.inventory-category[data-category="fert"] .inventory-category-name {color:#b99bff;}
+.inventory-category[data-category="wear"] .inventory-category-name {color:#8a8a90;}
+
+.systems-scrim {display:none; position:absolute; inset:0; background:#0707088c; pointer-events:auto;}
 .systems-root:has(.systems-panel:not([hidden])) .systems-scrim {display:block;}
+/* Keep quantity controls at their existing sizes and the transaction confirmation green. */
+.systems-panel.original-menu .trade-picker-controls button {padding:10px 6px; white-space:nowrap;}
+.systems-panel.original-menu .trade-picker-confirm {background:#a8dd83; border-color:#b5e592; color:#142511;}
+.systems-panel.original-menu .systems-row:has(.dex-sprite-frame) {flex-direction:row; align-items:center; gap:12px;}
 
-/* Match MenuShell's 360/520px panels and bounded, centered scroll region. */
-.systems-panel.original-menu {inset:0;width:min(520px,92vw);max-height:min(80dvh,40rem);height:fit-content;min-height:200px;margin:auto;}
-.systems-panel.original-menu[data-view="pause"] {width:min(360px,92vw);}
-.inventory-category[data-category="smoke"] .inventory-category-toggle,
-.inventory-category[data-category="key"] .inventory-category-toggle {color:#ffbe55;}
-.inventory-category[data-category="chip"] .inventory-category-toggle {color:#55d9ff;}
-.inventory-category[data-category="fert"] .inventory-category-toggle {color:#b99bff;}
-.inventory-category[data-category="wear"] .inventory-category-toggle {color:#8a8a90;}
+@media(max-width:600px) {
+  .systems-panel.original-menu,.systems-panel.original-menu[data-view="pause"] {
+    inset:auto 0 0; margin:0; width:100%; max-width:none; min-height:0; max-height:min(80dvh,576px); border-radius:16px 16px 0 0;
+  }
+  .systems-panel.original-menu footer {padding-bottom:max(16px,env(safe-area-inset-bottom));}
+  .systems-panel.original-menu header {padding-top:max(16px,env(safe-area-inset-top));}
+}
+@media(max-width:380px) {
+  .inventory-category li {grid-template-columns:56px minmax(0,1fr) auto; gap:8px;}
+  .inventory-category .inventory-use {grid-column:2/-1; justify-self:stretch;}
+}
+@media(max-height:500px) {
+  .systems-panel.original-menu {max-height:calc(100dvh - 12px); min-height:0;}
+  .systems-panel.original-menu header {padding-top:10px;}
+  .systems-panel.original-menu footer {padding-top:8px; padding-bottom:max(8px,env(safe-area-inset-bottom));}
+}

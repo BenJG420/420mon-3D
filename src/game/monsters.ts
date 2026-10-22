@@ -498,7 +498,7 @@ export function createMonsterGame(scene: THREE.Scene, player: THREE.Group, world
   window.addEventListener("keydown", e => {
     const target = e.target as HTMLElement | null;
     if (e.defaultPrevented || target?.closest("input,textarea,select,[contenteditable=true]")) return;
-    if (document.querySelector(".systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden]),.studio-panel.is-open")) return;
+    if (document.querySelector(".monster-collection:not([hidden]),.systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden]),.studio-panel.is-open")) return;
     if (e.code === "KeyE" && !e.repeat && !active) start();
   });
   return {

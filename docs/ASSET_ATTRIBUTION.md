@@ -1,5 +1,17 @@
 # Asset attribution
 
+## GUI fonts — v51
+
+- IBM Plex Sans, IBM Corp., and Press Start 2P, CodeMan38: SIL Open Font License 1.1.
+- Retrieved 2026-10-22 from the Google Fonts repository:
+  https://github.com/google/fonts/tree/main/ofl/ibmplexsans and
+  https://github.com/google/fonts/tree/main/ofl/pressstart2p .
+- Original variable IBM Plex Sans and regular Press Start 2P font data are bundled
+  as losslessly converted WOFF files in `public/fonts/`; full upstream licenses
+  are included as `IBMPlexSans-OFL.txt` and `PressStart2P-OFL.txt` there.
+- No remote font request at runtime. The running 2D game was used as a visual
+  reference; its screenshots are audit material, not redistributed game assets.
+
 ## District atmosphere — v29
 
 - Procedural asphalt, stone, plaster, wood and metal color/roughness/normal maps,

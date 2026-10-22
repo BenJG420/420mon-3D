@@ -29,6 +29,13 @@ import { createWardrobePreview } from "./game/wardrobe-preview";
 import "./styles.css";
 import "./home.css";
 import "./clothing.css";
+import "./gui.css";
+
+// Display layout is a UI preference, independent from render quality and saves.
+const UI_LAYOUT_KEY = "420mon-ui-layout";
+let hudLayout: "handy" | "leiste" = "handy";
+try { if (localStorage.getItem(UI_LAYOUT_KEY) === "leiste") hudLayout = "leiste"; } catch { /* private mode */ }
+document.documentElement.dataset.hudLayout = hudLayout;
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root not found.");
@@ -191,13 +198,53 @@ window.addEventListener("keyup", (event) => setKey(event.code, false));
 const hud = document.createElement("div");
 hud.className = "hud";
 hud.innerHTML = `
-  <div class="brand">420MON <span>LOWTOWN</span></div>
-  <div class="status">DEIN ZUHAUSE IN 3D</div>
-  <div class="hint">WASD / PFEILE · E INTERAGIEREN · T KLEIDUNG · SHIFT LAUFEN</div>
-  <div class="target">LOWTOWN · TESTVERSION 34</div>
-  <div class="local-map"><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
+  <button type="button" class="hud-toggle" aria-label="HUD ein- oder ausblenden" aria-expanded="true">◧</button>
+  <div class="hud-info"><div><b id="hud-cash"></b><span id="hud-clock"></span></div><div><span id="hud-level"></span><span class="status"></span></div><span id="hud-outfit"></span></div>
+  <div class="local-map"><button type="button" class="minimap-toggle" aria-label="Minimap ein- oder ausblenden" aria-expanded="true">−</button><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
+const hudToggle = hud.querySelector<HTMLButtonElement>(".hud-toggle")!;
+hudToggle.addEventListener("click", () => {
+  const collapsed = document.documentElement.dataset.hudCollapsed !== "true";
+  document.documentElement.dataset.hudCollapsed = String(collapsed);
+  hudToggle.setAttribute("aria-expanded", String(!collapsed));
+});
+const minimapToggle = hud.querySelector<HTMLButtonElement>(".minimap-toggle")!;
+minimapToggle.addEventListener("click", () => {
+  const collapsed = hud.querySelector(".local-map")!.classList.toggle("is-collapsed");
+  minimapToggle.setAttribute("aria-expanded", String(!collapsed)); minimapToggle.textContent = collapsed ? "+" : "−";
+});
+const hudDock = document.createElement("nav"); hudDock.className = "hud-dock"; hudDock.setAttribute("aria-label", "Schnellzugriff");
+for (const [view, name] of [["bag", "Inventar"], ["team", "Party"], ["dex", "Dex"], ["world", "Karte"]]) {
+  const button = document.createElement("button"); button.type = "button"; button.textContent = name;
+  button.setAttribute("data-hud-view", view);
+  button.addEventListener("click", () => window.dispatchEvent(new CustomEvent("420mon-open-menu", { detail: { view } })));
+  hudDock.append(button);
+}
+const bagShortcut = document.createElement("button"); bagShortcut.type = "button"; bagShortcut.textContent = "Tüte"; bagShortcut.setAttribute("aria-label", "Tüte an- oder ausziehen");
+bagShortcut.addEventListener("click", () => {
+  const s = getSave(); persistClothingChange(s, () => toggleBag(s), () => saveProgress());
+});
+hudDock.append(bagShortcut);
+const growShortcut = document.querySelector<HTMLButtonElement>(".grow-shortcut");
+if (growShortcut) { growShortcut.textContent = "Grow"; hudDock.append(growShortcut); }
+app.append(hudDock);
+let lastHudText = "", nextHudUpdate = 0;
+const hudTimeFormat = new Intl.DateTimeFormat("de-DE", { hour: "2-digit", minute: "2-digit" });
+function updateHud() {
+  const now = performance.now(); if (now < nextHudUpdate) return; nextHudUpdate = now + 250;
+  const s = getSave(), location = districtWorld.getMapInfo().name;
+  const time = hudTimeFormat.format(new Date());
+  const outfit = clothingLabel(s.outfit), level = Math.max(1, Number(s.trainerLv) || 1);
+  const signature = `${s.gold}|${level}|${outfit}|${location}|${time}`;
+  if (signature === lastHudText) return; lastHudText = signature;
+  hud.querySelector("#hud-cash")!.textContent = `${s.gold.toLocaleString("de-DE")} Softcash`;
+  hud.querySelector("#hud-clock")!.textContent = time;
+  hud.querySelector("#hud-level")!.textContent = `Lv.${level}`;
+  hud.querySelector(".status")!.textContent = location;
+  hud.querySelector("#hud-outfit")!.textContent = outfit;
+}
+updateHud();
 const graphicsControl = document.createElement("label");
 graphicsControl.className = "graphics-control";
 graphicsControl.innerHTML = '<span>Grafik</span><select aria-label="Grafikqualität"><option value="auto">Automatisch</option><option value="high">Hoch</option><option value="low">Sparsam</option></select>';
@@ -368,19 +415,19 @@ studioOpen.textContent = "✎ CHARAKTER";
 studioOpen.type = "button";
 app.appendChild(studioOpen);
 function toggleStudio(open: boolean) {
-  if (open && document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])")) return;
+  if (open && document.querySelector(".monster-battle:not([hidden]),.monster-collection:not([hidden]),.systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])")) return;
   studioPanel.classList.toggle("is-open", open);
   document.body.classList.toggle("wardrobe-preview", open);
   if (!open && studioPanel.contains(document.activeElement)) (document.activeElement as HTMLElement)?.blur();
   studioOpen.setAttribute("aria-expanded", String(open));
   studioOpen.textContent = open ? "✎ EDITOR OFFEN" : "✎ CHARAKTER";
   if (open) { state.forward = state.backward = state.left = state.right = state.sprint = false; previewTurn = 0; syncWardrobe(); }
-  updateStudioView();
+  resize();
 }
 window.addEventListener("420mon-preview-clothes", () => toggleStudio(true));
 window.addEventListener("keydown", event => {
   if (event.code === "Escape" && studioPanel.classList.contains("is-open")) toggleStudio(false);
-  if (event.code !== "KeyT" || event.repeat || event.defaultPrevented || (event.target as HTMLElement)?.closest("input,select,textarea,[contenteditable=true]") || document.querySelector(".monster-battle:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])")) return;
+  if (event.code !== "KeyT" || event.repeat || event.defaultPrevented || (event.target as HTMLElement)?.closest("input,select,textarea,[contenteditable=true]") || document.querySelector(".monster-battle:not([hidden]),.monster-collection:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])")) return;
   const s = getSave(); persistClothingChange(s, () => toggleBag(s), () => saveProgress());
 });
 studioOpen.addEventListener("click", () => toggleStudio(!studioPanel.classList.contains("is-open")));
@@ -505,7 +552,7 @@ function drawLocalMap() {
 
 function resize() {
   const width = window.innerWidth;
-  const height = window.innerHeight;
+  const height = Math.max(1, window.innerHeight - (hudLayout === "leiste" && !studioPanel.classList.contains("is-open") ? 128 : 0));
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
   const mobile = window.matchMedia("(pointer: coarse)").matches || width < 760;
@@ -521,6 +568,13 @@ function updateStudioView() {
   const mobile = width <= 680;
   camera.setViewOffset(width, height, mobile ? 0 : studioPanel.getBoundingClientRect().width / 2, mobile ? height * .265 : 0, width, height);
 }
+window.addEventListener("420mon-ui-layout", event => {
+  const mode = (event as CustomEvent<{ mode?: string }>).detail?.mode;
+  if (mode !== "handy" && mode !== "leiste") return;
+  hudLayout = mode; document.documentElement.dataset.hudLayout = mode;
+  try { localStorage.setItem(UI_LAYOUT_KEY, mode); } catch { /* keep session preference */ }
+  resize();
+});
 window.addEventListener("resize", resize);
 resize();
 
@@ -560,7 +614,7 @@ function animate() {
 
   if (input.lengthSq() > 0) input.normalize();
 
-  const overlayOpen = !!document.querySelector(".systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])");
+  const overlayOpen = !!document.querySelector(".monster-collection:not([hidden]),.systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])");
   const speed = monsterGame.inBattle || overlayOpen ? 0 : ((state.sprint || touch.sprint) ? 7.5 : 4.2) * fishEffectMultiplier(getSave(), "speed");
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
   blockedThisFrame = false;
@@ -621,8 +675,7 @@ function animate() {
   renderer.domElement.dataset.graphics = graphicsState.mode;
   renderer.domElement.dataset.bloom = String(graphicsState.bloom);
 
-  const status = hud.querySelector(".status");
-  if (status) status.textContent = districtWorld.getMapInfo().name;
+  updateHud();
 }
 
 animate();

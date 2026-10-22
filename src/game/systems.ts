@@ -10,7 +10,7 @@ import { quoteTrade, executeTrade, type TradeOffer } from "./trade-state";
 import { renderTradePicker } from "./trade-picker";
 import { QUEST_DEFS } from "./data/quests";
 
-import { getSave, saveProgress, maxHp, healLiving, type Save } from "./save";
+import { getSave, saveProgress, maxHp, type Save } from "./save";
 import { ensureIvs, ivScore, statsFor, statusName } from "./battle";
 import { getMove } from "./data/moves";
 import { spriteUrl } from "./sprites";
@@ -21,12 +21,11 @@ const load = getSave;
 export function createGameSystems(world: DistrictTravel, openGrowShop?: () => void, achievements?: { openJournal: () => void }) {
   const host = document.createElement("div");
   host.className = "systems-root";
-  host.innerHTML = `<button class="systems-toggle" id="systems-open">☰ 420MON MENÜ</button><button class="world-map-shortcut" id="world-map-open">🗺 STADTPLAN</button>
-  <div class="systems-scrim" aria-hidden="true"></div><section class="systems-panel original-menu" id="systems-panel" role="dialog" aria-modal="true" aria-label="420mon Menü" hidden>
-    <header><strong>420MON · LOWTOWN</strong><button id="systems-close" aria-label="Schließen">✕</button></header>
-    <nav id="systems-tabs"></nav>
+  host.innerHTML = `<button class="systems-toggle" id="systems-open">☰ Menü</button><button class="world-map-shortcut" id="world-map-open">Karte</button>
+  <div class="systems-scrim" aria-hidden="true"></div><section class="systems-panel original-menu" id="systems-panel" role="dialog" aria-modal="true" aria-labelledby="systems-title" hidden>
+    <header><div class="systems-heading"><h2 id="systems-title">Pause</h2><p id="systems-subtitle" hidden></p></div><button id="systems-close" aria-label="Schließen">✕</button></header>
     <div id="systems-content" class="systems-content"></div>
-    <footer id="systems-footer"></footer>
+    <footer id="systems-footer"><p id="systems-status" role="status" aria-live="polite" hidden></p><button id="systems-back">Weiter</button></footer>
   </section>`;
   document.querySelector("#app")!.append(host);
   const q = <T extends HTMLElement = HTMLElement>(id: string) => host.querySelector<T>("#" + id)!;
@@ -38,61 +37,83 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
   let merchant = "LOWTOWN · SHOP";
   let merchantItems: string[] = SHOP;
   let merchantSellMultiplier = 1;
+  let returnFocus: HTMLElement | null = null;
   let trade: { offer: TradeOffer; label: string; action: "Kaufen" | "Verkaufen"; quantity: string } | null = null;
   world.openShop(obj => {
     if (obj?.stall === "grow" && openGrowShop) { openGrowShop(); return; }
     merchant = obj?.label ?? "LOWTOWN · SHOP";
     merchantSellMultiplier = obj?.stall === "chips" ? .9 : obj?.stall === "threads" ? .85 : obj?.stall === "fence" ? 1.15 : 1;
     merchantItems = obj?.stall === "chips" ? STALL_CHIPS : obj?.stall === "threads" ? STALL_THREADS : obj?.stall === "fence" ? STALL_FENCE : SHOP;
+    rememberFocus();
     trade = null; tab = "shop"; panel.hidden = false; render();
+    window.dispatchEvent(new Event("420mon-menu-opened")); q("systems-close").focus();
   });
   const escape = (v: string) => v.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c]!);
   const save = (v: Save) => { saveProgress(v); };
-  const note = (msg: string) => { q("systems-footer").textContent = msg; };
+  const note = (msg: string) => { const status = q("systems-status"); status.textContent = msg; status.hidden = !msg; };
   function render() {
     const s = load();
-    panel.dataset.view = tab;
-    const tabsHost = q("systems-tabs");
-    tabsHost.replaceChildren();
-    if (tab !== "pause") {
-      const back = document.createElement("button"); back.textContent = trade ? "← Zum Handel" : healPick ? "← Zurück zum Inventar" : "← Zurück";
-      back.onclick = () => { if (trade) trade = null; else if (healPick) healPick = ""; else tab = "pause"; render(); }; tabsHost.append(back);
-    }
+    const subview = trade ? "trade" : healPick ? "heal" : "main";
+    const sameView = panel.dataset.view === tab && panel.dataset.subview === subview;
     const body = q("systems-content");
+    const scrollTop = sameView ? body.scrollTop : 0;
+    const active = document.activeElement instanceof HTMLElement && panel.contains(document.activeElement) ? document.activeElement : null;
+    const focusKey = sameView ? active?.dataset.menuFocus : undefined;
+    panel.dataset.view = tab;
+    panel.dataset.subview = subview;
+    const back = q<HTMLButtonElement>("systems-back");
+    back.textContent = trade ? "Zum Handel" : healPick ? "Zum Inventar" : tab === "pause" ? "Weiter" : tab === "box" ? "Zur Party" : "Zurück";
+    back.classList.toggle("menu-primary", tab === "pause");
+    note("");
     body.replaceChildren();
-    const title = (t: string) => { const h = document.createElement("h3"); h.textContent = t; body.append(h); };
+    const title = (text: string, subtitle = "") => {
+      q("systems-title").textContent = text;
+      q("systems-subtitle").textContent = subtitle; q("systems-subtitle").hidden = !subtitle;
+    };
+    const sectionTitle = (text: string) => { const h = document.createElement("h3"); h.className = "menu-section-title"; h.textContent = text; body.append(h); };
     const row = (label: string, action?: () => void, description?: string) => {
-      const b = document.createElement("button"); b.className = "systems-row";
+      const b = document.createElement("button"); b.className = "systems-row"; b.dataset.menuFocus = label;
       const strong = document.createElement("strong"); strong.textContent = label; b.append(strong);
       if (description) { const small = document.createElement("small"); small.textContent = description; b.append(small); }
       if (action) b.onclick = action; else b.disabled = true;
       body.append(b); return b;
     };
+    try {
     const known = new Set(s.collection);
     if (tab === "pause") {
       title("Pause");
-      const label = document.createElement("label"); label.className = "menu-display"; label.textContent = "Anzeige · Grafik ";
+      const display = document.createElement("fieldset"); display.className = "menu-display";
+      const legend = document.createElement("legend"); legend.textContent = "Anzeige";
+      const modes = document.createElement("div"); modes.className = "menu-display-modes";
+      const mode = document.documentElement.dataset.hudLayout === "leiste" ? "leiste" : "handy";
+      for (const [value, label] of [["handy", "Handy"], ["leiste", "Leiste"]] as const) {
+        const button = document.createElement("button"); button.textContent = label; button.dataset.uiLayout = value; button.dataset.menuFocus = `layout-${value}`;
+        button.setAttribute("aria-pressed", String(value === mode));
+        button.onclick = () => { window.dispatchEvent(new CustomEvent("420mon-ui-layout", { detail: { mode: value } })); render(); };
+        modes.append(button);
+      }
+      const displayHint = document.createElement("p"); displayHint.textContent = mode === "handy" ? "Kompaktes HUD. Touch-Steuerung bleibt direkt erreichbar." : "Schnellzugriffe als Leiste. Die Welt bleibt im Blick.";
+      display.append(legend, modes, displayHint); body.append(display);
       const graphics = document.querySelector<HTMLSelectElement>('[aria-label="Grafikqualität"]');
       if (graphics) {
-        const select = graphics.cloneNode(true) as HTMLSelectElement; select.removeAttribute("id"); select.setAttribute("aria-label", "Anzeige im Menü"); select.value = graphics.value;
-        select.onchange = () => { graphics.value = select.value; graphics.dispatchEvent(new Event("change")); }; label.append(select);
+        const label = document.createElement("label"); label.className = "menu-graphics"; label.textContent = "Grafikqualität";
+        const select = graphics.cloneNode(true) as HTMLSelectElement; select.removeAttribute("id"); select.setAttribute("aria-label", "Grafik im Menü"); select.value = graphics.value; select.dataset.menuFocus = "graphics";
+        select.onchange = () => { graphics.value = select.value; graphics.dispatchEvent(new Event("change")); }; label.append(select); body.append(label);
       }
-      body.append(label);
       for (const [key, name] of PAUSE_ENTRIES) row(name, () => {
         if (key === "home") { world.travel("capsule"); close(); return; }
         if (key === "ach" && achievements) { close(); achievements.openJournal(); return; }
         tab = key; selected = ""; healPick = ""; openCats.clear(); render();
       });
       const mute = document.querySelector<HTMLButtonElement>(".radio-mute-dock");
-      row(mute?.getAttribute("aria-pressed") === "true" ? "Ton an" : "Stumm", () => { mute?.click(); render(); });
+      row(mute?.getAttribute("aria-pressed") === "true" ? "Ton an" : "Ton aus", () => { mute?.click(); render(); }).dataset.menuFocus = "sound";
       row("Mit Freund:innen teilen", () => {
         const url = location.href;
         if (navigator.share) void navigator.share({title:"420mon",url}).catch(() => note("Teilen geschlossen."));
         else if (navigator.clipboard) void navigator.clipboard.writeText(url).then(() => note("Link kopiert."), () => note(url));
         else note(url);
       });
-      row("Konto · 2D-Original", () => {tab="net";render();});
-      row("Weiter", close);
+      const hint = document.createElement("p"); hint.className = "menu-keyboard-hint"; hint.textContent = "WASD laufen · E untersuchen · I Inventar · B Dex · M Karte · H Hilfe · T Tüte · Matratze speichert und heilt."; body.append(hint);
     } else if (["help", "net", "post", "log", "feedback"].includes(tab)) {
       const titles: Record<string,string> = {help:"Hilfe",net:"Leute & Chat",post:"Nachrichten",log:"Änderungen",feedback:"Feedback"};
       title(titles[tab]);
@@ -105,11 +126,11 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
         const p = document.createElement("p");
         p.textContent = tab === "net" || tab === "post" ? "Online-Funktionen laufen im 2D-Original. Der 3D-Test hat keinen Chat-/Nachrichtenserver und überträgt keine Spielstände dorthin." : "Projektinformationen und Rückmeldungen auf GitHub."; body.append(p);
         const link = document.createElement("a");
-        link.href = tab === "net" || tab === "post" ? "https://benjg420.github.io/420mon/" : tab === "log" ? "https://github.com/BenJG420/420mon-3D/commits/main/" : "https://github.com/BenJG420/420mon-3D/issues/new";
-        link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = tab === "net" || tab === "post" ? "2D-Original öffnen" : tab === "log" ? "Änderungen ansehen" : "Feedback schreiben"; body.append(link);
+        link.href = tab === "net" || tab === "post" ? "https://coral-nova-gem-pearl.grok.me/" : tab === "log" ? "https://github.com/BenJG420/420mon-3D/commits/main/" : "https://github.com/BenJG420/420mon-3D/issues/new";
+        link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = tab === "net" || tab === "post" ? "2D-Original öffnen ↗" : tab === "log" ? "Änderungen ansehen ↗" : "Feedback schreiben ↗"; body.append(link);
       }
     } else if (tab === "dex") {
-      title("ORIGINAL 420MON DEX · " + known.size + "/" + DEX_ORDER.length);
+      title("Dex", known.size + "/" + DEX_ORDER.length + " entdeckt");
       const search = document.createElement("input"); search.placeholder = "Monstername oder Nummer suchen"; search.value = selected;
       body.append(search);
       const list = document.createElement("div"); body.append(list);
@@ -154,7 +175,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
       search.oninput = () => { selected = search.value; show(); }; show();
     } else if (tab === "team" || tab === "box") {
       const team = tab === "team"; const arr = team ? s.team : s.box!;
-      title(team ? "DEIN TEAM · " + s.team.length + "/6" : "LAGERBOX · " + s.box!.length + " MONSTER");
+      title(team ? "Party" : "Lagerbox", team ? s.team.length + "/6 Partner" : s.box!.length + " Monster");
       row(team ? "Lagerbox öffnen" : "Zur Party", () => { tab = team ? "box" : "team"; render(); });
       arr.forEach((m, index) => {
         row(m.name + " · LV " + m.level + " · HP " + m.hp + "/" + maxHp(m), () => {
@@ -169,9 +190,13 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
           save(s); render(); note("Monster übertragen.");
         }, [team ? "Antippen: in Lagerbox verschieben" : "Antippen: ins Team holen", `EP ${m.xp}/${xpToNext(m.level)}`, ...(m.id && DEX[m.id] ? (() => { const ivs = ensureIvs(m.ivs), st = statsFor(m.id!, m.level, ivs); return [`Wert ${ivScore(ivs)} · ATK ${st.atk} · DEF ${st.def} · SP.A ${st.spa} · SP.D ${st.spd} · TEMPO ${st.spe}`, (m.moves?.length ? m.moves : DEX[m.id!].moves).map(id => getMove(id).name).join(" · ")]; })() : []), ...(m.status ? [statusName(m.status)] : [])].join(" · "));
       });
-      if (team) row("✚ TEAM HEILEN", () => { if (document.querySelector(".monster-battle:not([hidden])")) { note("Nicht während eines Kampfes."); return; } const n = healLiving(s.team); save(s); render(); note(n ? "Lebende Teammonster geheilt." : "Kein verletztes lebendes Monster im Team."); }, "Heilstation · außerhalb des Kampfes");
+      if (team) {
+        row("Lebende Partner heilen", () => { close(); document.querySelector<HTMLButtonElement>("#monster-heal")?.click(); }, "Besiegte Partner brauchen eine Matratze.");
+        row("Sammlung ansehen", () => { close(); document.querySelector<HTMLButtonElement>("#monster-collection-toggle")?.click(); });
+        row("Charakter ansehen", () => { close(); window.dispatchEvent(new Event("420mon-preview-clothes")); }, "Oberteil, Jacke, Hose, Schuhe, Kopf und Accessoires.");
+      }
     } else if (tab === "bag") {
-      title("INVENTAR · " + s.gold + " ₲");
+      title("Inventar", s.gold + " Softcash");
       const buffs = activeFishEffects(s);
       if (buffs.length) row(buffs.map(effect => effect.label).join(" · "));
       const use = (id: string, uid?: string) => {
@@ -193,7 +218,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
       };
       if (healPick && !ITEMS[healPick]) healPick = "";
       if (healPick) {
-        title("Wen heilen mit " + ITEMS[healPick].name + "?");
+        title("Heilen", "Wen heilen mit " + ITEMS[healPick].name + "?");
         for (const mon of s.team) {
           const down = mon.hp <= 0, full = mon.hp >= maxHp(mon);
           row(`${mon.name} · Lv.${mon.level} · ${mon.hp}/${maxHp(mon)} · ${down ? "k.o." : full ? "voll" : "Heilen"}`, down || full ? undefined : () => use(healPick,mon.uid));
@@ -205,7 +230,11 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
           const section = document.createElement("section"); section.className = "inventory-category"; section.dataset.category = group.cat;
           const toggle = document.createElement("button"); toggle.className = "inventory-category-toggle";
           const expanded = openCats.has(group.cat); toggle.setAttribute("aria-expanded", String(expanded));
-          toggle.textContent = `${CAT_LABEL[group.cat]} · ${group.rows.length} · ×${group.rows.reduce((n,r) => n+r.n,0)} ${expanded ? "▾" : "▸"}`;
+          toggle.dataset.menuFocus = `category-${group.cat}`;
+          const categoryName = document.createElement("span"); categoryName.className = "inventory-category-name"; categoryName.textContent = CAT_LABEL[group.cat];
+          const categoryCount = document.createElement("span"); categoryCount.className = "inventory-category-count"; categoryCount.dataset.categoryCount = group.cat; categoryCount.textContent = `${group.rows.length} · ×${group.rows.reduce((n,r) => n+r.n,0)}`;
+          const arrow = document.createElement("span"); arrow.className = "inventory-category-arrow"; arrow.setAttribute("aria-hidden", "true"); arrow.textContent = expanded ? "▾" : "▸";
+          toggle.append(categoryName, categoryCount, arrow);
           toggle.onclick = () => { if (expanded) openCats.delete(group.cat); else openCats.add(group.cat); render(); }; section.append(toggle);
           if (expanded) {
             const list = document.createElement("ul");
@@ -213,9 +242,10 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
               const li = document.createElement("li"); li.dataset.item = id;
               const glyph = document.createElement("span"); glyph.className = "inventory-glyph"; glyph.setAttribute("aria-hidden","true"); glyph.textContent = ({heal:"✚",smoke:"≈",bud:"♧",fish:"◁",wear:"♙",chip:"◉",seed:"•",fert:"▧",key:"⚿",misc:"◇"})[group.cat];
               const info = document.createElement("div"), name = document.createElement("strong"), desc = document.createElement("small");
-              name.textContent = `${def.name} ×${n}`; desc.textContent = def.desc + (def.where ? ` · ${def.where}` : ""); info.append(name,desc); li.append(glyph,info);
+              info.className = "inventory-item-info"; name.textContent = def.name; desc.textContent = def.desc + (def.where ? ` · ${def.where}` : ""); info.append(name,desc);
+              const count = document.createElement("span"); count.className = "inventory-item-count"; count.dataset.itemCount = id; count.textContent = `×${n}`; count.setAttribute("aria-label", `${n} Stück`); li.append(glyph,info,count);
               const action = def.use === "wear" ? clothingInventoryAction(s,id) : itemUseLabel(def,clothingId(s.outfit));
-              if (action) { const button = document.createElement("button"); button.textContent = action; button.setAttribute("aria-label",`${def.name}: ${action}`); button.onclick = () => use(id); li.append(button); }
+              if (action) { const button = document.createElement("button"); button.className = "inventory-use"; button.dataset.menuFocus = `use-${id}`; button.textContent = action; button.setAttribute("aria-label",`${def.name}: ${action}`); button.onclick = () => use(id); li.append(button); }
               list.append(li);
             }
             section.append(list);
@@ -226,9 +256,10 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
         const summary = document.createElement("summary"); summary.textContent = "3D-Ausrüstung"; extra.append(summary);
         const capsule = document.createElement("p"); capsule.textContent = `Standard-Kapsel ×${s.balls} · Angelegt: ${wardrobeLabel(s)}`; extra.append(capsule);
         const preview = document.createElement("button"); preview.textContent = "Charakter ansehen"; preview.onclick = () => { close(); window.dispatchEvent(new Event("420mon-preview-clothes")); }; extra.append(preview); body.append(extra);
+        const hint = document.createElement("p"); hint.className = "menu-inventory-hint"; hint.textContent = "I schließen · T Tüte · Tippen außerhalb schließt."; body.append(hint);
       }
     } else if (tab === "shop") {
-      title(merchant.toUpperCase() + " · " + s.gold + " ₲");
+      title(merchant, s.gold + " Softcash");
       const selectTrade = (offer: TradeOffer, label: string, action: "Kaufen" | "Verkaufen") => {
         if (!world.shopNearby()) { close(); return; }
         trade = { offer, label, action, quantity: "1" }; render();
@@ -254,15 +285,15 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
         const it = ITEMS[id]; if (!it.buy || it.cat === "key") continue;
         row(it.name + " · " + it.buy + " ₲", () => selectTrade({ kind: "buy", id, items: merchantItems }, it.name, "Kaufen"), it.desc).dataset.tradeBuy = id;
       }
-      title("VERKAUFEN · DEIN INVENTAR");
+      sectionTitle("Verkaufen · Dein Inventar");
       for (const [id, count] of Object.entries(s.inventory)) {
         const price = salePrice(s, id, merchantSellMultiplier); if (count < 1 || !price) continue;
         row(`${ITEMS[id].name} ×${count} · +${price} ₲`, () => selectTrade({ kind: "sell", id, sellMultiplier: merchantSellMultiplier }, ITEMS[id].name, "Verkaufen"), "Menge wählen").dataset.tradeSell = id;
       }
     } else if (tab === "world") {
-      title("LOWTOWN · STADTPLAN");
-      row("⌂ KAPSEL · DEIN ZUHAUSE", () => { world.travel("capsule"); panel.hidden = true; }, "Töpfe, Schlafplatz und dein erster Partner");
-      row("↓ KELLER · RAJKOS STUDIO", () => { world.travel("studio"); panel.hidden = true; }, "Growboxen und das ursprüngliche Studio");
+      title("Weltkarte", "Lowtown · " + world.getMapInfo().name);
+      row("⌂ KAPSEL · DEIN ZUHAUSE", () => { world.travel("capsule"); close(); }, "Töpfe, Schlafplatz und dein erster Partner");
+      row("↓ KELLER · RAJKOS STUDIO", () => { world.travel("studio"); close(); }, "Growboxen und das ursprüngliche Studio");
       const map = document.createElement("div"); map.className = "district-map";
       for (const d of DISTRICTS) {
         const btn = document.createElement("button"); btn.className = "district-map-pin";
@@ -273,16 +304,16 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
           const level = Math.max(Number(s.trainerLv) || 1, ...s.team.map(mon => mon.level));
           if (d.id !== "alley" && s.quests.q1_bolt !== "done") { note("Bolt in der Gasse zuerst helfen. Kanal-Luken bleiben als ursprünglicher Nebenweg offen."); return; }
           if (level < d.minLv) { note("Für dieses Gebiet brauchst du Stufe " + d.minLv + "."); return; }
-          world.travel(d.id); panel.hidden = true;
+          world.travel(d.id); close();
         };
         map.append(btn);
       }
       body.append(map);
-      row("↩ ZURÜCK NACH LOWTOWN / GASSE A", () => { world.travel("alley"); panel.hidden = true; }, "Zurück in die ursprüngliche Gasse");
+      row("↩ ZURÜCK NACH LOWTOWN / GASSE A", () => { world.travel("alley"); close(); }, "Zurück in die ursprüngliche Gasse");
       row("Aktueller Ort: " + world.getMapInfo().name, undefined, "Türen, Luken und Stadtplan verbinden Lowtown.");
     } else if (tab === "quest") {
       const completed = QUEST_DEFS.filter(quest => s.quests[quest.id] === "done").length;
-      title(`AUFTRÄGE · ${completed}/${QUEST_DEFS.length} ABGESCHLOSSEN`);
+      title("Quests", `${completed}/${QUEST_DEFS.length} abgeschlossen`);
       for (const quest of QUEST_DEFS) {
         const state = s.quests[quest.id] ?? "inactive";
         const progress = questProgress(s, quest), done = progress.done;
@@ -291,16 +322,39 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
       }
 
     }
+    } finally {
+      body.scrollTop = scrollTop;
+      if (!panel.hidden && active && !active.isConnected) {
+        const replacement = focusKey ? [...body.querySelectorAll<HTMLElement>("[data-menu-focus]")].find(element => element.dataset.menuFocus === focusKey) : undefined;
+        (replacement ?? q("systems-close")).focus({ preventScroll: true });
+      }
+    }
   }
-  function close() { panel.hidden = true; healPick = ""; trade = null; q("systems-open").focus(); }
+  function rememberFocus() {
+    if (panel.hidden) returnFocus = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null;
+  }
+  function close() {
+    panel.hidden = true; healPick = ""; trade = null;
+    const target = returnFocus?.isConnected && returnFocus.getClientRects().length ? returnFocus : q("systems-open");
+    target.focus({ preventScroll: true });
+  }
+  function back() {
+    if (trade) trade = null;
+    else if (healPick) healPick = "";
+    else if (tab === "pause" || tab === "bag") { close(); return; }
+    else tab = tab === "box" ? "team" : "pause";
+    render();
+  }
   function open(next: string) {
-    if (document.querySelector(".monster-battle:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.grow-backdrop:not([hidden]),.monster-model-overlay:not([hidden]),.slot-overlay:not([hidden]),.achievement-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.studio-panel.is-open")) return;
+    if (document.querySelector(".monster-battle:not([hidden]),.monster-collection:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.grow-backdrop:not([hidden]),.monster-model-overlay:not([hidden]),.slot-overlay:not([hidden]),.achievement-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.studio-panel.is-open")) return;
+    rememberFocus();
     trade = null; tab = next; healPick = ""; openCats.clear(); panel.hidden = false; render();
     window.dispatchEvent(new Event("420mon-menu-opened")); q("systems-close").focus();
   }
   q("systems-open").onclick = () => open("pause");
   q("world-map-open").onclick = () => open("world");
   q("systems-close").onclick = close;
+  q("systems-back").onclick = back;
   host.querySelector<HTMLElement>(".systems-scrim")!.onclick = close;
   window.addEventListener("keydown", event => {
     // The Dex model studio owns Escape/focus while it sits above this menu.
@@ -310,12 +364,13 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
     if (!panel.hidden) {
       event.stopImmediatePropagation();
       if (event.key === "Tab") {
-        const controls = [...panel.querySelectorAll<HTMLElement>("button:not([disabled]),a[href],select,input")].filter(b => b.getClientRects().length);
+        const controls = [...panel.querySelectorAll<HTMLElement>("button:not([disabled]),a[href],select:not([disabled]),input:not([disabled]),summary")].filter(b => b.getClientRects().length);
         const first = controls[0], last = controls[controls.length-1];
-        if (event.shiftKey && document.activeElement === first) {event.preventDefault();last?.focus();}
+        if (!panel.contains(document.activeElement)) {event.preventDefault();first?.focus();}
+        else if (event.shiftKey && document.activeElement === first) {event.preventDefault();last?.focus();}
         else if (!event.shiftKey && document.activeElement === last) {event.preventDefault();first?.focus();}
       }
-      if (event.code === "Escape") { event.preventDefault(); if (trade) {trade=null;render();} else if (healPick) { healPick="";render(); } else if (tab!=="pause") {tab="pause";render();} else close(); }
+      if (event.code === "Escape") { event.preventDefault(); back(); }
       else if (event.code === "KeyT") {event.preventDefault();const s=load();const result=persistClothingChange(s,()=>toggleBag(s),()=>saveProgress(s));if(result.ok){render();}note(result.lines.join(" "));}
       else if (event.code === "KeyI") {event.preventDefault();if(tab==="bag")close();else{trade=null;tab="bag";healPick="";render();}}
       return;
@@ -325,5 +380,9 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
   }, true);
   window.addEventListener("420mon-save-changed", () => { if (!panel.hidden && !trade) render(); });
   window.addEventListener("420mon-open-quests", () => open("quest"));
+  window.addEventListener("420mon-open-menu", event => {
+    const view = (event as CustomEvent<{ view?: string }>).detail?.view;
+    if (view && ["pause", "bag", "dex", "team", "world", "help", "quest"].includes(view)) open(view);
+  });
   render();
 }
