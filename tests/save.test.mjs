@@ -24,7 +24,9 @@ async function compile(relative) {
 }
 await compile("src/game/save.ts");
 await compile("src/game/rest.ts");
+await compile("src/game/starter-state.ts");
 after(() => rm(output, { recursive: true, force: true }));
+const { hasChosenStarter } = await import(pathToFileURL(path.join(output, "src/game/starter-state.mjs")));
 
 let serial = 0;
 async function fixture(entries = {}) {
@@ -160,6 +162,46 @@ test("the published test channel uses a separate save while the stable release k
   assert.equal(api.saveKeyForBase('/420mon-3D/test/'), '420mon-test-progress-v1');
   assert.equal(api.saveKeyForBase('/420mon-3D/'), '420mon-progress-v1');
   assert.equal(api.saveKeyForBase('/'), '420mon-progress-v1');
+});
+
+test("old 2D and 3D starter choices survive import and reload without new rewards or healing", async () => {
+  for (const key of ["420mon_save_v1", "420mon-progress-v1"]) {
+    const original = key === "420mon_save_v1";
+    const data = {
+      starterId: "mon_budling", eddiSeed: true, gold: 40,
+      [original ? "party" : "team"]: [],
+      box: [{ ...defeated, uid: "boxed-original-partner", xp: 17 }],
+      [original ? "inv" : "inventory"]: { seed_eddi: 0, key_dex: 1 },
+      map: "capsule", x: 162, y: 84,
+    };
+    const api = await fixture({ [key]: data });
+    const source = api.slots.get(key), save = api.getSave();
+    assert.equal(hasChosenStarter(save), true, "choice does not depend on the current party or species");
+    assert.equal(save.starterId, "mon_budling");
+    assert.equal(save.team.length, 0);
+    assert.equal(save.box[0].hp, 0);
+    assert.equal(save.box[0].xp, 17);
+    assert.equal(save.inventory.seed_eddi, 0, "the visibility fix does not grant a second starter seed");
+    api.saveProgress();
+    if (original) assert.equal(api.slots.get(key), source, "original 2D slot stays byte-identical");
+    const reload = await fixture({ "420mon-progress-v1": api.slots.get(api.SAVE_KEY) });
+    assert.equal(hasChosenStarter(reload.getSave()), true);
+    assert.equal(reload.getSave().box[0].hp, 0);
+    assert.equal(reload.getSave().box[0].xp, 17);
+    assert.equal(reload.getSave().inventory.seed_eddi, 0);
+  }
+});
+
+test("fresh and legacy saves without a choice keep the starter case despite owned monsters or Eddi's seed", async () => {
+  const fresh = await fixture();
+  assert.equal(hasChosenStarter(fresh.getSave()), false);
+  for (const starterId of [undefined, "", "  ", true, 1]) {
+    const legacy = await fixture({ "420mon-progress-v1": {
+      starterId, team: [{ name: "Neonix", hp: 0, xp: 17, level: 5 }], box: [living],
+      eddiSeed: true, inventory: { seed_eddi: 1 }, gold: 40,
+    } });
+    assert.equal(hasChosenStarter(legacy.getSave()), false, "ownership and seed migration never invent a starter choice");
+  }
 });
 
 

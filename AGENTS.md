@@ -1,5 +1,13 @@
 # AGENTS.md — Instructions for Codex working on 420mon-3D
 
+## Latest validation rule — Ben, 2026-10-22
+Ben tests gameplay in the published test build. Run only the build and directly
+affected tests; no new broad suites, combination sweeps or browser smoke loops.
+Then publish/merge each package. Existing CI may run automatically. This rule
+supersedes older three-block/full-suite/browser requirements below. For the GUI,
+place Grow care and planting action buttons directly below pot/growbox selection
+so touch players do not scroll between selection and action.
+
 Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wants a **complete, working 3D remake of their existing original 2D game**, retaining its authentic mechanics, monster assets, districts and quest content. **Do not start a replacement game from scratch, invent placeholder monsters, or report a work-in-progress as complete.**
 
 ## Repositories
