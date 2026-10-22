@@ -1,3 +1,13 @@
+> **v51 — GUI ready for publication:** live-2D menu structure, fixed title/footer,
+> touch bottom sheets, readable inventory counts/actions, compact HUD, separate
+> Handy/Leiste layout and graphic quality. Licensed local reference fonts.
+> **Grow actions are directly under the pot/growbox selector.**
+> Build + **28/28 directly affected tests** passed (inventory, Grow, trading).
+> No new browser run, broad suite or combination check: Ben performs visual and
+> gameplay checks in the test build, per his latest instruction. Existing item
+> glyphs remain; illustrated 2D item icons are a documented visual difference.
+> PR/merge/publication pending. Monster erst nach Freigabe.
+
 > **v50 — starter case, merged [PR #57](https://github.com/BenJG420/420mon-3D/pull/57), source `97e68c9`:** the original saved `starterId` now removes the case
 > from the room, interaction, collision, safe-spawn blockers and minimap after
 > choosing. The same marker in existing 3D/2D saves keeps it absent after reload;
@@ -5,7 +15,7 @@
 > 214/214 tests and corrected build passed before the new lean-validation rule.
 > The already-running fresh-choice/reload and old-2D-save touch smoke completed
 > successfully, including HP0/XP17 and unchanged original/stable saves. No browser
-> or shader errors. First build had a corrected TypeScript weak-type error. PR CI `39827322232` passed; Pages `39827460331` publishing.
+> or shader errors. First build had a corrected TypeScript weak-type error. PR CI `39827322232` passed; main CI `39827460352` and Pages `39827460331` passed. Published asset names/hashes verified; stable root unchanged.
 
 > **Published v49 — Mengenhandel:** [PR #56](https://github.com/BenJG420/420mon-3D/pull/56), source `a10f5a4`.
 > NPC shops, capsules and Grow shop share slider, +/−, Max, numeric input, live total
@@ -92,7 +102,7 @@
 > **NEXT: Dex #79. Coverage: 78 authored / 342 smooth reconstructions.**
 > Three rounds completed; same test URL and save slots.
 
-# Original-world test build v50
+# Original-world test build v51
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -697,6 +707,38 @@ relocation timed out because pagehide persistence restored the in-memory positio
 no extra smoke loop was added. Static's actual quest mutation is covered by the
 module tests; his browser interaction remains a user-check item.
 
+
+## GUI reference inspected — v51, 2026-10-22
+
+The live 2D game https://coral-nova-gem-pearl.grok.me/ was visited in isolated guest
+sessions without email on desktop (1365×900) and touch (390×844), before Ben’s
+new instruction to stop browser runs. No original accounts/saves were modified.
+Observed: Pause 360px, inventory 520px, maximum 640px height; centered desktop
+panels, touch bottom sheets, fixed title/footer and one scroll region. Pause order:
+Anzeige (Handy/Leiste), Hilfe, Leute & Chat, Nachrichten, Änderungen, Inventar,
+Dex, Quests, Erfolge, Party, Weltkarte, Kapsel, Feedback, Ton, Teilen; green Weiter.
+Inventory has collapsible categories with distinct-item and total-piece counts,
+name/count/description, contextual actions and a neutral Zurück returning to the
+world. Fresh guest categories: Heilen, Rausch, Chips, Samen, Kleidung, Keys.
+Green headings except orange Rausch/Keys and gray Kleidung. Existing extra 3D
+categories stay in the original source order. Color tokens: #070708 background,
+#121416 panel, #1a1c20 surfaces, #2a2a30 borders, #e8e8ea text, #8a8a90 muted,
+#7cff6b active; IBM Plex Sans body and Press Start 2P headings. HUD: compact
+cash/time/level/outfit at top left, collapsible minimap right, optional bottom
+shortcuts and touch controls. Local licensed fonts now match these families.
+Existing category glyphs remain; the original's illustrated item icons are not
+claimed as imported. Online entries link honestly to the live original; no new
+chat/account/payment server is implied.
+
+**Ben’s Grow requirement:** plant/care/harvest actions sit directly below the
+pot/growbox selector, ahead of the illustration and long bonus/harvest details.
+Empty slots keep seed/fertilizer inputs with the planting button in this action
+area. Original prices, care bonuses and planting rules remain unchanged.
+
+Evidence: `/workspace/scratch/420mon-audit/v51-reference-notes.md`, reference
+screenshots and recorded guest observations. Ben performs the next visual/gameplay
+check in the published test build. Validation here is build + affected tests only.
+
 ## Remaining work — Bens neue Prioritäten (2026-10-22)
 
 PR #54 / v47 is complete, merged and live. Coverage is 96 individual sculptures /
@@ -890,7 +932,7 @@ sign and post), Spotlamp (round lens, magenta housing, neck and tripod).
 Original references/hashes and shared PBR/UV/cache remain; previous 90
 geometries, toolkit, renderer and gameplay/saves are unchanged.
 
-**DEFERRED until after clothing, GUI, performance and district detail:** individual
+**Monster erst nach Freigabe — explicit approval from Ben required even after fixes, GUI, performance and district detail:** individual
 anatomy/detail work for the remaining **324 original species, starting Dex #97**,
 following the 2D artwork and reference. Current
 coverage is 96 authored / 324 smooth reconstructions.

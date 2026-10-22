@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — v51 GUI nach Live-2D und Grow-Aktionen oben
+
+Annahme v51: Die beobachtete 2D-Menüstruktur/Farben/Schriften/Touch-Bottomsheets werden auf vorhandene 3D-Funktionen übertragen; Handy/Leiste ist eine separate UI-Einstellung, bestehende Item-Glyphen bleiben bis echte Originalillustrationen übernommen werden.
+
+- v50 PR #57 jetzt live, Main CI 39827460352/Pages 39827460331 grün, Assets geprüft. v49 PR #56 ebenfalls veröffentlicht.
+- GUI: feste Header/Footer, geordnete Inventarzähler/Aktionen, weniger HUD-Überlappung, Daten links/Minimap rechts, Shortcuts unten; Funktionen bleiben über Menüs zugänglich. Lokale OFL-Schriften in public/fonts + ASSET_ATTRIBUTION.
+- Grow: Auswahl → Eingaben/Pflanzen oder Gieß-Rhythmus/Ernten → Illustration/lange Details. Keine Regel-/Bonus-/Handelsänderungen.
+- Neue Sparregel gilt: nur Build + direkt betroffene Tests, keine Browser-/Kombinations-/Vollsuite. Ben prüft selbst im Testbuild. v51 Build + 28/28 betroffene Tests (inventory-menu, grow, trade-state) grün; keine Browserrunde/Vollsuite. PR/Merge/Deploy als Nächstes. Danach Performance/Bezirke; Monster erst nach Bens ausdrücklicher Freigabe.
+
 # Aktueller Wiedereinstieg — v50 gemergt; weiter mit GUI v51
 
 - Starter-Koffer PR #57, Source `97e68c9c9904ebb4d4e8668b25306bf6b62e2e1d`, gemergt. 214 Tests + korrigierter Build; bereits gestarteter Smoke abgeschlossen, keine neuen Browserläufe. PR CI 39827322232 grün, Pages 39827460331 noch zu bestätigen.
