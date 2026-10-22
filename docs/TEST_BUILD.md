@@ -1,4 +1,4 @@
-> **v51 — GUI ready for publication:** live-2D menu structure, fixed title/footer,
+> **Published v51 — GUI, [PR #58](https://github.com/BenJG420/420mon-3D/pull/58), source `095856c`:** live-2D menu structure, fixed title/footer,
 > touch bottom sheets, readable inventory counts/actions, compact HUD, separate
 > Handy/Leiste layout and graphic quality. Licensed local reference fonts.
 > **Grow actions are directly under the pot/growbox selector.**
@@ -6,7 +6,11 @@
 > No new browser run, broad suite or combination check: Ben performs visual and
 > gameplay checks in the test build, per his latest instruction. Existing item
 > glyphs remain; illustrated 2D item icons are a documented visual difference.
-> PR/merge/publication pending. Monster erst nach Freigabe.
+> PR CI `39828716546`, main CI `39828751359` and Pages `39828751392` passed.
+> Live JS `index-DHW3W9Wh.js`, SHA256 `3ebf0b02af182387731afaca713267bc64f663202dfc66d9191df76ca26c5264`;
+> CSS `index-CDjTSEA-.css` and both fonts are byte-identical to the local build.
+> Pages log retrieval was empty; deployment success + live/local bytes verified.
+> Stable root unchanged. NEXT: Performance/FPS, then districts. Monster erst nach Freigabe.
 
 > **v50 — starter case, merged [PR #57](https://github.com/BenJG420/420mon-3D/pull/57), source `97e68c9`:** the original saved `starterId` now removes the case
 > from the room, interaction, collision, safe-spawn blockers and minimap after
@@ -739,7 +743,7 @@ Evidence: `/workspace/scratch/420mon-audit/v51-reference-notes.md`, reference
 screenshots and recorded guest observations. Ben performs the next visual/gameplay
 check in the published test build. Validation here is build + affected tests only.
 
-## Remaining work — Bens neue Prioritäten (2026-10-22)
+## Remaining work — Bens neue Prioritäten (2026-10-23)
 
 PR #54 / v47 is complete, merged and live. Coverage is 96 individual sculptures /
 324 smooth reconstructions. The new owner order below supersedes every older
@@ -761,14 +765,14 @@ are historical; existing repository CI may run automatically.
    stock, funds, bounds and save integrity. Preserve original prices and rules.
 3. **DONE — Starter case, PR #57 / v50:** remove the case from the room once a starter has
    been chosen. Keep it absent after reload and in existing saves; add a test.
-4. **NEXT — GUI:** use the running 2D version at https://coral-nova-gem-pearl.grok.me/
+4. **DONE — GUI, PR #58 / v51:** use the running 2D version at https://coral-nova-gem-pearl.grok.me/
    as the menu, inventory and HUD reference. Inspect its guest start (no email),
    reproduce the observed hierarchy/appearance/behavior and record findings here.
    **Grow touch priority:** put “Gieß-Rhythmus spielen” and planting/action buttons
    immediately below the pot/growbox selector, so selection and action do not
    require scrolling back and forth. Declutter overlaps and keep desktop/touch readable. Existing 2D saves originated
    there; preserve their import, never write to or reset that original save.
-5. **Performance:** measure FPS before and after; improve stable frame rates
+5. **NEXT — Performance/FPS:** measure FPS before and after; improve stable frame rates
    through appropriate instancing, LOD, culling, texture/shader optimization and
    a shadow budget. Record measurement scene, device/emulation and settings.
 6. **District detail — one PR per district:** preserve each original 2D layout,

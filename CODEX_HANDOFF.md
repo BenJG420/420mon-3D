@@ -1,3 +1,11 @@
+# Aktueller Wiedereinstieg — v51 veröffentlicht; Performance/FPS v52 als Nächstes
+
+- GUI PR #58 gemergt/live, Source `095856c1e558c2ccfcc830a8eb5b961db128e37d`. Grow-Aktionen direkt unter Auswahl, Menü/Inventar/HUD nach tatsächlich besuchter 2D-Vorlage. Existierende Itemglyphen behalten; kein Import illustrierter Itembilder behaupten.
+- Build + 28 direktbetroffene Tests grün, keine neue Browser-/Kombinations-/Vollsuite. PR CI 39828716546/Main CI39828751359/Pages39828751392 ebenfalls grün. Live JS `index-DHW3W9Wh.js`, SHA256 `3ebf0b02af182387731afaca713267bc64f663202dfc66d9191df76ca26c5264`, CSS `index-CDjTSEA-.css` und beide lokalen OFL-Fonts bytegleich zu lokalem Build; Stable unverändert. Pages-Logabruf leer, daher Nachweis über Workflowstatus und Livebytes. `/workspace/scratch/420mon-audit/v51-deploy-proof.json`.
+- Ben 2026-10-23: nächster Punkt Performance/FPS, danach Bezirke einzeln/eigener PR, eigene Dächer/Fassaden/Schilder/Neon/Müll/Pfützen; Spieler/NPCs nicht verändern. Nur Build+betroffene Tests, Ben prüft im Testbuild. Monster erst nach Bens ausdrücklicher Freigabe.
+
+## Historischer Verlauf
+
 # Aktuelle Arbeit — v51 GUI nach Live-2D und Grow-Aktionen oben
 
 Annahme v51: Die beobachtete 2D-Menüstruktur/Farben/Schriften/Touch-Bottomsheets werden auf vorhandene 3D-Funktionen übertragen; Handy/Leiste ist eine separate UI-Einstellung, bestehende Item-Glyphen bleiben bis echte Originalillustrationen übernommen werden.
