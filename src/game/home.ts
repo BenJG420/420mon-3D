@@ -15,6 +15,7 @@ import { spriteUrl } from "./sprites";
 import { trainerById, trainerPages, trainerStatus } from "./trainers";
 import { nimDialogue, declineNim } from "./nim";
 import { achievementCounts } from "./achievements";
+import { hasChosenStarter } from "./starter-state";
 
 type FishingActions = { openFishing: (obj: MapObj) => void; openTank: (obj: MapObj) => void };
 
@@ -60,11 +61,11 @@ export function createHomeInteractions(world: DistrictTravel, grow: GrowActions,
   }
   function starter() {
     const s = getSave();
-    if (s.starterId) { show("Der Koffer", ["Die Kiste ist leer. Dein Partner läuft schon mit."]); return; }
+    if (hasChosenStarter(s)) return;
     show("Dein erster Partner", ["Drei Original-420mon warten im Koffer. Wähle deinen Partner für Lowtown."], STARTERS.map(id => ({
       label: DEX[id].name + " · LV 5", image: spriteUrl(DEX[id].sprite),
       run: () => {
-        const current = getSave(); if (current.starterId) return;
+        const current = getSave(); if (hasChosenStarter(current)) return;
         const mon = createPartner(id, 5);
         (current.team.length < 6 ? current.team : current.box).push(mon);
         current.starterId = id;

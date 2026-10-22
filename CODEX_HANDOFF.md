@@ -1,3 +1,11 @@
+# Aktuelle Arbeit — v50 Starter-Koffer
+
+Annahme v50: Wie 2D runtime.objLive gilt ausschließlich ein nichtleerer gespeicherter starterId als abgeschlossene Wahl; Team/Box/eddiSeed allein beweisen keine Starterwahl und dürfen den Koffer nicht entfernen.
+
+- PR #56 / v49 ist gemergt und live. Jetzt Koffer nach Wahl aus Darstellung, Minimap, Interaktion und Kollision entfernen; reguläre alte 3D-/2D-Saves enthalten starterId bereits. Keine neuen Rewards/Migrationen.
+- v50: vor neuer Sparregel bereits 214/214 Tests bestanden; erster Build TS-Weak-Type-Fehler, korrigierter Build bestanden. Bereits gestarteter kurzer Browsercheck fertig: echte Wahl/Reload und alter 2D-Save auf Touch erfolgreich, HP0/XP17/Originalslot erhalten, keine Browser-/Shaderfehler. Keine weitere Browserprüfung. PR/Merge jetzt.
+- NEUE Sparregel Ben 2026-10-22: nur Build und direkt betroffene Tests; keine breiten Suiten/Kombinationsläufe/Browser-Runden mehr. Ben testet selbst im Testbuild. Für GUI Grow-Pflege-/Pflanzaktionen direkt unter Topf-/Growbox-Auswahl platzieren.
+
 # Aktueller Wiedereinstieg — v49 gemergt und live; nächster Schritt Starter-Koffer
 
 - PR #56 fertig, Source `a10f5a42779bbe03d1a7535b2be1d8a7a6ae7133`. Mengenwahl für NPC/Grow/Kapseln, Originalpreise, einmalige Buchung und vollständiger Rollback bei Speicherfehlern.

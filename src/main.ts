@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { createPlayerOcclusion } from "./game/occlusion";
+import { isTakenStarter } from "./game/starter-state";
 import { createMonsterGame } from "./game/monsters";
 import { createGameSystems } from "./game/systems";
 import { createDistrictWorld } from "./game/world";
@@ -494,6 +495,7 @@ function drawLocalMap() {
   mapContext.fillStyle = "#71857b";
   for (const wall of m.walls) mapContext.fillRect(ox + wall.x * scale, oy + wall.y * scale, Math.max(1, wall.w * scale), Math.max(1, wall.h * scale));
   for (const obj of m.objs) {
+    if (isTakenStarter(obj, getSave().starterId)) continue;
     mapContext.fillStyle = obj.kind === "door" || obj.kind === "manhole" ? "#ecc782" : obj.kind === "pot" ? "#81b478" : "#829aaa";
     mapContext.fillRect(ox + obj.x * scale, oy + obj.y * scale, Math.max(3, obj.w * scale), Math.max(3, obj.h * scale));
   }

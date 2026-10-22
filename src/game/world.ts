@@ -8,6 +8,7 @@ import { stageOf } from "./data/progress";
 import { createWorldSurfaces, projectSurfaceUvs } from "./world-surfaces";
 import { createNpcHuman } from "./npc-humanoids";
 import { getDistrictGraphics } from "./graphics-profile";
+import { isTakenStarter } from "./starter-state";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -272,7 +273,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
 
   function renderObject(obj: MapObj) {
-    if (obj.kind === "wild" || isDefeatedGate(obj, getSave().deadWild)) return; // Encounters own wild meshes; defeated gate trainers vanish.
+    const save = getSave();
+    if (obj.kind === "wild" || isDefeatedGate(obj, save.deadWild) || isTakenStarter(obj, save.starterId)) return;
     const g = objectGroup(obj);
     if (obj.kind === "pot") planter(obj, g);
     else if (obj.kind === "bed" || obj.kind === "mattress") bed(obj, g);
@@ -588,10 +590,10 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     // The original Gasse Felix leaves after hiring; his capsule body is separate.
     if (getSave().felixHired && id === "alley") removeMapObject("felix");
   }
-  function syncDefeatedGates() {
-    const defeatedIds = getSave().deadWild;
+  function syncRemovedObjects() {
+    const save = getSave();
     for (const obj of active.objs) {
-      if (!isDefeatedGate(obj, defeatedIds)) continue;
+      if (!isDefeatedGate(obj, save.deadWild) && !isTakenStarter(obj, save.starterId)) continue;
       removeMapObject(obj.id);
     }
   }
@@ -640,7 +642,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         const exit = active.objs.find(o => o.kind === "door" || o.kind === "manhole");
         return exit ? { x: exit.x + exit.w / 2, y: exit.y + exit.h / 2 } : { x: active.w / 2, y: active.h / 2 };
       })();
-    const spawn = safeSpawn(active, desired.x, desired.y, .48, progress.deadWild);
+    const spawn = safeSpawn(active, desired.x, desired.y, .48, progress.deadWild, progress.starterId);
     player.position.copy(at(spawn.x, spawn.y)); player.rotation.y = 0;
     lastPosition = { x: NaN, y: NaN }; saveLocation();
     localStorage.setItem("420mon-current-map", id); localStorage.setItem("420mon-district", id);
@@ -660,9 +662,9 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   function closestInteraction() {
     const p = sourcePosition();
     let best: MapObj | undefined, closest = 1.9;
-    const defeatedIds = getSave().deadWild;
+    const save = getSave();
     for (const object of active.objs) {
-      if (object.kind === "wild" || object.kind === "sign" || isDefeatedGate(object, defeatedIds)) continue;
+      if (object.kind === "wild" || object.kind === "sign" || isDefeatedGate(object, save.deadWild) || isTakenStarter(object, save.starterId)) continue;
       if (object.id === "felix" && getSave().felixHired) continue;
       const d = distance(object, p);
       if (d < closest) { closest = d; best = object; }
@@ -739,7 +741,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     }
     for (const glow of glowing) (glow.mesh.material as THREE.MeshStandardMaterial).emissiveIntensity = .55 + Math.sin(time / 1800 + glow.phase) * .08;
   }
-  window.addEventListener("420mon-save-changed", syncDefeatedGates);
+  window.addEventListener("420mon-save-changed", syncRemovedObjects);
   const saved = getSave();
   const requested = saved.map ?? localStorage.getItem("420mon-current-map") ?? localStorage.getItem("420mon-district") ?? "capsule";
   // Initial load must read location before travel writes the active map.
@@ -755,7 +757,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       shopFn(obj); return true;
     },
     openShop: fn => { shopFn = fn; }, update,
-    collides: (x, z, radius = .48) => collidesOnMap(active, x, z, radius, getSave().deadWild),
+    collides: (x, z, radius = .48) => collidesOnMap(active, x, z, radius, getSave().deadWild, getSave().starterId),
     getOccluders: () => occluders,
     getMapInfo: () => ({ id, name: active.name, map: active, w: active.w, h: active.h, scale: WORLD_SCALE,
       bounds: { minX: -active.w * WORLD_SCALE / 2, maxX: active.w * WORLD_SCALE / 2, minZ: -active.h * WORLD_SCALE / 2, maxZ: active.h * WORLD_SCALE / 2 }, player: sourcePosition() }),

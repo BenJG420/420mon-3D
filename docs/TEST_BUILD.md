@@ -1,3 +1,12 @@
+> **v50 — starter case:** the original saved `starterId` now removes the case
+> from the room, interaction, collision, safe-spawn blockers and minimap after
+> choosing. The same marker in existing 3D/2D saves keeps it absent after reload;
+> party, box or `eddiSeed` alone never count as a choice. Original rewards retained.
+> 214/214 tests and corrected build passed before the new lean-validation rule.
+> The already-running fresh-choice/reload and old-2D-save touch smoke completed
+> successfully, including HP0/XP17 and unchanged original/stable saves. No browser
+> or shader errors. First build had a corrected TypeScript weak-type error. PR pending.
+
 > **Published v49 — Mengenhandel:** [PR #56](https://github.com/BenJG420/420mon-3D/pull/56), source `a10f5a4`.
 > NPC shops, capsules and Grow shop share slider, +/−, Max, numeric input, live total
 > and one full-batch confirmation. Original per-unit prices/bonuses, bounds and
@@ -83,7 +92,7 @@
 > **NEXT: Dex #79. Coverage: 78 authored / 342 smooth reconstructions.**
 > Three rounds completed; same test URL and save slots.
 
-# Original-world test build v49
+# Original-world test build v50
 
 This is an integrated continuation of 420mon-3D. The original private 2D game
 BenJG420/420mon remains the specification. The visual reference supplied by the
@@ -692,7 +701,10 @@ module tests; his browser interaction remains a user-check item.
 
 PR #54 / v47 is complete, merged and live. Coverage is 96 individual sculptures /
 324 smooth reconstructions. The new owner order below supersedes every older
-NEXT/order note. One complete playable package per PR, maximum three check rounds.
+NEXT/order note. One complete playable package per PR. **Latest rule (Ben 2026-10-22):
+build + directly affected tests only; no broad suites, combination sweeps or browser
+runs. Ben tests gameplay in the published test build.** Older check budgets below
+are historical; existing repository CI may run automatically.
 
 1. **DONE — Kleidung, PR #55 / v48:** separate freely combinable slots for **Oberteil, Jacke,
    Hose, Schuhe, Kopf, Accessoires**, including Latzhose with Lederjacke. Swapping
@@ -710,7 +722,9 @@ NEXT/order note. One complete playable package per PR, maximum three check round
 4. **GUI:** use the running 2D version at https://coral-nova-gem-pearl.grok.me/
    as the menu, inventory and HUD reference. Inspect its guest start (no email),
    reproduce the observed hierarchy/appearance/behavior and record findings here.
-   Declutter overlaps and keep desktop/touch readable. Existing 2D saves originated
+   **Grow touch priority:** put “Gieß-Rhythmus spielen” and planting/action buttons
+   immediately below the pot/growbox selector, so selection and action do not
+   require scrolling back and forth. Declutter overlaps and keep desktop/touch readable. Existing 2D saves originated
    there; preserve their import, never write to or reset that original save.
 5. **Performance:** measure FPS before and after; improve stable frame rates
    through appropriate instancing, LOD, culling, texture/shader optimization and

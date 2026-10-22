@@ -8,7 +8,7 @@ import { build } from "esbuild";
 const root = fileURLToPath(new URL("../", import.meta.url));
 const compiled = await build({
   stdin: {
-    contents: 'export * from "./src/game/worldGeometry.ts"; export { MAPS, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y } from "./src/game/data/maps.ts"; export { createDistrictWorld } from "./src/game/world.ts"; export { getSave } from "./src/game/save.ts"; export { Scene, Group, Mesh, BoxGeometry, MeshBasicMaterial } from "three";',
+    contents: 'export * from "./src/game/worldGeometry.ts"; export * from "./src/game/starter-state.ts"; export { MAPS, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y } from "./src/game/data/maps.ts"; export { createDistrictWorld } from "./src/game/world.ts"; export { getSave, saveProgress } from "./src/game/save.ts"; export { Scene, Group, Mesh, BoxGeometry, MeshBasicMaterial } from "three";',
     resolveDir: root,
   },
   bundle: true,
@@ -17,7 +17,7 @@ const compiled = await build({
   format: "esm",
 });
 const { WORLD_SCALE, mapToWorld, worldToMap, collidesOnMap, safeSpawn, MAPS, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y,
-  createDistrictWorld, getSave, Scene, Group, Mesh, BoxGeometry, MeshBasicMaterial } = await import(
+  hasChosenStarter, isTakenStarter, createDistrictWorld, getSave, saveProgress, Scene, Group, Mesh, BoxGeometry, MeshBasicMaterial } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputFiles[0].text).toString("base64")}`
 );
 
@@ -117,6 +117,28 @@ test("original Kapsel start and legacy map-centre saves stay reachable", () => {
   }
 });
 
+test("only the saved starter choice removes the case from collision and safe spawn", () => {
+  const capsule = MAPS.capsule, starter = capsule.objs.find(object => object.id === "starter");
+  const centre = { x: starter.x + starter.w / 2, y: starter.y + starter.h / 2 };
+  const position = mapToWorld(capsule, centre.x, centre.y);
+  for (const starterId of [undefined, null, "", "  ", false, true, 42, {}]) {
+    assert.equal(hasChosenStarter({ starterId }), false);
+    assert.equal(isTakenStarter(starter, starterId), false);
+    assert.equal(collidesOnMap(capsule, position.x, position.z, .48, [], starterId), true);
+    assert.notDeepEqual(safeSpawn(capsule, centre.x, centre.y, .48, [], starterId), centre);
+  }
+  for (const starterId of ["mon_budling", "mon_glitchbitch", "mon_neonpunx", "legacy-chosen-species"]) {
+    assert.equal(hasChosenStarter({ starterId }), true);
+    assert.equal(isTakenStarter(starter, starterId), true);
+    assert.equal(collidesOnMap(capsule, position.x, position.z, .48, [], starterId), false);
+    assert.deepEqual(safeSpawn(capsule, centre.x, centre.y, .48, [], starterId), centre);
+    assert.equal(isTakenStarter(capsule.objs.find(object => object.id === "felix_crate"), starterId), false);
+    const bed = capsule.objs.find(object => object.kind === "bed");
+    const bedCentre = mapToWorld(capsule, bed.x + bed.w / 2, bed.y + bed.h / 2);
+    assert.equal(collidesOnMap(capsule, bedCentre.x, bedCentre.z, .48, [], starterId), true, "other furniture remains solid");
+  }
+});
+
 test("world interaction, original door gates and resource ownership work together", () => {
   const savedGlobals = Object.fromEntries(["window", "document", "localStorage", "CustomEvent"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
   const data = new Map([["420mon-progress-v1", JSON.stringify({ gold: 150, map: "retired-map", x: 210, y: 15 })]]);
@@ -156,6 +178,36 @@ test("world interaction, original door gates and resource ownership work togethe
     pressE(); prompt.onclick();
     assert.equal(interactionCount, 1, "keyboard and stale touch prompt are inert behind a dialog");
     modalOpen = false;
+
+    // Use the actual save event and world object graph, without rebuilding the room.
+    player.position.copy(world.toWorld(162, 110)); world.update();
+    const caseGroup = world.getRoot().getObjectByName("map-object:starter");
+    assert.ok(caseGroup, "fresh saves retain the visible case and label");
+    assert.equal(prompt.dataset.object, "starter");
+    assert.equal(pressE().defaultPrevented, true);
+    assert.equal(interacted.kind, "starter");
+    const caseCentre = world.toWorld(162, 84);
+    assert.equal(world.collides(caseCentre.x, caseCentre.z), true);
+    const growMesh = new Mesh(new BoxGeometry(), new MeshBasicMaterial());
+    world.getRoot().add(growMesh);
+    let caseDisposed = false, growDisposed = false;
+    caseGroup.traverse(object => { if (object.isMesh) object.geometry.addEventListener("dispose", () => { caseDisposed = true; }); });
+    growMesh.geometry.addEventListener("dispose", () => { growDisposed = true; });
+    const otherFurniture = world.getRoot().getObjectByName("map-object:bed");
+    assert.equal(saveProgress({ starterId: "mon_budling" }), true);
+    assert.equal(world.getRoot().getObjectByName("map-object:starter"), undefined);
+    assert.equal(caseDisposed, true);
+    assert.equal(prompt.hidden, true, "save event also clears the stale touch prompt");
+    assert.equal(growMesh.parent, world.getRoot());
+    assert.equal(growDisposed, false, "removing the case preserves independently owned Grow meshes");
+    assert.strictEqual(world.getRoot().getObjectByName("map-object:bed"), otherFurniture);
+    assert.equal(world.collides(caseCentre.x, caseCentre.z), false);
+    const afterChoiceCount = interactionCount;
+    pressE(); prompt.onclick();
+    assert.equal(interactionCount, afterChoiceCount, "neither keyboard nor stale touch action can reopen the removed case");
+    world.travel("studio"); world.travel("capsule", 162, 84);
+    assert.equal(world.getRoot().getObjectByName("map-object:starter"), undefined, "returning to the room retains the choice");
+    assert.deepEqual(world.getMapInfo().player, { x: 162, y: 84 }, "spawn no longer pushes the player away from the empty footprint");
 
     // Original main street exit needs both Bolt's quest and the level band.
     world.travel("alley", 2530, 716);
@@ -200,6 +252,10 @@ test("world interaction, original door gates and resource ownership work togethe
     const studioChildren = root.children.length;
     world.travel("capsule"); world.travel("studio");
     assert.equal(root.children.length, studioChildren, "only one active map's objects remain after revisiting rooms");
+    world.travel("capsule", 162, 84);
+    const loadedWorld = createDistrictWorld(new Scene(), new Group());
+    assert.equal(loadedWorld.getRoot().getObjectByName("map-object:starter"), undefined, "initial world construction with an old saved choice creates no case");
+    assert.equal(loadedWorld.collides(caseCentre.x, caseCentre.z), false);
   } finally {
     for (const [key, descriptor] of Object.entries(savedGlobals)) {
       if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key];
