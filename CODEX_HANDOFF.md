@@ -1,3 +1,13 @@
+# Aktuelle Arbeit — v49 Mengenwahl, danach Starter-Koffer und GUI
+
+Annahme v49: Mengenhandel gilt für NPC-Shops, Fangkapseln und Grow-Shop; einmalige Topf-/Boxfreischaltungen bleiben Einzelkäufe, Original-Stückpreise und Boni bleiben unverändert; bestätigter Stückpreis gilt für die Gesamtmenge, durch den Verkauf neu freigeschaltete Boni ab dem nächsten Vorgang.
+
+- Ben 2026-10-22: Mengenwahl als eigenes Paket/PR fertigstellen, danach Starter-Koffer, danach GUI. v49: Prüfblock 1 erfolgreich (211/211 Tests + Build). Prüfblock 2: NPC-Handel/Desktop inklusive Speicherfehler/Rücksetzen erfolgreich, Bild geprüft; Grow-Touch stoppte im Harness, weil pagehide die vor Reload gesetzte Position überschrieb. Kein Browser-/Shaderfehler. Max-Umbruch/Bestätigungsfarbe korrigiert; Block 3 ist PR/CI/Deploy plus gezielter Grow-Touch-Livecheck. Kein weiterer Volltest.
+- GUI-Referenz live https://coral-nova-gem-pearl.grok.me/ ohne E-Mail ansehen; Menü, Inventar, HUD nachbauen und Sichtbefund in TEST_BUILD.md dokumentieren. Isolierter Gastkontext, keine bestehenden 2D-Spielstände ändern.
+- **Monster erst nach Freigabe**: keine weiteren Sculpts ohne Bens ausdrückliche Zustimmung. Vorher Fehler/Performance sowie sämtliche Bezirksgrafik/-details abschließen; Abschluss dieser Arbeiten ist keine automatische Freigabe.
+
+## Letzter veröffentlichter Stand
+
 # Aktueller Wiedereinstieg — v48 Kleidung fertig, gemergt, live
 
 Annahme v48: Vorhandene Kleidungsitems schalten passende Einzelteile frei; sechs Slots kombinieren sie auf den bestehenden Rigs. Alte Outfits werden in Slots überführt, Originalboni bleiben bei einem aktiven Kleidungsitem ohne Addition; keine neuen Käufe oder Änderungen an NPCs/Animationen.

@@ -5,7 +5,9 @@ import { ITEMS, CAT_LABEL, groupedInv, itemUseLabel, SHOP, STALL_CHIPS, STALL_TH
 import { xpToNext } from "./data/progress";
 import { consumeFish, consumeSmoke, activeFishEffects } from "./fish-consumption";
 import { questProgress } from "./quests";
-import { salePrice, sellMerchantItem } from "./merchant-state";
+import { salePrice } from "./merchant-state";
+import { quoteTrade, executeTrade, type TradeOffer } from "./trade-state";
+import { renderTradePicker } from "./trade-picker";
 import { QUEST_DEFS } from "./data/quests";
 
 import { getSave, saveProgress, maxHp, healLiving, type Save } from "./save";
@@ -36,12 +38,13 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
   let merchant = "LOWTOWN · SHOP";
   let merchantItems: string[] = SHOP;
   let merchantSellMultiplier = 1;
+  let trade: { offer: TradeOffer; label: string; action: "Kaufen" | "Verkaufen"; quantity: string } | null = null;
   world.openShop(obj => {
     if (obj?.stall === "grow" && openGrowShop) { openGrowShop(); return; }
     merchant = obj?.label ?? "LOWTOWN · SHOP";
     merchantSellMultiplier = obj?.stall === "chips" ? .9 : obj?.stall === "threads" ? .85 : obj?.stall === "fence" ? 1.15 : 1;
     merchantItems = obj?.stall === "chips" ? STALL_CHIPS : obj?.stall === "threads" ? STALL_THREADS : obj?.stall === "fence" ? STALL_FENCE : SHOP;
-    tab = "shop"; panel.hidden = false; render();
+    trade = null; tab = "shop"; panel.hidden = false; render();
   });
   const escape = (v: string) => v.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c]!);
   const save = (v: Save) => { saveProgress(v); };
@@ -52,8 +55,8 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
     const tabsHost = q("systems-tabs");
     tabsHost.replaceChildren();
     if (tab !== "pause") {
-      const back = document.createElement("button"); back.textContent = healPick ? "← Zurück zum Inventar" : "← Zurück";
-      back.onclick = () => { if (healPick) healPick = ""; else tab = "pause"; render(); }; tabsHost.append(back);
+      const back = document.createElement("button"); back.textContent = trade ? "← Zum Handel" : healPick ? "← Zurück zum Inventar" : "← Zurück";
+      back.onclick = () => { if (trade) trade = null; else if (healPick) healPick = ""; else tab = "pause"; render(); }; tabsHost.append(back);
     }
     const body = q("systems-content");
     body.replaceChildren();
@@ -63,7 +66,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
       const strong = document.createElement("strong"); strong.textContent = label; b.append(strong);
       if (description) { const small = document.createElement("small"); small.textContent = description; b.append(small); }
       if (action) b.onclick = action; else b.disabled = true;
-      body.append(b);
+      body.append(b); return b;
     };
     const known = new Set(s.collection);
     if (tab === "pause") {
@@ -226,28 +229,35 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
       }
     } else if (tab === "shop") {
       title(merchant.toUpperCase() + " · " + s.gold + " ₲");
-      row("◉ FANGKAPSEL ×1 · 25 ₲", () => {
-        if (!world.shopNearby()) { panel.hidden = true; return; }
-        if (s.gold! < 25) { note("Nicht genug Geld."); return; }
-        s.gold! -= 25; s.balls++; save(s); render(); note("Fangkapsel gekauft.");
-      });
+      const selectTrade = (offer: TradeOffer, label: string, action: "Kaufen" | "Verkaufen") => {
+        if (!world.shopNearby()) { close(); return; }
+        trade = { offer, label, action, quantity: "1" }; render();
+      };
+      if (trade) {
+        const draft = trade;
+        renderTradePicker(body, {
+          label: draft.label, action: draft.action, initialQuantity: draft.quantity,
+          onQuantityChange: raw => { draft.quantity = raw; },
+          quote: quantity => quoteTrade(s, draft.offer, quantity),
+          confirm: (quantity, unitPrice) => {
+            if (!world.shopNearby()) { close(); return { ok: false, message: "Sprich den Händler erneut an." }; }
+            const result = executeTrade(s, draft.offer, quantity, unitPrice, () => saveProgress(s));
+            if (result.ok) { trade = null; render(); note(result.message); }
+            return result;
+          },
+          cancel: () => { trade = null; render(); },
+        });
+        return;
+      }
+      row("◉ FANGKAPSEL · 25 ₲", () => selectTrade({ kind: "capsule", id: "capsule" }, "Fangkapsel", "Kaufen"), "Menge wählen").dataset.tradeBuy = "capsule";
       for (const id of merchantItems) {
         const it = ITEMS[id]; if (!it.buy || it.cat === "key") continue;
-        row(it.name + " · " + it.buy + " ₲", () => {
-          if (!world.shopNearby()) { panel.hidden = true; return; }
-          if (s.gold! < it.buy!) { note("Nicht genug Geld."); return; }
-          s.gold! -= it.buy!; s.inventory![id] = (s.inventory![id] ?? 0) + 1;
-          save(s); render(); note(it.name + " gekauft.");
-        }, it.desc);
+        row(it.name + " · " + it.buy + " ₲", () => selectTrade({ kind: "buy", id, items: merchantItems }, it.name, "Kaufen"), it.desc).dataset.tradeBuy = id;
       }
       title("VERKAUFEN · DEIN INVENTAR");
       for (const [id, count] of Object.entries(s.inventory)) {
         const price = salePrice(s, id, merchantSellMultiplier); if (count < 1 || !price) continue;
-        row(`${ITEMS[id].name} ×${count} · +${price} ₲`, () => {
-          if (!world.shopNearby()) { panel.hidden = true; return; }
-          const earned = sellMerchantItem(s, id, merchantSellMultiplier);
-          if (earned) { save(s); render(); note(`${ITEMS[id].name} verkauft · +${earned} Softcash.`); }
-        }, "Ein Stück verkaufen");
+        row(`${ITEMS[id].name} ×${count} · +${price} ₲`, () => selectTrade({ kind: "sell", id, sellMultiplier: merchantSellMultiplier }, ITEMS[id].name, "Verkaufen"), "Menge wählen").dataset.tradeSell = id;
       }
     } else if (tab === "world") {
       title("LOWTOWN · STADTPLAN");
@@ -282,10 +292,10 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
 
     }
   }
-  function close() { panel.hidden = true; healPick = ""; q("systems-open").focus(); }
+  function close() { panel.hidden = true; healPick = ""; trade = null; q("systems-open").focus(); }
   function open(next: string) {
     if (document.querySelector(".monster-battle:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.grow-backdrop:not([hidden]),.monster-model-overlay:not([hidden]),.slot-overlay:not([hidden]),.achievement-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.studio-panel.is-open")) return;
-    tab = next; healPick = ""; openCats.clear(); panel.hidden = false; render();
+    trade = null; tab = next; healPick = ""; openCats.clear(); panel.hidden = false; render();
     window.dispatchEvent(new Event("420mon-menu-opened")); q("systems-close").focus();
   }
   q("systems-open").onclick = () => open("pause");
@@ -305,15 +315,15 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
         if (event.shiftKey && document.activeElement === first) {event.preventDefault();last?.focus();}
         else if (!event.shiftKey && document.activeElement === last) {event.preventDefault();first?.focus();}
       }
-      if (event.code === "Escape") { event.preventDefault(); if (healPick) { healPick="";render(); } else if (tab!=="pause") {tab="pause";render();} else close(); }
+      if (event.code === "Escape") { event.preventDefault(); if (trade) {trade=null;render();} else if (healPick) { healPick="";render(); } else if (tab!=="pause") {tab="pause";render();} else close(); }
       else if (event.code === "KeyT") {event.preventDefault();const s=load();const result=persistClothingChange(s,()=>toggleBag(s),()=>saveProgress(s));if(result.ok){render();}note(result.lines.join(" "));}
-      else if (event.code === "KeyI") {event.preventDefault();if(tab==="bag")close();else{tab="bag";healPick="";render();}}
+      else if (event.code === "KeyI") {event.preventDefault();if(tab==="bag")close();else{trade=null;tab="bag";healPick="";render();}}
       return;
     }
     const next: Record<string,string> = {KeyI:"bag",KeyB:"dex",KeyM:"world",KeyH:"help",Escape:"pause"};
     if (next[event.code]) {open(next[event.code]);if(!panel.hidden)event.preventDefault();}
   }, true);
-  window.addEventListener("420mon-save-changed", () => { if (!panel.hidden) render(); });
+  window.addEventListener("420mon-save-changed", () => { if (!panel.hidden && !trade) render(); });
   window.addEventListener("420mon-open-quests", () => open("quest"));
   render();
 }

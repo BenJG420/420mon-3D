@@ -1,13 +1,16 @@
 import * as THREE from "three";
 import { BOX_UNLOCK, GROW_SLOTS, ITEMS, POT_UNLOCK, STALL_GROW, STRAIN_LABEL, isGrowBox, strainOfItem } from "./data/items";
 import { formatGrowLeft, potYieldRaw, strainGrowBase, wallLeft } from "./data/grow";
-import { buyGrowItem, buyNextSlot, ensureGrowState, growRemaining, harvestPot, plantPot, recordGrowCare, growCareBonus, previewGrowHarvest, sellGrowBud, sleepGrow, slotOpen } from "./grow-state";
+import { buyNextSlot, ensureGrowState, growRemaining, harvestPot, plantPot, recordGrowCare, growCareBonus, previewGrowHarvest, sleepGrow, slotOpen } from "./grow-state";
 import { advanceStoryGrow as advanceGrow } from "./story-grow";
 import { getSave, saveProgress, type GrowPot } from "./save";
 import "./grow.css";
+import { quoteTrade, executeTrade, type TradeOffer } from "./trade-state";
+import { renderTradePicker } from "./trade-picker";
 
 type GrowWorld = {
   current(): string;
+  shopNearby(): boolean;
   getRoot(): THREE.Group;
   getMapInfo(): { id: string; w: number; h: number };
   toWorld(x: number, y: number): THREE.Vector3;
@@ -39,6 +42,7 @@ export function createGrowSystem(world: GrowWorld) {
   let selected = 0, tab = "plants", shopAccess = false, lastTick = Date.now(), lastSave = Date.now(), ownSave = false;
   let lastFocus: HTMLElement | null = null;
   let seedSelection = "", fertSelection = "";
+  let trade: { offer: TradeOffer; label: string; action: "Kaufen" | "Verkaufen"; quantity: string } | null = null;
   let care: { round: number; hits: number; started: number; target: number; position: number; plant: GrowPot } | null = null;
   let splashIndex = -1, splashUntil = 0;
   let lastPhases = state.pots.map(p => `${p.phase}:${p.seed}:${p.byFelix}:${p.eddiBoost}`).join();
@@ -149,15 +153,33 @@ export function createGrowSystem(world: GrowWorld) {
   }
 
   function renderShop() {
+    if (trade) {
+      const draft = trade; content.replaceChildren();
+      renderTradePicker(content, {
+        label: draft.label, action: draft.action, initialQuantity: draft.quantity,
+        onQuantityChange: raw => { draft.quantity = raw; },
+        quote: quantity => quoteTrade(state, draft.offer, quantity),
+        confirm: (quantity, unitPrice) => {
+          if (!shopAccess || !world.shopNearby()) { close(); return { ok: false, message: "Sprich den Grow-Händler erneut an." }; }
+          const result = executeTrade(state, draft.offer, quantity, unitPrice, () => {
+            ownSave = true; try { return saveProgress(); } finally { ownSave = false; }
+          });
+          if (result.ok) { lastSave = Date.now(); trade = null; render(); note(result.message); }
+          return result;
+        },
+        cancel: () => { trade = null; render(); },
+      });
+      return;
+    }
     const nextPot = POT_UNLOCK.find(p => p.slot === state.potsUnlocked + 1);
     const nextBox = BOX_UNLOCK.find(p => p.slot === state.boxesUnlocked + 1);
     const buds = Object.keys(state.inventory).filter(id => ITEMS[id]?.cat === "bud" && state.inventory[id] > 0);
     content.innerHTML = `<div class="grow-summary"><span>Indica beißt · Sativa läuft · Hybrid würfelt</span><span>${state.gold} <small>SOFTCASH</small></span></div>
       <div class="grow-upgrades">${[{ def: nextPot, box: false }, { def: nextBox, box: true }].map(({ def, box }) => `<article><span class="grow-eyebrow">${box ? "GROWBOXEN" : "TÖPFE"}</span><h3>${safe(def?.name ?? "Alle Plätze offen")}</h3><p>${safe(def?.blurb ?? "Deine Kapsel ist komplett ausgebaut.")}</p>${def ? `<button class="grow-primary" data-unlock="${box}" ${state.gold < def.price ? "disabled" : ""}>Freischalten · ${def.price}</button>` : ""}</article>`).join("")}</div>
       <h3 class="grow-shop-heading">Samen & Nährstoffe</h3><div class="grow-shop-list">${STALL_GROW.map(id => { const it = ITEMS[id]; const strain = strainOfItem(id); return `<article><div><b>${safe(it.name)}</b><small>${strain ? `${STRAIN_LABEL[strain.kind]} · ${formatGrowLeft(strainGrowBase(id))} · ${it.yieldN} Buds` : safe(it.desc)}</small><small>Im Inventar: ${state.inventory[id] ?? 0}</small></div><button data-buy="${safe(id)}" ${state.gold < it.buy! ? "disabled" : ""}>${it.buy} <span>+ Kaufen</span></button></article>`; }).join("")}</div>
-      ${buds.length ? `<h3 class="grow-shop-heading">Deine Ernte verkaufen</h3><div class="grow-shop-list">${buds.map(id => `<article><div><b>${safe(ITEMS[id].name)}</b><small>${state.inventory[id]}× im Inventar</small></div><button data-sell="${safe(id)}">+${Math.max(1, Math.round(ITEMS[id].sell! * .95))} <span>1× verkaufen</span></button></article>`).join("")}</div>` : ""}`;
-    content.querySelectorAll<HTMLButtonElement>("[data-buy]").forEach(b => b.onclick = () => { const id = b.dataset.buy!; if (buyGrowItem(state, id)) { persist(); render(); note(`${ITEMS[id].name} gekauft.`); } });
-    content.querySelectorAll<HTMLButtonElement>("[data-sell]").forEach(b => b.onclick = () => { const id = b.dataset.sell!, earned = sellGrowBud(state, id); if (earned) { persist(); render(); note(`1× ${ITEMS[id].name} verkauft. +${earned} Softcash.`); } });
+      ${buds.length ? `<h3 class="grow-shop-heading">Deine Ernte verkaufen</h3><div class="grow-shop-list">${buds.map(id => `<article><div><b>${safe(ITEMS[id].name)}</b><small>${state.inventory[id]}× im Inventar</small></div><button data-sell="${safe(id)}">+${Math.max(1, Math.round(ITEMS[id].sell! * .95))} <span>Menge verkaufen</span></button></article>`).join("")}</div>` : ""}`;
+    content.querySelectorAll<HTMLButtonElement>("[data-buy]").forEach(b => b.onclick = () => { const id = b.dataset.buy!; trade = { offer: { kind: "grow-buy", id }, label: ITEMS[id].name, action: "Kaufen", quantity: "1" }; render(); });
+    content.querySelectorAll<HTMLButtonElement>("[data-sell]").forEach(b => b.onclick = () => { const id = b.dataset.sell!; trade = { offer: { kind: "grow-sell", id }, label: ITEMS[id].name, action: "Verkaufen", quantity: "1" }; render(); });
     content.querySelectorAll<HTMLButtonElement>("[data-unlock]").forEach(b => b.onclick = () => { const box = b.dataset.unlock === "true"; if (buyNextSlot(state, box)) { persist(); render(); note(`${box ? "Growbox" : "Topf"} freigeschaltet. Der neue Platz wartet in der Kapsel.`); } });
   }
 
@@ -204,35 +226,35 @@ export function createGrowSystem(world: GrowWorld) {
   }
   function open(index = 0, allowShop = false) {
     if (!allowShop && world.current() !== "capsule") return;
-    shopAccess = allowShop;
+    trade = null; shopAccess = allowShop;
     selected = Number.isFinite(index) ? Math.max(0, Math.min(GROW_SLOTS - 1, Math.floor(index))) : 0; tab = "plants"; care = null;
     sync(); lastFocus = document.activeElement as HTMLElement;
     backdrop.hidden = false; render(); panel.focus();
     note(offline >= 25 ? `Deine Pflanzen sind ${formatGrowLeft(offline)} offline weitergewachsen.` : "Samen rein. Zeit geben. Schneiden. Dein eigener Grow in Lowtown.");
   }
-  function close() { backdrop.hidden = true; care = null; shopAccess = false; persist(); lastFocus?.focus(); }
+  function close() { backdrop.hidden = true; care = null; trade = null; shopAccess = false; persist(); lastFocus?.focus(); }
   host.querySelector<HTMLButtonElement>(".grow-close")!.onclick = close;
   shortcut.onclick = () => open();
   backdrop.addEventListener("click", e => { if (e.target === backdrop) close(); });
-  host.querySelectorAll<HTMLButtonElement>("[data-tab]").forEach(b => b.onclick = () => { if (b.dataset.tab === "shop" && !shopAccess) return; tab = b.dataset.tab!; care = null; render(); });
+  host.querySelectorAll<HTMLButtonElement>("[data-tab]").forEach(b => b.onclick = () => { if (b.dataset.tab === "shop" && !shopAccess) return; tab = b.dataset.tab!; care = null; trade = null; render(); });
   window.addEventListener("keydown", e => {
     if (backdrop.hidden) return;
-    if (e.code === "Escape") { e.preventDefault(); close(); return; }
+    if (e.code === "Escape") { e.preventDefault(); if (trade) {trade = null; render();} else close(); return; }
     const focusedButton = e.target instanceof Element ? e.target.closest("button") : null;
     if (care && (e.code === "Space" || e.code === "Enter") && (!focusedButton || focusedButton.hasAttribute("data-water"))) {
       e.preventDefault(); if (!e.repeat) tapWater(); return;
     }
     if (e.key === "Tab") {
-      const buttons = Array.from(panel.querySelectorAll<HTMLElement>('button:not([disabled]),select:not([disabled])'));
+      const buttons = Array.from(panel.querySelectorAll<HTMLElement>('button:not([disabled]),select:not([disabled]),input:not([disabled])'));
       const first = buttons[0], last = buttons.at(-1);
       if (e.shiftKey && (document.activeElement === first || document.activeElement === panel)) { e.preventDefault(); last?.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
     }
   });
   window.addEventListener("420mon-map-change", () => { rebuild(); if (!backdrop.hidden) close(); });
-  window.addEventListener("420mon-save-changed", () => { if (!ownSave) { ensureGrowState(state); if (!backdrop.hidden && !care) render(); } });
+  window.addEventListener("420mon-save-changed", () => { if (!ownSave) { ensureGrowState(state); if (!backdrop.hidden && !care && !trade) render(); } });
   window.addEventListener("pagehide", () => { advanceGrow(state); persist(); });
-  document.addEventListener("visibilitychange", () => { advanceGrow(state); persist(); if (!backdrop.hidden && !care) render(); });
+  document.addEventListener("visibilitychange", () => { advanceGrow(state); persist(); if (!backdrop.hidden && !care && !trade) render(); });
   rebuild();
 
   return {
@@ -247,7 +269,7 @@ export function createGrowSystem(world: GrowWorld) {
       if (care && state.pots[selected] !== care.plant) { care = null; render(); note("Felix hat diese Pflanze bereits geerntet. Ihr bisheriger Pflegebonus wurde bei der Ernte berücksichtigt."); }
       if (now - lastTick >= 500) {
         const oldPhases = lastPhases; lastPhases = state.pots.map(p => `${p.phase}:${p.seed}:${p.byFelix}:${p.eddiBoost}`).join(); lastTick = now;
-        if (state.pots.map(p => `${p.phase}:${p.seed}:${p.byFelix}:${p.eddiBoost}`).join() !== oldPhases && !backdrop.hidden && !care) render();
+        if (state.pots.map(p => `${p.phase}:${p.seed}:${p.byFelix}:${p.eddiBoost}`).join() !== oldPhases && !backdrop.hidden && !care && !trade) render();
         if (!backdrop.hidden && !care && tab === "plants") {
           content.querySelectorAll<HTMLElement>("[data-progress]").forEach(el => { el.style.width = `${progress(state.pots[Number(el.dataset.progress)]) * 100}%`; });
           content.querySelectorAll<HTMLElement>("[data-timer]").forEach(el => { const p = state.pots[Number(el.dataset.timer)]; el.textContent = p.phase === "ready" ? "Die Schere wartet. Deine Pflanze ist reif." : `Noch ${formatGrowLeft(growRemaining(state, p))} bis zur Ernte.`; });
