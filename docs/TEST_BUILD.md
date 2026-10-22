@@ -1,11 +1,11 @@
-> **v50 — starter case:** the original saved `starterId` now removes the case
+> **v50 — starter case, merged [PR #57](https://github.com/BenJG420/420mon-3D/pull/57), source `97e68c9`:** the original saved `starterId` now removes the case
 > from the room, interaction, collision, safe-spawn blockers and minimap after
 > choosing. The same marker in existing 3D/2D saves keeps it absent after reload;
 > party, box or `eddiSeed` alone never count as a choice. Original rewards retained.
 > 214/214 tests and corrected build passed before the new lean-validation rule.
 > The already-running fresh-choice/reload and old-2D-save touch smoke completed
 > successfully, including HP0/XP17 and unchanged original/stable saves. No browser
-> or shader errors. First build had a corrected TypeScript weak-type error. PR pending.
+> or shader errors. First build had a corrected TypeScript weak-type error. PR CI `39827322232` passed; Pages `39827460331` publishing.
 
 > **Published v49 — Mengenhandel:** [PR #56](https://github.com/BenJG420/420mon-3D/pull/56), source `a10f5a4`.
 > NPC shops, capsules and Grow shop share slider, +/−, Max, numeric input, live total
@@ -717,9 +717,9 @@ are historical; existing repository CI may run automatically.
    +/- controls, Max and a numeric input. Show the total price live and confirm
    the full selected quantity in one transaction. Support desktop/touch; test
    stock, funds, bounds and save integrity. Preserve original prices and rules.
-3. **NEXT — Starter case — own PR:** remove the case from the room once a starter has
+3. **DONE — Starter case, PR #57 / v50:** remove the case from the room once a starter has
    been chosen. Keep it absent after reload and in existing saves; add a test.
-4. **GUI:** use the running 2D version at https://coral-nova-gem-pearl.grok.me/
+4. **NEXT — GUI:** use the running 2D version at https://coral-nova-gem-pearl.grok.me/
    as the menu, inventory and HUD reference. Inspect its guest start (no email),
    reproduce the observed hierarchy/appearance/behavior and record findings here.
    **Grow touch priority:** put “Gieß-Rhythmus spielen” and planting/action buttons

@@ -1,3 +1,11 @@
+# Aktueller Wiedereinstieg — v50 gemergt; weiter mit GUI v51
+
+- Starter-Koffer PR #57, Source `97e68c9c9904ebb4d4e8668b25306bf6b62e2e1d`, gemergt. 214 Tests + korrigierter Build; bereits gestarteter Smoke abgeschlossen, keine neuen Browserläufe. PR CI 39827322232 grün, Pages 39827460331 noch zu bestätigen.
+- NEUE Regel Ben: nur Build + direkt betroffene Tests, keine breiten Suiten/Kombinationsprüfungen/Browserdurchläufe. Ben testet im Testbuild. Bestehende automatische CI darf laufen.
+- Als Nächstes eigener GUI-PR: echte 2D-Live-Referenz bereits angesehen, Notizen `/workspace/scratch/420mon-audit/v51-reference-notes.md`; feste Header/Footer, Handy/Leiste getrennt von Grafik, kompakteres HUD/Inventar. Grow: Gieß-Rhythmus und Pflanzaktionen direkt unter Topf-/Growbox-Auswahl. Monster erst nach Bens ausdrücklicher Freigabe.
+
+## Historischer Verlauf
+
 # Aktuelle Arbeit — v50 Starter-Koffer
 
 Annahme v50: Wie 2D runtime.objLive gilt ausschließlich ein nichtleerer gespeicherter starterId als abgeschlossene Wahl; Team/Box/eddiSeed allein beweisen keine Starterwahl und dürfen den Koffer nicht entfernen.
