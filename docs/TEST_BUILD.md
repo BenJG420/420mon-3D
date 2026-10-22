@@ -1,12 +1,15 @@
-> **v49 — bulk trade ready for publication:** NPC shops, capsules and Grow shop
-> share slider, +/−, Max, numeric input and live total with one explicit booking.
-> Original per-unit prices/bonuses, stock limits, saved counters and rollback on
-> failed persistence are preserved. Block 1: 211/211 tests + build passed.
-> Block 2: desktop NPC buy/sell, bounds, cancel, save failure/retry and focus passed;
-> image reviewed. Grow touch segment stopped because the harness changed saved
-> coordinates before pagehide wrote the current position back. No browser/shader
-> errors. Max wrapping/confirmation contrast corrected. Block 3: final CI/deploy
-> and focused Grow touch verification pending. No additional full local run.
+> **Published v49 — Mengenhandel:** [PR #56](https://github.com/BenJG420/420mon-3D/pull/56), source `a10f5a4`.
+> NPC shops, capsules and Grow shop share slider, +/−, Max, numeric input, live total
+> and one full-batch confirmation. Original per-unit prices/bonuses, bounds and
+> rollback on failed persistence are preserved. Three check blocks completed:
+> 211/211 local tests + build; desktop NPC smoke/image review; final PR CI
+> `39781120478`, main CI `39781292426`, Pages `39781292473` green.
+> Local Grow smoke fixture was overwritten by pagehide; focused final live touch
+> check passed buying, Max selling, reload, HP0/XP17 and untouched original/stable
+> saves at 320px, without browser/shader errors. Both screenshots reviewed.
+> Live JS `index-DuDgF1N1.js`, SHA256 `0ad2e8415d1abacc411e88b75e6b7c24b5c34d68a1f954c4548127dd0935adbd`;
+> CSS `index-BC8t3waH.css`; hashes/names match Pages; stable root unchanged.
+> **NEXT: starter case, GUI, performance, districts. Monster erst nach Freigabe.**
 
 > **Published v48 — clothing:** [PR #55](https://github.com/BenJG420/420mon-3D/pull/55),
 > source `8e21282`. Six independent slots: top, jacket, pants, shoes, head and
@@ -698,11 +701,11 @@ NEXT/order note. One complete playable package per PR, maximum three check round
    Preserve existing player/NPC rigs and legacy saves; use the original clothing
    as the starting point. All 2,304 combinations passed within the three check
    blocks; exact validation and limitations are recorded above.
-2. **NEXT — Bulk buying/selling — own PR:** add quantity selection with slider or
+2. **DONE — Bulk buying/selling, PR #56 / v49:** quantity selection with slider and
    +/- controls, Max and a numeric input. Show the total price live and confirm
    the full selected quantity in one transaction. Support desktop/touch; test
    stock, funds, bounds and save integrity. Preserve original prices and rules.
-3. **Starter case — own PR:** remove the case from the room once a starter has
+3. **NEXT — Starter case — own PR:** remove the case from the room once a starter has
    been chosen. Keep it absent after reload and in existing saves; add a test.
 4. **GUI:** use the running 2D version at https://coral-nova-gem-pearl.grok.me/
    as the menu, inventory and HUD reference. Inspect its guest start (no email),

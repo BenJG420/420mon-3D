@@ -30,9 +30,9 @@ Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds
    duplicate/missing parts or clipping, fitted to existing rigs and persisted.
    All 2,304 combinations tested within the three-check budget; final live
    desktop/touch preview and persistence checks passed. See TEST_BUILD.md.
-2. NEXT — Bulk buying/selling: quantity slider or +/-/Max/input, live total, one full
+2. DONE — PR #56 / v49, merged and published: Bulk buying/selling: quantity slider or +/-/Max/input, live total, one full
    transaction confirmation, desktop/touch and tests. Own PR.
-3. Hide the starter case after choosing, including reload and old saves; test.
+3. NEXT — Hide the starter case after choosing, including reload and old saves; test.
    Own PR.
 4. GUI reference: inspect and reproduce menu/inventory/HUD from the running
    2D game https://coral-nova-gem-pearl.grok.me/ (guest start, no email). Record

@@ -1,3 +1,12 @@
+# Aktueller Wiedereinstieg — v49 gemergt und live; nächster Schritt Starter-Koffer
+
+- PR #56 fertig, Source `a10f5a42779bbe03d1a7535b2be1d8a7a6ae7133`. Mengenwahl für NPC/Grow/Kapseln, Originalpreise, einmalige Buchung und vollständiger Rollback bei Speicherfehlern.
+- Drei Prüfblöcke abgeschlossen: 211/211 + Build; Desktop-Smoke mit Bildprüfung (Grow-Position im Harness durch pagehide überschrieben); finale PR CI 39781120478/Main CI 39781292426/Pages 39781292473 grün. Gezielter Live-Grow-Touchcheck 320px inklusive Kaufen/Max-Verkaufen/Reload/HP0/XP17/Original- und Stable-Save bestanden, keine Browser-/Shaderfehler, Bild angesehen.
+- Live JS `index-DuDgF1N1.js`, SHA256 `0ad2e8415d1abacc411e88b75e6b7c24b5c34d68a1f954c4548127dd0935adbd`, CSS `index-BC8t3waH.css`; Pages-Dateinamen/Hashes bestätigt, Stable unverändert. Nachweise `/workspace/scratch/420mon-audit/v49-*`.
+- Nächster eigener PR: Starter-Koffer. Danach direkt GUI nach tatsächlich besuchter 2D-Referenz; Notizen `/workspace/scratch/420mon-audit/v51-reference-notes.md` und Screenshots vorhanden. Dann Performance und Bezirke. **Monster erst nach Freigabe** durch Ben, keine automatische Freigabe nach Bezirken.
+
+## Historischer Arbeitsverlauf
+
 # Aktuelle Arbeit — v49 Mengenwahl, danach Starter-Koffer und GUI
 
 Annahme v49: Mengenhandel gilt für NPC-Shops, Fangkapseln und Grow-Shop; einmalige Topf-/Boxfreischaltungen bleiben Einzelkäufe, Original-Stückpreise und Boni bleiben unverändert; bestätigter Stückpreis gilt für die Gesamtmenge, durch den Verkauf neu freigeschaltete Boni ab dem nächsten Vorgang.
