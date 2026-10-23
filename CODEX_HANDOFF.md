@@ -1,3 +1,12 @@
+# Aktueller Wiedereinstieg — v54 Gasse A veröffentlicht; Grow-Hinterhöfe als Nächstes
+
+- Gasse A als PR #61 gemergt, Source `15d104ff5b172966b2a3e3108539805bebfb8d97`: eigene Ziegel-/Blech-/Teerpappe-Dächer, vollständige Fassaden/Rinnen/Kabel, Neon/Schilder/Türdetails, Müll/Efeu und sechs weitere Pfützen. Benannte Hausfronten korrekt zugeordnet, einschließlich Raze/Cherry am Kartenrand; Gebäude-Verdeckung beibehalten.
+- Drei lokale Runden verbraucht: Builds grün, 15 weitere betroffene Tests grün; Alley-Test fand zwei korrigierte Renderzuordnungen und zuletzt legitimen Erstbesuchsquest im Fixture. Fixture korrigiert, keine vierte lokale Runde. Finale PR CI39970548173 bestätigt alle Tests+Build grün. Main CI39970741718/Pages39970741771 ebenfalls grün. Live JS `index-DzV-Bttf.js`, SHA256 `d0fe002d13c68bc11de0f5984367d57c51bae105bc15c486fd528c61f5075838`; CSS/Fonts bytegleich zum lokalen Build, Stable unverändert. Nachweis `/workspace/scratch/420mon-audit/v54-deploy-proof.json`. Keine neue Browserprüfung, Ben testet selbst.
+- Buff-HUD PR #60 sowie Performance/FPS PR #59 ebenfalls gemergt/live. Die bestehenden Save-/Buff-/Kleidungsregeln und Spieler/NPCs bleiben erhalten.
+- **NÄCHSTER eigener PR: Grow-Hinterhöfe (`yard`) nach der Referenz detaillieren.** Danach weitere Bezirke einzeln, Originalgrundrisse/Kollision/Spieler/NPCs erhalten. Nur Build + direkt betroffene Tests, Ben prüft Optik/FPS. **Monster erst nach Freigabe** durch Ben, Ko-fi/Zahlungen übersprungen.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — v54 Gasse A
 
 Annahme v54: Gasse A ist das erste Bezirks-Paket; Details bleiben reine Darstellung auf dem Originalgrundriss, vorhandene Licht-/Schatten-/Wetterbudgets und Figuren bleiben erhalten.
