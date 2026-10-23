@@ -11,6 +11,7 @@ import { getDistrictGraphics } from "./graphics-profile";
 import { isTakenStarter } from "./starter-state";
 import { createStaticBatches, type StaticDecoration, type StaticBatchStats } from "./static-batches";
 import { alleyRoofKind, appendAlleyBuildingDetails, appendAlleyBinDetails, alleyRunoffPuddles, type AlleyFinish } from "./alley-details";
+import { appendYardShedDetails, appendYardBoundaryDetails, appendMossInteriorDetails, type YardFinish, type YardDetailEmitter } from "./yard-details";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -214,7 +215,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     box(frame, length + .25, .09, .75, mat(palette.stone, "stone"), 0, .045);
     const glow = box(frame, length - .15, 2.45, .04, mat(0x1f322b, undefined, 0x537c64), 0, 1.23);
     glowing.push({ mesh: glow, phase: obj.x });
-    if (id === "alley" && obj.id.startsWith("house_")) {
+    if ((id === "alley" || id === "yard") && obj.id.startsWith("house_")) {
       glow.material = mat(0x344b49, "wood", 0x1b2f29);
       projectSurfaceUvs(glow.geometry, glow.material);
       const parts: THREE.BufferGeometry[] = [];
@@ -222,7 +223,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         const piece = new THREE.BoxGeometry(w, h, .045); piece.translate(x, y, .06); parts.push(piece);
       }
       const geometry = mergeGeometries(parts, false); for (const part of parts) part.dispose();
-      if (geometry) { const hardware = mesh(geometry, mat(0x87795a, "metal"), frame, 0, 0, 0, false); hardware.name = "alley-door-hardware"; }
+      if (geometry) { const hardware = mesh(geometry, mat(0x87795a, "metal"), frame, 0, 0, 0, false); hardware.name = `${id}-door-hardware`; }
     }
     tag(frame, obj.label, Math.max(1.65, length), 3.1);
     lamp(frame, 0, 2.82, .3, 0xffce84, 8);
@@ -298,7 +299,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     else if (obj.kind === "door" || obj.kind === "manhole") door(obj, g);
     else if (obj.kind === "sign") {
       tag(g, obj.label, 1.8, 1.6); box(g, .08, 1.5, .08, mat(palette.dark, "metal"));
-      if (id === "alley") {
+      if (id === "alley" || id === "yard") {
         const pieces: THREE.BufferGeometry[] = [];
         const trim = (w: number, h: number, x: number, y: number) => {
           const piece = new THREE.BoxGeometry(w, h, .055); piece.translate(x, y, -.035); pieces.push(piece);
@@ -308,10 +309,10 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         const neon = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
         if (neon) {
           const light = mesh(neon, mat(0x486e71, undefined, 0x568b8a), g, 0, 0, 0, false);
-          light.name = "alley-sign-neon";
+          light.name = `${id}-sign-neon`;
         }
         const casing = box(g, 1.93, .51, .09, mat(0x293b42, "metal"), 0, 1.6, -.09);
-        casing.name = "alley-sign-casing";
+        casing.name = `${id}-sign-casing`;
       }
     }
     else if (obj.kind === "lamp") {
@@ -321,8 +322,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       box(g, Math.max(.9, obj.w * WORLD_SCALE), 1, Math.max(.7, obj.h * WORLD_SCALE), mat(0x4f5b49, "metal"));
       box(g, 1.06, .12, .91, mat(palette.dark, "metal"), 0, 1.07);
       for (const s of [-1, 1]) box(g, .13, .2, .3, mat(palette.dark), s * .43, .11, .33);
-      if (id === "alley") {
-        const litter = new THREE.Group(); litter.name = "alley-bin-detail"; g.add(litter);
+      if (id === "alley" || id === "yard") {
+        const litter = new THREE.Group(); litter.name = `${id}-bin-detail`; g.add(litter);
         const batches = new Map<AlleyFinish, THREE.BufferGeometry[]>();
         appendAlleyBinDetails((finish, geometry) => {
           const batch = batches.get(finish) ?? []; batch.push(geometry); batches.set(finish, batch);
@@ -330,7 +331,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         const finishes = { bag: mat(0x303c38), paper: mat(0xb1a88b), metal: mat(0x7a837c, "metal") };
         for (const [finish, pieces] of batches) {
           const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
-          if (geometry) { const part = mesh(geometry, finishes[finish as keyof typeof finishes], litter, 0, 0, 0, false); part.name = `alley-litter:${finish}`; }
+          if (geometry) { const part = mesh(geometry, finishes[finish as keyof typeof finishes], litter, 0, 0, 0, false); part.name = `${id}-litter:${finish}`; }
         }
       }
     } else prop(obj, g);
@@ -418,15 +419,47 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       m.name = `original-wall:${i}`; occluder(m);
       // Dark plinth and narrow cap keep the rooms readable as a cutaway diorama.
       occluder(region(r, .16, mat(palette.stone, "stone"), .08));
-      const roofKind = id === "alley" && outside ? alleyRoofKind(building?.variant ?? i) : undefined;
+      const yardShed = id === "yard" && !edge;
+      const roofKind = id === "alley" && outside ? alleyRoofKind(building?.variant ?? i)
+        : yardShed ? alleyRoofKind(i) : undefined;
       const roofTint = roofKind === "roof-tile" ? 0x896f5b : roofKind === "roof-metal" ? 0x718087 : roofKind === "roof-felt" ? 0x454d4c : outside ? 0x626c6b : 0x7d8681;
       const roof = occluder(region(r, .1, mat(roofTint, roofKind ?? "stone"), height + .02));
-      if (roofKind) { roof.name = "alley-roof"; roof.userData.roofKind = roofKind; }
+      if (roofKind) { roof.name = `${id}-roof`; roof.userData.roofKind = roofKind; }
+      if (id === "yard") {
+        const centre = at(r.x + r.w / 2, r.y + r.h / 2);
+        const side = edge && r.w < r.h;
+        const group = yardDetailGroup(yardShed ? "yard-shed-detail" : "yard-boundary-detail", centre, emit => {
+          if (yardShed) appendYardShedDetails(r.w * WORLD_SCALE, r.h * WORLD_SCALE, height, i, emit);
+          else appendYardBoundaryDetails((side ? r.h : r.w) * WORLD_SCALE, (side ? r.w : r.h) * WORLD_SCALE, height, emit);
+        });
+        if (edge) group.rotation.y = side ? (r.x === 0 ? Math.PI / 2 : -Math.PI / 2) : r.y === 0 ? 0 : Math.PI;
+      }
       if (outside && r.w > 100 && r.h > 80) {
         buildingDetails(r, height, i, building?.name, building?.side, building ? (building.x + building.w / 2 - r.x - r.w / 2) * WORLD_SCALE : 0);
       }
       for (const part of occluders.slice(firstPart)) part.userData.occlusionGroup = m.uuid;
     }
+  }
+
+  /** Each yard structure has bounded material batches and follows its wall fade. */
+  function yardDetailGroup(name: string, position: THREE.Vector3, append: (emit: YardDetailEmitter) => void) {
+    const group = new THREE.Group(); group.name = name; group.position.copy(position);
+    group.userData.districtDetail = id; root.add(group);
+    const finishes: Record<YardFinish, THREE.Material> = {
+      frame: mat(0x263b3c, "metal"), metal: mat(0x718078, "metal"),
+      brick: mat(0x6a6953, "plaster"), wood: mat(0x746649, "wood"), leaf: mat(0x4d6843),
+      warm: mat(0x665239, undefined, 0xb4884f), cool: mat(0x36534d, undefined, 0x568c75),
+    };
+    const batches = new Map<YardFinish, THREE.BufferGeometry[]>(), features = new Set<string>();
+    append((finish, geometry, feature) => {
+      const pieces = batches.get(finish) ?? []; pieces.push(geometry); batches.set(finish, pieces); features.add(feature);
+    });
+    group.userData.yardFeatures = [...features];
+    for (const [finish, pieces] of batches) {
+      const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+      if (geometry) { const part = occluder(mesh(geometry, finishes[finish], group, 0, 0, 0)); part.name = `${name}:${finish}`; }
+    }
+    return group;
   }
 
   function buildingDetails(r: Rect, height: number, seed: number, name?: string, entranceSide?: "n" | "s", nameOffsetX = 0) {
@@ -571,6 +604,23 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       decorations.push({ kind: "puddle", position: p, size, angle: seeded(i + 69) * Math.PI, stretch: .35 + seeded(i + 69) * .5 });
     }
     if (id === "alley") decorations.push(...alleyRunoffPuddles(active, at));
+    if (id === "yard") {
+      // The original nonblocking green patches remain walkable; no new planters/collision.
+      for (const [index, r] of (active.deco ?? []).entries()) {
+        const soil = region(r, .012, mat(0x394936, "plaster"), .036);
+        soil.name = "yard-ground-cover";
+        const count = index === 0 ? 12 : 24;
+        for (let i = 0; i < count; i++) {
+          const p = at(r.x + 8 + seeded(i + index * 57) * (r.w - 16), r.y + 8 + seeded(i + index * 19 + 91) * (r.h - 16));
+          const height = .23 + seeded(i + 56) * .27; p.y = .04 + height / 2;
+          decorations.push({ kind: "grass", position: p, height, lean: (seeded(i + 29) - .5) * .5 });
+        }
+      }
+      for (const r of active.walls.filter(r => r.x > 0 && r.y > 0 && r.x + r.w < active.w && r.y + r.h < active.h)) {
+        const p = at(r.x + r.w - 5, r.y + r.h + 7); p.y = .059;
+        decorations.push({ kind: "puddle", position: p, size: 1.6, angle: .3, stretch: .4 });
+      }
+    }
     staticBatches = createStaticBatches(root, decorations, { grass: mat(0x586c3d), puddle: puddleMaterial }, performanceMode);
     if (!active.indoor) for (let i = 0; i < Math.min(6, sketch.walk.length); i++) {
       const r = sketch.walk[i];
@@ -606,6 +656,12 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       box(table, 1.7, .1, 1.35, mat(palette.wood, "wood"), 0, .67);
       box(table, .12, .63, .12, mat(palette.dark), 0, .315);
       lamp(root, -5.2, 2.6, -4.5, 0xeeb473, 16);
+      if (id === "den_moss") {
+        const firstPart = occluders.length;
+        yardDetailGroup("moss-interior-detail", new THREE.Vector3(), emit => appendMossInteriorDetails(active.w * WORLD_SCALE, active.h * WORLD_SCALE, emit));
+        const northWall = occluders.find(part => part.name === "original-wall:0");
+        if (northWall) for (const part of occluders.slice(firstPart)) part.userData.occlusionGroup = northWall.uuid;
+      }
     }
     const sign = new THREE.Group(); sign.position.copy(at(active.w / 2, 34)); root.add(sign);
     if (id !== "alley" && id !== "kino") tag(sign, active.name.toUpperCase(), Math.min(9, active.w * WORLD_SCALE * .55), 3.25);

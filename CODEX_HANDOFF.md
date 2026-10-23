@@ -1,3 +1,13 @@
+# Aktuelle Arbeit — v55 Grow-Hinterhöfe
+
+Annahme v55: Die drei kleinen gesperrten Originalrechtecke sind Geräteschuppen; die zwei grünen Dekoflächen bleiben frei begehbar, Moss’ bestehendes Hinterzimmer gehört zum Bezirkspaket.
+
+- Nächster eigener PR auf `feat/yard-details-v55`: eigene Schuppendächer, Rinnen/Fassaden, Hofmauern mit Vegetation/Leitungen, Originalschilder mit Neon, Müll, instanzierte Grünflächen/Runoff und Moss-Wanddetails. Keine neuen Kollisionen, Figuren, Spielregeln oder Speicherfelder.
+- Nur Build + direkt betroffene Tests; keine Browserdurchläufe, Ben prüft den Testbuild. Eine lokale Prüfrunde: Build und 14/14 betroffene Tests grün. PR/Merge/Pages stehen noch aus.
+- Danach Kabelkeller als eigener PR. **Monster erst nach Freigabe** durch Ben. Ko-fi/Zahlungen übersprungen.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v54 Gasse A veröffentlicht; Grow-Hinterhöfe als Nächstes
 
 - Gasse A als PR #61 gemergt, Source `15d104ff5b172966b2a3e3108539805bebfb8d97`: eigene Ziegel-/Blech-/Teerpappe-Dächer, vollständige Fassaden/Rinnen/Kabel, Neon/Schilder/Türdetails, Müll/Efeu und sechs weitere Pfützen. Benannte Hausfronten korrekt zugeordnet, einschließlich Raze/Cherry am Kartenrand; Gebäude-Verdeckung beibehalten.

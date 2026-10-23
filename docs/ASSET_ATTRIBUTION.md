@@ -1,5 +1,14 @@
 # Asset attribution
 
+## Grow-Hinterhöfe / Moss — v55
+
+- Shed cladding, roof flashing, courtyard masonry, pipes, vegetation and Moss’
+  wall shelving are project-authored geometry in `src/game/yard-details.ts`.
+  `world.ts` places them only on the original district/room and reuses the v54
+  locally generated roof PBR maps, neon surrounds and batched refuse geometry.
+- No external models, textures or fonts added. Player/NPC rigs and their licenses
+  remain unchanged; original gameplay/map data remain the source of truth.
+
 ## Gasse A detail — v54
 
 - Roof tile, standing-seam metal and roofing-felt PBR maps are deterministic
