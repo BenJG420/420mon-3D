@@ -1,5 +1,13 @@
 # Asset attribution
 
+## Shared street props — v56
+
+- Empty bottles/cans, open cartons, bicycles and wire shopping carts are
+  project-authored geometries in `src/game/street-prop-models.ts`, spatially
+  instanced by `src/game/street-details.ts`. Existing procedural PBR materials
+  are reused. No external model, texture or new license dependency is added.
+- Player/NPC rigs, animation and the original monster assets are unchanged.
+
 ## Grow-Hinterhöfe / Moss — v55
 
 - Shed cladding, roof flashing, courtyard masonry, pipes, vegetation and Moss’

@@ -12,6 +12,7 @@ import { isTakenStarter } from "./starter-state";
 import { createStaticBatches, type StaticDecoration, type StaticBatchStats } from "./static-batches";
 import { alleyRoofKind, appendAlleyBuildingDetails, appendAlleyBinDetails, alleyRunoffPuddles, type AlleyFinish } from "./alley-details";
 import { appendYardShedDetails, appendYardBoundaryDetails, appendMossInteriorDetails, type YardFinish, type YardDetailEmitter } from "./yard-details";
+import { createStreetDetails } from "./street-details";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -89,6 +90,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   const storyNpcs = new Map<string, MapObj>();
   let performanceMode = true;
   let staticBatches: ReturnType<typeof createStaticBatches> | undefined;
+  let streetDetails: ReturnType<typeof createStreetDetails> | undefined;
 
   function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, parent: THREE.Object3D, x: number, y: number, z: number, shadow = true) {
     projectSurfaceUvs(geometry, material);
@@ -686,6 +688,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   function disposeMap() {
     for (const actor of npcActors.values()) actor.dispose(); npcActors.clear();
     staticBatches?.dispose(); staticBatches = undefined;
+    streetDetails?.dispose(); streetDetails = undefined;
     disposeOwnedObjects(root);
     root.clear(); mapObjects.clear(); roamingNpc = undefined; storyNpcs.clear(); occluders = []; lampLights.length = 0; lastLightSelection = -Infinity; glowing.length = 0;
   }
@@ -771,6 +774,13 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     progress.map = next; recordVisit(progress, next);
     disposeMap(); surfaces.setWetness(getDistrictGraphics(id).wetness);
     buildFloor(); buildWalls(); active.objs.forEach(renderObject); mapDetails();
+    // Opaque coated green glass avoids an extra transparency pass for tiny bottles.
+    const streetGlass = mat(0x396755, "metal");
+    streetGlass.metalness = .04; streetGlass.roughness = .2; streetGlass.clearcoat = .9;
+    streetDetails = createStreetDetails(root, active, {
+      glass: streetGlass, metal: mat(0x8a9691, "metal"),
+      rubber: mat(0x29312f), cardboard: mat(0x9a8055, "plaster"),
+    });
     const desired = x !== undefined && y !== undefined ? { x, y }
       : id === "capsule" ? { x: CAPSULE_SPAWN_X, y: CAPSULE_SPAWN_Y }
       : id === "studio" ? { x: 440, y: 140 }
@@ -781,6 +791,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       })();
     const spawn = safeSpawn(active, desired.x, desired.y, .48, progress.deadWild, progress.starterId);
     player.position.copy(at(spawn.x, spawn.y)); player.rotation.y = 0;
+    streetDetails.update(player.position);
     lastPosition = { x: NaN, y: NaN }; saveLocation();
     localStorage.setItem("420mon-current-map", id); localStorage.setItem("420mon-district", id);
     nearby = undefined; interactionMessage = undefined; prompt.hidden = true;
@@ -860,6 +871,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     root.userData.riggedNpcs = [...mapObjects.values()].filter(group => group.userData.npcModel === "rocketbox-rigged").length;
     if (time - lastLightSelection > 350) {
       lastLightSelection = time;
+      streetDetails?.update(player.position);
       const closest = lampLights.map(light => ({ light, distance: light.getWorldPosition(lightPosition).distanceToSquared(player.position) }));
       closest.sort((a, b) => a.distance - b.distance);
       const count = active.indoor ? 5 : 4;

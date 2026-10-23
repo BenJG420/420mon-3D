@@ -1,3 +1,13 @@
+# Aktuelle Arbeit — v56 Street-Details in den Bezirken
+
+Annahme v56: Straßenkleinkram wird bei bestehenden Tonnen platziert; Fahrräder/Einkaufswagen stehen nur im Freien, Innenbezirke erhalten Flaschen/Dosen/Kartons. Reine Kulisse ohne neue Kollisions- oder Speicherobjekte.
+
+- Bens Ergänzung nach bereits gemergtem PR #62: gemeinsame instanzierte Flaschen, Dosen, offene Kartons, Fahrräder und Einkaufswagen für alle 14 Bezirks-/Verbindungskarten mit Tonnen, einschließlich Gasse A und Grow-Hinterhöfen. Originalobjekte, Türen/NPC-Zugänge und gesperrte Flächen werden bei der Platzierung ausgespart.
+- Kleine 16m-Instanzzellen, gemeinsam verwendete Modelle/Materialien, Distanz-Ausblendung hinter 48m plus Zellenradius, keine zusätzlichen Schattenwerfer/Lichter. Spieler/NPCs unverändert. Zwei lokale Prüfrunden: beide Builds grün; Alley/Yard-Regressionschecks grün. Street-Test fand fehlenden Einkaufswagen am überfüllten ersten Alley-Standort; Ausweichplatz ergänzt, 2/2 Street-Tests final grün (alle 14 Karten, Instancing/Culling/Disposal). PR/Veröffentlichung stehen aus; keine Browserprüfung.
+- Danach Kabelkeller als eigener Bezirks-PR; weitere Bezirke einzeln. **Monster erst nach Freigabe** durch Ben. Ko-fi/Zahlungen übersprungen.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v55 Grow-Hinterhöfe veröffentlicht; Street-Details ergänzen
 
 - Grow-Hinterhöfe/Moss PR #62 gemergt und live, Source `da473611a0dad18c703f5e1db7033cc9ae7d2026`: drei eigene PBR-Schuppendächer, Fassaden/Rinnen/Hofmauern, Vegetation, Neon/Müll, instanzierte Grünflächen/Pfützen und Moss-Wanddetails. Grundriss, Spieler/NPCs, Kollisionen, Spielregeln/Saves unverändert.
