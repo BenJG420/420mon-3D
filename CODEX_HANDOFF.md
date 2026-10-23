@@ -1,3 +1,15 @@
+# Aktuelle Arbeit — v53 Buff-HUD vor den Bezirken
+
+Annahme v53: Zeitliche Buffs zeigen die bestehenden Spielzeitsekunden; der einzige aktive Outfitbonus zeigt ∞ (solange getragen), permanente Silk-/Züchterboni ∞. Sichtbare Kleidungsslots werden nicht zu neuen Boni addiert.
+
+- Bens GUI-Priorität: Buffsymbole/Restzeit oben links innerhalb desselben Cash-/Zeit-/Level-HUD. Native einklappbare Buffliste, Status als separate UI-Präferenz, Haupt-HUD-Schalter blendet beide aus. Keine Save-/Buff-/Kleidungsmechaniken geändert.
+- 2D-Quellabgleich aus 010807da: overlays.tsx Hud()/runtime.highList()/outfitHud; Reihenfolge/Farben und Sekunden übernommen. Icons ergänzen Bens ausdrücklichen Symbolwunsch. Keine neue Browserprüfung der Live-Referenz; Ben prüft im Testbuild.
+- v52 PR #59 gemergt/live, Source `7127acf592e3dcca910ae45c8266c5d083738e68`. Build+26Tests/PR CI39899369123/Main CI39899470712/Pages39899470729 grün. JS index-BPGswZVk.js SHA256 685563e2d2444b1154ef4e9d90367e89b73502b34449bcd567e070de664c249f; JS/CSS/Fonts bytegleich zum Build, Stable unverändert.
+- Build + 3/3 gezielte HUD-Tests grün; keine Browser-/Vollsuite.
+- Danach Gasse A als v54/eigener PR fortsetzen. Uncommitted Arbeit liegt auf feat/alley-details-v53 in /workspace/420mon-3D; nicht neu beginnen. Dieser GUI-Fix ist isoliert in /workspace/420mon-hud-buffs. Nur Build+direkt betroffene Tests, Ben testet selbst. **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — v52 Performance/FPS
 
 Annahme v52: Ohne weitere Browserläufe werden keine FPS erfunden; Ben misst im Testbuild denselben Standort über Hilfe → FPS vergleichen, während Node-Tests nur Geometrie/Draw-Call-Potenzial belegen.

@@ -18,6 +18,7 @@ import { createRadioSystem } from "./game/radio";
 import { createMonsterViewer } from "./game/monster-viewer";
 import { createPostProcessing } from "./game/post-processing";
 import { createPerformanceMonitor } from "./game/performance-monitor";
+import { createHudBuffs } from "./game/hud-buffs";
 import { graphicsPixelRatio, type GraphicsQuality } from "./game/graphics-profile";
 import { createAchievementBook } from "./game/achievement-book";
 import { syncAchievements } from "./game/achievements";
@@ -208,6 +209,7 @@ hud.innerHTML = `
   <div class="local-map"><button type="button" class="minimap-toggle" aria-label="Minimap ein- oder ausblenden" aria-expanded="true">−</button><canvas id="local-map-canvas" width="240" height="160"></canvas><span id="local-map-name"></span></div>
 `;
 app.appendChild(hud);
+const hudBuffs = createHudBuffs(hud.querySelector<HTMLElement>(".hud-info")!);
 const hudToggle = hud.querySelector<HTMLButtonElement>(".hud-toggle")!;
 hudToggle.addEventListener("click", () => {
   const collapsed = document.documentElement.dataset.hudCollapsed !== "true";
@@ -239,6 +241,7 @@ const hudTimeFormat = new Intl.DateTimeFormat("de-DE", { hour: "2-digit", minute
 function updateHud() {
   const now = performance.now(); if (now < nextHudUpdate) return; nextHudUpdate = now + 250;
   const s = getSave(), location = districtWorld.getMapInfo().name;
+  hudBuffs.update(s);
   const time = hudTimeFormat.format(new Date());
   const outfit = clothingLabel(s.outfit), level = Math.max(1, Number(s.trainerLv) || 1);
   const signature = `${s.gold}|${level}|${outfit}|${location}|${time}`;

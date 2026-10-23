@@ -60,3 +60,22 @@ body:has(.systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.monster-batt
 #app :is(.home-dialog-card,.monster-battle-card,.fish-panel,.achievement-panel,.radio-panel,.slot-panel,.monster-collection) { background:#121416f7; border-color:var(--ui-border); color:var(--ui-text); border-radius:14px; box-shadow:0 14px 50px #0007; font-family:"IBM Plex Sans",system-ui,sans-serif; }
 #app :is(.home-dialog-card,.monster-battle-card,.fish-panel,.achievement-panel,.radio-panel,.slot-panel,.monster-collection) :is(button,select,input) { font-family:"IBM Plex Sans",system-ui,sans-serif; min-height:44px; }
 #app :is(.home-dialog-card,.fish-panel,.achievement-panel,.radio-panel,.slot-panel) h2 { font-family:"Press Start 2P",ui-monospace,monospace; font-size:12px; line-height:1.8; color:var(--ui-accent); }
+
+/* Buffs belong to the same collapsible top-left Cash/time/level panel. */
+.hud-buffs { margin-top:5px; border-top:1px solid var(--ui-border); pointer-events:auto; min-width:0; }
+.hud-buffs[hidden] { display:none!important; }
+.hud-buffs summary { min-height:44px; display:list-item; align-content:center; cursor:pointer; color:var(--ui-accent); touch-action:manipulation; }
+.hud-buffs summary:focus-visible { outline:2px solid var(--ui-accent); outline-offset:2px; border-radius:4px; }
+.hud-buff-list { list-style:none; padding:0; margin:0; max-height:min(28dvh,220px); overflow-y:auto; overscroll-behavior:contain; }
+.hud-buff-list li { display:flex; align-items:start; gap:5px; padding:4px 0; border-top:1px solid #ffffff0a; font-size:11px; line-height:1.45; }
+.hud-buff-icon { flex:0 0 16px; text-align:center; }
+.hud-buff-label { min-width:0; flex:1; overflow-wrap:anywhere; }
+.hud-buff-time { flex:0 0 auto; color:var(--ui-accent); font-variant-numeric:tabular-nums; }
+html[data-hud-layout="leiste"] .hud-buffs { flex:0 0 100%; max-width:260px; background:#121416ed; border:1px solid var(--ui-border); border-radius:8px; padding:0 8px 4px; }
+
+.hud-buff-list [data-effect="catch"] { color:#7cff6b; }
+.hud-buff-list [data-effect="speed"] { color:#e8b45a; }
+.hud-buff-list [data-effect="gold"] { color:#ffd27a; }
+.hud-buff-list [data-effect="luck"] { color:#7cff8a; }
+.hud-buff-list [data-effect="xp"] { color:#ffb6d4; }
+.hud-buff-list li .hud-buff-time { color:inherit; }
