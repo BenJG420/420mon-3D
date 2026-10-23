@@ -1,4 +1,16 @@
-> **v52 — Performance/FPS, ready for PR/merge:** static grass/puddle instancing in small
+> **v53 — Buff HUD, ready for PR/merge:** active consumption effects show symbols,
+> original colors, percentage and remaining playtime seconds inside the existing
+> top-left Cash/time/level HUD. Outfit bonuses show ∞ while worn; permanent
+> Silk/Züchter indicators show ∞. Buffs collapse separately (UI preference) and
+> hide with the main HUD. Only the existing active outfit contributes, not all
+> six visual slots. Build + 3/3 focused HUD tests passed. No browser/full-suite run.
+> No gameplay/save/character changes.
+> Reference: original 2D overlays.tsx Hud(), runtime.highList()/outfitHud() at
+> `010807da`; no new browser session at the live reference. Ben checks visuals.
+> **NEXT: continue the already-started Gasse A district package as its own PR.
+> Monster erst nach Freigabe.**
+
+> **v52 — Performance/FPS, merged/live PR #59, source `7127acf`:** static grass/puddle instancing in small
 > culling cells, quality-aware shadow budget, and an optional local A/B FPS capture
 > under Hilfe → FPS vergleichen. No player/NPC, mechanics or save changes.
 > Node counts before culling: Gasse A decoration 111 → 38 calls, Grow-Hinterhöfe
@@ -782,7 +794,7 @@ are historical; existing repository CI may run automatically.
    immediately below the pot/growbox selector, so selection and action do not
    require scrolling back and forth. Declutter overlaps and keep desktop/touch readable. Existing 2D saves originated
    there; preserve their import, never write to or reset that original save.
-5. **IMPLEMENTED — Performance/FPS v52 (PR/merge pending):** spatially bounded static grass/puddle
+5. **DONE — Performance/FPS, PR #59 / v52:** spatially bounded static grass/puddle
    instancing and quality-aware shadows; existing facade merges, texture caches,
    pixel budgets and bounded bloom are retained. Optional Help → FPS vergleichen
    captures both modes at the same stationary view (2s warmup + 10s each), actual
@@ -790,13 +802,17 @@ are historical; existing repository CI may run automatically.
    Baseline restores v51 individual decoration and shadow sizes. Auto/Low reduce
    shadow resolution; High preserves it. **Actual before/after device FPS remains
    Ben’s test-build check; Node geometry counts are not an FPS result.**
-6. **NEXT after v52 — District detail, starting Gasse A (`alley`), one PR per district:** preserve each original 2D layout,
+6. **GUI priority v53 — Buff HUD before districts:** show active effects with
+   symbols and remaining time inside the same collapsible top-left Cash/time/level
+   panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
+   directly affected tests only; Ben checks the published GUI. Own PR.
+7. **NEXT — District detail, starting Gasse A (`alley`), one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
    vegetation and PBR materials; improve lighting, fog and post-processing.
    **Do not change players or NPCs in these district packages.**
-7. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up
+8. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up
    from **Dex #97 require Ben’s explicit approval**. Finishing fixes, performance
    and all district graphics/details does not itself grant that approval. Preserve the 96 authored models and PBR/UV/cache.
    Known v47 visual follow-up: Ypipe branches partly cover its eyes in the initial

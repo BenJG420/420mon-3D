@@ -45,9 +45,9 @@ Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds
 4. DONE — PR #58 / v51, merged and published: GUI reference: inspect and reproduce menu/inventory/HUD from the running
    2D game https://coral-nova-gem-pearl.grok.me/ (guest start, no email). Record
    actual observations in TEST_BUILD.md; desktop/touch clarity and less overlap.
-5. NEXT — Performance/FPS: measure FPS before/after; instancing, LOD, culling, textures,
+5. DONE — PR #59 / v52 Performance/FPS: decoration instancing, shadow budget and optional device A/B capture (actual FPS measurement by Ben pending); instancing, LOD, culling, textures,
    shaders and a shadow budget as appropriate.
-6. Detail districts one by one, one PR each: preserve 2D structure, independent
+6. FIRST — Buff HUD mini-fix (Ben 2026-10-23), own PR: symbols and remaining time in the same collapsible Cash/time/level HUD. Then detail districts one by one, starting Gasse A, one PR each: preserve 2D structure, independent
    roof materials (tile/metal/felt), edges/gutters, facades/windows/doors/signs,
    neon/trash/cables/puddles/props/vegetation/PBR, lighting/fog/post-processing.
    Do not change player/NPC assets or behavior in district packages.
