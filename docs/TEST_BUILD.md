@@ -1,3 +1,19 @@
+> **v55 — Grow-Hinterhöfe / Moss (publication pending):** the three original
+> blocked inner rectangles receive independent tile/metal/felt PBR roofs, gutters,
+> flashing, storage shutters, repaired cladding, lit side windows, vents and ivy.
+> Original courtyard walls gain masonry, conduit and restrained emissive fixtures;
+> existing signs, bins and Moss’ door gain neon/refuse/hardware detail. Both source
+> green patches remain walkable with 36 instanced tufts; three additional shed
+> runoff puddles use the existing batch renderer. Moss’ original room gains high
+> wall shelving, seed jars and conduit. Details share original wall occlusion,
+> at most seven material submissions per structure, no extra point lights.
+> Original map/actor/gameplay/save behavior and weather/shadow budgets retained.
+> One local round: build and 14/14 affected tests passed (yard/Moss, alley,
+> static batches, world geometry). Yard decorations: 71 objects / 25 potential
+> instanced main-pass draws before culling; this is not an FPS measurement.
+> No browser run; Ben checks visuals/device FPS. Next: Kabelkeller.
+> **Monster erst nach Freigabe.** Ko-fi/payment stays skipped.
+
 > **Published v54 — Gasse A detail, merged [PR #61](https://github.com/BenJG420/420mon-3D/pull/61), source `15d104f`:** three independent roof PBR
 > surfaces (tile/standing-seam metal/felt), four facade sides, gutters/downpipes,
 > shutters, cables, service boxes, ivy, existing signs with neon frames, detailed
@@ -826,7 +842,7 @@ are historical; existing repository CI may run automatically.
    symbols and remaining time inside the same collapsible top-left Cash/time/level
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
-7. **District detail — Gasse A DONE (PR #61 / v54); NEXT Grow-Hinterhöfe (`yard`), one PR per district:** preserve each original 2D layout,
+7. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe (`yard`) v55 implemented, publication pending; NEXT Kabelkeller (`cable`), one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
@@ -834,7 +850,9 @@ are historical; existing repository CI may run automatically.
    **Do not change players or NPCs in these district packages.**
    Gasse A v54 completes the first exterior package: independent roof PBR maps, four-sided
    facade detail, neon/signs, refuse and runoff puddles; no extra point lights.
-   Next is Grow-Hinterhöfe (`yard`), then Kabelkeller, Markt, Kino, Neonkai, Kanal,
+   Grow-Hinterhöfe v55 adds detailed original sheds/courtyard walls, source green
+   patches, refuse/neon/runoff and Moss’ interior, keeping the native layout and
+   actors. Next is Kabelkeller (`cable`), then Markt, Kino, Neonkai, Kanal,
    Aschegang, Abfluss, Chemiegasse, Ring, Labyrinth, Nischen and Schrotttor.
    Associated interiors follow with their district. Each gets its own PR; native
    device appearance/FPS stays with Ben, no blanket visual-completion claim.
