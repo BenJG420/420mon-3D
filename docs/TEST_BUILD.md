@@ -1,4 +1,4 @@
-> **v56 — Shared street details (publication pending):** locally authored empty
+> **Published v56 — Shared street details, [PR #63](https://github.com/BenJG420/420mon-3D/pull/63), source `ed853d8`:** locally authored empty
 > bottles, cans, open cardboard boxes, parked bicycles and wire shopping carts.
 > The common renderer retrofits Gasse A/Grow-Hinterhöfe and runs on all 14 district
 > and connecting maps at their original bins (indoor districts: small litter only).
@@ -10,7 +10,11 @@
 > passed. First street test caught the crowded initial cart location; placement
 > now tries another bin. Both focused street tests passed after correction,
 > including all 14 maps, clearance, geometry bounds, culling and resource disposal.
-> No browser/full-suite run. Ben checks appearance. Next district: Kabelkeller.
+> PR CI40020045721/Main CI40020249737/Pages40020249742 passed. Live JS
+> `index-CtT5N5H2.js`, SHA256 `f14f40613bb514aa5a60b231091730b78eda84c4898fc0fda6b7c0ab4be4f39d`;
+> JS/CSS/fonts match the local build, stable root unchanged. No browser/full-suite
+> run. Ben checks appearance. Next addendum: graffiti/stickers/posters and a few
+> flickering existing lamps, then the full Kabelkeller district package.
 > **Monster erst nach Freigabe.**
 
 > **Published v55 — Grow-Hinterhöfe / Moss, merged [PR #62](https://github.com/BenJG420/420mon-3D/pull/62), source `da47361`:** the three original
@@ -875,8 +879,11 @@ are historical; existing repository CI may run automatically.
    **Ben addendum (2026-10-23):** add empty bottles/cans, cardboard boxes,
    parked bicycles/shopping carts and similar street clutter with instancing.
    Retrofit Gasse A too; carry the shared detail system through every district.
-   v56 implements the shared street-detail addendum as its own PR after v55;
-   publication pending. The next full district package remains Kabelkeller. Player/NPC assets remain unchanged.
+   Street-detail addendum DONE (PR #63 / v56), merged and published.
+   **Ben addendum (2026-10-23): NEXT shared graffiti/tags/stickers/posters and a few
+   flickering lamps/lanterns across districts, including Gasse A retrofit; retain
+   performance budgets and actors.** Own PR because #63 is already merged.
+   The next full district package remains Kabelkeller. Player/NPC assets remain unchanged.
    Associated interiors follow with their district. Each gets its own PR; native
    device appearance/FPS stays with Ben, no blanket visual-completion claim.
 8. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up

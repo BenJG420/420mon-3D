@@ -1,3 +1,11 @@
+# Aktueller Wiedereinstieg — v56 Street-Details veröffentlicht; Wanddetails/Lampen ergänzen
+
+- PR #63 gemergt/live, Source `ed853d82dcf99ef7d3a7924cd6c25b695b9fd2fa`: gemeinsame instanzierte Flaschen/Dosen/Kartons/Fahrräder/Einkaufswagen in 14 Bezirks-/Verbindungskarten, inklusive Gasse A. Originalwege, Figuren, Kollisionen und Saves unverändert; kleine Instanzzellen/Distanz-Ausblendung, keine zusätzlichen Schattenwerfer/Lichter.
+- Zwei lokale Runden: Builds grün, Alley/Yard-Regressionschecks grün; Street-Tests 2/2 nach korrigiertem Ausweichplatz für Einkaufswagen grün. PR CI40020045721/Main CI40020249737/Pages40020249742 grün. Live JS `index-CtT5N5H2.js`, SHA256 `f14f40613bb514aa5a60b231091730b78eda84c4898fc0fda6b7c0ab4be4f39d`, JS/CSS/fonts bytegleich, Stable unverändert. Nachweis v56-deploy-proof.json. Keine Browserprüfung.
+- Ben ergänzt jetzt Graffiti/Tags/Sticker/Plakate und einzelne flackernde Laternen für alle Bezirke, Gasse A nachrüsten. Als eigener nächster kleiner PR, weil #63 bereits gemergt ist. Danach Kabelkeller. **Monster erst nach Freigabe** durch Ben, Ko-fi/Zahlungen übersprungen.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — v56 Street-Details in den Bezirken
 
 Annahme v56: Straßenkleinkram wird bei bestehenden Tonnen platziert; Fahrräder/Einkaufswagen stehen nur im Freien, Innenbezirke erhalten Flaschen/Dosen/Kartons. Reine Kulisse ohne neue Kollisions- oder Speicherobjekte.
