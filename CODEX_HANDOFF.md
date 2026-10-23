@@ -1,3 +1,11 @@
+# Aktueller Wiedereinstieg — v53 Buff-HUD veröffentlicht; Gasse A fortsetzen
+
+- PR #60 gemergt/live, Source `1ae40091bc6f925aad3ee4e19286db3ca8dc875a`. Buffsymbole/Restzeit im Cash-HUD; getrennt einklappbar und über Haupt-HUD versteckbar. Bestehende Spielzeit-/Outfitregeln erhalten.
+- Build + 3/3 gezielte Tests, PR CI39931342196/Main CI39931435161/Pages39931435097 grün. JS `index-CLGU9YtK.js`, SHA256 `19c29ccde341233742134454bb52fa70f783a5c3b003e9edfabbc4f1cb525597`; CSS `index-DAJEILXa.css` und Fonts bytegleich zum lokalen Build; Stable unverändert. Nachweis v53-buff-deploy-proof.json. Keine Browserprüfung, Ben testet selbst.
+- Als Nächstes angefangene Gasse A (Dächer/Fassaden/Schilder/Neon/Müll/Pfützen) als v54/eigener PR fertigstellen. Vorhandene Arbeit auf feat/alley-details-v53 in /workspace/420mon-3D beibehalten und mit main zusammenführen. Danach Bezirke einzeln, Spieler/NPCs nicht verändern. **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — v53 Buff-HUD vor den Bezirken
 
 Annahme v53: Zeitliche Buffs zeigen die bestehenden Spielzeitsekunden; der einzige aktive Outfitbonus zeigt ∞ (solange getragen), permanente Silk-/Züchterboni ∞. Sichtbare Kleidungsslots werden nicht zu neuen Boni addiert.

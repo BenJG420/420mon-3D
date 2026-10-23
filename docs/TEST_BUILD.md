@@ -1,10 +1,13 @@
-> **v53 — Buff HUD, ready for PR/merge:** active consumption effects show symbols,
+> **Published v53 — Buff HUD, [PR #60](https://github.com/BenJG420/420mon-3D/pull/60), source `1ae4009`:** active consumption effects show symbols,
 > original colors, percentage and remaining playtime seconds inside the existing
 > top-left Cash/time/level HUD. Outfit bonuses show ∞ while worn; permanent
 > Silk/Züchter indicators show ∞. Buffs collapse separately (UI preference) and
 > hide with the main HUD. Only the existing active outfit contributes, not all
 > six visual slots. Build + 3/3 focused HUD tests passed. No browser/full-suite run.
-> No gameplay/save/character changes.
+> No gameplay/save/character changes. PR CI39931342196/Main CI39931435161/
+> Pages39931435097 passed. Live JS `index-CLGU9YtK.js`, SHA256
+> `19c29ccde341233742134454bb52fa70f783a5c3b003e9edfabbc4f1cb525597`;
+> CSS `index-DAJEILXa.css` and fonts match the local build, stable root unchanged.
 > Reference: original 2D overlays.tsx Hud(), runtime.highList()/outfitHud() at
 > `010807da`; no new browser session at the live reference. Ben checks visuals.
 > **NEXT: continue the already-started Gasse A district package as its own PR.
@@ -802,7 +805,7 @@ are historical; existing repository CI may run automatically.
    Baseline restores v51 individual decoration and shadow sizes. Auto/Low reduce
    shadow resolution; High preserves it. **Actual before/after device FPS remains
    Ben’s test-build check; Node geometry counts are not an FPS result.**
-6. **GUI priority v53 — Buff HUD before districts:** show active effects with
+6. **DONE — Buff HUD, PR #60 / v53:** show active effects with
    symbols and remaining time inside the same collapsible top-left Cash/time/level
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
