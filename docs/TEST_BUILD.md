@@ -1,4 +1,4 @@
-> **v55 — Grow-Hinterhöfe / Moss (publication pending):** the three original
+> **Published v55 — Grow-Hinterhöfe / Moss, merged [PR #62](https://github.com/BenJG420/420mon-3D/pull/62), source `da47361`:** the three original
 > blocked inner rectangles receive independent tile/metal/felt PBR roofs, gutters,
 > flashing, storage shutters, repaired cladding, lit side windows, vents and ivy.
 > Original courtyard walls gain masonry, conduit and restrained emissive fixtures;
@@ -11,7 +11,10 @@
 > One local round: build and 14/14 affected tests passed (yard/Moss, alley,
 > static batches, world geometry). Yard decorations: 71 objects / 25 potential
 > instanced main-pass draws before culling; this is not an FPS measurement.
-> No browser run; Ben checks visuals/device FPS. Next: Kabelkeller.
+> PR CI40018866793/Main CI40019032929/Pages40019032930 passed. Live JS
+> `index-Draa-8EJ.js`, SHA256 `364debcd0e8a2391f61a54c1356ebbb3ca1e166e093513594cc2e071634a8ad7`;
+> JS/CSS/fonts match the local build; stable root unchanged. No browser run;
+> Ben checks visuals/device FPS. Next: Street-detail addendum, then Kabelkeller.
 > **Monster erst nach Freigabe.** Ko-fi/payment stays skipped.
 
 > **Published v54 — Gasse A detail, merged [PR #61](https://github.com/BenJG420/420mon-3D/pull/61), source `15d104f`:** three independent roof PBR
@@ -842,7 +845,7 @@ are historical; existing repository CI may run automatically.
    symbols and remaining time inside the same collapsible top-left Cash/time/level
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
-7. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe (`yard`) v55 implemented, publication pending; NEXT Kabelkeller (`cable`), one PR per district:** preserve each original 2D layout,
+7. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); NEXT Kabelkeller (`cable`), one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
@@ -854,6 +857,11 @@ are historical; existing repository CI may run automatically.
    patches, refuse/neon/runoff and Moss’ interior, keeping the native layout and
    actors. Next is Kabelkeller (`cable`), then Markt, Kino, Neonkai, Kanal,
    Aschegang, Abfluss, Chemiegasse, Ring, Labyrinth, Nischen and Schrotttor.
+   **Ben addendum (2026-10-23):** add empty bottles/cans, cardboard boxes,
+   parked bicycles/shopping carts and similar street clutter with instancing.
+   Retrofit Gasse A too; carry the shared detail system through every district.
+   v55 is already merged, so the street-detail addendum gets its own next PR
+   before Kabelkeller. Player/NPC assets remain unchanged.
    Associated interiors follow with their district. Each gets its own PR; native
    device appearance/FPS stays with Ben, no blanket visual-completion claim.
 8. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up

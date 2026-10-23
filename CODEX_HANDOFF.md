@@ -1,10 +1,10 @@
-# Aktuelle Arbeit — v55 Grow-Hinterhöfe
+# Aktueller Wiedereinstieg — v55 Grow-Hinterhöfe veröffentlicht; Street-Details ergänzen
 
-Annahme v55: Die drei kleinen gesperrten Originalrechtecke sind Geräteschuppen; die zwei grünen Dekoflächen bleiben frei begehbar, Moss’ bestehendes Hinterzimmer gehört zum Bezirkspaket.
+- Grow-Hinterhöfe/Moss PR #62 gemergt und live, Source `da473611a0dad18c703f5e1db7033cc9ae7d2026`: drei eigene PBR-Schuppendächer, Fassaden/Rinnen/Hofmauern, Vegetation, Neon/Müll, instanzierte Grünflächen/Pfützen und Moss-Wanddetails. Grundriss, Spieler/NPCs, Kollisionen, Spielregeln/Saves unverändert.
+- Eine lokale Prüfrunde: Build + 14/14 direkt betroffene Tests grün. PR CI40018866793/Main CI40019032929/Pages40019032930 grün. Live JS `index-Draa-8EJ.js`, SHA256 `364debcd0e8a2391f61a54c1356ebbb3ca1e166e093513594cc2e071634a8ad7`; JS/CSS/fonts bytegleich, Stable unverändert. Nachweis `/workspace/scratch/420mon-audit/v55-deploy-proof.json`. Ben prüft Optik/FPS, keine Browserdurchläufe.
+- Ben ergänzt während Veröffentlichung: mehr leere Flaschen, Fahrräder, Dosen, Kartons/Einkaufswagen für alle Bezirke, Gasse A nachrüsten, Instancing beachten. Als eigener nächster kleiner PR, weil #62 bereits gemergt ist; danach Kabelkeller. **Monster erst nach Freigabe**, Ko-fi/Zahlungen übersprungen.
 
-- Nächster eigener PR auf `feat/yard-details-v55`: eigene Schuppendächer, Rinnen/Fassaden, Hofmauern mit Vegetation/Leitungen, Originalschilder mit Neon, Müll, instanzierte Grünflächen/Runoff und Moss-Wanddetails. Keine neuen Kollisionen, Figuren, Spielregeln oder Speicherfelder.
-- Nur Build + direkt betroffene Tests; keine Browserdurchläufe, Ben prüft den Testbuild. Eine lokale Prüfrunde: Build und 14/14 betroffene Tests grün. PR/Merge/Pages stehen noch aus.
-- Danach Kabelkeller als eigener PR. **Monster erst nach Freigabe** durch Ben. Ko-fi/Zahlungen übersprungen.
+Annahme v55: Drei kleine gesperrte Originalrechtecke sind Geräteschuppen; grüne Dekoflächen bleiben begehbar, Moss’ vorhandenes Hinterzimmer gehört zum Bezirkspaket.
 
 ## Vorheriger Stand
 
