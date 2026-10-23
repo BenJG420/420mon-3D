@@ -1,3 +1,18 @@
+> **v56 — Shared street details (publication pending):** locally authored empty
+> bottles, cans, open cardboard boxes, parked bicycles and wire shopping carts.
+> The common renderer retrofits Gasse A/Grow-Hinterhöfe and runs on all 14 district
+> and connecting maps at their original bins (indoor districts: small litter only).
+> Deterministic placement avoids source walls, objects, door/NPC approaches and
+> overlapping props. Spatial 16m instancing cells share models/materials, retain
+> culling bounds and hide beyond 48m plus cell radius. No added shadow casters,
+> point lights, alpha passes, gameplay objects or save fields. Figures unchanged.
+> Validation: build passed in both local rounds; alley/yard integration checks
+> passed. First street test caught the crowded initial cart location; placement
+> now tries another bin. Both focused street tests passed after correction,
+> including all 14 maps, clearance, geometry bounds, culling and resource disposal.
+> No browser/full-suite run. Ben checks appearance. Next district: Kabelkeller.
+> **Monster erst nach Freigabe.**
+
 > **Published v55 — Grow-Hinterhöfe / Moss, merged [PR #62](https://github.com/BenJG420/420mon-3D/pull/62), source `da47361`:** the three original
 > blocked inner rectangles receive independent tile/metal/felt PBR roofs, gutters,
 > flashing, storage shutters, repaired cladding, lit side windows, vents and ivy.
@@ -860,8 +875,8 @@ are historical; existing repository CI may run automatically.
    **Ben addendum (2026-10-23):** add empty bottles/cans, cardboard boxes,
    parked bicycles/shopping carts and similar street clutter with instancing.
    Retrofit Gasse A too; carry the shared detail system through every district.
-   v55 is already merged, so the street-detail addendum gets its own next PR
-   before Kabelkeller. Player/NPC assets remain unchanged.
+   v56 implements the shared street-detail addendum as its own PR after v55;
+   publication pending. The next full district package remains Kabelkeller. Player/NPC assets remain unchanged.
    Associated interiors follow with their district. Each gets its own PR; native
    device appearance/FPS stays with Ben, no blanket visual-completion claim.
 8. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up
