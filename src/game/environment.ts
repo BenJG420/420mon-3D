@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { getDistrictGraphics, type DistrictGraphics } from "./graphics-profile";
+import { getDistrictGraphics, graphicsShadowSize, type DistrictGraphics, type GraphicsQuality } from "./graphics-profile";
 import { createDistrictWeather } from "./weather";
 
 export type SurfaceKind = "floor" | "wall" | "metal" | "wood";
@@ -269,9 +269,10 @@ export type GameEnvironment = {
   update: (player: THREE.Object3D, dt: number) => void;
   setIndoor: (indoor: boolean) => void;
   setDistrict: (mapId: string, indoor?: boolean) => void;
+  setPerformanceQuality: (quality: GraphicsQuality, optimized: boolean) => void;
   getDiagnostics: () => {
     district: string; indoor: boolean; rainDrops: number; rippleCount: number;
-    mistPatches: number; lights: number; reflection: string;
+    mistPatches: number; lights: number; reflection: string; shadowSize: number;
   };
   dispose: () => void;
 };
@@ -351,8 +352,16 @@ export function createEnvironment(scene: THREE.Scene, renderer: THREE.WebGLRende
   return {
     setDistrict,
     setIndoor(value) { setDistrict(district, value); },
+    setPerformanceQuality(quality, optimized) {
+      const size = graphicsShadowSize(quality, mobile, optimized);
+      if (key.shadow.mapSize.x === size) return;
+      // Recreate only when the budget changes, never during normal frames.
+      key.shadow.map?.dispose(); key.shadow.map = null;
+      key.shadow.mapSize.set(size, size);
+      key.shadow.needsUpdate = true;
+    },
     getDiagnostics() {
-      return { district, indoor, ...weather.getDiagnostics(), lights: 3, reflection: "hdr-pmrem" };
+      return { district, indoor, ...weather.getDiagnostics(), lights: 3, reflection: "hdr-pmrem", shadowSize: key.shadow.mapSize.x };
     },
     update(player, dt) {
       const step = Math.min(Math.max(dt, 0), .1);

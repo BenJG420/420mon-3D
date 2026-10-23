@@ -1,3 +1,13 @@
+# Aktuelle Arbeit — v52 Performance/FPS
+
+Annahme v52: Ohne weitere Browserläufe werden keine FPS erfunden; Ben misst im Testbuild denselben Standort über Hilfe → FPS vergleichen, während Node-Tests nur Geometrie/Draw-Call-Potenzial belegen.
+
+- Branch `perf/static-district-v52`: Gras/Pfützen in räumlich begrenzten Instanzen, Schattenbudget nach Grafikstufe; Hoch behält v51-Auflösung. Kein Spieler-/NPC-/Mechanik-/Save-Umbau.
+- FPS-Vergleich: je 2s Aufwärmen + 10s Messung, echte ungekappte RAF-Zeiten, Ø FPS/1% Low/p95/Draw Calls, Kontext/JSON lokal. Bewegung, fremde Overlays, Größen-/Kartenwechsel oder Hintergrundtab brechen ab. Standard bleibt optimiert.
+- Build + 26/26 direkt betroffene Tests grün (18 Welt/Grafik + 8 FPS-Auswertung); keine neue Browser-/Vollsuite. Nach eigenem PR/Merge folgt Gasse A als erster Bezirks-PR; weitere Bezirke einzeln. Monster erst nach Bens ausdrücklicher Freigabe, Ko-fi/Zahlungen übersprungen.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v51 veröffentlicht; Performance/FPS v52 als Nächstes
 
 - GUI PR #58 gemergt/live, Source `095856c1e558c2ccfcc830a8eb5b961db128e37d`. Grow-Aktionen direkt unter Auswahl, Menü/Inventar/HUD nach tatsächlich besuchter 2D-Vorlage. Existierende Itemglyphen behalten; kein Import illustrierter Itembilder behaupten.

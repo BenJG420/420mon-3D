@@ -122,6 +122,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
         row("Inventar", undefined, "Kategorie aufklappen, Menge lesen und Benutzen wählen. Heilitems öffnen die Partnerauswahl. k.o. bleibt k.o.; eine physische Matratze belebt wieder.");
         row("Grow und Angeln", undefined, "Grow am Topf pflegen für kürzere Zeiten und mehr Ertrag. Am Neonkai mit Weed-Samen angeln; Fischsammlung im Aquarium ansehen.");
         row("Charakter ansehen", () => { close(); window.dispatchEvent(new Event("420mon-preview-clothes")); });
+        row("FPS vergleichen", () => { close(); window.dispatchEvent(new Event("420mon-open-performance")); }, "24 Sekunden Vorher/Nachher-Vergleich auf deinem Gerät. Bitte dabei stehen bleiben.");
       } else {
         const p = document.createElement("p");
         p.textContent = tab === "net" || tab === "post" ? "Online-Funktionen laufen im 2D-Original. Der 3D-Test hat keinen Chat-/Nachrichtenserver und überträgt keine Spielstände dorthin." : "Projektinformationen und Rückmeldungen auf GitHub."; body.append(p);
@@ -346,7 +347,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
     render();
   }
   function open(next: string) {
-    if (document.querySelector(".monster-battle:not([hidden]),.monster-collection:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.grow-backdrop:not([hidden]),.monster-model-overlay:not([hidden]),.slot-overlay:not([hidden]),.achievement-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.studio-panel.is-open")) return;
+    if (document.querySelector(".performance-overlay:not([hidden]),.monster-battle:not([hidden]),.monster-collection:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.grow-backdrop:not([hidden]),.monster-model-overlay:not([hidden]),.slot-overlay:not([hidden]),.achievement-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.studio-panel.is-open")) return;
     rememberFocus();
     trade = null; tab = next; healPick = ""; openCats.clear(); panel.hidden = false; render();
     window.dispatchEvent(new Event("420mon-menu-opened")); q("systems-close").focus();

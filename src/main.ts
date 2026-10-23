@@ -17,6 +17,7 @@ import { createSlotMachines } from "./game/slots";
 import { createRadioSystem } from "./game/radio";
 import { createMonsterViewer } from "./game/monster-viewer";
 import { createPostProcessing } from "./game/post-processing";
+import { createPerformanceMonitor } from "./game/performance-monitor";
 import { graphicsPixelRatio, type GraphicsQuality } from "./game/graphics-profile";
 import { createAchievementBook } from "./game/achievement-book";
 import { syncAchievements } from "./game/achievements";
@@ -51,6 +52,8 @@ const renderer = new THREE.WebGLRenderer({
   antialias: true,
   powerPreference: "high-performance",
 });
+// Count the whole frame, including shadows and all composer passes.
+renderer.info.autoReset = false;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -64,6 +67,8 @@ const postProcessing = createPostProcessing(renderer, scene, camera);
 const storedQuality = localStorage.getItem("420mon-graphics-quality");
 let graphicsQuality: GraphicsQuality = storedQuality === "high" || storedQuality === "low" ? storedQuality : "auto";
 postProcessing.setQuality(graphicsQuality);
+let renderOptimized = true;
+environment.setPerformanceQuality(graphicsQuality, renderOptimized);
 
 // Modular low-poly humanoid. Individual limb pivots can later be replaced
 // with rigged meshes, clothing and equipment without changing movement code.
@@ -254,6 +259,7 @@ graphicsSelect.onchange = () => {
   graphicsQuality = graphicsSelect.value as GraphicsQuality;
   localStorage.setItem("420mon-graphics-quality", graphicsQuality);
   postProcessing.setQuality(graphicsQuality);
+  environment.setPerformanceQuality(graphicsQuality, renderOptimized);
   resize();
 };
 app.appendChild(graphicsControl);
@@ -415,7 +421,7 @@ studioOpen.textContent = "✎ CHARAKTER";
 studioOpen.type = "button";
 app.appendChild(studioOpen);
 function toggleStudio(open: boolean) {
-  if (open && document.querySelector(".monster-battle:not([hidden]),.monster-collection:not([hidden]),.systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])")) return;
+  if (open && document.querySelector(".monster-battle:not([hidden]),.monster-collection:not([hidden]),.systems-panel:not([hidden]),.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden]),.performance-overlay:not([hidden])")) return;
   studioPanel.classList.toggle("is-open", open);
   document.body.classList.toggle("wardrobe-preview", open);
   if (!open && studioPanel.contains(document.activeElement)) (document.activeElement as HTMLElement)?.blur();
@@ -427,7 +433,7 @@ function toggleStudio(open: boolean) {
 window.addEventListener("420mon-preview-clothes", () => toggleStudio(true));
 window.addEventListener("keydown", event => {
   if (event.code === "Escape" && studioPanel.classList.contains("is-open")) toggleStudio(false);
-  if (event.code !== "KeyT" || event.repeat || event.defaultPrevented || (event.target as HTMLElement)?.closest("input,select,textarea,[contenteditable=true]") || document.querySelector(".monster-battle:not([hidden]),.monster-collection:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])")) return;
+  if (event.code !== "KeyT" || event.repeat || event.defaultPrevented || (event.target as HTMLElement)?.closest("input,select,textarea,[contenteditable=true]") || document.querySelector(".monster-battle:not([hidden]),.monster-collection:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden]),.performance-overlay:not([hidden])")) return;
   const s = getSave(); persistClothingChange(s, () => toggleBag(s), () => saveProgress());
 });
 studioOpen.addEventListener("click", () => toggleStudio(!studioPanel.classList.contains("is-open")));
@@ -578,10 +584,34 @@ window.addEventListener("420mon-ui-layout", event => {
 window.addEventListener("resize", resize);
 resize();
 
+const performanceMonitor = createPerformanceMonitor({
+  setOptimized(enabled) {
+    renderOptimized = enabled;
+    districtWorld.setPerformanceMode(enabled);
+    environment.setPerformanceQuality(graphicsQuality, enabled);
+  },
+  getOptimized: () => renderOptimized,
+  getContext: () => ({
+    map: districtWorld.getMapInfo().id,
+    quality: graphicsQuality,
+    width: renderer.domElement.width, height: renderer.domElement.height,
+    pixelRatio: renderer.getPixelRatio(),
+    x: player.position.x, z: player.position.z,
+    cameraX: camera.position.x, cameraY: camera.position.y, cameraZ: camera.position.z,
+    shadowSize: environment.getDiagnostics().shadowSize,
+    ...districtWorld.getPerformanceStats(),
+    postProcessing: postProcessing.getDiagnostics().mode,
+    blocked: monsterGame.inBattle || !!document.querySelector(".monster-collection:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])"),
+  }),
+});
+let previousFrameTime: number | undefined;
 let achievementClock = 0;
 let graphicsDistrict = "";
-function animate() {
+function animate(frameTime?: number) {
   requestAnimationFrame(animate);
+  // Real RAF time for measurements; the gameplay delta below remains clamped.
+  const rawDeltaMs = frameTime !== undefined && previousFrameTime !== undefined ? frameTime - previousFrameTime : 0;
+  previousFrameTime = frameTime;
   const dt = Math.min(clock.getDelta(), 0.05);
   monsterGame.update(dt);
   rival.update(dt);
@@ -614,7 +644,7 @@ function animate() {
 
   if (input.lengthSq() > 0) input.normalize();
 
-  const overlayOpen = !!document.querySelector(".monster-collection:not([hidden]),.systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden])");
+  const overlayOpen = !!document.querySelector(".monster-collection:not([hidden]),.systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden]),.performance-overlay:not([hidden])");
   const speed = monsterGame.inBattle || overlayOpen ? 0 : ((state.sprint || touch.sprint) ? 7.5 : 4.2) * fishEffectMultiplier(getSave(), "speed");
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
   blockedThisFrame = false;
@@ -669,8 +699,12 @@ function animate() {
   const faded = playerOcclusion.update(districtWorld.getOccluders(), camera.position, player.position, dt);
   renderer.domElement.dataset.occludedBuildings = String(faded);
 
+  renderer.info.reset();
   if (editing) wardrobePreview.render(previewTurn, window.innerWidth, window.innerHeight, studioPanel.getBoundingClientRect().width);
   else if (!monsterViewer.isOpen() && !document.querySelector('.fish-overlay[data-aquarium="open"]')) postProcessing.render(dt);
+  if (rawDeltaMs > 0) performanceMonitor.recordFrame(rawDeltaMs, {
+    calls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
+  });
   const graphicsState = postProcessing.getDiagnostics();
   renderer.domElement.dataset.graphics = graphicsState.mode;
   renderer.domElement.dataset.bloom = String(graphicsState.bloom);

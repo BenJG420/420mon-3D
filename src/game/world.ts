@@ -9,6 +9,7 @@ import { createWorldSurfaces, projectSurfaceUvs } from "./world-surfaces";
 import { createNpcHuman } from "./npc-humanoids";
 import { getDistrictGraphics } from "./graphics-profile";
 import { isTakenStarter } from "./starter-state";
+import { createStaticBatches, type StaticDecoration, type StaticBatchStats } from "./static-batches";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -27,6 +28,8 @@ export type DistrictTravel = {
   getOccluders: () => THREE.Mesh[];
   getMapInfo: () => MapInfo;
   getRoot: () => THREE.Group;
+  setPerformanceMode: (enabled: boolean) => void;
+  getPerformanceStats: () => StaticBatchStats;
   toWorld: (x: number, y: number) => THREE.Vector3;
   setInteractionHandler: (fn: (obj: MapObj, mapId: string) => boolean | void) => void;
   setRoamingNpc: (obj?: MapObj) => void;
@@ -82,6 +85,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   let lastActorTime = performance.now();
   let roamingNpc: MapObj | undefined;
   const storyNpcs = new Map<string, MapObj>();
+  let performanceMode = true;
+  let staticBatches: ReturnType<typeof createStaticBatches> | undefined;
 
   function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, parent: THREE.Object3D, x: number, y: number, z: number, shadow = true) {
     projectSurfaceUvs(geometry, material);
@@ -459,6 +464,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
 
   function buildFloor() {
+    const decorations: StaticDecoration[] = [];
     const w = active.w * WORLD_SCALE, d = active.h * WORLD_SCALE;
     box(root, w + .25, .45, d + .25, mat(palette.dark, "stone"), 0, -.27);
     const indoor = getDistrictGraphics(id).wetness < .15;
@@ -478,8 +484,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         const amount = Math.min(55, Math.round(r.w * r.h / 1000));
         for (let i = 0; i < amount; i++) {
           const p = at(r.x + seeded(i + r.x) * r.w, r.y + seeded(i + r.y + 8) * r.h);
-          const leaf = mesh(new THREE.ConeGeometry(.1, .26 + seeded(i) * .22, 5), mat(0x586c3d), root, p.x, .17, p.z, false);
-          leaf.rotation.z = (seeded(i + 22) - .5) * .4;
+          p.y = .17;
+          decorations.push({ kind: "grass", position: p, height: .26 + seeded(i) * .22, lean: (seeded(i + 22) - .5) * .4 });
         }
       }
     }
@@ -488,10 +494,10 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const r = sketch.walk[i % Math.max(1, sketch.walk.length)]; if (!r) continue;
       const p = at(r.x + seeded(i + 712) * r.w, r.y + seeded(i + 309) * r.h);
       const size = .9 + seeded(i) * 2.5;
-      const puddle = mesh(new THREE.PlaneGeometry(size, size), puddleMaterial, root, p.x, .058, p.z, false);
-      puddle.rotation.x = -Math.PI / 2; puddle.rotation.z = seeded(i + 69) * Math.PI; puddle.scale.y = .35 + seeded(i + 69) * .5;
-      puddle.name = "rain-puddle";
+      p.y = .058;
+      decorations.push({ kind: "puddle", position: p, size, angle: seeded(i + 69) * Math.PI, stretch: .35 + seeded(i + 69) * .5 });
     }
+    staticBatches = createStaticBatches(root, decorations, { grass: mat(0x586c3d), puddle: puddleMaterial }, performanceMode);
     if (!active.indoor) for (let i = 0; i < Math.min(6, sketch.walk.length); i++) {
       const r = sketch.walk[i];
       const p = at(r.x + r.w * .82, r.y + r.h * .68);
@@ -549,6 +555,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
   function disposeMap() {
     for (const actor of npcActors.values()) actor.dispose(); npcActors.clear();
+    staticBatches?.dispose(); staticBatches = undefined;
     disposeOwnedObjects(root);
     root.clear(); mapObjects.clear(); roamingNpc = undefined; storyNpcs.clear(); occluders = []; lampLights.length = 0; lastLightSelection = -Infinity; glowing.length = 0;
   }
@@ -656,7 +663,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   document.querySelector("#app")!.append(prompt);
   function overlayOpen() {
     return document.body.classList.contains("menu-open") || !!document.querySelector(
-      ".systems-panel:not([hidden]), .grow-backdrop:not([hidden]), .monster-battle:not([hidden]),.monster-collection:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]), .story-overlay:not([hidden]), .radio-overlay:not([hidden]), .support-overlay:not([hidden]),.slot-overlay:not([hidden]), .studio-panel.is-open"
+      ".systems-panel:not([hidden]), .grow-backdrop:not([hidden]), .monster-battle:not([hidden]),.monster-collection:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]), .story-overlay:not([hidden]), .radio-overlay:not([hidden]), .support-overlay:not([hidden]),.slot-overlay:not([hidden]), .performance-overlay:not([hidden]), .studio-panel.is-open"
     );
   }
   function closestInteraction() {
@@ -762,6 +769,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     getMapInfo: () => ({ id, name: active.name, map: active, w: active.w, h: active.h, scale: WORLD_SCALE,
       bounds: { minX: -active.w * WORLD_SCALE / 2, maxX: active.w * WORLD_SCALE / 2, minZ: -active.h * WORLD_SCALE / 2, maxZ: active.h * WORLD_SCALE / 2 }, player: sourcePosition() }),
     getRoot: () => root, toWorld: at,
+    setPerformanceMode: enabled => { performanceMode = enabled; staticBatches?.setOptimized(enabled); },
+    getPerformanceStats: () => staticBatches?.getStats() ?? { optimized: performanceMode, objects: 0, baselineDraws: 0, optimizedDraws: 0, activeDraws: 0, cellSize: 16 },
     setInteractionHandler: fn => { interaction = fn; },
     setRoamingNpc, setStoryNpcs,
   };
