@@ -1,3 +1,15 @@
+# Aktuelle Arbeit — v54 Gasse A
+
+Annahme v54: Gasse A ist das erste Bezirks-Paket; Details bleiben reine Darstellung auf dem Originalgrundriss, vorhandene Licht-/Schatten-/Wetterbudgets und Figuren bleiben erhalten.
+
+- Buff-HUD PR #60 ist zuerst gemergt und live. Angefangene Gasse A übernommen, nicht neu gebaut; Branch nach Integration des Buff-Fixes `feat/alley-details-v54`.
+- Drei eigene PBR-Dachtypen (Ziegel/Blech/Teerpappe) mit Farb-/Rauheits-/Normalmaps, bedarfsweise Textur-Cache; vier Fassadenseiten mit Rinnen/Leitungen/Kabeln/Rollläden/Vegetation, Hausnamenschilder in Gebäudeverdeckung, Neonrahmen, Haustürdetails, Müllgruppen und sechs zusätzliche gebündelte Pfützen.
+- Kein neuer Spieler/NPC/Save-/Mechanikpfad. Fassaden max. acht Materialbatches plus Hausname, Müll drei Meshes/Tonne, keine neuen Punktlichter. Nur Build + direkt betroffene Tests; Ben prüft die Optik im Testbuild.
+- Prüfbudget v54 ausgeschöpft: Build grün in allen drei Runden; 15 übrige direktbetroffene Tests grün. Alley-Test deckte fehlende Hauszuordnung und Randhaus-Klassifikation auf (korrigiert); dritter Lauf erreichte Ressourcenprüfung und scheiterte erst an legitimem 18-Gold-Erstbesuchsquest im Fixture. Fixture jetzt bereits belohnter Marktbesuch, keine vierte lokale Runde; bestehende PR-CI bestätigt finalen Stand.
+- Danach Grow-Hinterhöfe (`yard`) als eigener PR, übrige Bezirke einzeln. **Monster erst nach Freigabe** durch Ben. Ko-fi/Zahlungen bleiben übersprungen.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v53 Buff-HUD veröffentlicht; Gasse A fortsetzen
 
 - PR #60 gemergt/live, Source `1ae40091bc6f925aad3ee4e19286db3ca8dc875a`. Buffsymbole/Restzeit im Cash-HUD; getrennt einklappbar und über Haupt-HUD versteckbar. Bestehende Spielzeit-/Outfitregeln erhalten.

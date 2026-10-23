@@ -10,6 +10,7 @@ import { createNpcHuman } from "./npc-humanoids";
 import { getDistrictGraphics } from "./graphics-profile";
 import { isTakenStarter } from "./starter-state";
 import { createStaticBatches, type StaticDecoration, type StaticBatchStats } from "./static-batches";
+import { alleyRoofKind, appendAlleyBuildingDetails, appendAlleyBinDetails, alleyRunoffPuddles, type AlleyFinish } from "./alley-details";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -213,6 +214,16 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     box(frame, length + .25, .09, .75, mat(palette.stone, "stone"), 0, .045);
     const glow = box(frame, length - .15, 2.45, .04, mat(0x1f322b, undefined, 0x537c64), 0, 1.23);
     glowing.push({ mesh: glow, phase: obj.x });
+    if (id === "alley" && obj.id.startsWith("house_")) {
+      glow.material = mat(0x344b49, "wood", 0x1b2f29);
+      projectSurfaceUvs(glow.geometry, glow.material);
+      const parts: THREE.BufferGeometry[] = [];
+      for (const [w, h, x, y] of [[length - .25, .22, 0, .28], [.055, .21, length * .29, 1.14], [.13, .11, -length * .33, .67], [.13, .11, -length * .33, 1.92]]) {
+        const piece = new THREE.BoxGeometry(w, h, .045); piece.translate(x, y, .06); parts.push(piece);
+      }
+      const geometry = mergeGeometries(parts, false); for (const part of parts) part.dispose();
+      if (geometry) { const hardware = mesh(geometry, mat(0x87795a, "metal"), frame, 0, 0, 0, false); hardware.name = "alley-door-hardware"; }
+    }
     tag(frame, obj.label, Math.max(1.65, length), 3.1);
     lamp(frame, 0, 2.82, .3, 0xffce84, 8);
   }
@@ -285,7 +296,24 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     else if (obj.kind === "bed" || obj.kind === "mattress") bed(obj, g);
     else if (obj.kind === "npc" || obj.kind === "shop" || obj.kind === "stall") npc(obj, g);
     else if (obj.kind === "door" || obj.kind === "manhole") door(obj, g);
-    else if (obj.kind === "sign") { tag(g, obj.label, 1.8, 1.6); box(g, .08, 1.5, .08, mat(palette.dark, "metal")); }
+    else if (obj.kind === "sign") {
+      tag(g, obj.label, 1.8, 1.6); box(g, .08, 1.5, .08, mat(palette.dark, "metal"));
+      if (id === "alley") {
+        const pieces: THREE.BufferGeometry[] = [];
+        const trim = (w: number, h: number, x: number, y: number) => {
+          const piece = new THREE.BoxGeometry(w, h, .055); piece.translate(x, y, -.035); pieces.push(piece);
+        };
+        trim(1.95, .045, 0, 1.36); trim(1.95, .045, 0, 1.84);
+        trim(.045, .52, -.95, 1.6); trim(.045, .52, .95, 1.6);
+        const neon = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+        if (neon) {
+          const light = mesh(neon, mat(0x486e71, undefined, 0x568b8a), g, 0, 0, 0, false);
+          light.name = "alley-sign-neon";
+        }
+        const casing = box(g, 1.93, .51, .09, mat(0x293b42, "metal"), 0, 1.6, -.09);
+        casing.name = "alley-sign-casing";
+      }
+    }
     else if (obj.kind === "lamp") {
       cylinder(g, .045, .07, 2.8, mat(palette.dark, "metal")); lamp(g, .2, 2.75, 0);
       box(g, .7, .06, .07, mat(palette.dark, "metal"), .15, 2.84);
@@ -293,6 +321,18 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       box(g, Math.max(.9, obj.w * WORLD_SCALE), 1, Math.max(.7, obj.h * WORLD_SCALE), mat(0x4f5b49, "metal"));
       box(g, 1.06, .12, .91, mat(palette.dark, "metal"), 0, 1.07);
       for (const s of [-1, 1]) box(g, .13, .2, .3, mat(palette.dark), s * .43, .11, .33);
+      if (id === "alley") {
+        const litter = new THREE.Group(); litter.name = "alley-bin-detail"; g.add(litter);
+        const batches = new Map<AlleyFinish, THREE.BufferGeometry[]>();
+        appendAlleyBinDetails((finish, geometry) => {
+          const batch = batches.get(finish) ?? []; batch.push(geometry); batches.set(finish, batch);
+        }, obj.x + obj.y);
+        const finishes = { bag: mat(0x303c38), paper: mat(0xb1a88b), metal: mat(0x7a837c, "metal") };
+        for (const [finish, pieces] of batches) {
+          const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+          if (geometry) { const part = mesh(geometry, finishes[finish as keyof typeof finishes], litter, 0, 0, 0, false); part.name = `alley-litter:${finish}`; }
+        }
+      }
     } else prop(obj, g);
   }
 
@@ -365,26 +405,36 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       if (id === "studio" && !edge) continue; // Lounge and speaker banks furnish original blocked rectangles.
       const obstacle = active.obstacles?.find(o => o.x === r.x && o.y === r.y && o.w === r.w && o.h === r.h);
       if (obstacle) { renderObstacle(obstacle); continue; }
-      const building = active.buildings?.find(b => b.x === r.x && b.y === r.y && b.w === r.w && b.h === r.h);
-      const outside = !active.indoor && !edge && r.w >= 56 && r.h >= 56;
-      const height = edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : outside ? 3.7 + seeded(i + 17) * 4.8 : 2.25;
+      const building = active.buildings?.find(b => b.x === r.x && b.y === r.y && b.w === r.w && b.h === r.h)
+        // Named alley houses occupy a smaller frontage within the source wall mass.
+        ?? (id === "alley" ? active.buildings?.find(b => b.name && b.x >= r.x && b.y >= r.y
+          && b.x + b.w <= r.x + r.w && b.y + b.h <= r.y + r.h) : undefined);
+      // Raze/Cherry's original building masses touch the map edge but are houses,
+      // not the thin boundary wall. Their footprint/collision still stays identical.
+      const outside = !active.indoor && (!edge || (id === "alley" && !!building?.name)) && r.w >= 56 && r.h >= 56;
+      const height = outside ? 3.7 + seeded(i + 17) * 4.8 : edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : 2.25;
       const m = region(r, height, mat(outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : palette.plaster, "plaster"));
       const firstPart = occluders.length;
       m.name = `original-wall:${i}`; occluder(m);
       // Dark plinth and narrow cap keep the rooms readable as a cutaway diorama.
       occluder(region(r, .16, mat(palette.stone, "stone"), .08));
-      occluder(region(r, .1, mat(outside ? 0x626c6b : 0x7d8681, "stone"), height + .02));
+      const roofKind = id === "alley" && outside ? alleyRoofKind(building?.variant ?? i) : undefined;
+      const roofTint = roofKind === "roof-tile" ? 0x896f5b : roofKind === "roof-metal" ? 0x718087 : roofKind === "roof-felt" ? 0x454d4c : outside ? 0x626c6b : 0x7d8681;
+      const roof = occluder(region(r, .1, mat(roofTint, roofKind ?? "stone"), height + .02));
+      if (roofKind) { roof.name = "alley-roof"; roof.userData.roofKind = roofKind; }
       if (outside && r.w > 100 && r.h > 80) {
-        buildingDetails(r, height, i, building?.name);
+        buildingDetails(r, height, i, building?.name, building?.side, building ? (building.x + building.w / 2 - r.x - r.w / 2) * WORLD_SCALE : 0);
       }
       for (const part of occluders.slice(firstPart)) part.userData.occlusionGroup = m.uuid;
     }
   }
 
-  function buildingDetails(r: Rect, height: number, seed: number, name?: string) {
+  function buildingDetails(r: Rect, height: number, seed: number, name?: string, entranceSide?: "n" | "s", nameOffsetX = 0) {
     const group = new THREE.Group(); group.name = "rain-worn-facade";
     group.position.copy(at(r.x + r.w / 2, r.y + r.h / 2)); root.add(group);
     const w = r.w * WORLD_SCALE, d = r.h * WORLD_SCALE;
+    const alley = id === "alley", features = new Set<string>();
+    if (alley) { group.userData.districtDetail = "alley"; group.userData.facadeSides = 4; }
     // Merge all repeated trim by material: dense façades cost a handful of draws.
     const batches = new Map<THREE.Material, THREE.BufferGeometry[]>();
     function detail(material: THREE.Material, width: number, h: number, depth: number, x: number, y: number, z: number) {
@@ -394,19 +444,20 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const frame = mat(0x1f2a30, "metal"), stone = mat(0x66706d, "stone"), metal = mat(0x4b5c60, "metal");
     const unlit = mat(0x14252c, "metal"), warm = mat(0x514432, undefined, 0x9b7044), cool = mat(0x273e43, undefined, 0x3a6268);
     const cols = Math.min(12, Math.max(2, Math.floor(w / 2.1))), rows = Math.max(1, Math.floor((height - .5) / 1.65));
-    for (let side = 0; side < 3; side++) {
-      const length = side ? d : w, count = side ? Math.min(8, Math.max(1, Math.floor(d / 2.2))) : cols;
+    for (let side = 0; side < (alley ? 4 : 3); side++) {
+      const cross = side === 1 || side === 2, reverse = side === 3;
+      const length = cross ? d : w, count = cross ? Math.min(8, Math.max(1, Math.floor(d / 2.2))) : cols;
       for (let row = 0; row < rows; row++) for (let col = 0; col < count; col++) {
         const u = -length / 2 + (col + .5) * length / count, y = 1.2 + row * 1.65;
         const light = seeded(seed * 101 + row * 27 + col * 7 + side * 19);
         const pane = light > .81 ? warm : light < .055 ? cool : unlit;
         const x = side === 1 ? -w / 2 - .04 : side === 2 ? w / 2 + .04 : u;
-        const z = side ? u : d / 2 + .04;
-        detail(frame, side ? .1 : .96, 1.11, side ? .96 : .1, x, y, z);
-        detail(pane, side ? .11 : .74, .88, side ? .74 : .11, x + (side === 1 ? -.025 : side === 2 ? .025 : 0), y, z + (side ? 0 : .025));
-        detail(stone, side ? .26 : 1.05, .09, side ? 1.05 : .26, x, y - .55, z);
-        detail(frame, side ? .14 : .04, .94, side ? .04 : .14, x, y, z + (side ? 0 : .07));
-        if (light > .5) detail(frame, side ? .14 : .8, .04, side ? .8 : .14, x, y + .08, z + (side ? 0 : .07));
+        const z = cross ? u : (reverse ? -1 : 1) * (d / 2 + .04);
+        detail(frame, cross ? .1 : .96, 1.11, cross ? .96 : .1, x, y, z);
+        detail(pane, cross ? .11 : .74, .88, cross ? .74 : .11, x + (side === 1 ? -.025 : side === 2 ? .025 : 0), y, z + (cross ? 0 : reverse ? -.025 : .025));
+        detail(stone, cross ? .26 : 1.05, .09, cross ? 1.05 : .26, x, y - .55, z);
+        detail(frame, cross ? .14 : .04, .94, cross ? .04 : .14, x, y, z + (cross ? 0 : reverse ? -.07 : .07));
+        if (light > .5) detail(frame, cross ? .14 : .8, .04, cross ? .8 : .14, x, y + .08, z + (cross ? 0 : reverse ? -.07 : .07));
       }
     }
     // Rain-darkened corner columns, roof parapet blocks, drainage and service ducts.
@@ -425,12 +476,34 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       for (let i = 0; i < 5; i++) detail(frame, w * .32, .035, .04, -w * .17, height + .42 + i * .1, d * .145);
       for (let i = 0; i < 3; i++) detail(metal, .1, .25, d * .34, w * .15 + i * .23, height + .25, 0);
     }
+    if (alley) {
+      const finishes: Record<AlleyFinish, THREE.Material> = {
+        frame, stone, metal, neon: cool, brick: mat(0x6b5146, "plaster"), leaf: mat(0x425f42),
+        paper: frame, bag: frame,
+      };
+      appendAlleyBuildingDetails(w, d, height, seed, (finish, geometry, feature) => {
+        const material = finishes[finish], batch = batches.get(material) ?? [];
+        batch.push(geometry); batches.set(material, batch); features.add(feature);
+      });
+      group.userData.alleyFeatures = [...features];
+    }
     for (const [material, geometries] of batches) {
       const geometry = mergeGeometries(geometries, false);
       for (const part of geometries) part.dispose();
-      if (geometry) occluder(mesh(geometry, material, group, 0, 0, 0));
+      if (geometry) {
+        const part = occluder(mesh(geometry, material, group, 0, 0, 0));
+        if (alley) { part.name = `alley-building-detail:${material.uuid}`; part.userData.alleyFeature = [...features]; }
+      }
     }
-    if (name) { const n = tag(group, name.toUpperCase(), Math.min(4, w * .8), 2.9, "#c6b48f", d / 2 + .2); n.name = "house-name"; }
+    if (name) {
+      const rear = alley && entranceSide === "s";
+      const n = tag(group, name.toUpperCase(), Math.min(4, w * .8), 2.9, "#c6b48f", (rear ? -1 : 1) * (d / 2 + .2));
+      n.name = "house-name";
+      if (alley) n.position.x = nameOffsetX;
+      if (rear) n.rotation.y = Math.PI;
+      // tag already owns a unique local material/texture; no clone or sharedTexture flag.
+      if (alley) occluders.push(n);
+    }
   }
   function renderObstacle(rect: Rect & { kind: string }) {
     const p = at(rect.x + rect.w / 2, rect.y + rect.h / 2);
@@ -497,6 +570,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       p.y = .058;
       decorations.push({ kind: "puddle", position: p, size, angle: seeded(i + 69) * Math.PI, stretch: .35 + seeded(i + 69) * .5 });
     }
+    if (id === "alley") decorations.push(...alleyRunoffPuddles(active, at));
     staticBatches = createStaticBatches(root, decorations, { grass: mat(0x586c3d), puddle: puddleMaterial }, performanceMode);
     if (!active.indoor) for (let i = 0; i < Math.min(6, sketch.walk.length); i++) {
       const r = sketch.walk[i];

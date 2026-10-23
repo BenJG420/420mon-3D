@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 /** Small, deterministic, local PBR tiles. No network textures or per-map copies. */
-export type WorldSurface = "stone" | "wood" | "plaster" | "metal" | "asphalt";
+export type WorldSurface = "stone" | "wood" | "plaster" | "metal" | "asphalt" | "roof-tile" | "roof-metal" | "roof-felt";
 const SIZE = 256;
 const clamp = (n: number) => Math.max(0, Math.min(1, n));
 const noise = (x: number, y: number, seed = 0) => {
@@ -47,6 +47,32 @@ function tile(kind: WorldSurface): Tile {
       const rust = coarse > .85 && grain > .3;
       value = .65 + grain * .1 + (scratch ? .19 : 0) - (rust ? .17 : 0);
       h = .5 + (scratch ? .035 : 0) + grain * .018; r = rust ? .93 : .37 + coarse * .2;
+    } else if (kind === "roof-tile") {
+      // Curved ceramic courses, staggered side joints and overlapping lower lips.
+      const row = Math.floor(y / 32), bx = (x + (row % 2) * 32) % 64, by = y % 32;
+      const side = bx < 3 || bx > 61, lap = by < 4;
+      const crown = Math.sin(bx / 64 * Math.PI);
+      const ceramic = noise(Math.floor((x + (row % 2) * 32) / 64), row, 18);
+      value = side || lap ? .25 + grain * .08 : .58 + ceramic * .17 + crown * .12 + (grain - .5) * .08;
+      h = side ? .12 : lap ? .22 : .42 + crown * .35 + (1 - by / 32) * .12 + grain * .018;
+      r = side || lap ? .86 : .48 + ceramic * .16;
+    } else if (kind === "roof-metal") {
+      // Standing seams and fasteners follow long metal sheets, not masonry joints.
+      const bx = x % 64, by = y % 64, seam = bx < 3 || bx > 61;
+      const screw = (bx - 9) ** 2 + (by - 8) ** 2 < 6;
+      const rib = Math.cos(bx / 64 * Math.PI * 8) * .025;
+      const scratch = noise(x, Math.floor(y / 5), 23) > .99;
+      value = seam ? .39 + grain * .1 : screw ? .83 : .67 + grain * .06 + rib + (scratch ? .14 : 0);
+      h = seam ? .84 : screw ? .69 : .43 + rib + grain * .008;
+      r = seam ? .48 : screw ? .22 : .29 + coarse * .15;
+    } else if (kind === "roof-felt") {
+      // Wide rolled bitumen with doubled overlap bands and gritty mineral finish.
+      const row = Math.floor(y / 64), bx = (x + (row % 2) * 64) % 128, by = y % 64;
+      const lap = by < 5 || bx < 4;
+      const grit = grain > .88 ? .08 : grain < .1 ? -.07 : 0;
+      value = lap ? .27 + grain * .05 : .49 + grain * .11 + grit;
+      h = lap ? .64 + grain * .012 : .46 + grain * .055 + grit * .2;
+      r = lap ? .66 : .85 + coarse * .07;
     } else {
       // Fine crushed aggregate and winding sealed cracks, rather than giant tiles.
       const crack = Math.abs(Math.sin(x * .032 + Math.sin(y * .041) * .9)) < .019;
@@ -84,13 +110,15 @@ function tile(kind: WorldSurface): Tile {
 }
 
 export function createWorldSurfaces() {
-  const tiles = Object.fromEntries((["stone", "wood", "plaster", "metal", "asphalt"] as const).map(kind => [kind, tile(kind)])) as Record<WorldSurface, Tile>;
+  // A district requests only the surfaces it uses. Roofs never allocate textures
+  // for untouched districts; later visits reuse the exact same PBR maps.
+  const tiles = new Map<WorldSurface, Tile>();
   const materials = new Map<string, THREE.MeshPhysicalMaterial>();
   let wetness = 0;
   const apply = (material: THREE.MeshPhysicalMaterial) => {
     const kind = material.userData.surface as WorldSurface | undefined;
     const wet = kind === "wood" ? wetness * .16 : kind === "plaster" ? wetness * .34 : wetness;
-    material.roughness = kind === "metal" ? .72 - wet * .32 : .98 - wet * .32;
+    material.roughness = kind === "metal" || kind === "roof-metal" ? .72 - wet * .32 : .98 - wet * .32;
     material.clearcoat = kind ? wet * .76 : 0;
     material.clearcoatRoughness = .18 + (1 - wet) * .3;
   };
@@ -99,21 +127,29 @@ export function createWorldSurfaces() {
       const key = `${new THREE.Color(color).getHexString()}-${kind ?? ""}-${emissive === undefined ? "" : new THREE.Color(emissive).getHexString()}`;
       let material = materials.get(key);
       if (!material) {
-        const t = kind ? tiles[kind] : undefined;
+        let t = kind ? tiles.get(kind) : undefined;
+        if (kind && !t) { t = tile(kind); tiles.set(kind, t); }
+        const relief = kind === "stone" ? .65 : kind === "roof-tile" ? .62 : kind === "roof-metal" ? .4 : kind === "roof-felt" ? .25 : .3;
         material = new THREE.MeshPhysicalMaterial({
           color, map: t?.color ?? null, roughnessMap: t?.roughness ?? null, normalMap: t?.normal ?? null,
-          normalScale: new THREE.Vector2(kind === "stone" ? .65 : .3, kind === "stone" ? .65 : .3),
-          metalness: kind === "metal" ? .68 : .015,
+          normalScale: new THREE.Vector2(relief, relief),
+          metalness: kind === "metal" || kind === "roof-metal" ? .68 : .015,
           emissive: emissive ?? 0, emissiveIntensity: emissive === undefined ? 0 : 2.4,
         });
-        material.userData.surface = kind; material.userData.surfaceTile = kind ? (kind === "asphalt" ? 2.4 : kind === "stone" ? 2.8 : 1.8) : 0;
+        material.userData.surface = kind;
+        material.userData.surfaceTile = !kind ? 0 : kind === "asphalt" || kind === "roof-metal" ? 2.4
+          : kind === "stone" ? 2.8 : kind === "roof-tile" ? 1.28 : kind === "roof-felt" ? 3.2 : 1.8;
         apply(material); materials.set(key, material);
       }
       return material;
     },
     setWetness(value: number) { wetness = clamp(value); for (const material of materials.values()) apply(material); },
     // Texture lifetime belongs to this world, never to a single map transition.
-    dispose() { for (const material of materials.values()) material.dispose(); for (const t of Object.values(tiles)) { t.color.dispose(); t.roughness.dispose(); t.normal.dispose(); } },
+    dispose() {
+      for (const material of materials.values()) material.dispose();
+      for (const t of tiles.values()) { t.color.dispose(); t.roughness.dispose(); t.normal.dispose(); }
+      materials.clear(); tiles.clear();
+    },
   };
 }
 

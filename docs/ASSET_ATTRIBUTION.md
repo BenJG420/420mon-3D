@@ -1,5 +1,14 @@
 # Asset attribution
 
+## Gasse A detail — v54
+
+- Roof tile, standing-seam metal and roofing-felt PBR maps are deterministic
+  project-authored textures in `src/game/world-surfaces.ts`, generated locally.
+  Facade trim, gutters, cables, signs and street debris are project-authored
+  geometry in `src/game/alley-details.ts` and `world.ts` on the original 2D map.
+- No downloaded photo, texture pack, external model or new font is included.
+  Original character/NPC rigs, animations and existing licenses are retained.
+
 ## GUI fonts — v51
 
 - IBM Plex Sans, IBM Corp., and Press Start 2P, CodeMan38: SIL Open Font License 1.1.
