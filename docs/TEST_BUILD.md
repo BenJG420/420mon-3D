@@ -1,3 +1,13 @@
+> **v52 — Performance/FPS, ready for PR/merge:** static grass/puddle instancing in small
+> culling cells, quality-aware shadow budget, and an optional local A/B FPS capture
+> under Hilfe → FPS vergleichen. No player/NPC, mechanics or save changes.
+> Node counts before culling: Gasse A decoration 111 → 38 calls, Grow-Hinterhöfe
+> 32 → 19, Neonkai 32 → 7 (not whole-scene calls or measured FPS).
+> Build + **26/26 directly affected tests** passed; no browser run or broad local suite.
+> Actual device FPS measurements remain with Ben; no automated browser benchmark
+> is claimed. Build and directly affected tests only. Districts follow in separate
+> PRs, starting Gasse A. **Monster erst nach Freigabe.**
+
 > **Published v51 — GUI, [PR #58](https://github.com/BenJG420/420mon-3D/pull/58), source `095856c`:** live-2D menu structure, fixed title/footer,
 > touch bottom sheets, readable inventory counts/actions, compact HUD, separate
 > Handy/Leiste layout and graphic quality. Licensed local reference fonts.
@@ -772,10 +782,15 @@ are historical; existing repository CI may run automatically.
    immediately below the pot/growbox selector, so selection and action do not
    require scrolling back and forth. Declutter overlaps and keep desktop/touch readable. Existing 2D saves originated
    there; preserve their import, never write to or reset that original save.
-5. **NEXT — Performance/FPS:** measure FPS before and after; improve stable frame rates
-   through appropriate instancing, LOD, culling, texture/shader optimization and
-   a shadow budget. Record measurement scene, device/emulation and settings.
-6. **District detail — one PR per district:** preserve each original 2D layout,
+5. **IMPLEMENTED — Performance/FPS v52 (PR/merge pending):** spatially bounded static grass/puddle
+   instancing and quality-aware shadows; existing facade merges, texture caches,
+   pixel budgets and bounded bloom are retained. Optional Help → FPS vergleichen
+   captures both modes at the same stationary view (2s warmup + 10s each), actual
+   untruncated frame times, mean FPS, 1% low, p95, draw calls and context as local JSON.
+   Baseline restores v51 individual decoration and shadow sizes. Auto/Low reduce
+   shadow resolution; High preserves it. **Actual before/after device FPS remains
+   Ben’s test-build check; Node geometry counts are not an FPS result.**
+6. **NEXT after v52 — District detail, starting Gasse A (`alley`), one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,

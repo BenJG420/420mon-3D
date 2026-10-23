@@ -1,5 +1,12 @@
 /** Presentation only: these profiles never change map geometry or gameplay. */
 export type GraphicsQuality = "auto" | "high" | "low";
+
+/** v51's shadow budget is retained for High and for the optional A/B baseline. */
+export function graphicsShadowSize(quality: GraphicsQuality, mobile: boolean, optimized = true): number {
+  const original = mobile ? 1024 : 2048;
+  if (!optimized || quality === "high") return original;
+  return quality === "low" ? 512 : 1024;
+}
 export type DistrictGraphics = {
   id: string; indoor: boolean; background: string; fog: { color: string; density: number };
   keyColor: string; fillColor: string; accent: string;

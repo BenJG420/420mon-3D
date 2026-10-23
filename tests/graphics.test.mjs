@@ -9,7 +9,7 @@ const server = await createServer({
 });
 after(() => server.close());
 const { MAPS } = await server.ssrLoadModule("/src/game/data/maps.ts");
-const { getDistrictGraphics, graphicsPixelRatio } = await server.ssrLoadModule("/src/game/graphics-profile.ts");
+const { getDistrictGraphics, graphicsPixelRatio, graphicsShadowSize } = await server.ssrLoadModule("/src/game/graphics-profile.ts");
 const { createDistrictWeather } = await server.ssrLoadModule("/src/game/weather.ts");
 
 test("every original map retains its identity and receives finite, appropriately sheltered district lighting", () => {
@@ -78,6 +78,21 @@ test("phone DPR3 and desktop 4K obey their pixel budgets while high quality can 
   assert.equal(graphicsPixelRatio(3840, 2160, 2, "high", false), 1);
   assert.ok(graphicsPixelRatio(390, 844, 3, "auto", true) < 2, "phone DPR does not force native supersampling");
   assert.ok(Number.isFinite(graphicsPixelRatio(0, 0, 0, "auto", true)), "pre-layout viewport is safe");
+});
+
+test("shadow budgets reduce Auto/Low work while High and A/B baseline retain v51 detail", () => {
+  for (const mobile of [false, true]) {
+    const original = mobile ? 1024 : 2048;
+    for (const quality of ["low", "auto", "high"]) {
+      assert.equal(graphicsShadowSize(quality, mobile, false), original);
+      const size = graphicsShadowSize(quality, mobile);
+      assert.ok(size <= original && Number.isInteger(Math.log2(size)));
+    }
+    assert.equal(graphicsShadowSize("high", mobile), original);
+    assert.equal(graphicsShadowSize("auto", mobile), 1024);
+    assert.equal(graphicsShadowSize("low", mobile), 512);
+  }
+  assert.equal(graphicsShadowSize("auto", false) ** 2 / 2048 ** 2, .25);
 });
 
 function weatherFixture(mobile) {
