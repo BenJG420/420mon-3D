@@ -147,7 +147,7 @@ test("original alley/yard/kai decoration batches reduce potential draw calls wit
       const root = world.getRoot(), decorations = root.getObjectByName("static-district-decorations");
       const optimized = renderedShapes(decorations), stats = world.getPerformanceStats();
       const grassCount = id === "kai" ? 0 : mapSketch(id).extras.reduce((count, { r }) => count + Math.min(55, Math.round(r.w * r.h / 1000)), 0);
-      assert.equal(stats.objects, grassCount + 32, `${id}: all original grass and puddles retained`);
+      assert.equal(stats.objects, grassCount + 32 + (id === "alley" ? 6 : 0), `${id}: original decoration and six alley runoff puddles retained`);
       assert.equal(stats.optimizedDraws, decorations.children.length);
       assert.ok(stats.optimizedDraws < stats.baselineDraws, `${id}: draw submissions should decrease`);
       const objects = root.children.filter(node => node !== decorations), occluders = [...world.getOccluders()];

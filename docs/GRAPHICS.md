@@ -1,4 +1,4 @@
-# District atmosphere — v29
+# District atmosphere and detail
 
 The target is the owner's dark, rain-soaked industrial courtyard reference:
 small wet paving, dark blue-green buildings, bright warm-white/amber pools of
@@ -46,7 +46,23 @@ phone DPR3 does not automatically triple internal rendering resolution. Resizing
 updates both the renderer and post targets. Physical Android and sustained
 native-4K performance remain device checks, not guarantees from emulation.
 
-No player/NPC replacement is included: licensed rigged characters and animation
-are the next two packages. Their source and redistribution terms belong in
+Existing licensed player/NPC rigs and animations are retained. Their source and
+redistribution terms are recorded in
 [ASSET_ATTRIBUTION.md](ASSET_ATTRIBUTION.md). Existing monster models, clothing,
 quests, battles, growth and saves remain connected.
+
+## Performance v52 and first district detail v54
+
+Static grass and puddles use 16-world-unit instancing cells, retaining frustum
+culling and the original geometry. Sparsam shadows use 512², Automatisch 1024²;
+Hoch retains 2048² desktop / 1024² mobile. Existing pixel/bloom budgets remain.
+Help → FPS vergleichen optionally restores individual decoration and v51 shadow
+sizes for 2 s warmup + 10 s capture per mode. These are device measurements with
+uncapped RAF durations and full-frame render counts; Node draw counts are not FPS.
+Ben runs this comparison and the visual check in the published test build.
+
+Gasse A is the first district detail package: independent repeating tile/metal/felt
+roof PBR textures, facade and roof trim, gutters, cables, illuminated sign frames,
+and small street debris/puddles. Details use material batches and the existing
+occlusion groups/light budget. Original ground plans, doors, collisions, player
+and NPC rendering/behavior stay intact. Other districts follow as separate PRs.

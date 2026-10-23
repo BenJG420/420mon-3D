@@ -1,3 +1,17 @@
+> **v54 — Gasse A detail, validation/PR pending:** three independent roof PBR
+> surfaces (tile/standing-seam metal/felt), four facade sides, gutters/downpipes,
+> shutters, cables, service boxes, ivy, existing signs with neon frames, detailed
+> house doors, refuse clusters and six additional instanced runoff puddles.
+> Facades share building occlusion and bounded material batches; original map
+> objects/collision, player/NPCs, mechanics/saves and light/weather budgets remain.
+> Build passed in all three local rounds; 15 other affected tests passed. The
+> alley test found missing contained-house metadata and edge-house classification
+> (fixed). Its third run reached disposal checks, then found the fixture's valid
+> first-market-visit +18 gold reward. Fixture now uses an already rewarded visit;
+> no fourth local run. Final confirmation is left to existing automatic PR CI.
+> Buff HUD PR #60 was merged/published first. Next district: Grow-Hinterhöfe.
+> **Monster erst nach Freigabe.** Ben checks visuals; build + affected tests only.
+
 > **Published v53 — Buff HUD, [PR #60](https://github.com/BenJG420/420mon-3D/pull/60), source `1ae4009`:** active consumption effects show symbols,
 > original colors, percentage and remaining playtime seconds inside the existing
 > top-left Cash/time/level HUD. Outfit bonuses show ∞ while worn; permanent
@@ -809,12 +823,18 @@ are historical; existing repository CI may run automatically.
    symbols and remaining time inside the same collapsible top-left Cash/time/level
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
-7. **NEXT — District detail, starting Gasse A (`alley`), one PR per district:** preserve each original 2D layout,
+7. **IN PROGRESS — District detail, Gasse A (`alley`) v54, one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
    vegetation and PBR materials; improve lighting, fog and post-processing.
    **Do not change players or NPCs in these district packages.**
+   Gasse A v54 implements the first package: independent roof PBR maps, four-sided
+   facade detail, neon/signs, refuse and runoff puddles; no extra point lights.
+   Next is Grow-Hinterhöfe (`yard`), then Kabelkeller, Markt, Kino, Neonkai, Kanal,
+   Aschegang, Abfluss, Chemiegasse, Ring, Labyrinth, Nischen and Schrotttor.
+   Associated interiors follow with their district. Each gets its own PR; native
+   device appearance/FPS stays with Ben, no blanket visual-completion claim.
 8. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up
    from **Dex #97 require Ben’s explicit approval**. Finishing fixes, performance
    and all district graphics/details does not itself grant that approval. Preserve the 96 authored models and PBR/UV/cache.
