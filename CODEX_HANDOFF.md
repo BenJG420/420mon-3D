@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — v59 Markt / Silk / Static
+
+Annahme v59: Die vier originalen Nordfassaden erhalten eigene Dächer; Marktstände werden nur an ihren bestehenden Überdachungen/Theken dekoriert, Silk/Static erhalten hohe Wandregale ohne neue Hindernisse oder Änderungen an Figuren.
+
+- Branch `feat/market-details-v59`: Markt als eigener Bezirks-PR fertig implementiert. Originalgrundriss, Händler/NPCs, Spieler, Interaktionen, Kollisionen und Saves bleiben erhalten. Vier eigene Dachflächen, Fassaden/Hofmauern, sechs bestehende Verkaufsstände, Neon/Türbeschläge, neun instanzierte Zusatzpfützen und beide Hinterzimmer fertig. Kleine Details sind materialweise zusammengefasst, ohne neue Schattenwerfer/Punktlichter; Originalverdeckung bleibt erhalten.
+- Ein Build und 10/10 direkt betroffene Tests grün; nach abschließender Korrektur der Lichtleistenhöhe nur Markt-Test gezielt erneut grün (zweite lokale Runde). Finaler Build enthält die korrigierten Höhen. Keine Browser-/Gesamtsuite. PR/Merge/Pages noch ausstehend. Ben prüft Optik/FPS im Testbuild. Danach Kino. **Monster erst nach Freigabe** durch Ben; Ko-fi/Zahlungen übersprungen.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v58 Kabelkeller veröffentlicht; Markt als Nächstes
 
 - PR #65 gemergt/live, Source `21f7ac8ee0a8dc794688db8bc863d4c2496ee546`: 27 hohe Racks und sechs niedrige Verteiler mit eigener PBR-Metallkappe, Paneelen/Lüftern/Patchkabeln/LEDs; max. sieben Materialbatches pro Schrank, gemeinsame Verdeckung. Zehn Servicewände, vier Terminals, Neon-Wegweiser und der ursprüngliche gesperrte Stromstreifen detailliert; feuchter Steinboden/Wege-Markierungen/drei instanzierte Zusatzpfützen.

@@ -16,6 +16,7 @@ import { createStreetDetails, isDetailedDistrict } from "./street-details";
 import { createWallArt } from "./wall-art";
 import { lampFlicker } from "./lamp-flicker";
 import { appendCableRackDetails, appendCableWallDetails, appendCableLiveDetails, appendCableTerminalDetails, type CableFinish, type CableDetailEmitter } from "./cable-details";
+import { appendMarketFacadeDetails, appendMarketBoundaryDetails, appendMarketStallDetails, appendMarketInteriorDetails, type MarketFinish, type MarketDetailEmitter } from "./market-details";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -231,7 +232,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     box(frame, length + .25, .09, .75, mat(palette.stone, "stone"), 0, .045);
     const glow = box(frame, length - .15, 2.45, .04, mat(0x1f322b, undefined, 0x537c64), 0, 1.23);
     glowing.push({ mesh: glow, phase: obj.x });
-    if ((id === "alley" || id === "yard") && obj.id.startsWith("house_")) {
+    if ((id === "alley" || id === "yard" || id === "market") && obj.id.startsWith("house_")) {
       glow.material = mat(0x344b49, "wood", 0x1b2f29);
       projectSurfaceUvs(glow.geometry, glow.material);
       const parts: THREE.BufferGeometry[] = [];
@@ -319,7 +320,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     else if (obj.kind === "door" || obj.kind === "manhole") door(obj, g);
     else if (obj.kind === "sign") {
       tag(g, obj.label, 1.8, 1.6); box(g, .08, 1.5, .08, mat(palette.dark, "metal"));
-      if (id === "alley" || id === "yard" || id === "cable") {
+      if (id === "alley" || id === "yard" || id === "cable" || id === "market") {
         const pieces: THREE.BufferGeometry[] = [];
         const trim = (w: number, h: number, x: number, y: number) => {
           const piece = new THREE.BoxGeometry(w, h, .055); piece.translate(x, y, -.035); pieces.push(piece);
@@ -443,8 +444,9 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       // Dark plinth and narrow cap keep the rooms readable as a cutaway diorama.
       occluder(region(r, .16, mat(palette.stone, "stone"), .08));
       const yardShed = id === "yard" && !edge;
+      const marketFacade = id === "market" && !edge;
       const roofKind = id === "alley" && outside ? alleyRoofKind(building?.variant ?? i)
-        : yardShed ? alleyRoofKind(i) : undefined;
+        : yardShed || marketFacade ? alleyRoofKind(i) : undefined;
       const roofTint = roofKind === "roof-tile" ? 0x896f5b : roofKind === "roof-metal" ? 0x718087 : roofKind === "roof-felt" ? 0x454d4c : outside ? 0x626c6b : 0x7d8681;
       const roof = occluder(region(r, .1, mat(roofTint, roofKind ?? "stone"), height + .02));
       if (roofKind) { roof.name = `${id}-roof`; roof.userData.roofKind = roofKind; }
@@ -464,6 +466,16 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         cableParts(group, emit => appendCableWallDetails((side ? r.h : r.w) * WORLD_SCALE, (side ? r.w : r.h) * WORLD_SCALE, height, emit));
         if (edge) group.rotation.y = side ? (r.x === 0 ? Math.PI / 2 : -Math.PI / 2) : r.y === 0 ? 0 : Math.PI;
       }
+      if (id === "market") {
+        const side = edge && r.w < r.h;
+        const group = marketDetailGroup(marketFacade ? "market-facade-detail" : "market-boundary-detail",
+          at(r.x + r.w / 2, r.y + r.h / 2), emit => {
+            if (marketFacade) appendMarketFacadeDetails(r.w * WORLD_SCALE, r.h * WORLD_SCALE, height, i, emit);
+            else appendMarketBoundaryDetails((side ? r.h : r.w) * WORLD_SCALE, (side ? r.w : r.h) * WORLD_SCALE, height, emit);
+          });
+        group.userData.sourceRect = r;
+        if (edge) group.rotation.y = side ? (r.x === 0 ? Math.PI / 2 : -Math.PI / 2) : r.y === 0 ? 0 : Math.PI;
+      }
       if (outside && r.w > 100 && r.h > 80) {
         buildingDetails(r, height, i, building?.name, building?.side, building ? (building.x + building.w / 2 - r.x - r.w / 2) * WORLD_SCALE : 0);
       }
@@ -480,6 +492,32 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       }
       for (const part of occluders.slice(firstPart)) part.userData.occlusionGroup = m.uuid;
     }
+  }
+  /** Market fixtures share cached PBR materials and the source structure's fade. */
+  function marketDetailGroup(name: string, position: THREE.Vector3, append: (emit: MarketDetailEmitter) => void) {
+    const group = new THREE.Group(); group.name = name; group.position.copy(position);
+    group.userData.districtDetail = "market"; root.add(group);
+    const finishes: Record<MarketFinish, THREE.Material> = {
+      frame: mat(0x25383e, "metal"), metal: mat(0x78857c, "metal"),
+      brick: mat(0x766653, "plaster"), wood: mat(0x766044, "wood"),
+      fabric: mat(0x687d71, "plaster"), leaf: mat(0x485e43),
+      warm: mat(0x746044, undefined, 0xb98d59), cool: mat(0x34595e, undefined, 0x518c96),
+    };
+    const batches = new Map<MarketFinish, THREE.BufferGeometry[]>(), features = new Set<string>();
+    append((finish, geometry, feature) => {
+      const parts = batches.get(finish) ?? []; parts.push(geometry); batches.set(finish, parts); features.add(feature);
+    });
+    group.userData.marketFeatures = [...features];
+    for (const [finish, pieces] of batches) {
+      const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+      if (geometry) {
+        const part = occluder(mesh(geometry, finishes[finish], group, 0, 0, 0, false));
+        part.name = `${name}:${finish}`;
+        // Stand-alone overhead fixtures fade together; walls override this with their UUID.
+        part.userData.occlusionGroup = group.uuid;
+      }
+    }
+    return group;
   }
   /** Keep detailed electrical fixtures to a few material batches per original solid. */
   function cableParts(group: THREE.Group, append: (emit: CableDetailEmitter) => void, fading = true) {
@@ -647,11 +685,11 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const w = active.w * WORLD_SCALE, d = active.h * WORLD_SCALE;
     box(root, w + .25, .45, d + .25, mat(palette.dark, "stone"), 0, -.27);
     const indoor = getDistrictGraphics(id).wetness < .15;
-    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "cable" ? 0x43575a : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" ? "stone" : "asphalt"), root, 0, .002, 0);
+    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "cable" ? 0x43575a : id === "market" ? 0x586567 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" || id === "market" ? "stone" : "asphalt"), root, 0, .002, 0);
     floor.rotation.x = -Math.PI / 2;
     const sketch = mapSketch(id);
     if (!active.indoor) for (const r of sketch.walk) {
-      const m = region(r, .045, mat(id === "yard" ? 0x637263 : 0x788487, "stone"), .007);
+      const m = region(r, .045, mat(id === "yard" ? 0x637263 : id === "market" ? 0x6d7169 : 0x788487, "stone"), .007);
       m.name = "original-walkway";
     }
     for (const { r, fill } of sketch.extras) {
@@ -677,6 +715,17 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       decorations.push({ kind: "puddle", position: p, size, angle: seeded(i + 69) * Math.PI, stretch: .35 + seeded(i + 69) * .5 });
     }
     if (id === "alley") decorations.push(...alleyRunoffPuddles(active, at));
+    if (id === "market") {
+      floor.name = "market-rain-paving";
+      // Runoff stays on the existing paving, below roof outlets and beside awnings.
+      const fronts = active.walls.filter(r => r.x > 0 && r.y > 0 && r.x + r.w < active.w && r.y + r.h < active.h);
+      const positions = fronts.map(r => at(r.x + r.w - 5, r.y + r.h + 12));
+      positions.push(...active.objs.filter(obj => obj.kind === "stall").map(obj => at(obj.x + obj.w / 2 + 20, obj.y + obj.h / 2 + 30)));
+      for (const p of positions) {
+        p.y = .059;
+        decorations.push({ kind: "puddle", position: p, size: 1.5, angle: .2, stretch: .4 });
+      }
+    }
     if (id === "cable") {
       floor.name = "cable-service-floor";
       for (const bin of active.objs.filter(obj => obj.kind === "bin")) {
@@ -726,6 +775,14 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
   function mapDetails() {
     if (id === "capsule" || id === "studio") { homeDetails(); return; }
+    if (id === "market") {
+      // Decorate the fixed counters separately: NPC rigs, children and animation stay intact.
+      for (const obj of active.objs.filter(obj => obj.kind === "stall" || obj.kind === "shop")) {
+        const group = marketDetailGroup("market-stall-detail", at(obj.x + obj.w / 2, obj.y + obj.h / 2),
+          emit => appendMarketStallDetails(obj.stall ?? "silk", emit));
+        group.userData.sourceObject = obj;
+      }
+    }
     if (id === "kino") {
       const screen = new THREE.Group(); screen.position.copy(at(360, 58)); root.add(screen);
       box(screen, 33, 3.9, .3, mat(0x182a27), 0, 2.1);
@@ -750,6 +807,13 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       if (id === "den_moss") {
         const firstPart = occluders.length;
         yardDetailGroup("moss-interior-detail", new THREE.Vector3(), emit => appendMossInteriorDetails(active.w * WORLD_SCALE, active.h * WORLD_SCALE, emit));
+        const northWall = occluders.find(part => part.name === "original-wall:0");
+        if (northWall) for (const part of occluders.slice(firstPart)) part.userData.occlusionGroup = northWall.uuid;
+      }
+      if (id === "den_silk" || id === "den_static") {
+        const firstPart = occluders.length;
+        marketDetailGroup("market-interior-detail", new THREE.Vector3(), emit =>
+          appendMarketInteriorDetails(active.w * WORLD_SCALE, active.h * WORLD_SCALE, id === "den_silk" ? "silk" : "static", emit));
         const northWall = occluders.find(part => part.name === "original-wall:0");
         if (northWall) for (const part of occluders.slice(firstPart)) part.userData.occlusionGroup = northWall.uuid;
       }
