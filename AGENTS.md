@@ -53,7 +53,7 @@ Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds
    Shared street props v56 (PR #63) and wall art/flickering existing lamps v57
    (PR #64) are merged/published across districts, including Gasse A.
    Do not change player/NPC assets or behavior in district packages.
-7. Ben 2026-10-24, BEFORE further districts, own PR each: Eddi inventory-style shop with bulk buy/sell quantity picker; Eddi smoking animation; realistic cannabis plants in every Grow phase; significantly brighter Kabelkeller. Only build + directly affected tests. Then Kino.
+7. Ben 2026-10-24, BEFORE further districts, own PR each: DONE Eddi inventory-style bulk shop PR #67 / v60 and smoking animation PR #68 / v61; NEXT realistic cannabis plants in every Grow phase v62, then significantly brighter Kabelkeller v63. Only build + directly affected tests. Then Kino.
 8. Monster erst nach Freigabe: only resume sculpts at #97 after Ben explicitly
    approves. First finish fixes and all district graphics/details. Retain the 96 existing models
    and shared PBR/cache. Do not claim 324 reconstructions are authored HD anatomy.
