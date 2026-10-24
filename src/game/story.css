@@ -15,3 +15,39 @@
 .story-row span { flex:1 1 200px; }
 .story-card footer { min-height:24px; color:#e4d89d; margin-top:16px; }
 @media (max-width:600px) { .story-overlay { padding:8px; } .story-card { max-height:92dvh; } }
+
+/* Eddi uses the existing 2D inventory hierarchy and shared quantity picker. */
+.story-card.eddi-shop { box-sizing:border-box; width:min(520px,100%); max-height:min(80dvh,640px); display:flex; flex-direction:column; overflow:hidden; padding:0; border-color:#2a2a30; border-radius:16px; background:#121416f2; color:#e8e8ea; font:14px/1.5 "IBM Plex Sans",system-ui,sans-serif; }
+.eddi-shop-overlay { background:#070708bb; }
+.eddi-shop > header { flex:0 0 auto; padding:16px 16px 8px; }
+.eddi-shop h2 { margin:0; color:#7cff6b; font:400 10px/2 "Press Start 2P",monospace; }
+.eddi-shop > header button { flex:0 0 44px; padding:8px; background:transparent; border-color:transparent; color:#8a8a90; }
+.eddi-shop-content { flex:1 1 auto; min-height:0; min-width:0; padding:0 16px 16px; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; scrollbar-width:thin; }
+.eddi-shop p { margin:8px 0; color:#8a8a90; line-height:1.5; overflow-wrap:anywhere; }
+.eddi-shop .eddi-wallet { color:#e8e8ea; font-variant-numeric:tabular-nums; }
+.eddi-shop button { min-height:44px; border:1px solid #2a2a30; border-radius:8px; background:#1a1c20; color:#e8e8ea; font:inherit; touch-action:manipulation; }
+.eddi-shop button:hover { border-color:#7cff6b; }
+.eddi-shop :is(button,input):focus-visible { outline:2px solid #7cff6b; outline-offset:-3px; }
+.eddi-shop nav { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0; }
+.eddi-shop button[aria-pressed=true],.eddi-shop .inventory-use { background:#7cff6b; border-color:#7cff6b; color:#070708; }
+.eddi-shop .inventory-category-toggle { display:flex; align-items:center; gap:8px; width:100%; padding:12px; border:0; border-radius:0; color:#7cff6b; text-align:left; }
+.eddi-shop .inventory-category li { grid-template-columns:minmax(0,1fr) auto auto; gap:10px; }
+.eddi-shop .inventory-item-info .eddi-price { color:#bde8b7; font-variant-numeric:tabular-nums; }
+.eddi-shop > footer { flex:0 0 auto; margin:0; padding:10px 16px 16px; border-top:1px solid #2a2a30; background:#121416; }
+.eddi-shop > footer p { margin:0 0 8px; max-height:3em; overflow:auto; color:#d4e4ca; font-size:12px; }
+.eddi-shop > footer p:empty { display:none; }
+.eddi-shop > footer button { width:100%; text-align:left; background:transparent; }
+.eddi-shop .trade-picker { padding:12px; background:#1a1c20; border-color:#2a2a30; font-family:inherit; }
+.eddi-shop .trade-picker-controls button { padding:10px 6px; white-space:nowrap; }
+.eddi-shop .trade-picker-confirm { background:#7cff6b; border-color:#7cff6b; color:#070708; }
+.eddi-shop .trade-picker-cancel { background:transparent; }
+@media (max-width:600px) {
+  .eddi-shop-overlay { padding:0; align-items:end; }
+  .story-card.eddi-shop { width:100%; max-height:90dvh; border-radius:16px 16px 0 0; }
+  .eddi-shop > footer { padding-bottom:max(16px,env(safe-area-inset-bottom)); }
+}
+@media (max-width:420px) {
+  .eddi-shop .inventory-category li { grid-template-columns:minmax(0,1fr) auto; }
+  .eddi-shop .inventory-category .inventory-use { grid-column:1/-1; width:100%; }
+}
+@media (max-height:500px) { .story-card.eddi-shop { max-height:calc(100dvh - 8px); } }

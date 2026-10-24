@@ -1,3 +1,13 @@
+> **v60 — Eddi inventory-style shop, publication pending:** original category order,
+> item descriptions/counts/prices, collapsible categories and the shared quantity
+> picker for buying and selling (+/−, Max, number, slider, live total, one confirmation).
+> Eddi's source prices/bonuses and one-time title stay intact; current NPC proximity
+> is checked at confirmation, failed saves restore the whole transaction including
+> the title flag. Fixed header/footer, one scroll region and a touch bottom sheet.
+> 21/21 affected trade/Eddi tests passed. Initial build caught the greeting callback's
+> optional-parent argument; corrected, build only repeated. Ben checks the GUI.
+> Next: v61 smoke, v62 plants, v63 brighter cable, then Kino. **Monster erst nach Freigabe.**
+
 > **Published v59 — Markt / Silk / Static, [PR #66](https://github.com/BenJG420/420mon-3D/pull/66), source `91286d1`:** four original northern
 > buildings now have independent tile/metal/felt PBR roofs, four-sided windows,
 > shutters, gutters, downpipes, cables and ivy. Six perimeter sections receive
@@ -918,7 +928,7 @@ are historical; existing repository CI may run automatically.
    symbols and remaining time inside the same collapsible top-left Cash/time/level
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
-7. **NEXT — Eddi shop UI / bulk trade (v60):** inventory/normal-shop layout with categories, rows, quantity/count and description. Buying and selling use the existing slider, +/−, Max, numeric input, live total and one batch confirmation. Retain Eddi prices, title rules, physical NPC access and saves.
+7. **IMPLEMENTED / publication pending — Eddi shop UI / bulk trade (v60):** inventory/normal-shop layout with categories, rows, quantity/count and description. Buying and selling use the existing slider, +/−, Max, numeric input, live total and one batch confirmation. Retain Eddi prices, title rules, physical NPC access and saves.
 8. **NEXT — Eddi smoking animation (v61):** visible smoking/pulsing ember/exhalation on his existing rig; other NPCs/player/behavior remain unchanged.
 9. **NEXT — Grow plant appearance (v62):** recognizable cannabis in every stage (seedling, vegetative, bloom, ready), including growboxes. Improve anatomy/leaves/buds with bounded shared geometry; preserve timings/yields/care and saves.
 10. **NEXT — Brighter Kabelkeller (v63):** significantly improve ambient/key/fill visibility and reduce obscuring fog; keep original map, light/shadow budget and atmosphere.

@@ -2,10 +2,11 @@
 import { ITEMS, STALL_GROW } from "./data/items";
 import { buyGrowItem, sellGrowBud } from "./grow-state";
 import { salePrice, sellMerchantItem } from "./merchant-state";
+import { eddiBuyPrice, buyEddiItem } from "./eddi-state";
 import type { Save } from "./save";
 
 export type TradeOffer = {
-  kind: "buy" | "sell" | "capsule" | "grow-buy" | "grow-sell";
+  kind: "buy" | "sell" | "capsule" | "grow-buy" | "grow-sell" | "eddi-buy" | "eddi-sell";
   id: string;
   items?: readonly string[];
   sellMultiplier?: number;
@@ -14,14 +15,15 @@ export type TradeQuote = { ok: boolean; max: number; unitPrice: number; total: n
 export type TradeResult = { ok: boolean; message: string; total: number };
 const MAX = Number.MAX_SAFE_INTEGER;
 const amount = (value: unknown): value is number => typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
-const buying = (kind: TradeOffer["kind"]) => kind === "buy" || kind === "grow-buy" || kind === "capsule";
+const buying = (kind: TradeOffer["kind"]) => kind === "buy" || kind === "grow-buy" || kind === "capsule" || kind === "eddi-buy";
 const stock = (s: Save, id: string): unknown => Object.hasOwn(s.inventory, id) ? s.inventory[id] : 0;
 
 /** Read-only quote. Max never includes fractional, unaffordable or unrepresentable units. */
 export function quoteTrade(s: Save, offer: TradeOffer, quantity = 1): TradeQuote {
   let unitPrice = 0, max = 0;
   const reject = (reason: string, total = 0): TradeQuote => ({ ok: false, max, unitPrice, total, reason });
-  if (!offer || typeof offer.id !== "string" || !["buy", "sell", "capsule", "grow-buy", "grow-sell"].includes(offer.kind)) return reject("Kein gültiges Angebot.");
+  if (!offer || typeof offer.id !== "string" || !["buy", "sell", "capsule", "grow-buy", "grow-sell", "eddi-buy", "eddi-sell"].includes(offer.kind)) return reject("Kein gültiges Angebot.");
+  if ((offer.kind === "eddi-buy" || offer.kind === "eddi-sell") && !s.eddiIn) return reject("Eddi ist noch nicht eingezogen.");
   if (!amount(s.gold)) return reject("Der Geldbestand ist ungültig.");
   if (offer.kind === "capsule") {
     if (offer.id !== "capsule" || !amount(s.balls)) return reject("Kein gültiges Kapselangebot.");
@@ -33,14 +35,15 @@ export function quoteTrade(s: Save, offer: TradeOffer, quantity = 1): TradeQuote
     const count = stock(s, offer.id);
     if (!amount(count)) return reject("Der Itembestand ist ungültig.");
     if (buying(offer.kind)) {
-      const offered = offer.kind === "grow-buy" ? STALL_GROW.includes(offer.id) : Array.isArray(offer.items) && offer.items.includes(offer.id);
-      if (!offered || item.cat === "key" || !amount(item.buy) || item.buy < 1) return reject("Dieses Item gibt es hier nicht zu kaufen.");
-      unitPrice = item.buy;
-      max = Math.min(Math.floor(s.gold / unitPrice), MAX - count);
+      const eddi = offer.kind === "eddi-buy", title = eddi && offer.id === "title_schnitt";
+      unitPrice = eddi ? eddiBuyPrice(s, offer.id) : item.buy ?? 0;
+      const offered = eddi ? unitPrice > 0 : offer.kind === "grow-buy" ? STALL_GROW.includes(offer.id) : Array.isArray(offer.items) && offer.items.includes(offer.id);
+      if (!offered || (item.cat === "key" && !title) || !amount(unitPrice) || unitPrice < 1) return reject("Dieses Item gibt es hier nicht zu kaufen.");
+      max = Math.min(Math.floor(s.gold / unitPrice), title ? 1 : MAX - count);
     } else {
       if (offer.kind === "grow-sell" && item.cat !== "bud") return reject("Hier kannst du nur Buds verkaufen.");
       if (!amount(item.sell) || item.sell < 1) return reject("Dieses Item ist nicht verkäuflich.");
-      unitPrice = offer.kind === "grow-sell" ? Math.max(1, Math.round(item.sell * .95)) : salePrice(s, offer.id, offer.sellMultiplier ?? 1);
+      unitPrice = offer.kind === "grow-sell" ? Math.max(1, Math.round(item.sell * .95)) : salePrice(s, offer.id, offer.kind === "eddi-sell" ? 2 : offer.sellMultiplier ?? 1);
       if (!amount(unitPrice) || unitPrice < 1) { unitPrice = 0; return reject("Der Verkaufspreis ist ungültig."); }
       const earned = s.stats.goldEarned ?? 0;
       if (!amount(earned)) return reject("Der Einnahmenzähler ist ungültig.");
@@ -49,7 +52,7 @@ export function quoteTrade(s: Save, offer: TradeOffer, quantity = 1): TradeQuote
         const buds = s.stats.budsSold ?? 0;
         if (!amount(buds)) return reject("Der Verkaufszähler ist ungültig.");
         max = Math.min(max, MAX - buds);
-        if (offer.kind === "sell") {
+        if (offer.kind === "sell" || offer.kind === "eddi-sell") {
           const silk = s.budsSoldToSilk ?? 0;
           if (!amount(silk)) return reject("Der Verkaufszähler ist ungültig.");
           max = Math.min(max, MAX - silk);
@@ -67,7 +70,7 @@ export function quoteTrade(s: Save, offer: TradeOffer, quantity = 1): TradeQuote
 // saveProgress also normalizes clothing/collection and can settle board quests. Roll back
 // those fields too, keeping the original mutable containers used by the running game.
 const BOOKING_FIELDS = ["gold", "balls", "inventory", "stats", "quest", "quests", "ach", "achTips", "achClaimed",
-  "budsSoldToSilk", "flagLowtown", "foundLoot", "wardrobe", "outfit", "worn", "collection"] as const;
+  "budsSoldToSilk", "flagLowtown", "foundLoot", "wardrobe", "outfit", "worn", "collection", "schnittTitle"] as const;
 function restoreContainer(original: unknown, snapshot: unknown): unknown {
   if (Array.isArray(original) && Array.isArray(snapshot)) {
     for (let i = 0; i < snapshot.length; i++) original[i] = restoreContainer(original[i], snapshot[i]);
@@ -105,9 +108,13 @@ export function executeTrade(s: Save, offer: TradeOffer, quantity: number, expec
     let accepted = true;
     if (offer.kind === "capsule") { s.gold -= quote.total; s.balls += quantity; }
     else if (offer.kind === "buy") { s.gold -= quote.total; s.inventory[offer.id] = (stock(s, offer.id) as number) + quantity; }
+    else if (offer.kind === "eddi-buy") {
+      const result = buyEddiItem(s, offer.id, quantity);
+      accepted = result.ok && result.price === quote.total;
+    }
     else if (offer.kind === "grow-buy") accepted = buyGrowItem(s, offer.id, quantity);
     else if (offer.kind === "grow-sell") accepted = sellGrowBud(s, offer.id, quantity) === quote.total;
-    else accepted = sellMerchantItem(s, offer.id, offer.sellMultiplier ?? 1, quantity) === quote.total;
+    else accepted = sellMerchantItem(s, offer.id, offer.kind === "eddi-sell" ? 2 : offer.sellMultiplier ?? 1, quantity) === quote.total;
     if (!accepted) { restore(); return fail("Das Angebot ist nicht mehr verfügbar."); }
     if (!persist()) { restore(); return fail("Handel konnte nicht gespeichert werden. Geld und Items bleiben unverändert."); }
     const name = offer.kind === "capsule" ? "Fangkapsel" : ITEMS[offer.id].name;
