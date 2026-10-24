@@ -1,4 +1,18 @@
-> **v61 — Eddi smoking animation, publication pending:** mouth-held joint anchored
+> **v62 — Botanical Grow plants, publication pending:** separate seedling/cotyledon,
+> branched vegetative, flowering and ripe models; curved serrated fan leaves with
+> veins, green calyx clusters and pale/amber pistils. Existing pots/growboxes keep
+> their positions, growth rules, yields, care, watering effects and saves. Shared
+> assets, at most five instanced parts and under 30k submitted triangles per plant;
+> only stems cast shadows, stage/map changes free instance buffers. One build and
+> 17/17 directly affected geometry/resource/Grow tests passed. No browser runs.
+> Next: brighter Kabelkeller, then Kino. **Monster erst nach Freigabe.**
+
+> Publication evidence for v60/v61: PR CI40119674572 / CI40119888267, main
+> CI40119785004 / CI40119979652 and Pages40119784998 / Pages40119979655 passed.
+> Archived deployment proofs retain byte comparison of JS/CSS/fonts and unchanged
+> stable root (`v60-deploy-proof.json`, `v61-deploy-proof.json`).
+
+> **Published v61 — Eddi smoking animation, [PR #68](https://github.com/BenJG420/420mon-3D/pull/68), source `1ea82a2`:** mouth-held joint anchored
 > to the existing rig's actual lip bones, pulsing ember and twelve instanced smoke
 > puffs. Draw/exhale fits the shortest original pause; walking/distance suppress it.
 > Other NPCs, player, bones/locomotion, Eddi rules and saves remain unchanged.
@@ -7,7 +21,7 @@
 > No browser tests; Ben checks appearance. Next: v62 plants, v63 brighter cable, Kino.
 > **Monster erst nach Freigabe.**
 
-> **v60 — Eddi inventory-style shop, publication pending:** original category order,
+> **Published v60 — Eddi inventory-style shop, [PR #67](https://github.com/BenJG420/420mon-3D/pull/67), source `6b17ff0`:** original category order,
 > item descriptions/counts/prices, collapsible categories and the shared quantity
 > picker for buying and selling (+/−, Max, number, slider, live total, one confirmation).
 > Eddi's source prices/bonuses and one-time title stay intact; current NPC proximity
@@ -938,8 +952,8 @@ are historical; existing repository CI may run automatically.
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
 7. **DONE — Eddi shop UI / bulk trade (v60), PR #67 merged:** inventory/normal-shop layout with categories, rows, quantity/count and description. Buying and selling use the existing slider, +/−, Max, numeric input, live total and one batch confirmation. Retain Eddi prices, title rules, physical NPC access and saves.
-8. **IMPLEMENTED / publication pending — Eddi smoking animation (v61):** visible smoking/pulsing ember/exhalation on his existing rig; other NPCs/player/behavior remain unchanged.
-9. **NEXT — Grow plant appearance (v62):** recognizable cannabis in every stage (seedling, vegetative, bloom, ready), including growboxes. Improve anatomy/leaves/buds with bounded shared geometry; preserve timings/yields/care and saves.
+8. **DONE — Eddi smoking animation (v61), PR #68 merged/live:** visible smoking/pulsing ember/exhalation on his existing rig; other NPCs/player/behavior remain unchanged.
+9. **IMPLEMENTED / publication pending — Grow plant appearance (v62):** recognizable cannabis in every stage (seedling, vegetative, bloom, ready), including growboxes. Improve anatomy/leaves/buds with bounded shared geometry; preserve timings/yields/care and saves.
 10. **NEXT — Brighter Kabelkeller (v63):** significantly improve ambient/key/fill visibility and reduce obscuring fog; keep original map, light/shadow budget and atmosphere.
 11. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); Markt / Silk / Static DONE (PR #66 / v59); NEXT Kino after items 7–10, one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs

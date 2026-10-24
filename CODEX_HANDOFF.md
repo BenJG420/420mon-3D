@@ -1,3 +1,13 @@
+# Aktuelle Arbeit — v62 Cannabis-Pflanzen fertig, PR ausstehend
+
+Annahme v62: Alle vorhandenen Sorten nutzen dieselbe botanische Phasenanatomie; Sortenregeln, Zeiten, Ertrag und Pflege bleiben unverändert.
+
+- Angefangene Pflanzen fortgesetzt: eigene Keimlingsform mit Keimblättern, verzweigte Pflanzen mit gekrümmten/gezackten 5–7-fingrigen Blättern und Adern, kompakte grüne Blüten mit hellen bzw. reifen amberfarbenen Pistillen. Gilt für Töpfe und Growboxen; bisherige Positionen, Halo/Gießeffekt und Saves erhalten.
+- Gemeinsame Geometrien/Materialien, maximal fünf instanzierte Materialgruppen und weniger als 30k dargestellte Dreiecke pro Pflanze; nur Stiele werfen zusätzliche Schatten. Instanzpuffer werden bei Phasen-/Kartenwechsel freigegeben, gemeinsame Assets bleiben erhalten.
+- Ein Build und 17/17 direkt betroffene Tests bereits grün, keine Wiederholung nötig/keine Browserläufe. v60 PR #67 und v61 PR #68 gemergt, CI/Pages grün. Danach v63 Kabelkeller heller, dann Kino. **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — v61 Eddi-Rauchanimation
 
 Annahme v61: Eddi hält den Joint am Mund; pulsierende Glut und zeitgesteuertes Ausatmen ergänzen seine Pausen, ohne Arm-/Laufanimationen oder Spielregeln umzubauen.

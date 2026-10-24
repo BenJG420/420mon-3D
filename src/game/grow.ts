@@ -7,6 +7,7 @@ import { getSave, saveProgress, type GrowPot } from "./save";
 import "./grow.css";
 import { quoteTrade, executeTrade, type TradeOffer } from "./trade-state";
 import { renderTradePicker } from "./trade-picker";
+import { createCannabisLibrary, cannabisGrowthScale } from "./cannabis-plants";
 
 type GrowWorld = {
   current(): string;
@@ -15,7 +16,8 @@ type GrowWorld = {
   getMapInfo(): { id: string; w: number; h: number };
   toWorld(x: number, y: number): THREE.Vector3;
 };
-type PlantVisual = { index: number; group: THREE.Group; crown: THREE.Group; halo: THREE.Mesh; drop: THREE.Group };
+type CannabisVisual = ReturnType<ReturnType<typeof createCannabisLibrary>["create"]>;
+type PlantVisual = { index: number; group: THREE.Group; crown: THREE.Group; plant: CannabisVisual; halo: THREE.Mesh; drop: THREE.Group };
 const phaseLabel = { empty: "Leer", sprout: "Keimling", grow: "Wachstum", bloom: "Blüte", ready: "Erntebereit" };
 const potName = (i: number) => isGrowBox(i) ? `Growbox ${i - 5}` : `Topf ${i + 1}`;
 const safe = (v: string) => v.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
@@ -48,16 +50,9 @@ export function createGrowSystem(world: GrowWorld) {
   let lastPhases = state.pots.map(p => `${p.phase}:${p.seed}:${p.byFelix}:${p.eddiBoost}`).join();
   const plants = new THREE.Group(); plants.name = "original-grow-plants";
   const visuals: PlantVisual[] = [];
-  const leafMat = new THREE.MeshStandardMaterial({ color: 0x43a259, roughness: .65, side: THREE.DoubleSide });
-  const newLeafMat = new THREE.MeshStandardMaterial({ color: 0x82c864, roughness: .62, side: THREE.DoubleSide });
-  const stemMat = new THREE.MeshStandardMaterial({ color: 0x6b8749, roughness: .8 });
-  const budMat = new THREE.MeshStandardMaterial({ color: 0xc29d7b, emissive: 0x472648, emissiveIntensity: .14, roughness: .85 });
+  // Shared botanical geometry lives with the Grow system, not a single map visit.
+  const cannabis = createCannabisLibrary();
   const dropMat = new THREE.MeshStandardMaterial({ color: 0x68dded, emissive: 0x34a9c6, transparent: true, opacity: .75, roughness: .12 });
-  const leafShape = new THREE.Shape();
-  leafShape.moveTo(0, 0); leafShape.lineTo(-.045, .1); leafShape.lineTo(-.09, .17); leafShape.lineTo(-.065, .2); leafShape.lineTo(-.12, .3); leafShape.lineTo(-.085, .34); leafShape.lineTo(-.1, .42); leafShape.lineTo(0, .7); leafShape.lineTo(.1, .42); leafShape.lineTo(.085, .34); leafShape.lineTo(.12, .3); leafShape.lineTo(.065, .2); leafShape.lineTo(.09, .17); leafShape.lineTo(.045, .1); leafShape.closePath();
-  const leafGeometry = new THREE.ShapeGeometry(leafShape);
-  const stemGeometry = new THREE.CylinderGeometry(.026, .04, 1.45, 6);
-  const budGeometry = new THREE.IcosahedronGeometry(.14, 1);
   const dropGeometry = new THREE.SphereGeometry(.035, 6, 5);
   const haloGeometry = new THREE.RingGeometry(.48, .53, 32);
   const haloMaterial = new THREE.MeshBasicMaterial({ color: 0xd7df98, transparent: true, opacity: .7, side: THREE.DoubleSide });
@@ -68,43 +63,25 @@ export function createGrowSystem(world: GrowWorld) {
   function progress(p: GrowPot) { return p.phase === "empty" ? 0 : Math.max(0, Math.min(1, 1 - p.timeLeft / Math.max(1, p.total))); }
 
   function buildPlant(index: number): PlantVisual {
-    const group = new THREE.Group(), crown = new THREE.Group(), drop = new THREE.Group();
+    const group = new THREE.Group(), plant = cannabis.create(), crown = plant.root, drop = new THREE.Group();
     const coords = isGrowBox(index) ? [60 + 28 * (index - 6), 158] : [77 + 22 * index, 34];
     group.position.copy(world.toWorld(coords[0], coords[1]));
     crown.position.y = isGrowBox(index) ? .43 : .58;
-    const stem = new THREE.Mesh(stemGeometry, stemMat); stem.position.y = .72; stem.castShadow = true; crown.add(stem);
-    const grownLeaves: THREE.Matrix4[] = [], newLeaves: THREE.Matrix4[] = [], buds: THREE.Matrix4[] = [];
-    for (let level = 0; level < 4; level++) for (let side = 0; side < 3; side++) {
-      const branch = new THREE.Object3D(); branch.position.y = .28 + level * .29; branch.rotation.y = side * Math.PI * 2 / 3 + level * .7;
-      branch.rotation.x = -.65;
-      branch.updateMatrix();
-      for (let finger = -2; finger <= 2; finger++) {
-        const leaf = new THREE.Object3D();
-        leaf.rotation.z = finger * .33;
-        const scale = (1 - Math.abs(finger) * .13) * (1 - level * .12);
-        leaf.scale.setScalar(scale); leaf.updateMatrix();
-        (level === 3 ? newLeaves : grownLeaves).push(new THREE.Matrix4().multiplyMatrices(branch.matrix, leaf.matrix));
-      }
-      const bud = new THREE.Object3D();
-      bud.position.set(Math.sin(branch.rotation.y) * .10, .38 + level * .29, Math.cos(branch.rotation.y) * .10);
-      bud.scale.set(.72, 1.8, .72); bud.updateMatrix(); buds.push(bud.matrix.clone());
-    }
-    for (const [mat, matrices] of [[leafMat, grownLeaves], [newLeafMat, newLeaves], [budMat, buds]] as const) {
-      const mesh = new THREE.InstancedMesh(mat === budMat ? budGeometry : leafGeometry, mat, matrices.length);
-      matrices.forEach((matrix, i) => mesh.setMatrixAt(i, matrix));
-      mesh.castShadow = true; mesh.userData.bud = mat === budMat; crown.add(mesh);
-    }
+    const pot = state.pots[index];
+    plant.setStage(slotOpen(state, index) ? pot.phase : "empty");
+    crown.scale.setScalar(cannabisGrowthScale(pot.phase, progress(pot)) * (isGrowBox(index) ? 1.18 : 1));
+    group.visible = slotOpen(state, index) && pot.phase !== "empty";
     const halo = new THREE.Mesh(haloGeometry, haloMaterial);
     halo.rotation.x = -Math.PI / 2; halo.position.y = .03;
     for (let i = 0; i < 14; i++) {
       const d = new THREE.Mesh(dropGeometry, dropMat); d.scale.y = 1.7; d.userData.phase = i / 14; drop.add(d);
     }
     group.add(crown, halo, drop); plants.add(group);
-    return { index, group, crown, halo, drop };
+    return { index, group, crown, plant, halo, drop };
   }
   function rebuild() {
     plants.removeFromParent();
-    plants.traverse(o => { if (o instanceof THREE.InstancedMesh) o.dispose(); });
+    for (const visual of visuals) visual.plant.dispose();
     plants.clear(); visuals.length = 0;
     if (world.current() === "capsule") {
       world.getRoot().add(plants);
@@ -302,9 +279,9 @@ export function createGrowSystem(world: GrowWorld) {
       for (const v of visuals) {
         const p = state.pots[v.index], fraction = progress(p);
         v.group.visible = slotOpen(state, v.index) && p.phase !== "empty";
-        const scale = (.17 + fraction * .83) * (isGrowBox(v.index) ? 1.18 : 1);
+        v.plant.setStage(slotOpen(state, v.index) ? p.phase : "empty");
+        const scale = cannabisGrowthScale(p.phase, fraction) * (isGrowBox(v.index) ? 1.18 : 1);
         v.crown.scale.setScalar(scale); v.crown.rotation.z = Math.sin(time * 1.3 + v.index) * .025;
-        v.crown.children.forEach(c => { if (c.userData.bud) c.visible = p.phase === "bloom" || p.phase === "ready"; });
         v.halo.visible = p.phase === "ready" || !!p.eddiBoost; if (v.halo.visible) v.halo.scale.setScalar(1 + Math.sin(time * 2 + v.index) * .06);
         v.drop.visible = splashIndex === v.index && performance.now() < splashUntil;
         if (v.drop.visible) v.drop.children.forEach(c => { const t = (time * .8 + c.userData.phase) % 1; c.position.set(Math.sin(c.userData.phase * 80) * .4, 1.9 - t * 1.7, Math.cos(c.userData.phase * 80) * .4); });
