@@ -15,6 +15,7 @@ import { appendYardShedDetails, appendYardBoundaryDetails, appendMossInteriorDet
 import { createStreetDetails, isDetailedDistrict } from "./street-details";
 import { createWallArt } from "./wall-art";
 import { lampFlicker } from "./lamp-flicker";
+import { appendCableRackDetails, appendCableWallDetails, appendCableLiveDetails, appendCableTerminalDetails, type CableFinish, type CableDetailEmitter } from "./cable-details";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -278,6 +279,10 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       box(g, w * .8, .13, .4, mat(palette.brass, "metal"), 0, .56, d * .4);
     } else if (obj.sprite?.includes("terminal") || obj.id === "term" || obj.id.startsWith("kino_")) {
       terminal(g, w);
+      if (id === "cable") {
+        const detail = new THREE.Group(); detail.name = "cable-terminal-detail"; g.add(detail);
+        cableParts(detail, emit => appendCableTerminalDetails(w, d, emit), false);
+      }
     } else if (obj.sprite?.includes("barrel") || obj.label === "Fass") {
       cylinder(g, w * .4, w * .43, .95, mat(palette.rust, "metal"));
       for (const y of [.2, .75]) cylinder(g, w * .445, w * .445, .06, mat(palette.dark, "metal"), 0, y);
@@ -314,7 +319,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     else if (obj.kind === "door" || obj.kind === "manhole") door(obj, g);
     else if (obj.kind === "sign") {
       tag(g, obj.label, 1.8, 1.6); box(g, .08, 1.5, .08, mat(palette.dark, "metal"));
-      if (id === "alley" || id === "yard") {
+      if (id === "alley" || id === "yard" || id === "cable") {
         const pieces: THREE.BufferGeometry[] = [];
         const trim = (w: number, h: number, x: number, y: number) => {
           const piece = new THREE.BoxGeometry(w, h, .055); piece.translate(x, y, -.035); pieces.push(piece);
@@ -452,6 +457,13 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         });
         if (edge) group.rotation.y = side ? (r.x === 0 ? Math.PI / 2 : -Math.PI / 2) : r.y === 0 ? 0 : Math.PI;
       }
+      if (id === "cable") {
+        const group = new THREE.Group(); group.name = "cable-wall-detail"; group.userData.sourceRect = r;
+        group.position.copy(at(r.x + r.w / 2, r.y + r.h / 2)); root.add(group);
+        const side = edge && r.w < r.h;
+        cableParts(group, emit => appendCableWallDetails((side ? r.h : r.w) * WORLD_SCALE, (side ? r.w : r.h) * WORLD_SCALE, height, emit));
+        if (edge) group.rotation.y = side ? (r.x === 0 ? Math.PI / 2 : -Math.PI / 2) : r.y === 0 ? 0 : Math.PI;
+      }
       if (outside && r.w > 100 && r.h > 80) {
         buildingDetails(r, height, i, building?.name, building?.side, building ? (building.x + building.w / 2 - r.x - r.w / 2) * WORLD_SCALE : 0);
       }
@@ -468,6 +480,30 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       }
       for (const part of occluders.slice(firstPart)) part.userData.occlusionGroup = m.uuid;
     }
+  }
+  /** Keep detailed electrical fixtures to a few material batches per original solid. */
+  function cableParts(group: THREE.Group, append: (emit: CableDetailEmitter) => void, fading = true) {
+    group.userData.districtDetail = "cable";
+    const finishes: Record<CableFinish, THREE.Material> = {
+      shell: mat(0x304b4b, "metal"), cap: mat(0x607a76, "roof-metal"),
+      metal: mat(0x67736d, "metal"), rubber: mat(0x1a2c2c), copper: mat(0x967458, "metal"),
+      green: mat(0x315b54, undefined, 0x4ca392), amber: mat(0x776344, undefined, 0xc3994f),
+    };
+    const batches = new Map<CableFinish, THREE.BufferGeometry[]>(), features = new Set<string>();
+    append((finish, geometry, feature) => {
+      const parts = batches.get(finish) ?? []; parts.push(geometry); batches.set(finish, parts); features.add(feature);
+    });
+    group.userData.cableFeatures = [...features];
+    const meshes: THREE.Mesh[] = [];
+    for (const [finish, pieces] of batches) {
+      const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+      if (geometry) {
+        const part = mesh(geometry, finishes[finish], group, 0, 0, 0, finish === "shell" && fading);
+        if (fading) occluder(part);
+        part.name = `${group.name.replace("-detail", "")}:${finish}`; meshes.push(part);
+      }
+    }
+    return meshes;
   }
 
   /** Each yard structure has bounded material batches and follows its wall fade. */
@@ -571,7 +607,15 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const p = at(rect.x + rect.w / 2, rect.y + rect.h / 2);
     const g = new THREE.Group(); g.position.copy(p); root.add(g);
     const w = rect.w * WORLD_SCALE, d = rect.h * WORLD_SCALE;
-    if (rect.kind === "rack") {
+    if (id === "cable" && rect.kind === "rack") {
+      g.name = "cable-rack-detail"; g.userData.sourceRect = rect;
+      const parts = cableParts(g, emit => appendCableRackDetails(w, d, rect.h >= 70 ? 2.9 : .8, rect.x + rect.y, emit));
+      const body = parts.find(part => part.name === "cable-rack:shell")!;
+      for (const part of parts) part.userData.occlusionGroup = body.uuid;
+    } else if (id === "cable" && rect.kind === "ember") {
+      g.name = "cable-live-detail"; g.userData.sourceRect = rect;
+      cableParts(g, emit => appendCableLiveDetails(w, d, emit), false);
+    } else if (rect.kind === "rack") {
       const h = rect.h >= 70 ? 2.9 : .8;
       const body = box(g, w, h, d, mat(0x364a45, "metal")); occluder(body);
       for (let y = .4; y < h; y += .38) {
@@ -603,7 +647,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const w = active.w * WORLD_SCALE, d = active.h * WORLD_SCALE;
     box(root, w + .25, .45, d + .25, mat(palette.dark, "stone"), 0, -.27);
     const indoor = getDistrictGraphics(id).wetness < .15;
-    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor ? "stone" : "asphalt"), root, 0, .002, 0);
+    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "cable" ? 0x43575a : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" ? "stone" : "asphalt"), root, 0, .002, 0);
     floor.rotation.x = -Math.PI / 2;
     const sketch = mapSketch(id);
     if (!active.indoor) for (const r of sketch.walk) {
@@ -633,6 +677,24 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       decorations.push({ kind: "puddle", position: p, size, angle: seeded(i + 69) * Math.PI, stretch: .35 + seeded(i + 69) * .5 });
     }
     if (id === "alley") decorations.push(...alleyRunoffPuddles(active, at));
+    if (id === "cable") {
+      floor.name = "cable-service-floor";
+      for (const bin of active.objs.filter(obj => obj.kind === "bin")) {
+        const p = at(bin.x + bin.w / 2, bin.y + bin.h + 12); p.y = .059;
+        decorations.push({ kind: "puddle", position: p, size: 1.6, angle: .35, stretch: .45 });
+      }
+      const strips: THREE.BufferGeometry[] = [];
+      // Painted service-lane edges follow existing walk rectangles; no raised curbs/collision.
+      for (const r of sketch.walk) {
+        const p = at(r.x + r.w / 2, r.y + r.h / 2), width = r.w * WORLD_SCALE, depth = r.h * WORLD_SCALE;
+        for (const sign of [-1, 1]) {
+          const strip = new THREE.BoxGeometry(width > depth ? width - .4 : .07, .008, width > depth ? .07 : depth - .4);
+          strip.translate(p.x + (width > depth ? 0 : sign * (width / 2 - .18)), .049, p.z + (width > depth ? sign * (depth / 2 - .18) : 0)); strips.push(strip);
+        }
+      }
+      const geometry = mergeGeometries(strips, false); for (const strip of strips) strip.dispose();
+      if (geometry) { const markings = mesh(geometry, mat(0x9a8758, "plaster"), root, 0, 0, 0, false); markings.name = "cable-route-markings"; }
+    }
     if (id === "yard") {
       // The original nonblocking green patches remain walkable; no new planters/collision.
       for (const [index, r] of (active.deco ?? []).entries()) {

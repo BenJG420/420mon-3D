@@ -1,5 +1,14 @@
 # Asset attribution
 
+## Kabelkeller detail — v58
+
+- Service racks/junction boxes, cooling fans, patch leads, electrical trench,
+  wall conduits and terminal fittings are project-authored geometry in
+  `src/game/cable-details.ts`, on the original 2D footprints. Existing procedural
+  PBR metal-cap/stone textures, wall-art atlas and street props are reused.
+- No external asset or font added; original player/NPC/monster assets and their
+  licenses are unchanged.
+
 ## Wall art and lamp effects — v57
 
 - Graffiti/tags, stickers and torn-paper posters are project-authored Canvas
