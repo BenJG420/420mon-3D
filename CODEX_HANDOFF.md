@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — v61 Eddi-Rauchanimation
+
+Annahme v61: Eddi hält den Joint am Mund; pulsierende Glut und zeitgesteuertes Ausatmen ergänzen seine Pausen, ohne Arm-/Laufanimationen oder Spielregeln umzubauen.
+
+- Nur Eddi erhält den Effekt, an den echten Lippen-/Mund-Bones verankert, auch nach Modell-Laden. Zwölf instanzierte Rauchpartikel; keine neuen Lichter/Schatten, keine neuen Ressourcen pro Frame. Ziehen/Ausatmen passt in seine kürzeste Originalpause (1,05s); beim Gehen/aus der Nähe unterbrochen. Ressourcen werden beim Kartenwechsel einmal freigegeben.
+- Ein Build und 8/8 direkt betroffene Tests grün (echte GLB-Mundposition, kurze Pause, unveränderte Bones, Ressourcen sowie Eddi-Regeln). Keine Browserläufe. PR/Merge ausstehend. v60 PR #67 ist gemergt, Pages läuft. Danach v62 Pflanzen, v63 heller Kabelkeller, Kino. **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — v60 Eddi-Shop
 
 Annahme v60: Eddi behält seine originalen Sonderpreise/Titelregeln; Kauf und Verkauf nutzen dieselbe atomare Mengenwahl wie normale Händler und prüfen bei Bestätigung seine aktuelle Nähe.
