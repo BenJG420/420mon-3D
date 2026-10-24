@@ -50,6 +50,8 @@ Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds
 6. DONE — Buff HUD mini-fix, PR #60 / v53 (Ben 2026-10-23): symbols and remaining time in the same collapsible Cash/time/level HUD. NEXT: detail districts one by one, Gasse A v54 DONE (PR #61), Grow-Hinterhöfe/Moss v55 DONE (PR #62), NEXT Kabelkeller; one PR each: preserve 2D structure, independent
    roof materials (tile/metal/felt), edges/gutters, facades/windows/doors/signs,
    neon/trash/cables/puddles/props/vegetation/PBR, lighting/fog/post-processing.
+   Shared street props v56 (PR #63) and wall art/flickering existing lamps v57
+   (PR #64) are merged/published across districts, including Gasse A.
    Do not change player/NPC assets or behavior in district packages.
 7. Monster erst nach Freigabe: only resume sculpts at #97 after Ben explicitly
    approves. First finish fixes and all district graphics/details. Retain the 96 existing models

@@ -1,4 +1,4 @@
-> **v57 — Graffiti, stickers/posters and flickering existing lamps (publication pending):**
+> **Published v57 — Graffiti, stickers/posters and flickering existing lamps, [PR #64](https://github.com/BenJG420/420mon-3D/pull/64), source `e004719`:**
 > one shared 1024×512 locally painted atlas, merged wall batches (at most 24 per
 > district, at most 24 quads per wall), original building occlusion preserved.
 > Ground-floor window bands remain clear. All 14 district/connecting maps reuse
@@ -9,7 +9,10 @@
 > changes. Build passed; all six directly affected tests passed across two local
 > rounds. First run: 5/6; the new fixture lacked a recognized save field, corrected
 > with gold. Wall-art recheck: 2/2. No product fix or repeated build/full suite.
-> No browser run; Ben checks appearance.
+> PR CI40049888375/Main CI40049999013/Pages40049999049 passed. Live JS
+> `index-Cd30CJG2.js`, SHA256 `36148a66949426912d8051931d181dd44feb673708f680ea4ab9e48024b0210d`;
+> JS/CSS/fonts match the local build; stable root unchanged. No browser run;
+> Ben checks appearance.
 > **Monster erst nach Freigabe.** Next full district package: Kabelkeller.
 
 > **Published v56 — Shared street details, [PR #63](https://github.com/BenJG420/420mon-3D/pull/63), source `ed853d8`:** locally authored empty
@@ -894,9 +897,10 @@ are historical; existing repository CI may run automatically.
    parked bicycles/shopping carts and similar street clutter with instancing.
    Retrofit Gasse A too; carry the shared detail system through every district.
    Street-detail addendum DONE (PR #63 / v56), merged and published.
-   **Ben addendum (2026-10-23): v57 implemented, publication pending — shared graffiti/tags/stickers/posters and a few
+   **Ben addendum DONE (PR #64 / v57), merged and published — shared graffiti/tags/stickers/posters and a few
    flickering lamps/lanterns across districts, including Gasse A retrofit; retain
-   performance budgets and actors.** Own PR because #63 is already merged.
+   performance budgets and actors.** Shared atlas/wall batches and existing lamp
+   selection retained; no extra point lights or shadow casters.
    The next full district package remains Kabelkeller. Player/NPC assets remain unchanged.
    Associated interiors follow with their district. Each gets its own PR; native
    device appearance/FPS stays with Ben, no blanket visual-completion claim.

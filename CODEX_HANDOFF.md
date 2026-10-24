@@ -1,3 +1,12 @@
+# Aktueller Wiedereinstieg — v57 Wandbilder/Laternen veröffentlicht; Kabelkeller als Nächstes
+
+- PR #64 gemergt/live, Source `e0047192c99720b2e0a15eddd65aa8d7e43caee9`: Graffiti/Tags, Sticker und Plakate über eine gemeinsame Atlastextur auf Originalwänden, inklusive Gasse A. Maximal 24 Wandbatches mit Gebäudeverdeckung. Bis zu zwei bestehende Laternen pro Bezirk dimmen kurz und weich; eigenes Leuchtmaterial/Lichtpfütze, keine neuen Lichter/Schattenwerfer.
+- Build und alle 6 direkt betroffenen Tests grün über zwei lokale Runden (ein ungültiges Save-Fixture korrigiert, danach 2/2 gezielte Wall-Art-Tests grün; kein erneuter Build). PR CI40049888375/Main CI40049999013/Pages40049999049 grün. Live JS `index-Cd30CJG2.js`, SHA256 `36148a66949426912d8051931d181dd44feb673708f680ea4ab9e48024b0210d`; JS/CSS/fonts bytegleich, Stable unverändert. Nachweis `/workspace/scratch/420mon-audit/v57-deploy-proof.json`. Keine Browserdurchläufe, Ben prüft Optik/FPS.
+- Spieler/NPCs, Originalwege/Kollisionen, Spielregeln und Saves unverändert. Vorherige Pakete v55 Grow-Hinterhöfe/Moss PR #62 und v56 Street-Details PR #63 ebenfalls veröffentlicht.
+- **NÄCHSTER eigener Bezirks-PR: Kabelkeller (`cable`) detaillieren.** Gemeinsame Street-Details und Wandbilder/Lampen beibehalten; danach Bezirke einzeln laut TEST_BUILD.md. **Monster erst nach Freigabe** durch Ben. Ko-fi/Zahlungen übersprungen.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — v57 Wandbilder und flackernde Laternen
 
 Annahme v57: Graffiti/Tags/Sticker/Plakate nutzen freie untere Fassadenbänder und vorhandene Hofmauern; maximal zwei bestehende Laternen pro Bezirk flackern kurz und weich, ohne neue Lichter oder Spielregeln.
