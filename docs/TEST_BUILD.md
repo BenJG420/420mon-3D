@@ -1,3 +1,21 @@
+> **v58 — Kabelkeller detail (publication pending):** original 27 full server
+> racks and six low junction boxes now have independent metal PBR caps, rails,
+> panels, vents/fans, patch cables and indicators in at most seven material
+> batches per cabinet. Every fitting shares its original cabinet's occlusion.
+> Original service walls gain conduit/brackets/junction boxes; four existing
+> terminals get visible connections, destination signs gain neon surrounds.
+> The blocked electrical strip becomes a low cable trench with warning edges
+> and green cores. Original routes get flat service-lane markings, damp stone
+> surfacing and three additional instanced runoff puddles. Shared street props,
+> wall art and existing flickering lamps are retained; no extra point lights.
+> Player/NPC, collision, interaction, gameplay and save behavior retained.
+> Validation: build passed; all 12 affected tests passed across two local rounds
+> (cable, world geometry and wall-art integration). The new cable fixture needed
+> updated parent matrices and a stable occluder array; targeted recheck passed.
+> No product fix/repeated build or browser/full-suite run. Ben checks visuals/FPS.
+> Next: Markt.
+> **Monster erst nach Freigabe.** Ko-fi/payment remains skipped.
+
 > **Published v57 — Graffiti, stickers/posters and flickering existing lamps, [PR #64](https://github.com/BenJG420/420mon-3D/pull/64), source `e004719`:**
 > one shared 1024×512 locally painted atlas, merged wall batches (at most 24 per
 > district, at most 24 quads per wall), original building occlusion preserved.
@@ -881,7 +899,7 @@ are historical; existing repository CI may run automatically.
    symbols and remaining time inside the same collapsible top-left Cash/time/level
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
-7. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); NEXT Kabelkeller (`cable`), one PR per district:** preserve each original 2D layout,
+7. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller (`cable`) v58 implemented, publication pending; NEXT Markt (`market`), one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
@@ -891,7 +909,9 @@ are historical; existing repository CI may run automatically.
    facade detail, neon/signs, refuse and runoff puddles; no extra point lights.
    Grow-Hinterhöfe v55 adds detailed original sheds/courtyard walls, source green
    patches, refuse/neon/runoff and Moss’ interior, keeping the native layout and
-   actors. Next is Kabelkeller (`cable`), then Markt, Kino, Neonkai, Kanal,
+   actors. Kabelkeller v58 details all original racks, service walls, terminals and
+   the blocked electrical trench, with independent PBR caps and shared occlusion.
+   Next is Markt (`market`), then Kino, Neonkai, Kanal,
    Aschegang, Abfluss, Chemiegasse, Ring, Labyrinth, Nischen and Schrotttor.
    **Ben addendum (2026-10-23):** add empty bottles/cans, cardboard boxes,
    parked bicycles/shopping carts and similar street clutter with instancing.
@@ -901,7 +921,7 @@ are historical; existing repository CI may run automatically.
    flickering lamps/lanterns across districts, including Gasse A retrofit; retain
    performance budgets and actors.** Shared atlas/wall batches and existing lamp
    selection retained; no extra point lights or shadow casters.
-   The next full district package remains Kabelkeller. Player/NPC assets remain unchanged.
+   The next full district package is Markt after v58 publication. Player/NPC assets remain unchanged.
    Associated interiors follow with their district. Each gets its own PR; native
    device appearance/FPS stays with Ben, no blanket visual-completion claim.
 8. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up

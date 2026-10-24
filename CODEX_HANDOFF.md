@@ -1,3 +1,13 @@
+# Aktuelle Arbeit — v58 Kabelkeller
+
+Annahme v58: Der unterirdische Kabelkeller erhält eigene Metallabdeckungen auf den bestehenden Server-/Verteilerschränken statt zusätzlicher Außendächer; der originale gesperrte Stromstreifen wird als elektrische Kabeltrasse dargestellt, Kollision/Spielregeln bleiben erhalten.
+
+- Branch `feat/cable-details-v58`: 27 hohe Racks und 6 niedrige Verteiler vollständig auf ihren Originalflächen detailliert, maximal 7 Materialbatches pro Schrank statt vieler Einzelteile. Eigene PBR-Metallkappen, Lüfter/Paneele/Griffe, Patchkabel, grün/amber LEDs. Sämtliche Teile gemeinsam mit dem Schrank ausgeblendet.
+- Zehn originale Wandflächen erhalten Leitungen, Halter, Verteiler und Warnmarker; vier Terminals sichtbare Anschlüsse/Leitungen, Originalschilder Neonrahmen. Feuchter Steinboden, flache Markierungen auf bestehenden Wegen und drei zusätzliche instanzierte Pfützen. Street-Details/Graffiti/flackernde Bestandslampen bleiben erhalten; keine neuen Punktlichter.
+- Spieler/NPCs, ursprüngliche Wege/Kollisionen, Interaktionen und Saves bleiben unverändert. Build grün; 12/12 betroffene Tests grün über zwei lokale Runden. Neuer Kabel-Test benötigte aktualisierte Elternmatrizen und eine stabile Occluder-Liste im Fixture; danach 1/1 gezielter Recheck grün, kein Produktfix/erneuter Build. PR/Merge/Pages noch ausstehend; keine Browserdurchläufe. Danach Markt. **Monster erst nach Freigabe** durch Ben; Ko-fi/Zahlungen übersprungen.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v57 Wandbilder/Laternen veröffentlicht; Kabelkeller als Nächstes
 
 - PR #64 gemergt/live, Source `e0047192c99720b2e0a15eddd65aa8d7e43caee9`: Graffiti/Tags, Sticker und Plakate über eine gemeinsame Atlastextur auf Originalwänden, inklusive Gasse A. Maximal 24 Wandbatches mit Gebäudeverdeckung. Bis zu zwei bestehende Laternen pro Bezirk dimmen kurz und weich; eigenes Leuchtmaterial/Lichtpfütze, keine neuen Lichter/Schattenwerfer.
