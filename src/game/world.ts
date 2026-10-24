@@ -12,7 +12,9 @@ import { isTakenStarter } from "./starter-state";
 import { createStaticBatches, type StaticDecoration, type StaticBatchStats } from "./static-batches";
 import { alleyRoofKind, appendAlleyBuildingDetails, appendAlleyBinDetails, alleyRunoffPuddles, type AlleyFinish } from "./alley-details";
 import { appendYardShedDetails, appendYardBoundaryDetails, appendMossInteriorDetails, type YardFinish, type YardDetailEmitter } from "./yard-details";
-import { createStreetDetails } from "./street-details";
+import { createStreetDetails, isDetailedDistrict } from "./street-details";
+import { createWallArt } from "./wall-art";
+import { lampFlicker } from "./lamp-flicker";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -91,6 +93,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   let performanceMode = true;
   let staticBatches: ReturnType<typeof createStaticBatches> | undefined;
   let streetDetails: ReturnType<typeof createStreetDetails> | undefined;
+  let wallArt: ReturnType<typeof createWallArt> | undefined;
+  const animatedLamps: { light: THREE.PointLight; emitter: THREE.MeshPhysicalMaterial; seed: number; intensity: number; emissive: number; pool?: THREE.MeshBasicMaterial }[] = [];
 
   function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, parent: THREE.Object3D, x: number, y: number, z: number, shadow = true) {
     projectSurfaceUvs(geometry, material);
@@ -121,20 +125,29 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide }); material.userData.local = true;
     return mesh(new THREE.PlaneGeometry(width, width / 4), material, parent, 0, y, z, false);
   }
-  function lamp(parent: THREE.Object3D, x: number, y: number, z: number, color = 0xf5bc71, strength = 12) {
+  function lamp(parent: THREE.Object3D, x: number, y: number, z: number, color = 0xf5bc71, strength = 12, flickerSeed?: number) {
     box(parent, .42, .13, .33, mat(palette.dark, "metal"), x, y, z);
-    box(parent, .33, .035, .22, mat(color, undefined, color), x, y - .08, z);
+    const emitter = box(parent, .33, .035, .22, mat(color, undefined, color), x, y - .08, z);
     const light = new THREE.PointLight(color, strength * (active.indoor ? 1 : 1.6), 12, 2);
     light.position.set(x, y - .2, z); light.visible = false; parent.add(light); lampLights.push(light);
+    let poolMaterial: THREE.MeshBasicMaterial | undefined;
     if (!active.indoor) {
       // Soft pools and broken wet streaks sit directly below the actual fixture.
       const pool = new THREE.MeshBasicMaterial({ color, map: poolTexture, transparent: true, opacity: .19, depthWrite: false, blending: THREE.AdditiveBlending });
+      poolMaterial = pool;
       pool.userData.local = true; pool.userData.sharedTexture = true;
       const reflected = mesh(new THREE.PlaneGeometry(2.8, 3.8), pool, parent, x, .066, z, false);
       reflected.rotation.x = -Math.PI / 2;
       const shaft = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .018, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }); shaft.userData.local = true;
       const cone = mesh(new THREE.ConeGeometry(1.15, Math.max(.3, y - .25), 16, 1, true), shaft, parent, x, (y - .25) / 2 + .1, z, false);
       cone.name = "lamp-haze";
+    }
+    if (flickerSeed !== undefined) {
+      // Only this fixture varies: do not animate the shared material of other lamps/actors.
+      const material = (emitter.material as THREE.MeshPhysicalMaterial).clone();
+      material.userData.local = true; material.userData.sharedTexture = true; emitter.material = material;
+      emitter.name = "flickering-lamp-emitter"; light.name = "flickering-district-lamp";
+      animatedLamps.push({ light, emitter: material, seed: flickerSeed, intensity: light.intensity, emissive: material.emissiveIntensity, pool: poolMaterial });
     }
   }
   function at(x: number, y: number) {
@@ -318,7 +331,9 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       }
     }
     else if (obj.kind === "lamp") {
-      cylinder(g, .045, .07, 2.8, mat(palette.dark, "metal")); lamp(g, .2, 2.75, 0);
+      cylinder(g, .045, .07, 2.8, mat(palette.dark, "metal"));
+      const flicker = isDetailedDistrict(id) && active.objs.filter(o => o.kind === "lamp").indexOf(obj) < 2;
+      lamp(g, .2, 2.75, 0, 0xf5bc71, 12, flicker ? obj.x + obj.y * 7 : undefined);
       box(g, .7, .06, .07, mat(palette.dark, "metal"), .15, 2.84);
     } else if (obj.kind === "bin") {
       box(g, Math.max(.9, obj.w * WORLD_SCALE), 1, Math.max(.7, obj.h * WORLD_SCALE), mat(0x4f5b49, "metal"));
@@ -402,6 +417,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
 
   function buildWalls() {
+    let artCount = 0;
     for (let i = 0; i < active.walls.length; i++) {
       const r = active.walls[i];
       const edge = r.x <= 0 || r.y <= 0 || r.x + r.w >= active.w || r.y + r.h >= active.h;
@@ -438,6 +454,17 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       }
       if (outside && r.w > 100 && r.h > 80) {
         buildingDetails(r, height, i, building?.name, building?.side, building ? (building.x + building.w / 2 - r.x - r.w / 2) * WORLD_SCALE : 0);
+      }
+      if (isDetailedDistrict(id) && artCount < 24) {
+        wallArt ??= createWallArt();
+        // House windows keep their ground-floor band; blank perimeter walls have more room.
+        const band = edge && !outside ? Math.min(1.8, height - .12) : yardShed ? .85 : .6;
+        const geometry = wallArt.geometry(r.w * WORLD_SCALE, r.h * WORLD_SCALE, height, i, band);
+        if (geometry) {
+          const p = at(r.x + r.w / 2, r.y + r.h / 2);
+          const art = occluder(mesh(geometry, wallArt.material, root, p.x, 0, p.z, false));
+          art.name = "district-wall-art"; art.userData.artTypes = geometry.userData.wallArtTypes; artCount++;
+        }
       }
       for (const part of occluders.slice(firstPart)) part.userData.occlusionGroup = m.uuid;
     }
@@ -689,6 +716,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     for (const actor of npcActors.values()) actor.dispose(); npcActors.clear();
     staticBatches?.dispose(); staticBatches = undefined;
     streetDetails?.dispose(); streetDetails = undefined;
+    animatedLamps.length = 0;
     disposeOwnedObjects(root);
     root.clear(); mapObjects.clear(); roamingNpc = undefined; storyNpcs.clear(); occluders = []; lampLights.length = 0; lastLightSelection = -Infinity; glowing.length = 0;
   }
@@ -866,6 +894,11 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
   function update() {
     const time = performance.now();
+    for (const fixture of animatedLamps) {
+      const factor = lampFlicker(fixture.seed, time / 1000);
+      fixture.light.intensity = fixture.intensity * factor; fixture.emitter.emissiveIntensity = fixture.emissive * factor;
+      if (fixture.pool) fixture.pool.opacity = .19 * factor;
+    }
     const actorDt = Math.min(.05, Math.max(0, (time - lastActorTime) / 1000)); lastActorTime = time;
     for (const actor of npcActors.values()) actor.update(actorDt, player.position);
     root.userData.riggedNpcs = [...mapObjects.values()].filter(group => group.userData.npcModel === "rocketbox-rigged").length;

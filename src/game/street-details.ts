@@ -8,6 +8,7 @@ import { appendStreetProp, type StreetFinish, type StreetPropKind } from "./stre
 export type StreetPropPlacement = { kind: StreetPropKind; x: number; z: number; angle: number };
 export const STREET_PROP_RADIUS: Record<StreetPropKind, number> = { bottle: .14, can: .12, cardboard: .36, bicycle: 1, cart: .72 };
 const DISTRICTS = new Set(["alley", "yard", "cable", "market", "kino", "kai", "sewer", "ash", "drain", "chem", "ring", "labyrinth", "nische", "scrap"]);
+export const isDetailedDistrict = (id: string) => DISTRICTS.has(id);
 const CELL_SIZE = 16, VIEW_DISTANCE = 48;
 const seeded = (i: number) => { const n = Math.sin(i * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
 

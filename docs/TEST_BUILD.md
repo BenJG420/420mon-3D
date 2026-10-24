@@ -1,3 +1,17 @@
+> **v57 — Graffiti, stickers/posters and flickering existing lamps (publication pending):**
+> one shared 1024×512 locally painted atlas, merged wall batches (at most 24 per
+> district, at most 24 quads per wall), original building occlusion preserved.
+> Ground-floor window bands remain clear. All 14 district/connecting maps reuse
+> the system, including Gasse A. At most two existing lamp fixtures per district
+> get occasional short smooth dimming with independent emissive materials and
+> matching ground light pools; existing light/shadow selection is retained.
+> No new point lights or shadow casters. No player/NPC, route, gameplay or save
+> changes. Build passed; all six directly affected tests passed across two local
+> rounds. First run: 5/6; the new fixture lacked a recognized save field, corrected
+> with gold. Wall-art recheck: 2/2. No product fix or repeated build/full suite.
+> No browser run; Ben checks appearance.
+> **Monster erst nach Freigabe.** Next full district package: Kabelkeller.
+
 > **Published v56 — Shared street details, [PR #63](https://github.com/BenJG420/420mon-3D/pull/63), source `ed853d8`:** locally authored empty
 > bottles, cans, open cardboard boxes, parked bicycles and wire shopping carts.
 > The common renderer retrofits Gasse A/Grow-Hinterhöfe and runs on all 14 district
@@ -880,7 +894,7 @@ are historical; existing repository CI may run automatically.
    parked bicycles/shopping carts and similar street clutter with instancing.
    Retrofit Gasse A too; carry the shared detail system through every district.
    Street-detail addendum DONE (PR #63 / v56), merged and published.
-   **Ben addendum (2026-10-23): NEXT shared graffiti/tags/stickers/posters and a few
+   **Ben addendum (2026-10-23): v57 implemented, publication pending — shared graffiti/tags/stickers/posters and a few
    flickering lamps/lanterns across districts, including Gasse A retrofit; retain
    performance budgets and actors.** Own PR because #63 is already merged.
    The next full district package remains Kabelkeller. Player/NPC assets remain unchanged.

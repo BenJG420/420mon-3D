@@ -1,5 +1,14 @@
 # Asset attribution
 
+## Wall art and lamp effects — v57
+
+- Graffiti/tags, stickers and torn-paper posters are project-authored Canvas
+  drawings in `src/game/wall-art.ts`, combined in one local 1024×512 atlas.
+  No external artwork, photo, font or texture pack is redistributed. Canvas
+  uses installed generic fonts; text and paint details are drawn at runtime.
+- `lamp-flicker.ts` animates existing fixtures; no new external asset. Original
+  player/NPC models, animation and monster artwork are unchanged.
+
 ## Shared street props — v56
 
 - Empty bottles/cans, open cartons, bicycles and wire shopping carts are
