@@ -1,3 +1,12 @@
+> **v61 — Eddi smoking animation, publication pending:** mouth-held joint anchored
+> to the existing rig's actual lip bones, pulsing ember and twelve instanced smoke
+> puffs. Draw/exhale fits the shortest original pause; walking/distance suppress it.
+> Other NPCs, player, bones/locomotion, Eddi rules and saves remain unchanged.
+> No additional lights/shadows or frame-by-frame resource creation. One build and
+> 8/8 affected tests passed, including actual GLB mouth anchoring and disposal.
+> No browser tests; Ben checks appearance. Next: v62 plants, v63 brighter cable, Kino.
+> **Monster erst nach Freigabe.**
+
 > **v60 — Eddi inventory-style shop, publication pending:** original category order,
 > item descriptions/counts/prices, collapsible categories and the shared quantity
 > picker for buying and selling (+/−, Max, number, slider, live total, one confirmation).
@@ -928,8 +937,8 @@ are historical; existing repository CI may run automatically.
    symbols and remaining time inside the same collapsible top-left Cash/time/level
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
-7. **IMPLEMENTED / publication pending — Eddi shop UI / bulk trade (v60):** inventory/normal-shop layout with categories, rows, quantity/count and description. Buying and selling use the existing slider, +/−, Max, numeric input, live total and one batch confirmation. Retain Eddi prices, title rules, physical NPC access and saves.
-8. **NEXT — Eddi smoking animation (v61):** visible smoking/pulsing ember/exhalation on his existing rig; other NPCs/player/behavior remain unchanged.
+7. **DONE — Eddi shop UI / bulk trade (v60), PR #67 merged:** inventory/normal-shop layout with categories, rows, quantity/count and description. Buying and selling use the existing slider, +/−, Max, numeric input, live total and one batch confirmation. Retain Eddi prices, title rules, physical NPC access and saves.
+8. **IMPLEMENTED / publication pending — Eddi smoking animation (v61):** visible smoking/pulsing ember/exhalation on his existing rig; other NPCs/player/behavior remain unchanged.
 9. **NEXT — Grow plant appearance (v62):** recognizable cannabis in every stage (seedling, vegetative, bloom, ready), including growboxes. Improve anatomy/leaves/buds with bounded shared geometry; preserve timings/yields/care and saves.
 10. **NEXT — Brighter Kabelkeller (v63):** significantly improve ambient/key/fill visibility and reduce obscuring fog; keep original map, light/shadow budget and atmosphere.
 11. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); Markt / Silk / Static DONE (PR #66 / v59); NEXT Kino after items 7–10, one PR per district:** preserve each original 2D layout,
