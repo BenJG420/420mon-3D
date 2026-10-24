@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — v60 Eddi-Shop
+
+Annahme v60: Eddi behält seine originalen Sonderpreise/Titelregeln; Kauf und Verkauf nutzen dieselbe atomare Mengenwahl wie normale Händler und prüfen bei Bestätigung seine aktuelle Nähe.
+
+- Kategorien/Items wie Inventar, Beschreibungen/Bestand/Stückpreis, gemeinsamer Mengenregler mit +/−/Max/Eingabefeld/Gesamtpreis/einer Bestätigung, feste Kopf-/Fußzeile und Touch-Ansicht. Originalpreise/Saves erhalten; Titel bleibt einmaliges Flag. 21/21 direkte Handels-/Eddi-Tests grün. Erster Build fand den Begrüßungs-Callback mit neuem optionalen Elternparameter; korrigiert, nur Build erneut. Veröffentlichung ausstehend.
+- Danach v61 Eddi-Rauch, v62 Cannabis-Pflanzen, v63 Kabelkeller heller, dann Kino. **Monster erst nach Freigabe**. Ben prüft Optik, keine Browserläufe.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v59 Markt veröffentlicht; Bens vier Wünsche zuerst
 
 - Markt / Silk / Static als PR #66 gemergt/live, Source `91286d17ddbd778d59ab0bfbdbf088c353a6cd63`. Eigene PBR-Dächer, Fassaden/Hofmauern, sechs Standdetails, Neon/Türbeschläge, neun Zusatzpfützen und beide Hinterzimmer. Figuren, Grundriss, Kollisionen, Spielregeln und Saves erhalten.
