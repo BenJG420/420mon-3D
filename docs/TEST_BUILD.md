@@ -9,9 +9,10 @@
 > Static's gains radios/electronics above the original furniture. Shared street
 > clutter, wall art and flickering lamps remain. No extra point lights/shadow casters.
 > Detail batches share source-wall occlusion; original map, actors, collisions,
-> interactions and saves remain unchanged. Build and 10/10 affected tests passed;
-> final light-strip height adjustment received one focused market recheck (passed),
-> no repeated build or broad/browser tests. Ben checks visuals/device FPS. Next: Kino.
+> interactions and saves remain unchanged. Build and 11/11 affected tests passed over three local rounds: initial 10,
+> focused market recheck after light-strip adjustment, then alley recheck after CI
+> found its obsolete expectation of no market roofs. No repeated build or local
+> broad/browser tests. Ben checks visuals/device FPS. Next: Kino.
 > **Monster erst nach Freigabe.** Ko-fi/payment stays skipped.
 
 > **Published v58 — Kabelkeller detail, [PR #65](https://github.com/BenJG420/420mon-3D/pull/65), source `21f7ac8`:** original 27 full server

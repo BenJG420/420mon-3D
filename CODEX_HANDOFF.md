@@ -3,7 +3,7 @@
 Annahme v59: Die vier originalen Nordfassaden erhalten eigene Dächer; Marktstände werden nur an ihren bestehenden Überdachungen/Theken dekoriert, Silk/Static erhalten hohe Wandregale ohne neue Hindernisse oder Änderungen an Figuren.
 
 - Branch `feat/market-details-v59`: Markt als eigener Bezirks-PR fertig implementiert. Originalgrundriss, Händler/NPCs, Spieler, Interaktionen, Kollisionen und Saves bleiben erhalten. Vier eigene Dachflächen, Fassaden/Hofmauern, sechs bestehende Verkaufsstände, Neon/Türbeschläge, neun instanzierte Zusatzpfützen und beide Hinterzimmer fertig. Kleine Details sind materialweise zusammengefasst, ohne neue Schattenwerfer/Punktlichter; Originalverdeckung bleibt erhalten.
-- Ein Build und 10/10 direkt betroffene Tests grün; nach abschließender Korrektur der Lichtleistenhöhe nur Markt-Test gezielt erneut grün (zweite lokale Runde). Finaler Build enthält die korrigierten Höhen. Keine Browser-/Gesamtsuite. PR/Merge/Pages noch ausstehend. Ben prüft Optik/FPS im Testbuild. Danach Kino. **Monster erst nach Freigabe** durch Ben; Ko-fi/Zahlungen übersprungen.
+- Ein Build und 11/11 direkt betroffene Tests grün über drei lokale Runden: Erstlauf 10/10, finaler Lichtleisten-Nachtest Markt grün; CI fand eine alte Gasse-Testannahme ohne Marktdächer, Erwartung aktualisiert und nur Gasse-Test erneut grün. Finaler Build enthält die korrigierten Höhen. Keine Browser-/Gesamtsuite. PR/Merge/Pages noch ausstehend. Ben prüft Optik/FPS im Testbuild. Danach Kino. **Monster erst nach Freigabe** durch Ben; Ko-fi/Zahlungen übersprungen.
 
 ## Vorheriger Stand
 
