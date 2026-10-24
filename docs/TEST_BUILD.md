@@ -1,4 +1,4 @@
-> **v59 — Markt / Silk / Static implemented, publication pending:** four original northern
+> **Published v59 — Markt / Silk / Static, [PR #66](https://github.com/BenJG420/420mon-3D/pull/66), source `91286d1`:** four original northern
 > buildings now have independent tile/metal/felt PBR roofs, four-sided windows,
 > shutters, gutters, downpipes, cables and ivy. Six perimeter sections receive
 > repairs/conduit; the five market stalls and Silk's existing counter get awning
@@ -12,7 +12,7 @@
 > interactions and saves remain unchanged. Build and 11/11 affected tests passed over three local rounds: initial 10,
 > focused market recheck after light-strip adjustment, then alley recheck after CI
 > found its obsolete expectation of no market roofs. No repeated build or local
-> broad/browser tests. Ben checks visuals/device FPS. Next: Kino.
+> broad/browser tests. Ben checks visuals/device FPS. PR CI40094281231/Main CI40094361416/Pages40094361402 passed. Live JS `index-B8mZxlyP.js`, SHA256 `cfe3bf74c300d9eccaca1d5eb53c9e99d64976a042ce7535c3e7fdf0a9746604`; JS/CSS/fonts match locally, stable unchanged. Next: Ben’s four wishes below, then Kino.
 > **Monster erst nach Freigabe.** Ko-fi/payment stays skipped.
 
 > **Published v58 — Kabelkeller detail, [PR #65](https://github.com/BenJG420/420mon-3D/pull/65), source `21f7ac8`:** original 27 full server
@@ -918,7 +918,11 @@ are historical; existing repository CI may run automatically.
    symbols and remaining time inside the same collapsible top-left Cash/time/level
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
-7. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); IN PROGRESS Markt / Silk / Static (`market`, `den_silk`, `den_static`) v59, one PR per district:** preserve each original 2D layout,
+7. **NEXT — Eddi shop UI / bulk trade (v60):** inventory/normal-shop layout with categories, rows, quantity/count and description. Buying and selling use the existing slider, +/−, Max, numeric input, live total and one batch confirmation. Retain Eddi prices, title rules, physical NPC access and saves.
+8. **NEXT — Eddi smoking animation (v61):** visible smoking/pulsing ember/exhalation on his existing rig; other NPCs/player/behavior remain unchanged.
+9. **NEXT — Grow plant appearance (v62):** recognizable cannabis in every stage (seedling, vegetative, bloom, ready), including growboxes. Improve anatomy/leaves/buds with bounded shared geometry; preserve timings/yields/care and saves.
+10. **NEXT — Brighter Kabelkeller (v63):** significantly improve ambient/key/fill visibility and reduce obscuring fog; keep original map, light/shadow budget and atmosphere.
+11. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); Markt / Silk / Static DONE (PR #66 / v59); NEXT Kino after items 7–10, one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
@@ -930,7 +934,7 @@ are historical; existing repository CI may run automatically.
    patches, refuse/neon/runoff and Moss’ interior, keeping the native layout and
    actors. Kabelkeller v58 details all original racks, service walls, terminals and
    the blocked electrical trench, with independent PBR caps and shared occlusion.
-   Next is Markt (`market`), then Kino, Neonkai, Kanal,
+   Markt v59 adds independent roofs, facades, six decorated existing counters and Silk/Static interiors. After Ben’s four wishes, next is Kino, then Neonkai, Kanal,
    Aschegang, Abfluss, Chemiegasse, Ring, Labyrinth, Nischen and Schrotttor.
    **Ben addendum (2026-10-23):** add empty bottles/cans, cardboard boxes,
    parked bicycles/shopping carts and similar street clutter with instancing.
@@ -940,10 +944,10 @@ are historical; existing repository CI may run automatically.
    flickering lamps/lanterns across districts, including Gasse A retrofit; retain
    performance budgets and actors.** Shared atlas/wall batches and existing lamp
    selection retained; no extra point lights or shadow casters.
-   Current package: Markt / Silk / Static v59 (own roofs, facades, counter/awning detail, neon, runoff and high interior shelving). Next after merge: Kino. Player/NPC assets remain unchanged.
+   Markt / Silk / Static v59 is merged and published. Before Kino, finish items 7–10 above. Player/NPC assets remain unchanged in district packages.
    Associated interiors follow with their district. Each gets its own PR; native
    device appearance/FPS stays with Ben, no blanket visual-completion claim.
-8. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up
+12. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up
    from **Dex #97 require Ben’s explicit approval**. Finishing fixes, performance
    and all district graphics/details does not itself grant that approval. Preserve the 96 authored models and PBR/UV/cache.
    Known v47 visual follow-up: Ypipe branches partly cover its eyes in the initial

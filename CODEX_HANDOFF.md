@@ -1,3 +1,11 @@
+# Aktueller Wiedereinstieg — v59 Markt veröffentlicht; Bens vier Wünsche zuerst
+
+- Markt / Silk / Static als PR #66 gemergt/live, Source `91286d17ddbd778d59ab0bfbdbf088c353a6cd63`. Eigene PBR-Dächer, Fassaden/Hofmauern, sechs Standdetails, Neon/Türbeschläge, neun Zusatzpfützen und beide Hinterzimmer. Figuren, Grundriss, Kollisionen, Spielregeln und Saves erhalten.
+- Ein Build; 11/11 betroffene Tests grün über drei lokale Runden (Markt-Lichtleisten-Nachtest; CI fand alte Gasse-Testannahme ohne Marktdächer, korrigiert und gezielt grün). Finale PR CI40094281231/Main CI40094361416/Pages40094361402 grün. Live JS `index-B8mZxlyP.js`, SHA256 `cfe3bf74c300d9eccaca1d5eb53c9e99d64976a042ce7535c3e7fdf0a9746604`; JS/CSS/fonts bytegleich, Stable unverändert. Nachweis `v59-deploy-proof.json`. Keine Browserläufe.
+- **NEUE Reihenfolge vor Kino/weiteren Bezirken (Ben 2026-10-24), je eigener PR:** (1) Eddi-Shop wie Inventar/normaler Shop mit Mengenwahl für Kauf/Verkauf, (2) Eddi-Rauchanimation, (3) echte Cannabis-Optik für jede Grow-Pflanzenphase, (4) Kabelkeller deutlich heller. Danach Kino. Nur Build + direkt betroffene Tests; Ben prüft Optik/FPS. **Monster erst nach Freigabe**; Ko-fi/Zahlungen übersprungen.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — v59 Markt / Silk / Static
 
 Annahme v59: Die vier originalen Nordfassaden erhalten eigene Dächer; Marktstände werden nur an ihren bestehenden Überdachungen/Theken dekoriert, Silk/Static erhalten hohe Wandregale ohne neue Hindernisse oder Änderungen an Figuren.
