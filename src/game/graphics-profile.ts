@@ -26,7 +26,13 @@ const NIGHT: Omit<DistrictGraphics, "id"> = {
 const PROFILES: Record<string, Partial<DistrictGraphics>> = {
   alley: { accent: "#8cb6b8", fog: { color: "#102331", density: .024 } },
   yard: { accent: "#9ab86a", fillColor: "#426869", fog: { color: "#122729", density: .032 }, wetness: .79, rain: .72 },
-  cable: { accent: "#45dfb9", fillColor: "#355c75", fog: { color: "#0d2225", density: .035 }, rain: .45 },
+  // Service lighting reaches the rack aisles without adding point lights/shadow passes.
+  cable: {
+    background: "#152426", accent: "#78ddbe", keyColor: "#e4efdd", fillColor: "#88a9b5",
+    keyIntensity: 3, fillIntensity: 1.8, environmentIntensity: .95, exposure: 1.25,
+    fog: { color: "#253d40", density: .018 }, rain: .45,
+    contrast: 1.04, vignette: .1, bloom: { strength: .22, radius: .4, threshold: 1.35 },
+  },
   market: { accent: "#ffb46a", keyColor: "#d4d7df", fog: { color: "#25202a", density: .025 }, rain: .8 },
   sewer: { accent: "#6ed6b3", fillColor: "#3b6c61", fog: { color: "#10231f", density: .042 }, rain: 0, wetness: 1 },
   ash: { accent: "#ff7a43", fillColor: "#686178", fog: { color: "#2b1b23", density: .034 }, rain: .68, wetness: .78 },

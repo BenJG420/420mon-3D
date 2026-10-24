@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — v63 Kabelkeller heller, PR ausstehend
+
+Annahme v63: Die bessere Lesbarkeit kommt aus vorhandenen Haupt-/Füll-/Umgebungslichtern und klarerem Nebel; keine zusätzlichen Punktlichter oder veränderten Figuren.
+
+- Nur Kabelkeller-Grafikprofil: Hauptlicht 1,45→3, Fülllicht 0,8→1,8, Umgebung 0,44→0,95, Belichtung 1,1→1,25; hellere Lichtfarben, Nebeldichte 0,035→0,018, weniger Kontrast/Vignette/Bloom. Grundriss, Racks/Details, Spieler/NPCs, Spielregeln, Saves und Schattenbudget bleiben erhalten.
+- Ein Build und 7/7 direkt betroffene Grafik-/Kabelkeller-Tests grün. Keine Browserläufe, Ben prüft Helligkeit. v62 Pflanzen PR #69 gemergt (`bcb94d8`), CI/Pages läuft. Danach Kino als nächster eigener Bezirks-PR. **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — v62 Cannabis-Pflanzen fertig, PR ausstehend
 
 Annahme v62: Alle vorhandenen Sorten nutzen dieselbe botanische Phasenanatomie; Sortenregeln, Zeiten, Ertrag und Pflege bleiben unverändert.

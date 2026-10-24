@@ -1,4 +1,12 @@
-> **v62 — Botanical Grow plants, publication pending:** separate seedling/cotyledon,
+> **v63 — Brighter Kabelkeller, publication pending:** substantially increased
+> existing key/fill/environment light (3 / 1.8 / 0.95), exposure 1.25, brighter light
+> colors and thinner fog (0.018). Reduced contrast/vignette/bloom keep the original
+> service aisles readable. Only the cable graphics profile changes: no additional
+> lights/shadow passes, geometry, actors, gameplay or save changes. One build and
+> 7/7 directly affected graphics/cable tests passed; Ben checks brightness in-game.
+> Next district: Kino. **Monster erst nach Freigabe.**
+
+> **Merged v62 — Botanical Grow plants, [PR #69](https://github.com/BenJG420/420mon-3D/pull/69), source `bcb94d8`:** separate seedling/cotyledon,
 > branched vegetative, flowering and ripe models; curved serrated fan leaves with
 > veins, green calyx clusters and pale/amber pistils. Existing pots/growboxes keep
 > their positions, growth rules, yields, care, watering effects and saves. Shared
@@ -953,8 +961,8 @@ are historical; existing repository CI may run automatically.
    directly affected tests only; Ben checks the published GUI. Own PR.
 7. **DONE — Eddi shop UI / bulk trade (v60), PR #67 merged:** inventory/normal-shop layout with categories, rows, quantity/count and description. Buying and selling use the existing slider, +/−, Max, numeric input, live total and one batch confirmation. Retain Eddi prices, title rules, physical NPC access and saves.
 8. **DONE — Eddi smoking animation (v61), PR #68 merged/live:** visible smoking/pulsing ember/exhalation on his existing rig; other NPCs/player/behavior remain unchanged.
-9. **IMPLEMENTED / publication pending — Grow plant appearance (v62):** recognizable cannabis in every stage (seedling, vegetative, bloom, ready), including growboxes. Improve anatomy/leaves/buds with bounded shared geometry; preserve timings/yields/care and saves.
-10. **NEXT — Brighter Kabelkeller (v63):** significantly improve ambient/key/fill visibility and reduce obscuring fog; keep original map, light/shadow budget and atmosphere.
+9. **DONE — Grow plant appearance (v62), PR #69 merged:** recognizable cannabis in every stage (seedling, vegetative, bloom, ready), including growboxes. Improve anatomy/leaves/buds with bounded shared geometry; preserve timings/yields/care and saves.
+10. **IMPLEMENTED / publication pending — Brighter Kabelkeller (v63):** significantly improve ambient/key/fill visibility and reduce obscuring fog; keep original map, light/shadow budget and atmosphere.
 11. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); Markt / Silk / Static DONE (PR #66 / v59); NEXT Kino after items 7–10, one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
