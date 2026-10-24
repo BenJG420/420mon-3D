@@ -47,7 +47,7 @@ Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds
    actual observations in TEST_BUILD.md; desktop/touch clarity and less overlap.
 5. DONE — PR #59 / v52 Performance/FPS: decoration instancing, shadow budget and optional device A/B capture (actual FPS measurement by Ben pending); instancing, LOD, culling, textures,
    shaders and a shadow budget as appropriate.
-6. DONE — Buff HUD mini-fix, PR #60 / v53 (Ben 2026-10-23): symbols and remaining time in the same collapsible Cash/time/level HUD. NEXT: detail districts one by one, Gasse A v54 DONE (PR #61), Grow-Hinterhöfe/Moss v55 DONE (PR #62), NEXT Kabelkeller; one PR each: preserve 2D structure, independent
+6. DONE — Buff HUD mini-fix, PR #60 / v53 (Ben 2026-10-23): symbols and remaining time in the same collapsible Cash/time/level HUD. NEXT: detail districts one by one, Gasse A v54 DONE (PR #61), Grow-Hinterhöfe/Moss v55 DONE (PR #62), Kabelkeller v58 DONE (PR #65), NEXT Markt; one PR each: preserve 2D structure, independent
    roof materials (tile/metal/felt), edges/gutters, facades/windows/doors/signs,
    neon/trash/cables/puddles/props/vegetation/PBR, lighting/fog/post-processing.
    Shared street props v56 (PR #63) and wall art/flickering existing lamps v57

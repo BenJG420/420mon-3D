@@ -1,3 +1,12 @@
+# Aktueller Wiedereinstieg — v58 Kabelkeller veröffentlicht; Markt als Nächstes
+
+- PR #65 gemergt/live, Source `21f7ac8ee0a8dc794688db8bc863d4c2496ee546`: 27 hohe Racks und sechs niedrige Verteiler mit eigener PBR-Metallkappe, Paneelen/Lüftern/Patchkabeln/LEDs; max. sieben Materialbatches pro Schrank, gemeinsame Verdeckung. Zehn Servicewände, vier Terminals, Neon-Wegweiser und der ursprüngliche gesperrte Stromstreifen detailliert; feuchter Steinboden/Wege-Markierungen/drei instanzierte Zusatzpfützen.
+- Spieler/NPCs, Originalgrundriss, Kollisionen, Interaktionen und Saves unverändert. Street-Details/Graffiti und bestehende flackernde Laternen bleiben erhalten; keine neuen Punktlichter.
+- Build und 12/12 direkt betroffene Tests grün über zwei lokale Runden: neuer Kabel-Test brauchte aktualisierte Elternmatrizen und stabile Occluder-Liste im Fixture; gezielter Recheck grün, kein Produktfix/erneuter Build. PR CI40070568787/Main CI40070663853/Pages40070663930 grün. Live JS `index-CE5_O_4F.js`, SHA256 `0ae8f9294d8034db404b0afd48201b9186f8d3d0b10c38701d7dd8e9bb7dbc91`; JS/CSS/fonts bytegleich, Stable unverändert. Nachweis `/workspace/scratch/420mon-audit/v58-deploy-proof.json`. Keine Browserdurchläufe, Ben prüft Optik/FPS.
+- **NÄCHSTER eigener Bezirks-PR: Markt (`market`) detaillieren.** Danach Kino, Neonkai usw. laut TEST_BUILD.md. Gemeinsame Detail-Systeme und Figuren beibehalten. **Monster erst nach Freigabe** durch Ben. Ko-fi/Zahlungen übersprungen.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — v58 Kabelkeller
 
 Annahme v58: Der unterirdische Kabelkeller erhält eigene Metallabdeckungen auf den bestehenden Server-/Verteilerschränken statt zusätzlicher Außendächer; der originale gesperrte Stromstreifen wird als elektrische Kabeltrasse dargestellt, Kollision/Spielregeln bleiben erhalten.

@@ -1,4 +1,4 @@
-> **v58 — Kabelkeller detail (publication pending):** original 27 full server
+> **Published v58 — Kabelkeller detail, [PR #65](https://github.com/BenJG420/420mon-3D/pull/65), source `21f7ac8`:** original 27 full server
 > racks and six low junction boxes now have independent metal PBR caps, rails,
 > panels, vents/fans, patch cables and indicators in at most seven material
 > batches per cabinet. Every fitting shares its original cabinet's occlusion.
@@ -13,7 +13,9 @@
 > (cable, world geometry and wall-art integration). The new cable fixture needed
 > updated parent matrices and a stable occluder array; targeted recheck passed.
 > No product fix/repeated build or browser/full-suite run. Ben checks visuals/FPS.
-> Next: Markt.
+> PR CI40070568787/Main CI40070663853/Pages40070663930 passed. Live JS
+> `index-CE5_O_4F.js`, SHA256 `0ae8f9294d8034db404b0afd48201b9186f8d3d0b10c38701d7dd8e9bb7dbc91`;
+> JS/CSS/fonts match the local build, stable root unchanged. Next: Markt.
 > **Monster erst nach Freigabe.** Ko-fi/payment remains skipped.
 
 > **Published v57 — Graffiti, stickers/posters and flickering existing lamps, [PR #64](https://github.com/BenJG420/420mon-3D/pull/64), source `e004719`:**
@@ -899,7 +901,7 @@ are historical; existing repository CI may run automatically.
    symbols and remaining time inside the same collapsible top-left Cash/time/level
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
-7. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller (`cable`) v58 implemented, publication pending; NEXT Markt (`market`), one PR per district:** preserve each original 2D layout,
+7. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); NEXT Markt (`market`), one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
@@ -921,7 +923,7 @@ are historical; existing repository CI may run automatically.
    flickering lamps/lanterns across districts, including Gasse A retrofit; retain
    performance budgets and actors.** Shared atlas/wall batches and existing lamp
    selection retained; no extra point lights or shadow casters.
-   The next full district package is Markt after v58 publication. Player/NPC assets remain unchanged.
+   The next full district package is Markt (`market`). Player/NPC assets remain unchanged.
    Associated interiors follow with their district. Each gets its own PR; native
    device appearance/FPS stays with Ben, no blanket visual-completion claim.
 8. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up
