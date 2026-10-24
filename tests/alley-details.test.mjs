@@ -150,7 +150,7 @@ test("Gasse A details share building occlusion, preserve the original world and 
     assert.ok([...externalDisposals.values()].every(count => count === 0), "player and foreign systems keep ownership");
     assert.equal(root.getObjectByName("alley-roof"), undefined);
     assert.equal(root.children.some(node => node.userData.districtDetail === "alley"), false);
-    assert.equal(meshes(root).some(node => materials(node).some(material => String(material.userData.surface).startsWith("roof-"))), false, "other districts retain their existing roof materials");
+    assert.equal(meshes(root).filter(node => node.name === "market-roof").length, 4, "v59 market roofs replace the old undecorated destination without retaining alley meshes");
     for (const key of ["gold", "inventory", "team", "box", "starterId"]) assert.deepEqual(getSave()[key], snapshot[key], `${key}: travel must not change gameplay content`);
     assert.equal(data.get("420mon_save_v1"), originalSave);
     assert.equal(data.get("stable-release-fixture"), "unchanged");
