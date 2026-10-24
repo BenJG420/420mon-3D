@@ -1,3 +1,13 @@
+# Aktuelle Arbeit — v57 Wandbilder und flackernde Laternen
+
+Annahme v57: Graffiti/Tags/Sticker/Plakate nutzen freie untere Fassadenbänder und vorhandene Hofmauern; maximal zwei bestehende Laternen pro Bezirk flackern kurz und weich, ohne neue Lichter oder Spielregeln.
+
+- Angefangenen Branch `feat/wall-art-lamps-v57` fortgesetzt. Eine gemeinsame 1024×512-Atlastextur, maximal 24 zusammengefasste Wand-Meshes pro Bezirk, gemeinsam mit der jeweiligen Originalwand ausgeblendet. Bestehende Fensterbänder bleiben frei.
+- Flackern ändert nur Intensität, eigenes Leuchtmaterial und vorhandene Lichtpfütze; Lichtauswahl und Schattenbudget bleiben erhalten. Spieler/NPCs, Wege/Kollisionen, Mechaniken und Saves unverändert.
+- Build grün, alle 6 direkt betroffenen Tests grün über zwei lokale Runden: erster Lauf 5/6, ungültiges Test-Save-Fixture um Gold-Feld ergänzt, danach 2/2 Wall-Art-Tests grün. Kein Produktfehler, keine erneute Build-/Gesamtsuite. PR/Merge/Pages noch ausstehend, keine Browserdurchläufe. Danach Kabelkeller als nächster eigener Bezirks-PR. **Monster erst nach Freigabe** durch Ben, Ko-fi/Zahlungen übersprungen.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v56 Street-Details veröffentlicht; Wanddetails/Lampen ergänzen
 
 - PR #63 gemergt/live, Source `ed853d82dcf99ef7d3a7924cd6c25b695b9fd2fa`: gemeinsame instanzierte Flaschen/Dosen/Kartons/Fahrräder/Einkaufswagen in 14 Bezirks-/Verbindungskarten, inklusive Gasse A. Originalwege, Figuren, Kollisionen und Saves unverändert; kleine Instanzzellen/Distanz-Ausblendung, keine zusätzlichen Schattenwerfer/Lichter.
