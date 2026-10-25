@@ -3,7 +3,7 @@
 Annahme v65: Neonkai bleibt der originale offene Angelkai; die gesperrte Kaimauer wird nur visuell niedriger, Lagerfassaden schmücken die vorhandene Nordwand und dekoratives Straßeninventar liegt abseits der bestehenden Zugänge.
 
 - Fünf eigene Metall-PBR-Kappen, niedrige Brüstung mit Festmacherringen/Bollards, Lagerfront mit Rolltoren/Oberlichtern/Rinnen/Neon, vier Angelplätze und Glutwalze detailliert. Wasser und Kapsel-Pad nutzen getrennte Oberflächen, zwei zusammengefasste Wasserreflex-/Wellenbatches; fünf Zusatzpfützen (37 insgesamt). Neun instanzierte Requisiten (Flaschen/Dosen/Kartons/Rad) in sieben Materialbatches. Eine bestehende flackernde Laterne, keine zusätzlichen Punktlichter/Detailschatten.
-- Originalwege/Kollisionen, Interaktionen, Spieler/NPCs und Saves erhalten. Ein Build + 11/11 direkte Kai-/Kino-/Weltgeometrie-Tests grün; Kino-Test deckt die Integration beider Pakete im gemeinsamen Renderer ab. Keine Browserläufe. PR/Merge/Pages folgen nach Kino PR #72. Danach Kanal als nächster Bezirks-PR. **Monster erst nach Freigabe**.
+- Originalwege/Kollisionen, Interaktionen, Spieler/NPCs und Saves erhalten. Ein Build und 14/14 direkte Tests in zwei lokalen Runden grün: zuerst 11 Kai-/Kino-/Weltgeometrie-Tests, nach CI-Hinweis drei Instancing-Tests mit aktualisierter Pfützen-Erwartung (37 statt 32). Kein weiterer Build nötig; Kino-Test deckt die Integration beider Pakete im gemeinsamen Renderer ab. Keine Browserläufe. PR/Merge/Pages folgen nach Kino PR #72. Danach Kanal als nächster Bezirks-PR. **Monster erst nach Freigabe**.
 
 ## Vorheriger Stand
 
