@@ -1,3 +1,15 @@
+# Aktueller Wiedereinstieg — Eddi-Kauf, Kino und Neonkai gemergt/live
+
+- Eddi-Kauf-Fix PR #71 veröffentlicht: Unterhaltung bleibt trotz Eddis Bewegung am Gesprächsort nutzbar; echte Mengenwahl/Buchung und Zugangsgrenzen getestet. Ein Build + 5 direkte Tests.
+- Kino v64 PR #72 veröffentlicht: Bühne/eigene Kappen, Vorhänge/Leinwand/Lautsprecher, Wand- und Gerätedetails, instanziertes Kleininventar. Ein Build + 10 direkte Tests.
+- Neonkai v65 PR #73 veröffentlicht: Lagerfront/Kaimauer/eigene Metallkappen, Angelgeräte/Wasser/Neon/Pfützen, instanzierte Straßenrequisiten. Ein Build + 14 direkte Tests über zwei lokale Runden; nur alte Instancing-Erwartung nach CI-Hinweis angepasst, kein erneuter Build.
+- v64 PR #72: Source `41cba85fe71a67cf2ba720ad5220ac7db3475c8b`, PR CI40211330822, Main CI40211478261, Pages40211478306; live `index-BXYyAYsO.js`, SHA256 `49ce1ad61733bad6023924d21b39266b1fa6a7eb705af14247ab493cd9d1028f`. JS/CSS/fonts bytegleich, Stable unverändert (`v64-deploy-proof.json`).
+- v65 PR #73: Source `7cc915096eed0ba5e64a5bbf2c2f8f1f9db7423b`, PR CI40211639596, Main CI40211745081, Pages40211745026; live `index-Dk3ZcoWr.js`, SHA256 `7013611d790bc0c5cfd4dda68d9b32e3d528a52c99789097c6b2ba09a937b6bd`. JS/CSS/fonts bytegleich, Stable unverändert (`v65-deploy-proof.json`).
+- Finale PR-CI, Main-CI und Pages aller drei Pakete grün; Veröffentlichungsnachweis in TEST_BUILD.md. Keine Browserläufe; Ben prüft Optik/FPS. Spieler/NPCs, Originalwege/Interaktionen und Saves erhalten.
+- **NÄCHSTER eigener Bezirks-PR: Kanal (`sewer`)** nach TEST_BUILD.md, dann Aschegang usw. Nur Build + direkt betroffene Tests. **Monster erst nach Freigabe** durch Ben; Ko-fi/Zahlungsserver bleiben übersprungen.
+
+## Vorheriger Stand
+
 # Aktueller Stand — Neonkai v65 fertig, eigener PR nach Kino
 
 Annahme v65: Neonkai bleibt der originale offene Angelkai; die gesperrte Kaimauer wird nur visuell niedriger, Lagerfassaden schmücken die vorhandene Nordwand und dekoratives Straßeninventar liegt abseits der bestehenden Zugänge.
