@@ -1,9 +1,18 @@
+# Aktueller Stand — Kino v64 fertig, PR/Merge folgt
+
+Annahme v64: Die originale gesperrte Leinwandfläche wird als niedriger Bühnensockel gerendert; Kollisionen, Geräte und Durchgänge bleiben unverändert.
+
+- Sechs eigene PBR-Kappen (Filz/Metall), Wandpaneele/Akustikleisten/Leitungen, Bühne, gewellte Vorhänge, Leinwandrahmen und Lautsprecher. Original-Leinwand und fünf Geräte erhalten gemeinsam ausgeblendete Ausstattung/lesbare Bedienelemente. Teppichgang, zwei instanzierte Eintrittspfützen und instanzierte Dosen/Tickets, Bestandslicht flackert. Keine zusätzlichen Lichter/Schatten der Details.
+- Ein Build + 10/10 direkte Kino-/Weltgeometrie-Tests grün (Originalkollisionen/Interaktionen, Verdeckung, Ressourcenfreigabe und Saves/Figuren). Keine Browserläufe; Ben prüft Optik. Eddi-Kauf-Fix PR #71 gemergt/live, Beleg unten. Danach Neonkai v65 als eigener PR; **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Vorrangiger Bugfix — Eddi-Kauf (v60)
 
-Annahme: Eine am echten Eddi gestartete Unterhaltung bleibt am Gesprächsort gültig, während er seine unveränderten Grow-Runden fortsetzt; Kartenwechsel, Schließen oder Verlassen dieses Orts beenden den Handelszugang.
+Annahme: Eine am echten Eddi gestartete Unterhaltung bleibt am Gesprächsort gültig, während er seine unveränderten Grow-Runden fortsetzt; Kartenwechsel/Schließen löschen die Unterhaltung, außerhalb dieses Orts ist kein Handel möglich.
 
 - Ursache: Die Mengenwahl und Bestätigung prüften wiederholt Eddis inzwischen bewegte Position und schlossen das Menü ohne Meldung. Die Unterhaltung bindet sich jetzt beim Öffnen an den echten Gesprächsort; Fehler bleiben sichtbar, Kauf/Verkauf nutzen unverändert die atomare Mengenbuchung.
-- Eigener Fix-PR vor Kino v64 und Neonkai. Nur Build und gezielte Shop-/Handelstests; keine Browserläufe. Ein Build und 5/5 direkte Shop-/Handelstests grün; PR/Merge/Veröffentlichung folgen. Figuren und deren Verhalten unverändert. **Monster erst nach Freigabe**.
+- Eigener Fix-PR vor Kino v64 und Neonkai. Nur Build und gezielte Shop-/Handelstests; keine Browserläufe. Ein Build und 5/5 direkte Shop-/Handelstests grün; PR #71 gemergt (`a7f8ce973370f81bdadab35baa5b2f451fea206f`), PR CI40185942418 grün. Main CI40186027775/Pages40186027808 grün; live `index-4rP0pLyZ.js`, SHA256 `934f3f4e84482289593bdf134819d94acc9ca71e93f3197f10811ef47df3a8f8`, JS/CSS/fonts bytegleich und Stable unverändert (`veddi-buy-deploy-proof.json`). Figuren und deren Verhalten unverändert. **Monster erst nach Freigabe**.
 
 ## Vorheriger Stand
 

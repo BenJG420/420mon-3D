@@ -1,4 +1,8 @@
-> **Eddi purchase hotfix (v60), implemented before Kino:** the moving NPC invalidated quantity selection/confirmation and silently closed the menu. Keep an already opened physical conversation valid at its starting point while Eddi continues his original movement. Leaving that location/map or closing clears access; failed selection/confirmation shows a reason. Prices, bulk booking, saves and NPCs stay unchanged. One build + 5/5 affected tests passed (actual UI selection/confirmation after NPC movement, quantity booking/persistence, selling, cancellation and physical access guards). Ben checks the published UI.
+> **Kino v64 implemented, PR/merge pending:** the original blocked projection rectangle is now a low stage so it no longer hides the retained screen. Six independent felt/metal PBR caps, acoustic wall panels/trim/conduit, stage fittings, pleated curtains, screen frame and speakers, five decorated original devices with readable controls, carpet aisle, two instanced entry puddles and instanced cans/tickets. One existing exit lamp flickers; no extra point lights or detail shadows. Structures fade as groups; original layout/collisions/interactions, figures and saves remain intact. One build + 10/10 directly affected tests passed. No browser runs; Ben checks appearance. Next: Neonkai v65, own PR. **Monster erst nach Freigabe.**
+
+> Publication: Eddi fix source `a7f8ce973370f81bdadab35baa5b2f451fea206f`; PR CI40185942418/Main CI40186027775/Pages40186027808 passed. Live JS `index-4rP0pLyZ.js`, SHA256 `934f3f4e84482289593bdf134819d94acc9ca71e93f3197f10811ef47df3a8f8`; JS/CSS/fonts byte match, stable root unchanged (`veddi-buy-deploy-proof.json`).
+
+> **Published Eddi purchase hotfix (v60), [PR #71](https://github.com/BenJG420/420mon-3D/pull/71) merged before Kino:** the moving NPC invalidated quantity selection/confirmation and silently closed the menu. Keep an already opened physical conversation valid at its starting point while Eddi continues his original movement. Trading outside that location is rejected; map changes or closing clear access; failed selection/confirmation shows a reason. Prices, bulk booking, saves and NPCs stay unchanged. One build + 5/5 affected tests passed (actual UI selection/confirmation after NPC movement, quantity booking/persistence, selling, cancellation and physical access guards). Ben checks the published UI.
 
 > **Published v63 — Brighter Kabelkeller, [PR #70](https://github.com/BenJG420/420mon-3D/pull/70), source `445b720`:** substantially increased
 > existing key/fill/environment light (3 / 1.8 / 0.95), exposure 1.25, brighter light
@@ -963,11 +967,11 @@ are historical; existing repository CI may run automatically.
    symbols and remaining time inside the same collapsible top-left Cash/time/level
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
-7. **HOTFIX IMPLEMENTED, PR pending before Kino:** Eddi purchases must remain usable while he walks away during an open physical conversation; show failures instead of silently closing. Own PR. Original v60 package: **DONE — Eddi shop UI / bulk trade (v60), PR #67 merged:** inventory/normal-shop layout with categories, rows, quantity/count and description. Buying and selling use the existing slider, +/−, Max, numeric input, live total and one batch confirmation. Retain Eddi prices, title rules, physical NPC access and saves.
+7. **DONE — Eddi purchase hotfix, PR #71 merged before Kino:** Eddi purchases must remain usable while he walks away during an open physical conversation; show failures instead of silently closing. Own PR. Original v60 package: **DONE — Eddi shop UI / bulk trade (v60), PR #67 merged:** inventory/normal-shop layout with categories, rows, quantity/count and description. Buying and selling use the existing slider, +/−, Max, numeric input, live total and one batch confirmation. Retain Eddi prices, title rules, physical NPC access and saves.
 8. **DONE — Eddi smoking animation (v61), PR #68 merged/live:** visible smoking/pulsing ember/exhalation on his existing rig; other NPCs/player/behavior remain unchanged.
 9. **DONE — Grow plant appearance (v62), PR #69 merged/live:** recognizable cannabis in every stage (seedling, vegetative, bloom, ready), including growboxes. Improve anatomy/leaves/buds with bounded shared geometry; preserve timings/yields/care and saves.
 10. **DONE — Brighter Kabelkeller (v63), PR #70 merged/live:** significantly improve ambient/key/fill visibility and reduce obscuring fog; keep original map, light/shadow budget and atmosphere.
-11. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); Markt / Silk / Static DONE (PR #66 / v59); IN PROGRESS Kino (v64), then Neonkai, one PR per district:** preserve each original 2D layout,
+11. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); Markt / Silk / Static DONE (PR #66 / v59); Kino implemented (v64, PR/merge pending), NEXT Neonkai (v65), one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
@@ -979,7 +983,7 @@ are historical; existing repository CI may run automatically.
    patches, refuse/neon/runoff and Moss’ interior, keeping the native layout and
    actors. Kabelkeller v58 details all original racks, service walls, terminals and
    the blocked electrical trench, with independent PBR caps and shared occlusion.
-   Markt v59 adds independent roofs, facades, six decorated existing counters and Silk/Static interiors. After Ben’s four wishes, next is Kino, then Neonkai, Kanal,
+   Markt v59 adds independent roofs, facades, six decorated existing counters and Silk/Static interiors. Kino v64 is implemented; next is Neonkai v65, then Kanal,
    Aschegang, Abfluss, Chemiegasse, Ring, Labyrinth, Nischen and Schrotttor.
    **Ben addendum (2026-10-23):** add empty bottles/cans, cardboard boxes,
    parked bicycles/shopping carts and similar street clutter with instancing.
@@ -989,7 +993,7 @@ are historical; existing repository CI may run automatically.
    flickering lamps/lanterns across districts, including Gasse A retrofit; retain
    performance budgets and actors.** Shared atlas/wall batches and existing lamp
    selection retained; no extra point lights or shadow casters.
-   Markt / Silk / Static v59 is merged and published. Ben’s four wishes (items 7–10) are merged. Kino v64 is in progress. Player/NPC assets remain unchanged in district packages.
+   Markt / Silk / Static v59 is merged and published. Ben’s four wishes (items 7–10) are merged. Kino v64 is implemented and validated, PR/merge pending; next Neonkai v65. Player/NPC assets remain unchanged in district packages.
    Associated interiors follow with their district. Each gets its own PR; native
    device appearance/FPS stays with Ben, no blanket visual-completion claim.
 12. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up
