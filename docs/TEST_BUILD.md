@@ -1,3 +1,5 @@
+> **Kanal v66 implemented, PR/merge pending:** four independent metal PBR wall caps, damp masonry/stone paving, pipes/flanges/valves/service cabinets/moss/emissive strips in 34 short wall chunks. Fourteen original hatches gain low mechanical fittings; fourteen existing signs gain neon surrounds. Fourteen flush drainage sections and fourteen additional instanced puddles (46 total). New detail groups use local frustum bounds and distance culling, keeping source-wall occlusion. Existing thirteen lamps/two flickers and wall art remain; the same six street-prop clusters now cover the full corridor. Original map/actors/collisions/interactions/saves remain unchanged; no new point lights or detail shadows. One build + 12/12 directly affected Kanal/world/street tests passed in one local round. No browser runs; Ben checks visuals/FPS. Next: Aschegang, own PR. **Monster erst nach Freigabe.**
+
 > Publication evidence v64/v65: Kino PR CI40211330822/Main CI40211478261/Pages40211478306; Neonkai final PR CI40211639596/Main CI40211745081/Pages40211745026. Pages and live JS/CSS/fonts byte comparisons passed; stable root unchanged. Both final PR checks and main CI runs passed.
 > v64: `index-BXYyAYsO.js`, SHA256 `49ce1ad61733bad6023924d21b39266b1fa6a7eb705af14247ab493cd9d1028f` (`v64-deploy-proof.json`).
 > v65: `index-Dk3ZcoWr.js`, SHA256 `7013611d790bc0c5cfd4dda68d9b32e3d528a52c99789097c6b2ba09a937b6bd` (`v65-deploy-proof.json`).
@@ -977,7 +979,7 @@ are historical; existing repository CI may run automatically.
 8. **DONE — Eddi smoking animation (v61), PR #68 merged/live:** visible smoking/pulsing ember/exhalation on his existing rig; other NPCs/player/behavior remain unchanged.
 9. **DONE — Grow plant appearance (v62), PR #69 merged/live:** recognizable cannabis in every stage (seedling, vegetative, bloom, ready), including growboxes. Improve anatomy/leaves/buds with bounded shared geometry; preserve timings/yields/care and saves.
 10. **DONE — Brighter Kabelkeller (v63), PR #70 merged/live:** significantly improve ambient/key/fill visibility and reduce obscuring fog; keep original map, light/shadow budget and atmosphere.
-11. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); Markt / Silk / Static DONE (PR #66 / v59); Kino DONE (PR #72 / v64); Neonkai DONE (PR #73 / v65), NEXT Kanal, one PR per district:** preserve each original 2D layout,
+11. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); Markt / Silk / Static DONE (PR #66 / v59); Kino DONE (PR #72 / v64); Neonkai DONE (PR #73 / v65), Kanal v66 implemented (PR/merge pending), NEXT Aschegang, one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
@@ -989,8 +991,7 @@ are historical; existing repository CI may run automatically.
    patches, refuse/neon/runoff and Moss’ interior, keeping the native layout and
    actors. Kabelkeller v58 details all original racks, service walls, terminals and
    the blocked electrical trench, with independent PBR caps and shared occlusion.
-   Markt v59 adds independent roofs, facades, six decorated existing counters and Silk/Static interiors. Kino v64 and Neonkai v65 are merged/live; next is Kanal,
-   Aschegang, Abfluss, Chemiegasse, Ring, Labyrinth, Nischen and Schrotttor.
+   Markt v59 adds independent roofs, facades, six decorated existing counters and Silk/Static interiors. Kino v64 and Neonkai v65 are merged/live; Kanal v66 is implemented, then Aschegang, Abfluss, Chemiegasse, Ring, Labyrinth, Nischen and Schrotttor.
    **Ben addendum (2026-10-23):** add empty bottles/cans, cardboard boxes,
    parked bicycles/shopping carts and similar street clutter with instancing.
    Retrofit Gasse A too; carry the shared detail system through every district.
@@ -999,7 +1000,7 @@ are historical; existing repository CI may run automatically.
    flickering lamps/lanterns across districts, including Gasse A retrofit; retain
    performance budgets and actors.** Shared atlas/wall batches and existing lamp
    selection retained; no extra point lights or shadow casters.
-   Markt / Silk / Static v59 is merged and published. Ben’s four wishes (items 7–10) are merged. Kino v64 PR #72 and Neonkai v65 PR #73 are merged/live; next Kanal. Player/NPC assets remain unchanged in district packages.
+   Markt / Silk / Static v59 is merged and published. Ben’s four wishes (items 7–10) are merged. Kino v64 PR #72 and Neonkai v65 PR #73 are merged/live; Kanal v66 is implemented/validated; next Aschegang. Player/NPC assets remain unchanged in district packages.
    Associated interiors follow with their district. Each gets its own PR; native
    device appearance/FPS stays with Ben, no blanket visual-completion claim.
 12. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up

@@ -21,7 +21,11 @@ function distanceToRect(map: MapDef, x: number, z: number, rect: Rect) {
 export function planStreetDetails(map: MapDef): StreetPropPlacement[] {
   if (!DISTRICTS.has(map.id)) return [];
   const placements: StreetPropPlacement[] = [];
-  const bins = map.objs.filter(obj => obj.kind === "bin").slice(0, 6);
+  const availableBins = map.objs.filter(obj => obj.kind === "bin");
+  // The long Kanal needs the same six clusters spread over its full route.
+  const bins = map.id === "sewer" && availableBins.length > 6
+    ? Array.from({ length: 6 }, (_, i) => availableBins[Math.round(i * (availableBins.length - 1) / 5)])
+    : availableBins.slice(0, 6);
   for (const [index, bin] of bins.entries()) {
     const centre = mapToWorld(map, bin.x + bin.w / 2, bin.y + bin.h / 2);
     const kinds: StreetPropKind[] = ["cardboard", "bottle", "bottle", "bottle", "can", "can"];

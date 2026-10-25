@@ -18,6 +18,7 @@ import { lampFlicker } from "./lamp-flicker";
 import { appendCableRackDetails, appendCableWallDetails, appendCableLiveDetails, appendCableTerminalDetails, type CableFinish, type CableDetailEmitter } from "./cable-details";
 import { appendKaiWall, appendKaiQuay, appendKaiDevice, appendKaiWater, type KaiFinish, type KaiEmitter } from "./kai-details";
 import { createKaiLitter } from "./kai-litter";
+import { appendSewerWallDetails, appendSewerHatchDetails, appendSewerDrainDetails, type SewerFinish, type SewerDetailEmitter } from "./sewer-details";
 import { appendMarketFacadeDetails, appendMarketBoundaryDetails, appendMarketStallDetails, appendMarketInteriorDetails, type MarketFinish, type MarketDetailEmitter } from "./market-details";
 
 import { appendKinoWallDetails, appendKinoStageDetails, appendKinoScreenDetails, appendKinoDeviceDetails, type KinoFinish, type KinoDetailEmitter } from "./kino-details";
@@ -102,6 +103,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   let streetDetails: ReturnType<typeof createStreetDetails> | undefined;
   let kinoLitter: ReturnType<typeof createKinoLitter> | undefined;
   let kaiLitter: ReturnType<typeof createKaiLitter> | undefined;
+  const sewerDetailGroups: THREE.Group[] = [];
+  const sewerDetailPosition = new THREE.Vector3();
   let wallArt: ReturnType<typeof createWallArt> | undefined;
   const animatedLamps: { light: THREE.PointLight; emitter: THREE.MeshPhysicalMaterial; seed: number; intensity: number; emissive: number; pool?: THREE.MeshBasicMaterial }[] = [];
 
@@ -224,7 +227,13 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     if (hatch) {
       const disc = cylinder(g, .72, .76, .06, mat(palette.dark, "metal"), 0, .06);
       for (let i = -2; i <= 2; i++) box(g, 1.15, .025, .045, mat(palette.brass, "metal"), 0, .106, i * .17);
-      tag(g, obj.label, 2.2, 1.6); disc.userData.hatch = true; return;
+      tag(g, obj.label, 2.2, 1.6);
+      if (id === "sewer") {
+        const detail = new THREE.Group(); detail.name = "sewer-hatch-detail"; g.add(detail);
+        detail.userData.sourceObject = obj;
+        sewerParts(detail, emit => appendSewerHatchDetails(w, d, emit), false, 1);
+      }
+      disc.userData.hatch = true; return;
     }
     if (obj.id.startsWith("pad_") || obj.id.startsWith("kai_cast")) {
       box(g, w, .08, d, mat(palette.green, undefined, 0x4a735f), 0, .07);
@@ -340,7 +349,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     else if (obj.kind === "door" || obj.kind === "manhole") door(obj, g);
     else if (obj.kind === "sign") {
       tag(g, obj.label, 1.8, 1.6); box(g, .08, 1.5, .08, mat(palette.dark, "metal"));
-      if (id === "alley" || id === "yard" || id === "cable" || id === "market" || id === "kai") {
+      if (id === "alley" || id === "yard" || id === "cable" || id === "market" || id === "kai" || id === "sewer") {
         const pieces: THREE.BufferGeometry[] = [];
         const trim = (w: number, h: number, x: number, y: number) => {
           const piece = new THREE.BoxGeometry(w, h, .055); piece.translate(x, y, -.035); pieces.push(piece);
@@ -459,7 +468,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const outside = !active.indoor && (!edge || (id === "alley" && !!building?.name)) && r.w >= 56 && r.h >= 56;
       const kinoStage = id === "kino" && i === 5;
       const height = kinoStage ? .28 : id === "kai" && i === 4 ? .65 : outside ? 3.7 + seeded(i + 17) * 4.8 : edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : 2.25;
-      const m = region(r, height, mat(outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : palette.plaster, "plaster"));
+      const m = region(r, height, mat(outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : id === "sewer" ? 0x4d625d : palette.plaster, id === "sewer" ? "stone" : "plaster"));
       const firstPart = occluders.length;
       m.name = `original-wall:${i}`; occluder(m);
       // Dark plinth and narrow cap keep the rooms readable as a cutaway diorama.
@@ -467,10 +476,10 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const yardShed = id === "yard" && !edge;
       const marketFacade = id === "market" && !edge;
       const roofKind = id === "alley" && outside ? alleyRoofKind(building?.variant ?? i)
-        : id === "kai" ? "roof-metal" : yardShed || marketFacade ? alleyRoofKind(i) : id === "kino" ? kinoStage ? "roof-felt" : "roof-metal" : undefined;
+        : id === "kai" || id === "sewer" ? "roof-metal" : yardShed || marketFacade ? alleyRoofKind(i) : id === "kino" ? kinoStage ? "roof-felt" : "roof-metal" : undefined;
       const roofTint = roofKind === "roof-tile" ? 0x896f5b : roofKind === "roof-metal" ? 0x718087 : roofKind === "roof-felt" ? 0x454d4c : outside ? 0x626c6b : 0x7d8681;
       const roof = occluder(region(r, .1, mat(roofTint, roofKind ?? "stone"), height + .02));
-      if (roofKind) { roof.name = id === "kai" ? "kai-cap" : `${id}-roof`; roof.userData.roofKind = roofKind; }
+      if (roofKind) { roof.name = id === "kai" || id === "sewer" ? `${id}-cap` : `${id}-roof`; roof.userData.roofKind = roofKind; }
       if (id === "kino") {
         roof.name = "kino-cap";
         const side = edge && r.w < r.h;
@@ -516,6 +525,19 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
           : appendKaiWall((side ? r.h : r.w) * WORLD_SCALE, (side ? r.w : r.h) * WORLD_SCALE, height, i === 0, emit));
         if (edge) group.rotation.y = side ? (r.x === 0 ? Math.PI / 2 : -Math.PI / 2) : r.y === 0 ? 0 : Math.PI;
       }
+      if (id === "sewer") {
+        const side = r.w < r.h, length = (side ? r.h : r.w) * WORLD_SCALE;
+        const depth = (side ? r.w : r.h) * WORLD_SCALE, count = Math.ceil(length / 24), span = length / count;
+        const angle = side ? (r.x === 0 ? Math.PI / 2 : -Math.PI / 2) : r.y === 0 ? 0 : Math.PI;
+        const centre = at(r.x + r.w / 2, r.y + r.h / 2);
+        for (let chunk = 0; chunk < count; chunk++) {
+          const group = new THREE.Group(); group.name = "sewer-wall-detail"; root.add(group);
+          const offset = -length / 2 + (chunk + .5) * span;
+          group.position.copy(centre).add(new THREE.Vector3(Math.cos(angle) * offset, 0, -Math.sin(angle) * offset));
+          group.rotation.y = angle; group.userData.sourceRect = r; group.userData.chunk = chunk;
+          sewerParts(group, emit => appendSewerWallDetails(span, depth, height, i * 17 + chunk, emit), true, Math.hypot(span, depth) / 2 + 1);
+        }
+      }
       if (outside && r.w > 100 && r.h > 80) {
         buildingDetails(r, height, i, building?.name, building?.side, building ? (building.x + building.w / 2 - r.x - r.w / 2) * WORLD_SCALE : 0);
       }
@@ -555,6 +577,35 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       }
     }
     return group;
+  }
+
+  function sewerParts(group: THREE.Group, append: (emit: SewerDetailEmitter) => void, fading: boolean, radius: number) {
+    group.userData.districtDetail = "sewer"; group.userData.detailRadius = radius;
+    sewerDetailGroups.push(group);
+    const finishes: Record<SewerFinish, THREE.Material> = {
+      stone: mat(0x67746a, "stone"), metal: mat(0x7b8980, "metal"), rust: mat(0x82624c, "metal"),
+      dark: mat(0x263b36), moss: mat(0x49674b, "plaster"),
+      cyan: mat(0x3f7065, undefined, 0x579d89), amber: mat(0x7e704b, undefined, 0xb69a61),
+    };
+    const batches = new Map<SewerFinish, THREE.BufferGeometry[]>(), features = new Set<string>();
+    append((finish, geometry, feature) => {
+      const pieces = batches.get(finish) ?? []; pieces.push(geometry); batches.set(finish, pieces); features.add(feature);
+    });
+    group.userData.sewerFeatures = [...features];
+    for (const [finish, pieces] of batches) {
+      const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+      if (!geometry) continue;
+      const part = mesh(geometry, finishes[finish], group, 0, 0, 0, false);
+      part.name = `${group.name}:${finish}`;
+      if (fading) { occluder(part); part.userData.occlusionGroup = group.uuid; }
+    }
+  }
+  function updateSewerDetails() {
+    for (const group of sewerDetailGroups) {
+      group.getWorldPosition(sewerDetailPosition);
+      group.visible = Math.hypot(sewerDetailPosition.x - player.position.x, sewerDetailPosition.z - player.position.z)
+        <= 48 + group.userData.detailRadius;
+    }
   }
 
   function kaiParts(group: THREE.Group, append: (emit: KaiEmitter) => void, fading = true) {
@@ -769,7 +820,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const w = active.w * WORLD_SCALE, d = active.h * WORLD_SCALE;
     box(root, w + .25, .45, d + .25, mat(palette.dark, "stone"), 0, -.27);
     const indoor = getDistrictGraphics(id).wetness < .15;
-    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "cable" ? 0x43575a : id === "market" ? 0x586567 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" || id === "market" || id === "kai" ? "stone" : "asphalt"), root, 0, .002, 0);
+    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "cable" ? 0x43575a : id === "market" ? 0x586567 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" || id === "market" || id === "kai" || id === "sewer" ? "stone" : "asphalt"), root, 0, .002, 0);
     floor.rotation.x = -Math.PI / 2;
     const sketch = mapSketch(id);
     if (!active.indoor) for (const r of sketch.walk) {
@@ -805,6 +856,17 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       for (const [x, y] of [[28, 142], [52, 150]]) {
         const p = at(x, y); p.y = .059;
         decorations.push({ kind: "puddle", position: p, size: 1.15, angle: .3, stretch: .4 });
+      }
+    }
+    if (id === "sewer") {
+      floor.name = "sewer-service-floor";
+      const hatches = active.objs.filter(obj => obj.kind === "manhole");
+      for (const [index, hatch] of hatches.entries()) {
+        const p = at(hatch.x + hatch.w + 13, hatch.y + hatch.h + 18); p.y = .059;
+        decorations.push({ kind: "puddle", position: p, size: 1.7, angle: .3, stretch: .4 });
+        const drain = new THREE.Group(); drain.name = "sewer-drain-detail";
+        drain.position.copy(at(hatch.x + hatch.w / 2, 302)); root.add(drain);
+        sewerParts(drain, emit => appendSewerDrainDetails(5.4, .9, index, emit), false, 3);
       }
     }
     if (id === "alley") decorations.push(...alleyRunoffPuddles(active, at));
@@ -957,7 +1019,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     streetDetails?.dispose(); streetDetails = undefined;
     kinoLitter?.dispose(); kinoLitter = undefined;
     kaiLitter?.dispose(); kaiLitter = undefined;
-    animatedLamps.length = 0;
+    animatedLamps.length = 0; sewerDetailGroups.length = 0;
     disposeOwnedObjects(root);
     root.clear(); mapObjects.clear(); roamingNpc = undefined; storyNpcs.clear(); occluders = []; lampLights.length = 0; lastLightSelection = -Infinity; glowing.length = 0;
   }
@@ -1060,7 +1122,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       })();
     const spawn = safeSpawn(active, desired.x, desired.y, .48, progress.deadWild, progress.starterId);
     player.position.copy(at(spawn.x, spawn.y)); player.rotation.y = 0;
-    streetDetails.update(player.position);
+    streetDetails.update(player.position); updateSewerDetails();
     lastPosition = { x: NaN, y: NaN }; saveLocation();
     localStorage.setItem("420mon-current-map", id); localStorage.setItem("420mon-district", id);
     nearby = undefined; interactionMessage = undefined; prompt.hidden = true;
@@ -1145,7 +1207,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     root.userData.riggedNpcs = [...mapObjects.values()].filter(group => group.userData.npcModel === "rocketbox-rigged").length;
     if (time - lastLightSelection > 350) {
       lastLightSelection = time;
-      streetDetails?.update(player.position);
+      streetDetails?.update(player.position); updateSewerDetails();
       const closest = lampLights.map(light => ({ light, distance: light.getWorldPosition(lightPosition).distanceToSquared(player.position) }));
       closest.sort((a, b) => a.distance - b.distance);
       const count = active.indoor ? 5 : 4;

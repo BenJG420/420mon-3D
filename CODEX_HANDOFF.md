@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — Kanal v66
+
+Annahme v66: Der lange Originalkanal erhält Mauerabdeckungen und flache Entwässerungsdetails am freien Rand; kein neuer Wassergraben, keine Decke oder Änderung an Wegen, Ausstiegen und Kollisionen.
+
+- Branch `feat/kanal-details-v66`: vier eigene Metall-PBR-Kappen, feuchter Steinboden/Mauerwerk, Rohrflansche/Ventile/Halter/Kästen/Moos/Leuchtstreifen in 34 kurzen Wandgruppen. 14 Original-Luken mit Beschlägen, 14 vorhandene Wegweiser mit Neonrahmen, 14 flache Rinnen und 14 Zusatzpfützen (46 insgesamt). Neue Detailgruppen lokal/frustum- und entfernungsbegrenzt; gemeinsame Originalwand-Verdeckung.
+- Bestehende 13 Lampen (zwei flackernd), Graffiti und instanziertes Straßeninventar erhalten; dessen sechs Kanal-Cluster decken jetzt die ganze Länge ab. Keine zusätzlichen Punktlichter/Detailschatten, Figuren/Spielregeln/Saves unverändert. Ein Build + 12/12 direkt betroffene Kanal-/Weltgeometrie-/Street-Tests in einer lokalen Runde grün, keine Browserläufe. Eigener PR/Merge folgt; nächster Bezirk Aschegang. **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — Eddi-Kauf, Kino und Neonkai gemergt/live
 
 - Eddi-Kauf-Fix PR #71 veröffentlicht: Unterhaltung bleibt trotz Eddis Bewegung am Gesprächsort nutzbar; echte Mengenwahl/Buchung und Zugangsgrenzen getestet. Ein Build + 5 direkte Tests.

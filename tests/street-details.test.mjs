@@ -49,6 +49,11 @@ test("district street props are deterministic, stay near existing bins and prese
       }), `${id}: scenery stays at original street-service anchors`);
       if (map.indoor) assert.ok(item.kind !== "bicycle" && item.kind !== "cart", "indoor rooms do not receive parked outdoor vehicles");
     }
+    if (id === "sewer") {
+      assert.ok(placements.some(item => item.x < -map.w * WORLD_SCALE * .4));
+      assert.ok(placements.some(item => item.x > map.w * WORLD_SCALE * .4), "Kanal props extend to its eastern exits within the same six-cluster budget");
+      assert.ok(placements.length <= 39);
+    }
     if (id === "alley" || id === "yard") assert.deepEqual([...new Set(placements.map(item => item.kind))].sort(), [...kinds].sort(), `${id}: retrofitted streets include each requested prop type`);
   }
 });
