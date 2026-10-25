@@ -1,3 +1,12 @@
+# Aktueller Wiedereinstieg — Kanal v66 veröffentlicht; Aschegang als Nächstes
+
+- PR #74 gemergt/live: eigene Metall-PBR-Abdeckungen, feuchtes Mauerwerk/Rohre/Ventile/Kästen, 14 Lukendetails/Neon-Wegweiser, flache Rinnen und 14 Zusatzpfützen. 34 lokale Wandgruppen mit Frustum-/Entfernungsausblendung; sechs instanzierte Street-Cluster über den ganzen Kanal. Figuren, Originalwege/Kollisionen/Interaktionen/Saves erhalten.
+- Ein Build + 12/12 direkte Tests in einer lokalen Runde grün; keine Browserläufe. Ben prüft Optik/FPS im Testbuild.
+- Source `fcb82df69c8ca42e111e73887fc289519a7b45a7`; PR CI40240562565/Main CI40240669084/Pages40240669085 grün. Live JS `index-DzmyxMmc.js`, SHA256 `de732d97e80faa8cd553cbd847d42d015bcbabee7e8c579e4acf178ac630ed01`; JS/CSS/fonts bytegleich, Stable unverändert (`v66-deploy-proof.json`).
+- **NÄCHSTER eigener Bezirks-PR: Aschegang (`ash`)**, danach Abfluss laut TEST_BUILD.md. Nur Build + direkt betroffene Tests. **Monster erst nach Freigabe**; Ko-fi/Zahlungsserver bleiben übersprungen.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — Kanal v66
 
 Annahme v66: Der lange Originalkanal erhält Mauerabdeckungen und flache Entwässerungsdetails am freien Rand; kein neuer Wassergraben, keine Decke oder Änderung an Wegen, Ausstiegen und Kollisionen.
