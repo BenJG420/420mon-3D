@@ -26,7 +26,8 @@ export function createStoryEconomy(world: DistrictTravel) {
   let trade: { offer: TradeOffer; label: string; action: "Kaufen" | "Verkaufen"; quantity: string } | null = null;
   const openCategories = new Set<string>(CAT_ORDER);
   let eddiLine = "";
-  const close = () => { overlay.hidden = true; mode = ""; trade = null; lastFocus?.focus(); };
+  let eddiConversation: MapObj | null = null;
+  const close = () => { overlay.hidden = true; mode = ""; trade = null; eddiConversation = null; lastFocus?.focus(); };
   function open(next: string) {
     advanceStoryGrow(s);
     if (overlay.hidden) lastFocus = document.activeElement as HTMLElement;
@@ -109,7 +110,9 @@ export function createStoryEconomy(world: DistrictTravel) {
       (previous ?? card.querySelector<HTMLElement>("button"))?.focus();
     }
   }
-  function eddiNearby() { return !!s.eddiIn && nearby(eddiBody(s), "capsule"); }
+  // Eddi continues his original Grow rounds during dialogue. Keep the physical
+  // conversation valid at its starting point instead of chasing his moving body.
+  function eddiNearby() { return !!s.eddiIn && !!eddiConversation && nearby(eddiConversation, "capsule"); }
   function renderEddi() {
     const body = document.createElement("div"); body.className = "eddi-shop-content"; card.append(body);
     paragraph(eddiLine, body);
@@ -129,9 +132,8 @@ export function createStoryEconomy(world: DistrictTravel) {
         quote: quantity => eddiNearby() ? quoteTrade(s, draft.offer, quantity)
           : { ok: false, max: 0, unitPrice: 0, total: 0, reason: "Sprich Eddi in deiner Nähe erneut an." },
         confirm: (quantity, unitPrice) => {
-          // Eddi keeps moving while this menu is open: check his current position.
           advanceStoryGrow(s);
-          if (!eddiNearby()) { close(); return { ok: false, message: "Sprich Eddi in deiner Nähe erneut an." }; }
+          if (!eddiNearby()) return { ok: false, message: "Sprich Eddi in deiner Nähe erneut an." };
           const result = executeTrade(s, draft.offer, quantity, unitPrice, () => saveProgress(s));
           if (result.ok) { trade = null; note = result.message; render(); }
           return result;
@@ -174,7 +176,7 @@ export function createStoryEconomy(world: DistrictTravel) {
           li.append(info, owned);
           const action = selling ? "Verkaufen" : "Kaufen";
           const choose = button(action, () => {
-            if (!eddiNearby()) { close(); return; }
+            if (!eddiNearby()) { note = "Sprich Eddi in deiner Nähe erneut an."; render(); return; }
             trade = { offer, label: def.name, action, quantity: "1" }; render();
             card.querySelector<HTMLInputElement>("[data-trade-quantity]")?.focus();
           }, li, !quote.ok);
@@ -203,7 +205,12 @@ export function createStoryEconomy(world: DistrictTravel) {
     openFelix(obj: MapObj) { if (!nearby(obj, obj.id === "felix" ? "alley" : "capsule")) return; view = meetFelix(s) ? "first" : "offer"; saveProgress(); open("felix"); },
     openCrate(obj: MapObj) { if (nearby(obj, "capsule")) { view = "put"; open("crate"); } },
     openCage(obj: MapObj) { if (nearby(obj, "capsule")) open("cage"); },
-    openEddi(obj: MapObj) { if (s.eddiIn && nearby(obj, "capsule")) { view = "buy"; open("eddi"); } },
+    openEddi(obj: MapObj) {
+      const body = eddiBody(s);
+      if (s.eddiIn && obj.id === body.id && nearby(body, "capsule")) {
+        view = "buy"; eddiConversation = body; open("eddi");
+      }
+    },
     close,
     update() {
       const worker = ensureFelixState(s), bodies: MapObj[] = [];
