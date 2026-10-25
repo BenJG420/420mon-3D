@@ -47,13 +47,13 @@ Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds
    actual observations in TEST_BUILD.md; desktop/touch clarity and less overlap.
 5. DONE — PR #59 / v52 Performance/FPS: decoration instancing, shadow budget and optional device A/B capture (actual FPS measurement by Ben pending); instancing, LOD, culling, textures,
    shaders and a shadow budget as appropriate.
-6. DONE — Buff HUD mini-fix, PR #60 / v53 (Ben 2026-10-23): symbols and remaining time in the same collapsible Cash/time/level HUD. NEXT: detail districts one by one, Gasse A v54 DONE (PR #61), Grow-Hinterhöfe/Moss v55 DONE (PR #62), Kabelkeller v58 DONE (PR #65), Markt/Silk/Static v59 DONE (PR #66), Kino v64 implemented (merge pending), NEXT Neonkai after the four requests below; one PR each: preserve 2D structure, independent
+6. DONE — Buff HUD mini-fix, PR #60 / v53 (Ben 2026-10-23): symbols and remaining time in the same collapsible Cash/time/level HUD. NEXT: detail districts one by one, Gasse A v54 DONE (PR #61), Grow-Hinterhöfe/Moss v55 DONE (PR #62), Kabelkeller v58 DONE (PR #65), Markt/Silk/Static v59 DONE (PR #66), Kino v64 PR #72; Neonkai v65 implemented (merge pending), NEXT Kanal; one PR each: preserve 2D structure, independent
    roof materials (tile/metal/felt), edges/gutters, facades/windows/doors/signs,
    neon/trash/cables/puddles/props/vegetation/PBR, lighting/fog/post-processing.
    Shared street props v56 (PR #63) and wall art/flickering existing lamps v57
    (PR #64) are merged/published across districts, including Gasse A.
    Do not change player/NPC assets or behavior in district packages.
-7. Ben 2026-10-24, BEFORE further districts, own PR each: DONE Eddi inventory-style bulk shop PR #67 / v60 and smoking animation PR #68 / v61; DONE botanical cannabis growth v62 PR #69; DONE brighter Kabelkeller v63 PR #70. Kino v64 implemented/validated, merge pending; NEXT Neonkai v65. Eddi purchase hotfix PR #71 is merged/live. Only build + directly affected tests.
+7. Ben 2026-10-24, BEFORE further districts, own PR each: DONE Eddi inventory-style bulk shop PR #67 / v60 and smoking animation PR #68 / v61; DONE botanical cannabis growth v62 PR #69; DONE brighter Kabelkeller v63 PR #70. Kino v64 PR #72 and Neonkai v65 implemented/validated; merge/publication tracked in TEST_BUILD. NEXT Kanal. Eddi purchase hotfix PR #71 is merged/live. Only build + directly affected tests.
 8. Monster erst nach Freigabe: only resume sculpts at #97 after Ben explicitly
    approves. First finish fixes and all district graphics/details. Retain the 96 existing models
    and shared PBR/cache. Do not claim 324 reconstructions are authored HD anatomy.
