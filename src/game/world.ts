@@ -16,6 +16,8 @@ import { createStreetDetails, isDetailedDistrict } from "./street-details";
 import { createWallArt } from "./wall-art";
 import { lampFlicker } from "./lamp-flicker";
 import { appendCableRackDetails, appendCableWallDetails, appendCableLiveDetails, appendCableTerminalDetails, type CableFinish, type CableDetailEmitter } from "./cable-details";
+import { appendKaiWall, appendKaiQuay, appendKaiDevice, appendKaiWater, type KaiFinish, type KaiEmitter } from "./kai-details";
+import { createKaiLitter } from "./kai-litter";
 import { appendMarketFacadeDetails, appendMarketBoundaryDetails, appendMarketStallDetails, appendMarketInteriorDetails, type MarketFinish, type MarketDetailEmitter } from "./market-details";
 
 import { appendKinoWallDetails, appendKinoStageDetails, appendKinoScreenDetails, appendKinoDeviceDetails, type KinoFinish, type KinoDetailEmitter } from "./kino-details";
@@ -99,6 +101,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   let staticBatches: ReturnType<typeof createStaticBatches> | undefined;
   let streetDetails: ReturnType<typeof createStreetDetails> | undefined;
   let kinoLitter: ReturnType<typeof createKinoLitter> | undefined;
+  let kaiLitter: ReturnType<typeof createKaiLitter> | undefined;
   let wallArt: ReturnType<typeof createWallArt> | undefined;
   const animatedLamps: { light: THREE.PointLight; emitter: THREE.MeshPhysicalMaterial; seed: number; intensity: number; emissive: number; pool?: THREE.MeshBasicMaterial }[] = [];
 
@@ -312,6 +315,11 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         label.userData.occlusionGroup = detail.uuid; occluders.push(label);
       }
     }
+    if (id === "kai" && (obj.id.startsWith("kai_cast") || obj.id === "slot_kai")) {
+      const detail = new THREE.Group(); detail.name = "kai-device-detail"; g.add(detail);
+      detail.userData.sourceObject = obj;
+      kaiParts(detail, emit => appendKaiDevice(w, d, obj.id.startsWith("kai_cast"), emit), false);
+    }
     if (obj.kind === "starter" || obj.id === "term" || obj.id.includes("slot_")) tag(g, obj.label, Math.max(1.4, Math.min(w, 2.5)), 1.75);
   }
   function terminalSpeaker(g: THREE.Object3D, x: number, z: number) {
@@ -332,7 +340,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     else if (obj.kind === "door" || obj.kind === "manhole") door(obj, g);
     else if (obj.kind === "sign") {
       tag(g, obj.label, 1.8, 1.6); box(g, .08, 1.5, .08, mat(palette.dark, "metal"));
-      if (id === "alley" || id === "yard" || id === "cable" || id === "market") {
+      if (id === "alley" || id === "yard" || id === "cable" || id === "market" || id === "kai") {
         const pieces: THREE.BufferGeometry[] = [];
         const trim = (w: number, h: number, x: number, y: number) => {
           const piece = new THREE.BoxGeometry(w, h, .055); piece.translate(x, y, -.035); pieces.push(piece);
@@ -450,7 +458,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       // not the thin boundary wall. Their footprint/collision still stays identical.
       const outside = !active.indoor && (!edge || (id === "alley" && !!building?.name)) && r.w >= 56 && r.h >= 56;
       const kinoStage = id === "kino" && i === 5;
-      const height = kinoStage ? .28 : outside ? 3.7 + seeded(i + 17) * 4.8 : edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : 2.25;
+      const height = kinoStage ? .28 : id === "kai" && i === 4 ? .65 : outside ? 3.7 + seeded(i + 17) * 4.8 : edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : 2.25;
       const m = region(r, height, mat(outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : palette.plaster, "plaster"));
       const firstPart = occluders.length;
       m.name = `original-wall:${i}`; occluder(m);
@@ -459,10 +467,10 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const yardShed = id === "yard" && !edge;
       const marketFacade = id === "market" && !edge;
       const roofKind = id === "alley" && outside ? alleyRoofKind(building?.variant ?? i)
-        : yardShed || marketFacade ? alleyRoofKind(i) : id === "kino" ? kinoStage ? "roof-felt" : "roof-metal" : undefined;
+        : id === "kai" ? "roof-metal" : yardShed || marketFacade ? alleyRoofKind(i) : id === "kino" ? kinoStage ? "roof-felt" : "roof-metal" : undefined;
       const roofTint = roofKind === "roof-tile" ? 0x896f5b : roofKind === "roof-metal" ? 0x718087 : roofKind === "roof-felt" ? 0x454d4c : outside ? 0x626c6b : 0x7d8681;
       const roof = occluder(region(r, .1, mat(roofTint, roofKind ?? "stone"), height + .02));
-      if (roofKind) { roof.name = `${id}-roof`; roof.userData.roofKind = roofKind; }
+      if (roofKind) { roof.name = id === "kai" ? "kai-cap" : `${id}-roof`; roof.userData.roofKind = roofKind; }
       if (id === "kino") {
         roof.name = "kino-cap";
         const side = edge && r.w < r.h;
@@ -498,6 +506,14 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
             else appendMarketBoundaryDetails((side ? r.h : r.w) * WORLD_SCALE, (side ? r.w : r.h) * WORLD_SCALE, height, emit);
           });
         group.userData.sourceRect = r;
+        if (edge) group.rotation.y = side ? (r.x === 0 ? Math.PI / 2 : -Math.PI / 2) : r.y === 0 ? 0 : Math.PI;
+      }
+      if (id === "kai") {
+        const quay = i === 4, side = edge && r.w < r.h;
+        const group = new THREE.Group(); group.name = quay ? "kai-quay-detail" : "kai-wall-detail";
+        group.userData.sourceRect = r; group.position.copy(at(r.x + r.w / 2, r.y + r.h / 2)); root.add(group);
+        kaiParts(group, emit => quay ? appendKaiQuay(r.w * WORLD_SCALE, r.h * WORLD_SCALE, height, emit)
+          : appendKaiWall((side ? r.h : r.w) * WORLD_SCALE, (side ? r.w : r.h) * WORLD_SCALE, height, i === 0, emit));
         if (edge) group.rotation.y = side ? (r.x === 0 ? Math.PI / 2 : -Math.PI / 2) : r.y === 0 ? 0 : Math.PI;
       }
       if (outside && r.w > 100 && r.h > 80) {
@@ -541,6 +557,26 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     return group;
   }
 
+  function kaiParts(group: THREE.Group, append: (emit: KaiEmitter) => void, fading = true) {
+    group.userData.districtDetail = "kai";
+    const finishes: Record<KaiFinish, THREE.Material> = {
+      frame: mat(0x26353c, "metal"), metal: mat(0x738586, "metal"), stone: mat(0x586967, "stone"),
+      wood: mat(0x6e6450, "wood"), rust: mat(0x826052, "metal"),
+      cyan: mat(0x346674, undefined, 0x4eabb8), warm: mat(0x876853, undefined, 0xc28d61),
+    };
+    const batches = new Map<KaiFinish, THREE.BufferGeometry[]>(), features = new Set<string>();
+    append((finish, geometry, feature) => {
+      const pieces = batches.get(finish) ?? []; pieces.push(geometry); batches.set(finish, pieces); features.add(feature);
+    });
+    group.userData.kaiFeatures = [...features];
+    for (const [finish, pieces] of batches) {
+      const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+      if (!geometry) continue;
+      const part = mesh(geometry, finishes[finish], group, 0, 0, 0, false);
+      part.name = `${group.name}:${finish}`;
+      if (fading) { occluder(part); part.userData.occlusionGroup = group.uuid; }
+    }
+  }
   /** Market fixtures share cached PBR materials and the source structure's fade. */
   function marketDetailGroup(name: string, position: THREE.Vector3, append: (emit: MarketDetailEmitter) => void) {
     const group = new THREE.Group(); group.name = name; group.position.copy(position);
@@ -733,7 +769,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const w = active.w * WORLD_SCALE, d = active.h * WORLD_SCALE;
     box(root, w + .25, .45, d + .25, mat(palette.dark, "stone"), 0, -.27);
     const indoor = getDistrictGraphics(id).wetness < .15;
-    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "cable" ? 0x43575a : id === "market" ? 0x586567 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" || id === "market" ? "stone" : "asphalt"), root, 0, .002, 0);
+    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "cable" ? 0x43575a : id === "market" ? 0x586567 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" || id === "market" || id === "kai" ? "stone" : "asphalt"), root, 0, .002, 0);
     floor.rotation.x = -Math.PI / 2;
     const sketch = mapSketch(id);
     if (!active.indoor) for (const r of sketch.walk) {
@@ -741,9 +777,10 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       m.name = "original-walkway";
     }
     for (const { r, fill } of sketch.extras) {
-      const water = id === "drain" || id === "kai";
+      const water = id === "drain" || (id === "kai" && r.y === 220);
       const color = new THREE.Color(fill);
       const m = region(r, .025, mat(color.lerp(new THREE.Color(water ? 0x1c3945 : 0x3c5146), .7), water ? "metal" : "stone"), .025);
+      if (id === "kai") m.name = water ? "kai-water" : "kai-transfer-pad";
       if (water) { const material = m.material as THREE.MeshPhysicalMaterial; material.roughness = .15; material.clearcoat = .9; }
       if (id === "alley" || id === "yard") {
         const amount = Math.min(55, Math.round(r.w * r.h / 1000));
@@ -771,6 +808,13 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       }
     }
     if (id === "alley") decorations.push(...alleyRunoffPuddles(active, at));
+    if (id === "kai") {
+      floor.name = "kai-rain-paving";
+      for (const [x, y] of [[130, 52], [460, 52], [700, 64], [861, 133], [100, 160]]) {
+        const p = at(x, y); p.y = .059;
+        decorations.push({ kind: "puddle", position: p, size: 1.5, angle: .25, stretch: .45 });
+      }
+    }
     if (id === "market") {
       floor.name = "market-rain-paving";
       // Runoff stays on the existing paving, below roof outlets and beside awnings.
@@ -839,6 +883,13 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         group.userData.sourceObject = obj;
       }
     }
+    if (id === "kai") {
+      const water = new THREE.Group(); water.name = "kai-water-detail";
+      water.position.copy(at(480, 292)); root.add(water);
+      kaiParts(water, emit => appendKaiWater(928 * WORLD_SCALE, 144 * WORLD_SCALE, emit), false);
+      kaiLitter = createKaiLitter(root, at, { glass: mat(0x426c60, "metal"), metal: mat(0x788080, "metal"),
+        rubber: mat(0x283236), cardboard: mat(0x8a7657, "wood") });
+    }
     if (id === "kino") {
       const screen = kinoDetailGroup("kino-screen-detail", at(360, 58), appendKinoScreenDetails);
       const backing = occluder(mesh(new THREE.BoxGeometry(33, 3.9, .3), mat(0x182a27), screen, 0, 2.1, 0, false));
@@ -905,6 +956,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     staticBatches?.dispose(); staticBatches = undefined;
     streetDetails?.dispose(); streetDetails = undefined;
     kinoLitter?.dispose(); kinoLitter = undefined;
+    kaiLitter?.dispose(); kaiLitter = undefined;
     animatedLamps.length = 0;
     disposeOwnedObjects(root);
     root.clear(); mapObjects.clear(); roamingNpc = undefined; storyNpcs.clear(); occluders = []; lampLights.length = 0; lastLightSelection = -Infinity; glowing.length = 0;
