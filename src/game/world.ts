@@ -18,6 +18,9 @@ import { lampFlicker } from "./lamp-flicker";
 import { appendCableRackDetails, appendCableWallDetails, appendCableLiveDetails, appendCableTerminalDetails, type CableFinish, type CableDetailEmitter } from "./cable-details";
 import { appendMarketFacadeDetails, appendMarketBoundaryDetails, appendMarketStallDetails, appendMarketInteriorDetails, type MarketFinish, type MarketDetailEmitter } from "./market-details";
 
+import { appendKinoWallDetails, appendKinoStageDetails, appendKinoScreenDetails, appendKinoDeviceDetails, type KinoFinish, type KinoDetailEmitter } from "./kino-details";
+import { createKinoLitter } from "./kino-litter";
+
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
   id: string; name: string; map: MapDef; w: number; h: number; scale: number;
@@ -95,6 +98,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   let performanceMode = true;
   let staticBatches: ReturnType<typeof createStaticBatches> | undefined;
   let streetDetails: ReturnType<typeof createStreetDetails> | undefined;
+  let kinoLitter: ReturnType<typeof createKinoLitter> | undefined;
   let wallArt: ReturnType<typeof createWallArt> | undefined;
   const animatedLamps: { light: THREE.PointLight; emitter: THREE.MeshPhysicalMaterial; seed: number; intensity: number; emissive: number; pool?: THREE.MeshBasicMaterial }[] = [];
 
@@ -243,7 +247,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       if (geometry) { const hardware = mesh(geometry, mat(0x87795a, "metal"), frame, 0, 0, 0, false); hardware.name = `${id}-door-hardware`; }
     }
     tag(frame, obj.label, Math.max(1.65, length), 3.1);
-    lamp(frame, 0, 2.82, .3, 0xffce84, 8);
+    lamp(frame, 0, 2.82, .3, 0xffce84, 8, id === "kino" ? 640 : undefined);
   }
   function terminal(g: THREE.Group, width = 1.15) {
     box(g, width, .73, .82, mat(palette.dark, "metal"));
@@ -299,6 +303,14 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       box(g, w + .03, .065, d + .03, mat(palette.brass, "metal"), 0, .6);
       for (const x of [-1, 1]) box(g, .09, .59, d + .04, mat(0x2e362d, "metal"), x * w * .32, .3);
       box(g, .16, .19, .045, mat(0xae9b65, "metal"), 0, .49, d / 2 + .03);
+    }
+    if (id === "kino" && (obj.id.startsWith("kino_") || obj.id === "slot_kino")) {
+      const detail = kinoDetailGroup("kino-device-detail", new THREE.Vector3(),
+        emit => appendKinoDeviceDetails(w, d, obj.id === "slot_kino", emit), g);
+      if (obj.id !== "slot_kino") {
+        const label = tag(detail, obj.label, Math.min(w * .84, 1.9), 1.48, "#e0c6a1", .18);
+        label.userData.occlusionGroup = detail.uuid; occluders.push(label);
+      }
     }
     if (obj.kind === "starter" || obj.id === "term" || obj.id.includes("slot_")) tag(g, obj.label, Math.max(1.4, Math.min(w, 2.5)), 1.75);
   }
@@ -437,7 +449,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       // Raze/Cherry's original building masses touch the map edge but are houses,
       // not the thin boundary wall. Their footprint/collision still stays identical.
       const outside = !active.indoor && (!edge || (id === "alley" && !!building?.name)) && r.w >= 56 && r.h >= 56;
-      const height = outside ? 3.7 + seeded(i + 17) * 4.8 : edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : 2.25;
+      const kinoStage = id === "kino" && i === 5;
+      const height = kinoStage ? .28 : outside ? 3.7 + seeded(i + 17) * 4.8 : edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : 2.25;
       const m = region(r, height, mat(outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : palette.plaster, "plaster"));
       const firstPart = occluders.length;
       m.name = `original-wall:${i}`; occluder(m);
@@ -446,10 +459,21 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const yardShed = id === "yard" && !edge;
       const marketFacade = id === "market" && !edge;
       const roofKind = id === "alley" && outside ? alleyRoofKind(building?.variant ?? i)
-        : yardShed || marketFacade ? alleyRoofKind(i) : undefined;
+        : yardShed || marketFacade ? alleyRoofKind(i) : id === "kino" ? kinoStage ? "roof-felt" : "roof-metal" : undefined;
       const roofTint = roofKind === "roof-tile" ? 0x896f5b : roofKind === "roof-metal" ? 0x718087 : roofKind === "roof-felt" ? 0x454d4c : outside ? 0x626c6b : 0x7d8681;
       const roof = occluder(region(r, .1, mat(roofTint, roofKind ?? "stone"), height + .02));
       if (roofKind) { roof.name = `${id}-roof`; roof.userData.roofKind = roofKind; }
+      if (id === "kino") {
+        roof.name = "kino-cap";
+        const side = edge && r.w < r.h;
+        const group = kinoDetailGroup(kinoStage ? "kino-stage-detail" : "kino-wall-detail",
+          at(r.x + r.w / 2, r.y + r.h / 2), emit => {
+            if (kinoStage) appendKinoStageDetails(r.w * WORLD_SCALE, r.h * WORLD_SCALE, height, emit);
+            else appendKinoWallDetails((side ? r.h : r.w) * WORLD_SCALE, (side ? r.w : r.h) * WORLD_SCALE, height, emit);
+          });
+        group.userData.sourceRect = r;
+        if (edge) group.rotation.y = side ? (r.x === 0 ? Math.PI / 2 : -Math.PI / 2) : r.y === 0 ? 0 : Math.PI;
+      }
       if (id === "yard") {
         const centre = at(r.x + r.w / 2, r.y + r.h / 2);
         const side = edge && r.w < r.h;
@@ -493,6 +517,30 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       for (const part of occluders.slice(firstPart)) part.userData.occlusionGroup = m.uuid;
     }
   }
+  /** A cinema fixture costs one draw per finish and shares a single fade group. */
+  function kinoDetailGroup(name: string, position: THREE.Vector3, append: (emit: KinoDetailEmitter) => void, parent: THREE.Object3D = root) {
+    const group = new THREE.Group(); group.name = name; group.position.copy(position); parent.add(group);
+    group.userData.districtDetail = "kino";
+    const finishes: Record<KinoFinish, THREE.Material> = {
+      frame: mat(0x293236, "metal"), metal: mat(0x91877b, "metal"), fabric: mat(0x683d43, "plaster"),
+      wood: mat(0x715a41, "wood"), rubber: mat(0x1b2327),
+      warm: mat(0x806c47, undefined, 0xb9975c), cool: mat(0x3b6769, undefined, 0x558e91),
+    };
+    const batches = new Map<KinoFinish, THREE.BufferGeometry[]>(), features = new Set<string>();
+    append((finish, geometry, feature) => {
+      const pieces = batches.get(finish) ?? []; pieces.push(geometry); batches.set(finish, pieces); features.add(feature);
+    });
+    group.userData.kinoFeatures = [...features];
+    for (const [finish, pieces] of batches) {
+      const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+      if (geometry) {
+        const part = occluder(mesh(geometry, finishes[finish], group, 0, 0, 0, false));
+        part.name = `${name}:${finish}`; part.userData.occlusionGroup = group.uuid;
+      }
+    }
+    return group;
+  }
+
   /** Market fixtures share cached PBR materials and the source structure's fade. */
   function marketDetailGroup(name: string, position: THREE.Vector3, append: (emit: MarketDetailEmitter) => void) {
     const group = new THREE.Group(); group.name = name; group.position.copy(position);
@@ -714,6 +762,14 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       p.y = .058;
       decorations.push({ kind: "puddle", position: p, size, angle: seeded(i + 69) * Math.PI, stretch: .35 + seeded(i + 69) * .5 });
     }
+    if (id === "kino") {
+      const carpet = region({ x: 20, y: 108, w: 680, h: 72 }, .012, mat(0x493b45, "plaster"), .031);
+      carpet.name = "kino-aisle-carpet"; carpet.castShadow = false;
+      for (const [x, y] of [[28, 142], [52, 150]]) {
+        const p = at(x, y); p.y = .059;
+        decorations.push({ kind: "puddle", position: p, size: 1.15, angle: .3, stretch: .4 });
+      }
+    }
     if (id === "alley") decorations.push(...alleyRunoffPuddles(active, at));
     if (id === "market") {
       floor.name = "market-rain-paving";
@@ -784,10 +840,16 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       }
     }
     if (id === "kino") {
-      const screen = new THREE.Group(); screen.position.copy(at(360, 58)); root.add(screen);
-      box(screen, 33, 3.9, .3, mat(0x182a27), 0, 2.1);
-      box(screen, 31.5, 3.3, .05, mat(0x55796e, undefined, 0x21483b), 0, 2.1, .19);
-      tag(screen, "420MON · KIEZKINO", 13, 2.1, "#d0c499", .23);
+      const screen = kinoDetailGroup("kino-screen-detail", at(360, 58), appendKinoScreenDetails);
+      const backing = occluder(mesh(new THREE.BoxGeometry(33, 3.9, .3), mat(0x182a27), screen, 0, 2.1, 0, false));
+      backing.name = "kino-screen-backing";
+      const panel = occluder(mesh(new THREE.BoxGeometry(31.5, 3.3, .05), mat(0x55796e, undefined, 0x21483b), screen, 0, 2.1, .19, false));
+      panel.name = "kino-screen-panel";
+      const title = tag(screen, "420MON · KIEZKINO", 13, 2.1, "#d0c499", .23);
+      // The tag owns its texture; only ordinary PBR meshes use cloned fade materials.
+      occluders.push(title);
+      for (const part of [backing, panel, title]) part.userData.occlusionGroup = screen.uuid;
+      kinoLitter = createKinoLitter(root, at, { metal: mat(0x8a9691, "metal"), rubber: mat(0x29312f), paper: mat(0xb8aa8f, "plaster") });
     } else if (id === "ring") {
       const rect = mapSketch(id).extras[0]?.r; if (rect) {
         const p = at(rect.x + rect.w / 2, rect.y + rect.h / 2);
@@ -842,6 +904,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     for (const actor of npcActors.values()) actor.dispose(); npcActors.clear();
     staticBatches?.dispose(); staticBatches = undefined;
     streetDetails?.dispose(); streetDetails = undefined;
+    kinoLitter?.dispose(); kinoLitter = undefined;
     animatedLamps.length = 0;
     disposeOwnedObjects(root);
     root.clear(); mapObjects.clear(); roamingNpc = undefined; storyNpcs.clear(); occluders = []; lampLights.length = 0; lastLightSelection = -Infinity; glowing.length = 0;
