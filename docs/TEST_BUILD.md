@@ -1,12 +1,16 @@
-> **v63 — Brighter Kabelkeller, publication pending:** substantially increased
+> **Eddi purchase hotfix (v60), implemented before Kino:** the moving NPC invalidated quantity selection/confirmation and silently closed the menu. Keep an already opened physical conversation valid at its starting point while Eddi continues his original movement. Leaving that location/map or closing clears access; failed selection/confirmation shows a reason. Prices, bulk booking, saves and NPCs stay unchanged. One build + 5/5 affected tests passed (actual UI selection/confirmation after NPC movement, quantity booking/persistence, selling, cancellation and physical access guards). Ben checks the published UI.
+
+> **Published v63 — Brighter Kabelkeller, [PR #70](https://github.com/BenJG420/420mon-3D/pull/70), source `445b720`:** substantially increased
 > existing key/fill/environment light (3 / 1.8 / 0.95), exposure 1.25, brighter light
 > colors and thinner fog (0.018). Reduced contrast/vignette/bloom keep the original
 > service aisles readable. Only the cable graphics profile changes: no additional
 > lights/shadow passes, geometry, actors, gameplay or save changes. One build and
 > 7/7 directly affected graphics/cable tests passed; Ben checks brightness in-game.
+> PR CI40142934014/Main CI40143069012/Pages40143068974 passed. Live JS
+> `index-BZ21YNr0.js`, SHA256 `a0bcbbdee13133d7d37f02f30beae75ea643a4ccdfec6f1cc5dc9769bee2b3c1`; JS/CSS/fonts byte-equal, stable root unchanged.
 > Next district: Kino. **Monster erst nach Freigabe.**
 
-> **Merged v62 — Botanical Grow plants, [PR #69](https://github.com/BenJG420/420mon-3D/pull/69), source `bcb94d8`:** separate seedling/cotyledon,
+> **Published v62 — Botanical Grow plants, [PR #69](https://github.com/BenJG420/420mon-3D/pull/69), source `bcb94d8`:** separate seedling/cotyledon,
 > branched vegetative, flowering and ripe models; curved serrated fan leaves with
 > veins, green calyx clusters and pale/amber pistils. Existing pots/growboxes keep
 > their positions, growth rules, yields, care, watering effects and saves. Shared
@@ -959,11 +963,11 @@ are historical; existing repository CI may run automatically.
    symbols and remaining time inside the same collapsible top-left Cash/time/level
    panel. Preserve effect clocks/rules and the one active outfit bonus. Build +
    directly affected tests only; Ben checks the published GUI. Own PR.
-7. **DONE — Eddi shop UI / bulk trade (v60), PR #67 merged:** inventory/normal-shop layout with categories, rows, quantity/count and description. Buying and selling use the existing slider, +/−, Max, numeric input, live total and one batch confirmation. Retain Eddi prices, title rules, physical NPC access and saves.
+7. **HOTFIX IMPLEMENTED, PR pending before Kino:** Eddi purchases must remain usable while he walks away during an open physical conversation; show failures instead of silently closing. Own PR. Original v60 package: **DONE — Eddi shop UI / bulk trade (v60), PR #67 merged:** inventory/normal-shop layout with categories, rows, quantity/count and description. Buying and selling use the existing slider, +/−, Max, numeric input, live total and one batch confirmation. Retain Eddi prices, title rules, physical NPC access and saves.
 8. **DONE — Eddi smoking animation (v61), PR #68 merged/live:** visible smoking/pulsing ember/exhalation on his existing rig; other NPCs/player/behavior remain unchanged.
-9. **DONE — Grow plant appearance (v62), PR #69 merged:** recognizable cannabis in every stage (seedling, vegetative, bloom, ready), including growboxes. Improve anatomy/leaves/buds with bounded shared geometry; preserve timings/yields/care and saves.
-10. **IMPLEMENTED / publication pending — Brighter Kabelkeller (v63):** significantly improve ambient/key/fill visibility and reduce obscuring fog; keep original map, light/shadow budget and atmosphere.
-11. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); Markt / Silk / Static DONE (PR #66 / v59); NEXT Kino after items 7–10, one PR per district:** preserve each original 2D layout,
+9. **DONE — Grow plant appearance (v62), PR #69 merged/live:** recognizable cannabis in every stage (seedling, vegetative, bloom, ready), including growboxes. Improve anatomy/leaves/buds with bounded shared geometry; preserve timings/yields/care and saves.
+10. **DONE — Brighter Kabelkeller (v63), PR #70 merged/live:** significantly improve ambient/key/fill visibility and reduce obscuring fog; keep original map, light/shadow budget and atmosphere.
+11. **District detail — Gasse A DONE (PR #61 / v54); Grow-Hinterhöfe/Moss DONE (PR #62 / v55); Kabelkeller DONE (PR #65 / v58); Markt / Silk / Static DONE (PR #66 / v59); IN PROGRESS Kino (v64), then Neonkai, one PR per district:** preserve each original 2D layout,
    add substantially richer visual detail matching the reference. Give roofs
    their own tile/metal/felt materials, edges and gutters instead of floor textures.
    Detail facades, windows, doors, signage, neon, trash, cables, puddles, props,
@@ -985,7 +989,7 @@ are historical; existing repository CI may run automatically.
    flickering lamps/lanterns across districts, including Gasse A retrofit; retain
    performance budgets and actors.** Shared atlas/wall batches and existing lamp
    selection retained; no extra point lights or shadow casters.
-   Markt / Silk / Static v59 is merged and published. Before Kino, finish items 7–10 above. Player/NPC assets remain unchanged in district packages.
+   Markt / Silk / Static v59 is merged and published. Ben’s four wishes (items 7–10) are merged. Kino v64 is in progress. Player/NPC assets remain unchanged in district packages.
    Associated interiors follow with their district. Each gets its own PR; native
    device appearance/FPS stays with Ben, no blanket visual-completion claim.
 12. **Monster erst nach Freigabe:** remaining monster sculpts and visual follow-up

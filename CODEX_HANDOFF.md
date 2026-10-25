@@ -1,3 +1,22 @@
+# Vorrangiger Bugfix — Eddi-Kauf (v60)
+
+Annahme: Eine am echten Eddi gestartete Unterhaltung bleibt am Gesprächsort gültig, während er seine unveränderten Grow-Runden fortsetzt; Kartenwechsel, Schließen oder Verlassen dieses Orts beenden den Handelszugang.
+
+- Ursache: Die Mengenwahl und Bestätigung prüften wiederholt Eddis inzwischen bewegte Position und schlossen das Menü ohne Meldung. Die Unterhaltung bindet sich jetzt beim Öffnen an den echten Gesprächsort; Fehler bleiben sichtbar, Kauf/Verkauf nutzen unverändert die atomare Mengenbuchung.
+- Eigener Fix-PR vor Kino v64 und Neonkai. Nur Build und gezielte Shop-/Handelstests; keine Browserläufe. Ein Build und 5/5 direkte Shop-/Handelstests grün; PR/Merge/Veröffentlichung folgen. Figuren und deren Verhalten unverändert. **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
+# Aktuelle Arbeit — v64 Kino; Bens vier Wünsche gemergt
+
+Annahme v64: Kino bleibt ein geschützter Innenraum; das gesperrte Leinwandrechteck wird als niedriger Bühnensockel mit eigener Filzabdeckung dargestellt, damit es die Leinwand nicht verdeckt. Originalkollisionen/Interaktionen bleiben erhalten.
+
+- v60 Shop PR #67, v61 Rauchen PR #68 und v62 Pflanzen PR #69 gemergt/live. v62 Source `bcb94d88667fe91cba5ceda910c28b2ff700e624`, Build+17 Tests und PR CI40142788933/Main CI40142893865/Pages40142893730 grün; Live JS `index-Dub-lcq6.js`, SHA256 `2d20dede67d6c940a294fa1e02ba7b9a046a4a1f59f4282be68eb1c55eaab522`, Bytevergleich/Stable grün (`v62-deploy-proof.json`).
+- v63 heller Kabelkeller PR #70 gemergt, Source `445b720623ef408071723b21aa5180f999394d5e`; ein Build+7 Tests und PR CI40142934014 grün. Main CI40143069012/Pages40143068974 grün. Live JS `index-BZ21YNr0.js`, SHA256 `a0bcbbdee13133d7d37f02f30beae75ea643a4ccdfec6f1cc5dc9769bee2b3c1` bytegleich, Stable unverändert (`v63-deploy-proof.json`).
+- Branch `feat/kino-details-v64`: Kino wird jetzt mit Bühne/Kappen, Leinwandrahmen/Vorhängen/Lautsprechern, Wänden, Geräten/Labels, Gang/Eintrittsspur und instanziertem Bühnenkleinkram detailliert. Noch keine lokale Prüfung. Spieler/NPCs, Originalwege/Saves bleiben erhalten. Danach Neonkai. **Monster erst nach Freigabe**. Nur Build+direkte Tests, Ben prüft Optik.
+
+## Vorheriger Stand
+
 # Aktuelle Arbeit — v63 Kabelkeller heller, PR ausstehend
 
 Annahme v63: Die bessere Lesbarkeit kommt aus vorhandenen Haupt-/Füll-/Umgebungslichtern und klarerem Nebel; keine zusätzlichen Punktlichter oder veränderten Figuren.
