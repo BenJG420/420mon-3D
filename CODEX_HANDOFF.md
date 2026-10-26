@@ -1,9 +1,11 @@
-# Aktuelle Arbeit — Abfluss v68
+# Aktueller Wiedereinstieg — Abfluss v68 veröffentlicht; Chemiegasse als Nächstes
+
+- PR #76 gemergt/live: vier eigene PBR-Dächer/Pumpenhausfassaden, 19 Wandkappen mit lokal gebündelten Details, neun niedrige Wasserbecken, sechs Rohre/sechs Ventile/drei Toiletten/zwei Original-Pumpensockel, sieben Prop-Details, Lukendetails und zwei Neon-Wegweiser. Vier Zusatzpfützen (36 insgesamt); vorhandene vier Lampen/zwei Flackerlampen, Wetter/Graffiti/Straßeninventar erhalten. Keine zusätzlichen Punktlichter/Detailschatten.
+- Ein Build + 10/10 direkte Abfluss-/Weltgeometrie-Tests über zwei lokale Runden grün. Nur NPC-Testposition oberhalb des breiten Sluice-Gates korrigiert, kein Produktfix/erneuter Build. Keine Browserläufe; Ben prüft Optik/FPS. Spieler/NPCs, Originalwege/Kollisionen/Interaktionen/Saves erhalten.
+- Source `eccc05890367c48727042077f2f451f1fbcbac66`; PR CI40300156779/Main CI40300345523/Pages40300345642 grün. Live JS `index-C_K4SfOm.js`, SHA256 `09974d80b1ba688dccf00bf304b1c9b6a4576e1d5b238866c9e2327a7daba4af`; JS/CSS/fonts bytegleich, Stable unverändert (`v68-deploy-proof.json`).
+- **NÄCHSTER eigener Bezirks-PR: Chemiegasse (`chem`)**, danach Ring laut TEST_BUILD.md. Nur Build + direkt betroffene Tests. **Monster erst nach Freigabe**; Ko-fi/Zahlungsserver bleiben übersprungen.
 
 Annahme v68: Die neun gesperrten Original-Wasserflächen werden als niedrige Becken statt hoher Mauern dargestellt; die zwei darin liegenden Original-Pumpensockel werden sichtbar, ohne neue Wege oder Kollisionen einzuführen.
-
-- Branch `feat/abfluss-details-v68`: vier eigene PBR-Dächer/Pumpenhausfassaden, 19 Wandkappen mit lokal gebündelten Details, neun niedrige Wasserbecken, sechs Rohre/sechs Ventile/drei Toiletten/zwei Original-Pumpensockel, sieben Prop-Details, Lukendetails und zwei Neon-Wegweiser. Vier Zusatzpfützen (36 insgesamt); bestehende vier Lampen/zwei Flackerlampen, Wetter/Graffiti/Straßeninventar erhalten. Keine zusätzlichen Punktlichter/Detailschatten.
-- Ein Build + 10/10 direkte Abfluss-/Weltgeometrie-Tests über zwei lokale Runden grün. Nur Testposition für Murk/Leck oberhalb des breiten Sluice-Gates korrigiert, kein Produktfix/erneuter Build. Keine Browserläufe; Ben prüft Optik/FPS. Spieler/NPCs, Originalwege/Kollisionen/Interaktionen/Saves erhalten. Eigener PR/Merge folgt, danach Chemiegasse. **Monster erst nach Freigabe**.
 
 ## Vorheriger Stand
 
