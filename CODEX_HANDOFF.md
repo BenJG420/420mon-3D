@@ -1,9 +1,11 @@
-# Aktuelle Arbeit — Ring v70
+# Aktueller Wiedereinstieg — Ring v70 veröffentlicht; Labyrinth als Nächstes
 
 Annahme v70: Der Käfig folgt vollständig den neun originalen Zaunsegmenten samt Zugängen; die bisherige zusätzliche Mini-Ring-Dekoration auf nur einem Segment entfällt, und der Arena-Belag bleibt flach auf der Originalfläche.
 
-- Branch `feat/ring-details-v70`: vier eigene PBR-Dächer/Gym-Fassaden, fünf Wandkappen mit lokalen Leitungs-/Poster-/Reparaturdetails, neun korrekt längs ausgerichtete Käfigzäune mit Drahtgitter, flacher Arena-Belag/zwei Kreidemarkierungen, vier Bankdetails, drei Kisten, Kanalluke und zwei Neon-Wegweiser. Drei Zusatzpfützen (35 insgesamt); vorhandene drei Lampen/zwei Flackerlampen, Wetter/Graffiti/Straßeninventar erhalten. Keine zusätzlichen Punktlichter/Detailschatten.
-- Build + 10/10 direkte Ring-/Weltgeometrie-Tests über zwei lokale Runden grün. Dünnen Arena-Belag gezielt an der 15-mm-Mindesthöhe des gemeinsamen Box-Helfers vorbeigeführt, damit er unter der Kreide bleibt; danach nur Build/Ring-Test wiederholt. Keine Browserläufe; Ben prüft Optik/FPS. Originalwege/Kollisionen/Begegnungen/Interaktionen/Saves und Spieler/NPCs erhalten. Eigener PR/Merge folgt; danach Labyrinth. **Monster erst nach Freigabe**.
+- PR #78 gemergt/live: vier eigene PBR-Dächer/Gym-Fassaden, fünf Wandkappen mit lokalen Leitungs-/Poster-/Reparaturdetails, neun korrekt längs ausgerichtete Käfigzäune mit Drahtgitter, flacher Arena-Belag/zwei Kreidemarkierungen, vier Bankdetails, drei Kisten, Kanalluke und zwei Neon-Wegweiser. Drei Zusatzpfützen (35 insgesamt); vorhandene drei Lampen/zwei Flackerlampen, Wetter/Graffiti/Straßeninventar erhalten. Keine zusätzlichen Punktlichter/Detailschatten.
+- Build + 10/10 direkte Ring-/Weltgeometrie-Tests über zwei lokale Runden grün. Dünnen Arena-Belag gezielt an der 15-mm-Mindesthöhe des gemeinsamen Box-Helfers vorbeigeführt, damit er unter der Kreide bleibt; danach nur Build/Ring-Test wiederholt. Keine Browserläufe; Ben prüft Optik/FPS. Originalwege/Kollisionen/Begegnungen/Interaktionen/Saves und Spieler/NPCs erhalten. Nächster eigener Bezirks-PR: **Labyrinth (`labyrinth`)**, danach Nischen. **Monster erst nach Freigabe** durch Ben, auch nach allen Bezirken; Ko-fi/Zahlungsserver bleiben übersprungen.
+
+- Source `538dc80fc4d9fce75bdca85fafef1d7aca0d68f7`; PR CI40351086283/Main CI40395073925/Pages40395074001 grün. Live JS `index-Cb0vq53h.js`, SHA256 `22dc05f389155f19a3650938473ac36b2068f602aaa172aab66bd7134ffbbc64`; JS/CSS/fonts bytegleich, Stable unverändert (`v70-deploy-proof.json`).
 
 ## Vorheriger Stand
 
