@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — Ring v70
+
+Annahme v70: Der Käfig folgt vollständig den neun originalen Zaunsegmenten samt Zugängen; die bisherige zusätzliche Mini-Ring-Dekoration auf nur einem Segment entfällt, und der Arena-Belag bleibt flach auf der Originalfläche.
+
+- Branch `feat/ring-details-v70`: vier eigene PBR-Dächer/Gym-Fassaden, fünf Wandkappen mit lokalen Leitungs-/Poster-/Reparaturdetails, neun korrekt längs ausgerichtete Käfigzäune mit Drahtgitter, flacher Arena-Belag/zwei Kreidemarkierungen, vier Bankdetails, drei Kisten, Kanalluke und zwei Neon-Wegweiser. Drei Zusatzpfützen (35 insgesamt); vorhandene drei Lampen/zwei Flackerlampen, Wetter/Graffiti/Straßeninventar erhalten. Keine zusätzlichen Punktlichter/Detailschatten.
+- Build + 10/10 direkte Ring-/Weltgeometrie-Tests über zwei lokale Runden grün. Dünnen Arena-Belag gezielt an der 15-mm-Mindesthöhe des gemeinsamen Box-Helfers vorbeigeführt, damit er unter der Kreide bleibt; danach nur Build/Ring-Test wiederholt. Keine Browserläufe; Ben prüft Optik/FPS. Originalwege/Kollisionen/Begegnungen/Interaktionen/Saves und Spieler/NPCs erhalten. Eigener PR/Merge folgt; danach Labyrinth. **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — Chemiegasse v69 veröffentlicht; Ring als Nächstes
 
 - PR #77 gemergt/live: drei eigene PBR-Dächer/Laborfassaden, 13 Wandkappen mit lokalen Leitungs-/Reparaturdetails, sechs offene Chemiebecken mit Flüssigkeit/Armaturen/Manometern/Warnrändern, sechs flache Markierungen in den Original-Dampfzonen, ein Serviceblock, sechs Prop-Details, Kanalluke und zwei Neon-Wegweiser. Drei Zusatzpfützen (35 insgesamt); vorhandene drei Lampen/zwei Flackerlampen, Wetter/Graffiti/Straßeninventar erhalten. Keine zusätzlichen Punktlichter/Detailschatten.
