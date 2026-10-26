@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — Abfluss v68
+
+Annahme v68: Die neun gesperrten Original-Wasserflächen werden als niedrige Becken statt hoher Mauern dargestellt; die zwei darin liegenden Original-Pumpensockel werden sichtbar, ohne neue Wege oder Kollisionen einzuführen.
+
+- Branch `feat/abfluss-details-v68`: vier eigene PBR-Dächer/Pumpenhausfassaden, 19 Wandkappen mit lokal gebündelten Details, neun niedrige Wasserbecken, sechs Rohre/sechs Ventile/drei Toiletten/zwei Original-Pumpensockel, sieben Prop-Details, Lukendetails und zwei Neon-Wegweiser. Vier Zusatzpfützen (36 insgesamt); bestehende vier Lampen/zwei Flackerlampen, Wetter/Graffiti/Straßeninventar erhalten. Keine zusätzlichen Punktlichter/Detailschatten.
+- Ein Build + 10/10 direkte Abfluss-/Weltgeometrie-Tests über zwei lokale Runden grün. Nur Testposition für Murk/Leck oberhalb des breiten Sluice-Gates korrigiert, kein Produktfix/erneuter Build. Keine Browserläufe; Ben prüft Optik/FPS. Spieler/NPCs, Originalwege/Kollisionen/Interaktionen/Saves erhalten. Eigener PR/Merge folgt, danach Chemiegasse. **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — Aschegang v67 veröffentlicht; Abfluss als Nächstes
 
 - PR #75 gemergt/live: sechs eigene PBR-Dächer/Industriefassaden, neun Wandkappen und drei Blockdetails, acht niedrige Glutbecken, acht Prop-Details, zwei Neon-Wegweiser, sechs zusätzliche instanzierte Pfützen (38 insgesamt). Gemeinsame Gebäude-Verdeckung, gebündelte Geometrie; kein zusätzliches Punktlicht/Detailschatten. Wetter, Street-Inventar, Graffiti und Flackerlampen erhalten.
