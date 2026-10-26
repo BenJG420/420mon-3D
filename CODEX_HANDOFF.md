@@ -1,9 +1,11 @@
-# Aktuelle Arbeit — Labyrinth v71
+# Aktueller Wiedereinstieg — Labyrinth v71 veröffentlicht; Nischen als Nächstes
 
 Annahme v71: Das Labyrinth bleibt ein offener Einblick in die originalen Innenkorridore; alle Wandhöhen und Wege bleiben erhalten, Details ragen höchstens 12 cm aus Wandflächen, und beide Gitter folgen vollständig ihren gesperrten Originalrechtecken ohne Hushs schmalen Durchgang zu verengen.
 
-- Branch `feat/labyrinth-details-v71`: 17 eigene Metall-/Teerpappenkappen, lokale Gangfassaden mit Oberlichtern/Gittern/Rollläden, Leitungen/Kabeln, Reparaturen/Notizen/violetten Leuchtstreifen. Zwei vollständige Eisengitter, vier flache Schattenzonen-Details, vier Kisten, Kanalluke und zwei Neon-Wegweiser. Drei Zusatzpfützen (35 insgesamt); vorhandene vier Lampen/zwei Flackerlampen, Nebel/Post-Processing/Graffiti/instanziertes Straßeninventar erhalten. Wandteile ≤16 m/≤5 Materialien, keine zusätzlichen Punktlichter/Detailschatten.
-- Build + 10/10 direkte Labyrinth-/Weltgeometrie-Tests über zwei lokale Runden grün. Der erste gezielte Test fand die falsch gewählte Stirnseite der seitlichen Außenwände; Ausrichtung korrigiert, danach nur Build/Labyrinth-Test wiederholt. Keine Browserläufe; Ben prüft Optik/FPS. Originalwege/Kollisionen/Begegnungen/Interaktionen/Saves und Spieler/NPCs erhalten. Eigener PR/Merge folgt; danach Nischen. **Monster erst nach Freigabe** durch Ben, auch nach allen Bezirken.
+- PR #79 gemergt/live: 17 eigene Metall-/Teerpappenkappen, lokale Gangfassaden mit Oberlichtern/Gittern/Rollläden, Leitungen/Kabeln, Reparaturen/Notizen/violetten Leuchtstreifen. Zwei vollständige Eisengitter, vier flache Schattenzonen-Details, vier Kisten, Kanalluke und zwei Neon-Wegweiser. Drei Zusatzpfützen (35 insgesamt); vorhandene vier Lampen/zwei Flackerlampen, Nebel/Post-Processing/Graffiti/instanziertes Straßeninventar erhalten. Wandteile ≤16 m/≤5 Materialien, keine zusätzlichen Punktlichter/Detailschatten.
+- Build + 10/10 direkte Labyrinth-/Weltgeometrie-Tests über zwei lokale Runden grün. Der erste gezielte Test fand die falsch gewählte Stirnseite der seitlichen Außenwände; Ausrichtung korrigiert, danach nur Build/Labyrinth-Test wiederholt. Keine Browserläufe; Ben prüft Optik/FPS. Originalwege/Kollisionen/Begegnungen/Interaktionen/Saves und Spieler/NPCs erhalten. Nächster eigener Bezirks-PR: **Nischen (`nische`)**, danach Schrotttor. Ko-fi/Zahlungsserver bleiben übersprungen. **Monster erst nach Freigabe** durch Ben, auch nach allen Bezirken.
+
+- Source `95726928960a8221527bf12de2779cbfa0fa27d7`; PR CI40395872325/Main CI40396048596/Pages40396048815 grün. Live JS `index-pxEy-3q7.js`, SHA256 `40a05c5bde3c89f72ffb3b5e5c0ef634e20e2d92a578f9c617624727c8fac03b`; JS/CSS/fonts bytegleich, Stable unverändert (`v71-deploy-proof.json`).
 
 ## Vorheriger Stand
 
