@@ -1,3 +1,11 @@
+# Aktuelle Arbeit — Aschegang v67
+
+Annahme v67: Alle acht gesperrten Original-Glutflächen werden als niedrige Glutbecken statt teilweise als Gebäudeblöcke dargestellt; Wege, Kollisionen, Figuren und Interaktionen bleiben unverändert.
+
+- Branch `feat/aschegang-details-v67`: sechs eigene PBR-Dächer/Fassaden, neun Wandkappen, drei Blockdetails, acht niedrige Glutbecken, acht Prop-Details, zwei Neon-Wegweiser und sechs zusätzliche instanzierte Pfützen. Batchweise Geometrie, keine zusätzlichen Lichter/Detailschatten; vorhandenes Wetter/Straßeninventar/Graffiti/Flackerlicht erhalten. Ein Build + 10/10 direkte Aschegang-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Ben prüft Optik/FPS. Eigener PR/Merge und Testbuild folgen. Danach Abfluss (`drain`); **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — Kanal v66 veröffentlicht; Aschegang als Nächstes
 
 - PR #74 gemergt/live: eigene Metall-PBR-Abdeckungen, feuchtes Mauerwerk/Rohre/Ventile/Kästen, 14 Lukendetails/Neon-Wegweiser, flache Rinnen und 14 Zusatzpfützen. 34 lokale Wandgruppen mit Frustum-/Entfernungsausblendung; sechs instanzierte Street-Cluster über den ganzen Kanal. Figuren, Originalwege/Kollisionen/Interaktionen/Saves erhalten.
