@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — Labyrinth v71
+
+Annahme v71: Das Labyrinth bleibt ein offener Einblick in die originalen Innenkorridore; alle Wandhöhen und Wege bleiben erhalten, Details ragen höchstens 12 cm aus Wandflächen, und beide Gitter folgen vollständig ihren gesperrten Originalrechtecken ohne Hushs schmalen Durchgang zu verengen.
+
+- Branch `feat/labyrinth-details-v71`: 17 eigene Metall-/Teerpappenkappen, lokale Gangfassaden mit Oberlichtern/Gittern/Rollläden, Leitungen/Kabeln, Reparaturen/Notizen/violetten Leuchtstreifen. Zwei vollständige Eisengitter, vier flache Schattenzonen-Details, vier Kisten, Kanalluke und zwei Neon-Wegweiser. Drei Zusatzpfützen (35 insgesamt); vorhandene vier Lampen/zwei Flackerlampen, Nebel/Post-Processing/Graffiti/instanziertes Straßeninventar erhalten. Wandteile ≤16 m/≤5 Materialien, keine zusätzlichen Punktlichter/Detailschatten.
+- Build + 10/10 direkte Labyrinth-/Weltgeometrie-Tests über zwei lokale Runden grün. Der erste gezielte Test fand die falsch gewählte Stirnseite der seitlichen Außenwände; Ausrichtung korrigiert, danach nur Build/Labyrinth-Test wiederholt. Keine Browserläufe; Ben prüft Optik/FPS. Originalwege/Kollisionen/Begegnungen/Interaktionen/Saves und Spieler/NPCs erhalten. Eigener PR/Merge folgt; danach Nischen. **Monster erst nach Freigabe** durch Ben, auch nach allen Bezirken.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — Ring v70 veröffentlicht; Labyrinth als Nächstes
 
 Annahme v70: Der Käfig folgt vollständig den neun originalen Zaunsegmenten samt Zugängen; die bisherige zusätzliche Mini-Ring-Dekoration auf nur einem Segment entfällt, und der Arena-Belag bleibt flach auf der Originalfläche.
