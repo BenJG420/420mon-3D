@@ -1,9 +1,11 @@
-# Aktuelle Arbeit — Chemiegasse v69
+# Aktueller Wiedereinstieg — Chemiegasse v69 veröffentlicht; Ring als Nächstes
+
+- PR #77 gemergt/live: drei eigene PBR-Dächer/Laborfassaden, 13 Wandkappen mit lokalen Leitungs-/Reparaturdetails, sechs offene Chemiebecken mit Flüssigkeit/Armaturen/Manometern/Warnrändern, sechs flache Markierungen in den Original-Dampfzonen, ein Serviceblock, sechs Prop-Details, Kanalluke und zwei Neon-Wegweiser. Drei Zusatzpfützen (35 insgesamt); vorhandene drei Lampen/zwei Flackerlampen, Wetter/Graffiti/Straßeninventar erhalten. Keine zusätzlichen Punktlichter/Detailschatten.
+- Ein Build + 10/10 direkte Chemiegasse-/Weltgeometrie-Tests in einer lokalen Runde grün. Keine Browserläufe; Ben prüft Optik/FPS. Spieler/NPCs, Originalwege/Kollisionen/Begegnungen/Interaktionen/Saves erhalten.
+- Source `c713c6004a9dd12e3c7b3227e7f1fd613d95d454`; PR CI40307972359/Main CI40340191480/Pages40340191279 grün. Live JS `index-DtXC8vGI.js`, SHA256 `f41a816f3947ce428256cefd6673ee516b551c75369fedbff9494049cf65f51d`; JS/CSS/fonts bytegleich, Stable unverändert (`v69-deploy-proof.json`).
+- **NÄCHSTER eigener Bezirks-PR: Ring (`ring`)**, danach Labyrinth laut TEST_BUILD.md. Nur Build + direkt betroffene Tests. **Monster erst nach Freigabe** durch Ben, auch nach Abschluss aller Bezirke; Ko-fi/Zahlungsserver bleiben übersprungen.
 
 Annahme v69: Die sechs originalen gesperrten Becken behalten ihre .75 m hohen Sockel und erhalten sichtbare Flüssigkeit/Armaturen; flache Warnmarkierungen bleiben in den bestehenden Dampf-Begegnungszonen ohne neue Hindernisse oder Effekte.
-
-- Branch `feat/chemiegasse-details-v69`: drei eigene PBR-Dächer/Laborfassaden, 13 Wandkappen mit lokalen Leitungs-/Reparaturdetails, sechs offene Chemiebecken mit Flüssigkeit/Armaturen/Manometern/Warnrändern, sechs flache Markierungen in den Original-Dampfzonen, ein Serviceblock, sechs Prop-Details, Kanalluke und zwei Neon-Wegweiser. Drei Zusatzpfützen (35 insgesamt); vorhandene drei Lampen/zwei Flackerlampen, Wetter/Graffiti/Straßeninventar erhalten. Keine zusätzlichen Punktlichter/Detailschatten.
-- Ein Build + 10/10 direkte Chemiegasse-/Weltgeometrie-Tests in einer lokalen Runde grün. Keine Browserläufe; Ben prüft Optik/FPS. Spieler/NPCs, Originalwege/Kollisionen/Begegnungen/Interaktionen/Saves erhalten. Eigener PR/Merge folgt; danach Ring. **Monster erst nach Freigabe**.
 
 ## Vorheriger Stand
 
