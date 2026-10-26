@@ -1,8 +1,11 @@
-# Aktuelle Arbeit — Aschegang v67
+# Aktueller Wiedereinstieg — Aschegang v67 veröffentlicht; Abfluss als Nächstes
+
+- PR #75 gemergt/live: sechs eigene PBR-Dächer/Industriefassaden, neun Wandkappen und drei Blockdetails, acht niedrige Glutbecken, acht Prop-Details, zwei Neon-Wegweiser, sechs zusätzliche instanzierte Pfützen (38 insgesamt). Gemeinsame Gebäude-Verdeckung, gebündelte Geometrie; kein zusätzliches Punktlicht/Detailschatten. Wetter, Street-Inventar, Graffiti und Flackerlampen erhalten.
+- Originalwege/Kollisionen/Interaktionen/Saves und Spieler/NPCs unverändert. Ein Build + 10/10 direkte Aschegang-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Ben prüft Optik/FPS.
+- Source `15ac7a0c59f03dbf8d27fd6ee8fddc7b403cf1cf`; PR CI40269542632/Main CI40269672806/Pages40269672708 grün. Live JS `index-DZ7w_bjp.js`, SHA256 `34cee28bcdcac43e8d75724f695cd6759b3fb06f8238116a5fa32d6126ef4210`; JS/CSS/fonts bytegleich, Stable unverändert (`v67-deploy-proof.json`).
+- **NÄCHSTER eigener Bezirks-PR: Abfluss (`drain`)**, danach Chemiegasse laut TEST_BUILD.md. Nur Build + direkt betroffene Tests. **Monster erst nach Freigabe**; Ko-fi/Zahlungsserver bleiben übersprungen.
 
 Annahme v67: Alle acht gesperrten Original-Glutflächen werden als niedrige Glutbecken statt teilweise als Gebäudeblöcke dargestellt; Wege, Kollisionen, Figuren und Interaktionen bleiben unverändert.
-
-- Branch `feat/aschegang-details-v67`: sechs eigene PBR-Dächer/Fassaden, neun Wandkappen, drei Blockdetails, acht niedrige Glutbecken, acht Prop-Details, zwei Neon-Wegweiser und sechs zusätzliche instanzierte Pfützen. Batchweise Geometrie, keine zusätzlichen Lichter/Detailschatten; vorhandenes Wetter/Straßeninventar/Graffiti/Flackerlicht erhalten. Ein Build + 10/10 direkte Aschegang-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Ben prüft Optik/FPS. Eigener PR/Merge und Testbuild folgen. Danach Abfluss (`drain`); **Monster erst nach Freigabe**.
 
 ## Vorheriger Stand
 
