@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { MAPS, mapSketch, ASH_HOT, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y, type MapDef, type MapObj, type Rect } from "./data/maps";
+import { MAPS, mapSketch, ASH_HOT, DRAIN_WATER, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y, type MapDef, type MapObj, type Rect } from "./data/maps";
 import { WORLD_SCALE, mapToWorld, worldToMap, collidesOnMap, safeSpawn, isDefeatedGate } from "./worldGeometry";
 import { getSave, saveProgress } from "./save";
 import { recordVisit, setQuestState } from "./quests";
@@ -24,6 +24,7 @@ import { appendMarketFacadeDetails, appendMarketBoundaryDetails, appendMarketSta
 import { appendKinoWallDetails, appendKinoStageDetails, appendKinoScreenDetails, appendKinoDeviceDetails, type KinoFinish, type KinoDetailEmitter } from "./kino-details";
 import { createKinoLitter } from "./kino-litter";
 import { appendAshFacadeDetails, appendAshBoundaryDetails, appendAshEmberDetails, appendAshPropDetails, type AshFinish, type AshDetailEmitter } from "./ash-details";
+import { appendDrainFacadeDetails, appendDrainBoundaryDetails, appendDrainWaterDetails, appendDrainObstacleDetails, appendDrainPropDetails, type DrainFinish, type DrainDetailEmitter } from "./drain-details";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -57,6 +58,7 @@ const palette = {
 };
 const seeded = (i: number) => { const n = Math.sin(i * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
 const DAILY_TRAINERS = new Set(["cinder", "tide", "vial", "knuckle", "hush", "glow", "coil"]);
+const sameRect = (a: Rect, b: Rect) => a.x === b.x && a.y === b.y && a.w === b.w && a.h === b.h;
 
 export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): DistrictTravel {
   const root = new THREE.Group(); root.name = "original-map-world"; scene.add(root);
@@ -234,6 +236,10 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         detail.userData.sourceObject = obj;
         sewerParts(detail, emit => appendSewerHatchDetails(w, d, emit), false, 1);
       }
+      if (id === "drain") {
+        const detail = drainDetailGroup("drain-hatch-detail", new THREE.Vector3(), emit => appendSewerHatchDetails(w, d, emit), g, false);
+        detail.userData.sourceObject = obj;
+      }
       disc.userData.hatch = true; return;
     }
     if (obj.id.startsWith("pad_") || obj.id.startsWith("kai_cast")) {
@@ -335,6 +341,11 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const detail = ashDetailGroup("ash-prop-detail", new THREE.Vector3(), emit => appendAshPropDetails(w, d, kind, emit), g, false);
       detail.userData.sourceObject = obj;
     }
+    if (id === "drain" && obj.kind === "prop") {
+      const detail = drainDetailGroup("drain-prop-detail", new THREE.Vector3(),
+        emit => appendDrainPropDetails(w, d, obj.sprite?.includes("barrel") ? "barrel" : "crate", emit), g, false);
+      detail.userData.sourceObject = obj;
+    }
     if (obj.kind === "starter" || obj.id === "term" || obj.id.includes("slot_")) tag(g, obj.label, Math.max(1.4, Math.min(w, 2.5)), 1.75);
   }
   function terminalSpeaker(g: THREE.Object3D, x: number, z: number) {
@@ -355,7 +366,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     else if (obj.kind === "door" || obj.kind === "manhole") door(obj, g);
     else if (obj.kind === "sign") {
       tag(g, obj.label, 1.8, 1.6); box(g, .08, 1.5, .08, mat(palette.dark, "metal"));
-      if (id === "alley" || id === "yard" || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash") {
+      if (id === "alley" || id === "yard" || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash" || id === "drain") {
         const pieces: THREE.BufferGeometry[] = [];
         const trim = (w: number, h: number, x: number, y: number) => {
           const piece = new THREE.BoxGeometry(w, h, .055); piece.translate(x, y, -.035); pieces.push(piece);
@@ -369,7 +380,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         }
         const casing = box(g, 1.93, .51, .09, mat(0x293b42, "metal"), 0, 1.6, -.09);
         casing.name = `${id}-sign-casing`;
-        if (id === "ash") casing.castShadow = false;
+        if (id === "ash" || id === "drain") casing.castShadow = false;
       }
     }
     else if (obj.kind === "lamp") {
@@ -464,6 +475,13 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const r = active.walls[i];
       const edge = r.x <= 0 || r.y <= 0 || r.x + r.w >= active.w || r.y + r.h >= active.h;
       if (id === "studio" && !edge) continue; // Lounge and speaker banks furnish original blocked rectangles.
+      // Water is blocked by the original 2D collision rectangles, not a tall 3D wall.
+      if (id === "drain" && DRAIN_WATER.some(water => sameRect(water, r))) {
+        const group = drainDetailGroup("drain-water-detail", at(r.x + r.w / 2, r.y + r.h / 2),
+          emit => appendDrainWaterDetails(r.w * WORLD_SCALE, r.h * WORLD_SCALE, i, emit), root, false);
+        group.userData.sourceRect = r;
+        continue;
+      }
       // All eight source heat areas are low, blocked beds, including those without an obstacle entry.
       if (id === "ash" && ASH_HOT.includes(r)) {
         const group = ashDetailGroup("ash-ember-detail", at(r.x + r.w / 2, r.y + r.h / 2),
@@ -482,7 +500,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const outside = !active.indoor && (!edge || (id === "alley" && !!building?.name)) && r.w >= 56 && r.h >= 56;
       const kinoStage = id === "kino" && i === 5;
       const height = kinoStage ? .28 : id === "kai" && i === 4 ? .65 : outside ? 3.7 + seeded(i + 17) * 4.8 : edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : 2.25;
-      const m = region(r, height, mat(id === "ash" ? outside ? 0x64554b : 0x5a5550 : outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : id === "sewer" ? 0x4d625d : palette.plaster, id === "sewer" ? "stone" : "plaster"));
+      const m = region(r, height, mat(id === "drain" ? 0x526760 : id === "ash" ? outside ? 0x64554b : 0x5a5550 : outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : id === "sewer" ? 0x4d625d : palette.plaster, id === "sewer" || id === "drain" ? "stone" : "plaster"));
       const firstPart = occluders.length;
       m.name = `original-wall:${i}`; occluder(m);
       // Dark plinth and narrow cap keep the rooms readable as a cutaway diorama.
@@ -490,12 +508,35 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const yardShed = id === "yard" && !edge;
       const marketFacade = id === "market" && !edge;
       const ashFacade = id === "ash" && outside;
+      const drainFacade = id === "drain" && outside;
       const roofKind = id === "alley" && outside ? alleyRoofKind(building?.variant ?? i)
+        : id === "drain" ? drainFacade ? alleyRoofKind(i) : "roof-metal"
         : id === "ash" ? ashFacade ? alleyRoofKind(i) : "roof-metal"
         : id === "kai" || id === "sewer" ? "roof-metal" : yardShed || marketFacade ? alleyRoofKind(i) : id === "kino" ? kinoStage ? "roof-felt" : "roof-metal" : undefined;
       const roofTint = roofKind === "roof-tile" ? 0x896f5b : roofKind === "roof-metal" ? 0x718087 : roofKind === "roof-felt" ? 0x454d4c : outside ? 0x626c6b : 0x7d8681;
       const roof = occluder(region(r, .1, mat(roofTint, roofKind ?? "stone"), height + .02));
       if (roofKind) { roof.name = id === "kai" || id === "sewer" ? `${id}-cap` : `${id}-roof`; roof.userData.roofKind = roofKind; }
+      if (id === "drain") {
+        roof.name = drainFacade ? "drain-roof" : "drain-cap";
+        const centre = at(r.x + r.w / 2, r.y + r.h / 2);
+        if (drainFacade) {
+          const group = drainDetailGroup("drain-facade-detail", centre,
+            emit => appendDrainFacadeDetails(r.w * WORLD_SCALE, r.h * WORLD_SCALE, height, i, emit));
+          group.userData.sourceRect = r;
+        } else {
+          // Short local meshes allow frustum culling along the long service walls.
+          const side = r.w < r.h, length = (side ? r.h : r.w) * WORLD_SCALE;
+          const depth = (side ? r.w : r.h) * WORLD_SCALE, count = Math.ceil(length / 24), span = length / count;
+          const angle = side ? (r.x < active.w / 2 ? Math.PI / 2 : -Math.PI / 2) : r.y > active.h / 2 ? Math.PI : 0;
+          for (let chunk = 0; chunk < count; chunk++) {
+            const offset = -length / 2 + (chunk + .5) * span;
+            const position = centre.clone().add(new THREE.Vector3(Math.cos(angle) * offset, 0, -Math.sin(angle) * offset));
+            const group = drainDetailGroup("drain-boundary-detail", position,
+              emit => appendDrainBoundaryDetails(span, depth, height, i * 17 + chunk, emit));
+            group.rotation.y = angle; group.userData.sourceRect = r; group.userData.chunk = chunk;
+          }
+        }
+      }
       if (id === "ash") {
         roof.name = ashFacade ? "ash-roof" : "ash-cap";
         const side = edge && r.w < r.h;
@@ -565,7 +606,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
           sewerParts(group, emit => appendSewerWallDetails(span, depth, height, i * 17 + chunk, emit), true, Math.hypot(span, depth) / 2 + 1);
         }
       }
-      if (outside && r.w > 100 && r.h > 80 && id !== "ash") {
+      if (outside && r.w > 100 && r.h > 80 && id !== "ash" && id !== "drain") {
         buildingDetails(r, height, i, building?.name, building?.side, building ? (building.x + building.w / 2 - r.x - r.w / 2) * WORLD_SCALE : 0);
       }
       if (isDetailedDistrict(id) && artCount < 24) {
@@ -654,6 +695,29 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       part.name = `${group.name}:${finish}`;
       if (fading) { occluder(part); part.userData.occlusionGroup = group.uuid; }
     }
+  }
+  /** Wet masonry, mechanical fittings and basin details reuse cached PBR finishes. */
+  function drainDetailGroup(name: string, position: THREE.Vector3, append: (emit: DrainDetailEmitter) => void, parent: THREE.Object3D = root, fading = true) {
+    const group = new THREE.Group(); group.name = name; group.position.copy(position); parent.add(group);
+    group.userData.districtDetail = "drain";
+    const finishes: Record<DrainFinish, THREE.Material> = {
+      stone: mat(0x697a6b, "stone"), metal: mat(0x82938f, "metal"), rust: mat(0x7a5944, "metal"),
+      dark: mat(0x202f31, "metal"), moss: mat(0x46614a, "plaster"),
+      cyan: mat(0x37646b, undefined, 0x5b9ba8), amber: mat(0x7b6750, undefined, 0xb58a55),
+      wood: mat(0x6b6251, "wood"), porcelain: mat(0xb2bbb1),
+    };
+    const batches = new Map<DrainFinish, THREE.BufferGeometry[]>(), features = new Set<string>();
+    append((finish, geometry, feature) => {
+      const pieces = batches.get(finish) ?? []; pieces.push(geometry); batches.set(finish, pieces); features.add(feature);
+    });
+    group.userData.drainFeatures = [...features];
+    for (const [finish, pieces] of batches) {
+      const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+      if (!geometry) continue;
+      const part = mesh(geometry, finishes[finish], group, 0, 0, 0, false); part.name = `${name}:${finish}`;
+      if (fading) { occluder(part); part.userData.occlusionGroup = group.uuid; }
+    }
+    return group;
   }
   /** Each ash structure has at most seven cached material batches and one fade group. */
   function ashDetailGroup(name: string, position: THREE.Vector3, append: (emit: AshDetailEmitter) => void, parent: THREE.Object3D = root, fading = true) {
@@ -829,6 +893,27 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const p = at(rect.x + rect.w / 2, rect.y + rect.h / 2);
     const g = new THREE.Group(); g.position.copy(p); root.add(g);
     const w = rect.w * WORLD_SCALE, d = rect.h * WORLD_SCALE;
+    if (id === "drain" && (rect.kind === "pipe" || rect.kind === "valve" || rect.kind === "toilet" || rect.kind === "block")) {
+      g.name = "drain-obstacle-detail"; g.userData.sourceRect = rect;
+      let body: THREE.Mesh;
+      if (rect.kind === "pipe" || rect.kind === "valve") {
+        body = mesh(new THREE.CylinderGeometry(Math.min(w, d) * .48, Math.min(w, d) * .48, Math.max(w, d), 12), mat(0x68756a, "metal"), g, 0, .7, 0);
+        body.rotation.z = w > d ? Math.PI / 2 : 0; if (d > w) body.rotation.x = Math.PI / 2;
+      } else {
+        body = box(g, w, rect.kind === "toilet" ? .78 : .75, d, mat(rect.kind === "toilet" ? 0x938d75 : palette.stone, "stone"));
+        // Source pump plinths were hidden in the water walls; keep their new view cheap.
+        if (rect.kind === "block") body.castShadow = false;
+      }
+      body.name = "drain-obstacle-body"; occluder(body); body.userData.occlusionGroup = body.uuid;
+      if (rect.kind === "block") {
+        const cap = occluder(mesh(new THREE.BoxGeometry(w, .06, d), mat(0x738981, "roof-metal"), g, 0, .77, 0, false));
+        cap.name = "drain-block-cap"; cap.userData.occlusionGroup = body.uuid;
+      }
+      const detail = drainDetailGroup("drain-obstacle-fittings", new THREE.Vector3(),
+        emit => appendDrainObstacleDetails(w, d, rect.kind as "pipe" | "valve" | "toilet" | "block", emit), g);
+      for (const part of detail.children) part.userData.occlusionGroup = body.uuid;
+      return;
+    }
     if (id === "cable" && rect.kind === "rack") {
       g.name = "cable-rack-detail"; g.userData.sourceRect = rect;
       const parts = cableParts(g, emit => appendCableRackDetails(w, d, rect.h >= 70 ? 2.9 : .8, rect.x + rect.y, emit));
@@ -877,7 +962,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const w = active.w * WORLD_SCALE, d = active.h * WORLD_SCALE;
     box(root, w + .25, .45, d + .25, mat(palette.dark, "stone"), 0, -.27);
     const indoor = getDistrictGraphics(id).wetness < .15;
-    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "ash" ? 0x60564d : id === "cable" ? 0x43575a : id === "market" ? 0x586567 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash" ? "stone" : "asphalt"), root, 0, .002, 0);
+    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "drain" ? 0x536a69 : id === "ash" ? 0x60564d : id === "cable" ? 0x43575a : id === "market" ? 0x586567 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash" || id === "drain" ? "stone" : "asphalt"), root, 0, .002, 0);
     floor.rotation.x = -Math.PI / 2;
     const sketch = mapSketch(id);
     if (!active.indoor) for (const r of sketch.walk) {
@@ -889,6 +974,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const color = new THREE.Color(fill);
       const m = region(r, .025, mat(color.lerp(new THREE.Color(water ? 0x1c3945 : 0x3c5146), .7), water ? "metal" : "stone"), .025);
       if (id === "kai") m.name = water ? "kai-water" : "kai-transfer-pad";
+      if (id === "drain") { m.name = "drain-water"; m.userData.sourceRect = r; m.castShadow = false; }
       if (water) { const material = m.material as THREE.MeshPhysicalMaterial; material.roughness = .15; material.clearcoat = .9; }
       if (id === "alley" || id === "yard") {
         const amount = Math.min(55, Math.round(r.w * r.h / 1000));
@@ -927,6 +1013,13 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       }
     }
     if (id === "alley") decorations.push(...alleyRunoffPuddles(active, at));
+    if (id === "drain") {
+      floor.name = "drain-rain-paving";
+      for (const bin of active.objs.filter(obj => obj.kind === "bin")) {
+        const p = at(bin.x + bin.w / 2, bin.y + bin.h + 10); p.y = .059;
+        decorations.push({ kind: "puddle", position: p, size: 1.3, angle: .3, stretch: .4 });
+      }
+    }
     if (id === "ash") {
       floor.name = "ash-rain-paving";
       const facades = active.walls.filter(r => !ASH_HOT.includes(r) && r.w >= 56 && r.h >= 56
@@ -1006,6 +1099,11 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
   function mapDetails() {
     if (id === "capsule" || id === "studio") { homeDetails(); return; }
+    if (id === "drain") {
+      // These two original obstacle plinths sit inside water instead of duplicating a wall.
+      for (const obstacle of active.obstacles ?? []) if (obstacle.kind === "block"
+        && !active.walls.some(wall => sameRect(wall, obstacle))) renderObstacle(obstacle);
+    }
     if (id === "market") {
       // Decorate the fixed counters separately: NPC rigs, children and animation stay intact.
       for (const obj of active.objs.filter(obj => obj.kind === "stall" || obj.kind === "shop")) {
