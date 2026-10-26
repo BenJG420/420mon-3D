@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — Chemiegasse v69
+
+Annahme v69: Die sechs originalen gesperrten Becken behalten ihre .75 m hohen Sockel und erhalten sichtbare Flüssigkeit/Armaturen; flache Warnmarkierungen bleiben in den bestehenden Dampf-Begegnungszonen ohne neue Hindernisse oder Effekte.
+
+- Branch `feat/chemiegasse-details-v69`: drei eigene PBR-Dächer/Laborfassaden, 13 Wandkappen mit lokalen Leitungs-/Reparaturdetails, sechs offene Chemiebecken mit Flüssigkeit/Armaturen/Manometern/Warnrändern, sechs flache Markierungen in den Original-Dampfzonen, ein Serviceblock, sechs Prop-Details, Kanalluke und zwei Neon-Wegweiser. Drei Zusatzpfützen (35 insgesamt); vorhandene drei Lampen/zwei Flackerlampen, Wetter/Graffiti/Straßeninventar erhalten. Keine zusätzlichen Punktlichter/Detailschatten.
+- Ein Build + 10/10 direkte Chemiegasse-/Weltgeometrie-Tests in einer lokalen Runde grün. Keine Browserläufe; Ben prüft Optik/FPS. Spieler/NPCs, Originalwege/Kollisionen/Begegnungen/Interaktionen/Saves erhalten. Eigener PR/Merge folgt; danach Ring. **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — Abfluss v68 veröffentlicht; Chemiegasse als Nächstes
 
 - PR #76 gemergt/live: vier eigene PBR-Dächer/Pumpenhausfassaden, 19 Wandkappen mit lokal gebündelten Details, neun niedrige Wasserbecken, sechs Rohre/sechs Ventile/drei Toiletten/zwei Original-Pumpensockel, sieben Prop-Details, Lukendetails und zwei Neon-Wegweiser. Vier Zusatzpfützen (36 insgesamt); vorhandene vier Lampen/zwei Flackerlampen, Wetter/Graffiti/Straßeninventar erhalten. Keine zusätzlichen Punktlichter/Detailschatten.

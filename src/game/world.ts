@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { MAPS, mapSketch, ASH_HOT, DRAIN_WATER, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y, type MapDef, type MapObj, type Rect } from "./data/maps";
+import { MAPS, mapSketch, ASH_HOT, DRAIN_WATER, CHEM_VATS, CHEM_FILL, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y, type MapDef, type MapObj, type Rect } from "./data/maps";
 import { WORLD_SCALE, mapToWorld, worldToMap, collidesOnMap, safeSpawn, isDefeatedGate } from "./worldGeometry";
 import { getSave, saveProgress } from "./save";
 import { recordVisit, setQuestState } from "./quests";
@@ -25,6 +25,7 @@ import { appendKinoWallDetails, appendKinoStageDetails, appendKinoScreenDetails,
 import { createKinoLitter } from "./kino-litter";
 import { appendAshFacadeDetails, appendAshBoundaryDetails, appendAshEmberDetails, appendAshPropDetails, type AshFinish, type AshDetailEmitter } from "./ash-details";
 import { appendDrainFacadeDetails, appendDrainBoundaryDetails, appendDrainWaterDetails, appendDrainObstacleDetails, appendDrainPropDetails, type DrainFinish, type DrainDetailEmitter } from "./drain-details";
+import { appendChemFacadeDetails, appendChemBoundaryDetails, appendChemVatDetails, appendChemBlockDetails, appendChemPropDetails, appendChemVatMarkings, type ChemFinish, type ChemDetailEmitter } from "./chem-details";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -240,6 +241,11 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         const detail = drainDetailGroup("drain-hatch-detail", new THREE.Vector3(), emit => appendSewerHatchDetails(w, d, emit), g, false);
         detail.userData.sourceObject = obj;
       }
+      if (id === "chem") {
+        const detail = chemDetailGroup("chem-hatch-detail", new THREE.Vector3(), emit => appendSewerHatchDetails(w, d,
+          (finish, geometry, feature) => emit(finish === "amber" ? "yellow" : finish === "cyan" ? "green" : finish === "moss" ? "dark" : finish, geometry, feature)), g, false);
+        detail.userData.sourceObject = obj;
+      }
       disc.userData.hatch = true; return;
     }
     if (obj.id.startsWith("pad_") || obj.id.startsWith("kai_cast")) {
@@ -346,6 +352,11 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         emit => appendDrainPropDetails(w, d, obj.sprite?.includes("barrel") ? "barrel" : "crate", emit), g, false);
       detail.userData.sourceObject = obj;
     }
+    if (id === "chem" && obj.kind === "prop") {
+      const detail = chemDetailGroup("chem-prop-detail", new THREE.Vector3(),
+        emit => appendChemPropDetails(w, d, obj.sprite?.includes("barrel") ? "barrel" : "crate", emit), g, false);
+      detail.userData.sourceObject = obj;
+    }
     if (obj.kind === "starter" || obj.id === "term" || obj.id.includes("slot_")) tag(g, obj.label, Math.max(1.4, Math.min(w, 2.5)), 1.75);
   }
   function terminalSpeaker(g: THREE.Object3D, x: number, z: number) {
@@ -366,7 +377,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     else if (obj.kind === "door" || obj.kind === "manhole") door(obj, g);
     else if (obj.kind === "sign") {
       tag(g, obj.label, 1.8, 1.6); box(g, .08, 1.5, .08, mat(palette.dark, "metal"));
-      if (id === "alley" || id === "yard" || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash" || id === "drain") {
+      if (id === "alley" || id === "yard" || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash" || id === "drain" || id === "chem") {
         const pieces: THREE.BufferGeometry[] = [];
         const trim = (w: number, h: number, x: number, y: number) => {
           const piece = new THREE.BoxGeometry(w, h, .055); piece.translate(x, y, -.035); pieces.push(piece);
@@ -380,7 +391,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         }
         const casing = box(g, 1.93, .51, .09, mat(0x293b42, "metal"), 0, 1.6, -.09);
         casing.name = `${id}-sign-casing`;
-        if (id === "ash" || id === "drain") casing.castShadow = false;
+        if (id === "ash" || id === "drain" || id === "chem") casing.castShadow = false;
       }
     }
     else if (obj.kind === "lamp") {
@@ -500,7 +511,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const outside = !active.indoor && (!edge || (id === "alley" && !!building?.name)) && r.w >= 56 && r.h >= 56;
       const kinoStage = id === "kino" && i === 5;
       const height = kinoStage ? .28 : id === "kai" && i === 4 ? .65 : outside ? 3.7 + seeded(i + 17) * 4.8 : edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : 2.25;
-      const m = region(r, height, mat(id === "drain" ? 0x526760 : id === "ash" ? outside ? 0x64554b : 0x5a5550 : outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : id === "sewer" ? 0x4d625d : palette.plaster, id === "sewer" || id === "drain" ? "stone" : "plaster"));
+      const m = region(r, height, mat(id === "chem" ? 0x576152 : id === "drain" ? 0x526760 : id === "ash" ? outside ? 0x64554b : 0x5a5550 : outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : id === "sewer" ? 0x4d625d : palette.plaster, id === "sewer" || id === "drain" ? "stone" : "plaster"));
       const firstPart = occluders.length;
       m.name = `original-wall:${i}`; occluder(m);
       // Dark plinth and narrow cap keep the rooms readable as a cutaway diorama.
@@ -509,13 +520,35 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const marketFacade = id === "market" && !edge;
       const ashFacade = id === "ash" && outside;
       const drainFacade = id === "drain" && outside;
+      const chemFacade = id === "chem" && outside;
       const roofKind = id === "alley" && outside ? alleyRoofKind(building?.variant ?? i)
+        : id === "chem" ? chemFacade ? CHEM_FILL.includes(r) ? "roof-felt" : alleyRoofKind(i) : "roof-metal"
         : id === "drain" ? drainFacade ? alleyRoofKind(i) : "roof-metal"
         : id === "ash" ? ashFacade ? alleyRoofKind(i) : "roof-metal"
         : id === "kai" || id === "sewer" ? "roof-metal" : yardShed || marketFacade ? alleyRoofKind(i) : id === "kino" ? kinoStage ? "roof-felt" : "roof-metal" : undefined;
       const roofTint = roofKind === "roof-tile" ? 0x896f5b : roofKind === "roof-metal" ? 0x718087 : roofKind === "roof-felt" ? 0x454d4c : outside ? 0x626c6b : 0x7d8681;
       const roof = occluder(region(r, .1, mat(roofTint, roofKind ?? "stone"), height + .02));
       if (roofKind) { roof.name = id === "kai" || id === "sewer" ? `${id}-cap` : `${id}-roof`; roof.userData.roofKind = roofKind; }
+      if (id === "chem") {
+        roof.name = chemFacade ? "chem-roof" : "chem-cap";
+        const centre = at(r.x + r.w / 2, r.y + r.h / 2);
+        if (chemFacade) {
+          const group = chemDetailGroup("chem-facade-detail", centre,
+            emit => appendChemFacadeDetails(r.w * WORLD_SCALE, r.h * WORLD_SCALE, height, i, emit));
+          group.userData.sourceRect = r;
+        } else {
+          const side = r.w < r.h, length = (side ? r.h : r.w) * WORLD_SCALE;
+          const depth = (side ? r.w : r.h) * WORLD_SCALE, count = Math.ceil(length / 24), span = length / count;
+          const angle = side ? (r.x < active.w / 2 ? Math.PI / 2 : -Math.PI / 2) : r.y > active.h / 2 ? Math.PI : 0;
+          for (let chunk = 0; chunk < count; chunk++) {
+            const offset = -length / 2 + (chunk + .5) * span;
+            const position = centre.clone().add(new THREE.Vector3(Math.cos(angle) * offset, 0, -Math.sin(angle) * offset));
+            const group = chemDetailGroup("chem-boundary-detail", position,
+              emit => appendChemBoundaryDetails(span, depth, height, i * 17 + chunk, emit));
+            group.rotation.y = angle; group.userData.sourceRect = r; group.userData.chunk = chunk;
+          }
+        }
+      }
       if (id === "drain") {
         roof.name = drainFacade ? "drain-roof" : "drain-cap";
         const centre = at(r.x + r.w / 2, r.y + r.h / 2);
@@ -606,7 +639,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
           sewerParts(group, emit => appendSewerWallDetails(span, depth, height, i * 17 + chunk, emit), true, Math.hypot(span, depth) / 2 + 1);
         }
       }
-      if (outside && r.w > 100 && r.h > 80 && id !== "ash" && id !== "drain") {
+      if (outside && r.w > 100 && r.h > 80 && id !== "ash" && id !== "drain" && id !== "chem") {
         buildingDetails(r, height, i, building?.name, building?.side, building ? (building.x + building.w / 2 - r.x - r.w / 2) * WORLD_SCALE : 0);
       }
       if (isDetailedDistrict(id) && artCount < 24) {
@@ -695,6 +728,30 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       part.name = `${group.name}:${finish}`;
       if (fading) { occluder(part); part.userData.occlusionGroup = group.uuid; }
     }
+  }
+  /** Chemical service structures use local material batches with their source solid's fade. */
+  function chemDetailGroup(name: string, position: THREE.Vector3, append: (emit: ChemDetailEmitter) => void, parent: THREE.Object3D = root, fading = true) {
+    const group = new THREE.Group(); group.name = name; group.position.copy(position); parent.add(group);
+    group.userData.districtDetail = "chem";
+    const liquid = mat(0x546c36, undefined, 0x1a2e0a);
+    liquid.roughness = .19; liquid.clearcoat = .85; liquid.emissiveIntensity = .65;
+    const finishes: Record<ChemFinish, THREE.Material> = {
+      stone: mat(0x6b7060, "plaster"), metal: mat(0x929b88, "metal"), rust: mat(0x80654b, "metal"),
+      dark: mat(0x28352e, "metal"), yellow: mat(0xc0aa50, "plaster"), green: liquid,
+      glass: mat(0x27474c, "metal", 0x43645d), wood: mat(0x756950, "wood"),
+    };
+    const batches = new Map<ChemFinish, THREE.BufferGeometry[]>(), features = new Set<string>();
+    append((finish, geometry, feature) => {
+      const pieces = batches.get(finish) ?? []; pieces.push(geometry); batches.set(finish, pieces); features.add(feature);
+    });
+    group.userData.chemFeatures = [...features];
+    for (const [finish, pieces] of batches) {
+      const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+      if (!geometry) continue;
+      const part = mesh(geometry, finishes[finish], group, 0, 0, 0, false); part.name = `${name}:${finish}`;
+      if (fading) { occluder(part); part.userData.occlusionGroup = group.uuid; }
+    }
+    return group;
   }
   /** Wet masonry, mechanical fittings and basin details reuse cached PBR finishes. */
   function drainDetailGroup(name: string, position: THREE.Vector3, append: (emit: DrainDetailEmitter) => void, parent: THREE.Object3D = root, fading = true) {
@@ -893,6 +950,20 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const p = at(rect.x + rect.w / 2, rect.y + rect.h / 2);
     const g = new THREE.Group(); g.position.copy(p); root.add(g);
     const w = rect.w * WORLD_SCALE, d = rect.h * WORLD_SCALE;
+    if (id === "chem" && rect.kind === "block") {
+      const vat = CHEM_VATS.some(source => sameRect(source, rect));
+      g.name = vat ? "chem-vat-detail" : "chem-block-detail"; g.userData.sourceRect = rect;
+      const body = occluder(box(g, w, .75, d, mat(vat ? 0x566456 : palette.stone, vat ? "metal" : "stone")));
+      body.name = "chem-obstacle-body"; body.userData.occlusionGroup = body.uuid;
+      if (!vat) {
+        const cap = occluder(mesh(new THREE.BoxGeometry(w, .06, d), mat(0x7a826c, "roof-metal"), g, 0, .77, 0, false));
+        cap.name = "chem-block-cap"; cap.userData.occlusionGroup = body.uuid;
+      }
+      const detail = chemDetailGroup(vat ? "chem-vat-fittings" : "chem-block-fittings", new THREE.Vector3(),
+        emit => vat ? appendChemVatDetails(w, d, rect.x + rect.y, emit) : appendChemBlockDetails(w, d, emit), g);
+      for (const part of detail.children) part.userData.occlusionGroup = body.uuid;
+      return;
+    }
     if (id === "drain" && (rect.kind === "pipe" || rect.kind === "valve" || rect.kind === "toilet" || rect.kind === "block")) {
       g.name = "drain-obstacle-detail"; g.userData.sourceRect = rect;
       let body: THREE.Mesh;
@@ -962,7 +1033,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const w = active.w * WORLD_SCALE, d = active.h * WORLD_SCALE;
     box(root, w + .25, .45, d + .25, mat(palette.dark, "stone"), 0, -.27);
     const indoor = getDistrictGraphics(id).wetness < .15;
-    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "drain" ? 0x536a69 : id === "ash" ? 0x60564d : id === "cable" ? 0x43575a : id === "market" ? 0x586567 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash" || id === "drain" ? "stone" : "asphalt"), root, 0, .002, 0);
+    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "chem" ? 0x5b6554 : id === "drain" ? 0x536a69 : id === "ash" ? 0x60564d : id === "cable" ? 0x43575a : id === "market" ? 0x586567 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash" || id === "drain" || id === "chem" ? "stone" : "asphalt"), root, 0, .002, 0);
     floor.rotation.x = -Math.PI / 2;
     const sketch = mapSketch(id);
     if (!active.indoor) for (const r of sketch.walk) {
@@ -1013,6 +1084,18 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       }
     }
     if (id === "alley") decorations.push(...alleyRunoffPuddles(active, at));
+    if (id === "chem") {
+      floor.name = "chem-rain-paving";
+      for (const bin of active.objs.filter(obj => obj.kind === "bin")) {
+        const p = at(bin.x + bin.w / 2, bin.y + bin.h + 14); p.y = .059;
+        decorations.push({ kind: "puddle", position: p, size: 1.3, angle: .3, stretch: .4 });
+      }
+      for (const vat of CHEM_VATS) {
+        const group = chemDetailGroup("chem-vat-markings", at(vat.x + vat.w / 2, vat.y + vat.h / 2),
+          emit => appendChemVatMarkings(vat.w * WORLD_SCALE, vat.h * WORLD_SCALE, emit), root, false);
+        group.userData.sourceRect = vat;
+      }
+    }
     if (id === "drain") {
       floor.name = "drain-rain-paving";
       for (const bin of active.objs.filter(obj => obj.kind === "bin")) {
