@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — Schrotttor v73
+
+Annahme v73: Die zwei originalen Förderbänder und fünf Schrottflächen erhalten erkennbare Rollen-/Altmetallformen statt der bisherigen generischen Boxhaufen; die .75-m-Sockel, Coils exakt 16 Pixel breiter Durchgang und alle Originalkollisionen bleiben erhalten.
+
+- Branch `feat/schrotttor-details-v73`: fünf eigene Dächer/Werkstattfassaden, fünf Randmauerkappen, zwei Förderbänder, fünf Schrotthaufen, zwei Torblöcke und fünf vollständige Zaunsegmente detailliert. Fünf flache Rostzonen, fünf Prop-Details, Kanalluke, zwei Neon-Wegweiser und drei zusätzliche instanzierte Pfützen. Wand-/Banddetails lokal bis 16 m, höchstens sechs Wandmaterialien bzw. vier pro Maschine/Haufen; keine zusätzlichen Punktlichter/Detailschatten. Drei vorhandene Lampen/zwei Flackerlampen, Regen/Nebel/Post-Processing, Graffiti und Street-Instancing erhalten. Keine Spieler-/NPC-/Mechanikänderung; Monster erst nach Bens Freigabe.
+- Ein Build + 10/10 direkte Schrotttor-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Ben prüft Optik/FPS. Eigener PR und Merge folgen. Danach Bens Optik-/FPS-Rückmeldungen und konkrete Fehler bearbeiten; aus dem Abschluss der Bezirke folgt keine Monster-Freigabe. Ko-fi/Zahlungsserver bleiben übersprungen.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — Nischen v72 veröffentlicht; Schrotttor als Nächstes
 
 Annahme v72: Die neun Original-Nischen erhalten gefaltete Sichtschutz-Trennwände auf ihren bestehenden Zaunflächen; die beiden Gitter bei Glow und alle Eingänge bleiben offen wie im 2D-Grundriss, ohne neue Möbel oder Kollisionen.
