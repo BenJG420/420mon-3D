@@ -1,9 +1,11 @@
-# Aktuelle Arbeit — Nischen v72
+# Aktueller Wiedereinstieg — Nischen v72 veröffentlicht; Schrotttor als Nächstes
 
 Annahme v72: Die neun Original-Nischen erhalten gefaltete Sichtschutz-Trennwände auf ihren bestehenden Zaunflächen; die beiden Gitter bei Glow und alle Eingänge bleiben offen wie im 2D-Grundriss, ohne neue Möbel oder Kollisionen.
 
-- Branch `feat/nischen-details-v72`: neun eigene Metall-/Teerpappenkappen, lokale Gangdetails mit Polstern/Lüftung/Leitungen/rosa Neon, 23 Stoff-Trennwände und zwei Eisengitter, zehn Teppichzonen, drei Kisten, Kanalluke und zwei Wegweiser. Spieler/NPCs, Originalwege, Interaktionen und Saves unverändert. Wandteile ≤16 m/≤5 Materialien, Trennwände ≤4 Materialien, Gitter ≤3 Materialien; drei zusätzliche instanzierte Pfützen (35 insgesamt). Keine zusätzlichen Punktlichter/Detailschatten; vorhandenes Street-Instancing, Graffiti und Flackerlampen bleiben erhalten.
-- Ein Build + 10/10 direkte Nischen-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Ben prüft Optik/FPS. Eigener PR und Merge folgen. Danach Schrotttor. **Monster erst nach Freigabe** durch Ben; Ko-fi/Zahlungsserver bleiben übersprungen.
+- PR #80 gemergt/live: neun eigene Metall-/Teerpappenkappen, lokale Gangdetails mit Polstern/Lüftung/Leitungen/rosa Neon, 23 Stoff-Trennwände und zwei Eisengitter, zehn Teppichzonen, drei Kisten, Kanalluke und zwei Wegweiser. Spieler/NPCs, Originalwege, Interaktionen und Saves unverändert. Wandteile ≤16 m/≤5 Materialien, Trennwände ≤4 Materialien, Gitter ≤3 Materialien; drei zusätzliche instanzierte Pfützen (35 insgesamt). Keine zusätzlichen Punktlichter/Detailschatten; vorhandenes Street-Instancing, Graffiti und Flackerlampen bleiben erhalten.
+- Ein Build + 10/10 direkte Nischen-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Ben prüft Optik/FPS. Nächster eigener Bezirks-PR: **Schrotttor (`scrap`)**. **Monster erst nach Freigabe** durch Ben; Ko-fi/Zahlungsserver bleiben übersprungen.
+
+- Source `06ad484c46f6a3eacce04d09df46ce5cad42c2bf`; PR CI40432994991/Main CI40433155833/Pages40433155914 grün. Live JS `index-BRNm2PGa.js`, SHA256 `20d7a3630209897431affe45a0460d54d700c3396d9be9a2b2b8f361c5c8bd71`; JS/CSS/fonts bytegleich, Stable unverändert (`v72-deploy-proof.json`).
 
 ## Vorheriger Stand
 
