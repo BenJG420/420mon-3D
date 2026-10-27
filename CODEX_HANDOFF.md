@@ -1,9 +1,11 @@
-# Aktueller Wiedereinstieg — Aquarium/Fische v74 implementiert; PR/Veröffentlichung ausstehend
+# Aktueller Wiedereinstieg — Aquarium/Fische v74 veröffentlicht, PR #82
 
 Annahme v74: Alle 42 Original-Fischarten behalten Namen, Farben, Fanghistorie und Boni; ihre Becken-Darstellung erhält anatomisch passende 3D-Fischformen. Katalog-Porträts bleiben original, das Kapsel-Aquarium behält seinen Grundriss.
 
 - Bens neuer Auftrag vor den Monstern, eigener PR: detaillierte 3D-Fische mit Körper-/Flossenbewegung; Glas/Tiefe/Lichtbrechung, Kaustik, Wasserpflanzen, Kies/Steine/Deko und Blasen. Gemeinsame Modelle für Kapsel und Nahansicht; begrenzte Instanzen und 30-fps-Animation, keine Spieler-/NPC-/Mechanik-/Saveänderung.
-- Ein Build + 24/24 direkte Aquarium-/Angeln-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Bens Optik-/FPS-Prüfung steht aus. Körper-Winding, Transparenz-Tiefenschreiben, Shader-Cache und Pflanzen-/Schwimmabstände vor der ersten Prüfrunde korrigiert. Drei gemeinsame Fisch-Shaderprogramme, drei Meshes/<7k Dreiecke pro Fisch; Nahansicht mit halber Refractionsauflösung, Kapsel ohne Transmission. **Monster erst nach Freigabe**. PR/Merge/Veröffentlichung noch ausstehend.
+- Ein Build + 24/24 direkte Aquarium-/Angeln-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Bens Optik-/FPS-Prüfung steht aus. Körper-Winding, Transparenz-Tiefenschreiben, Shader-Cache und Pflanzen-/Schwimmabstände vor der ersten Prüfrunde korrigiert. Drei gemeinsame Fisch-Shaderprogramme, drei Meshes/<7k Dreiecke pro Fisch; Nahansicht mit halber Refractionsauflösung, Kapsel ohne Transmission. **Monster erst nach Freigabe**. PR #82 gemergt/live.
+- Source `89f81573ab188f3a41c49f66a4c085db6c7212c8`; PR CI40504855365/Main CI40505073146/Pages40505073242 grün. Live JS `index-DevRC_Rh.js`, SHA256 `abfdc5a53bc54f19b2331b4c7ac6df6a99eb772350539da525934aa794261397`; JS/CSS/fonts bytegleich, Stable unverändert (`v74-deploy-proof.json`).
+- Nächster Stand: Bens konkrete Optik-/Gameplay-/FPS-Rückmeldungen und daraus folgende Fixes; alle geplanten Bezirks-Pakete sind geliefert. Keine automatische Freigabe für Monster.
 
 ## Vorheriger Stand
 
