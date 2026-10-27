@@ -1,9 +1,11 @@
-# Aktuelle Arbeit — Schrotttor v73
+# Aktueller Wiedereinstieg — Schrotttor v73 veröffentlicht; Bezirks-Pakete umgesetzt
 
 Annahme v73: Die zwei originalen Förderbänder und fünf Schrottflächen erhalten erkennbare Rollen-/Altmetallformen statt der bisherigen generischen Boxhaufen; die .75-m-Sockel, Coils exakt 16 Pixel breiter Durchgang und alle Originalkollisionen bleiben erhalten.
 
-- Branch `feat/schrotttor-details-v73`: fünf eigene Dächer/Werkstattfassaden, fünf Randmauerkappen, zwei Förderbänder, fünf Schrotthaufen, zwei Torblöcke und fünf vollständige Zaunsegmente detailliert. Fünf flache Rostzonen, fünf Prop-Details, Kanalluke, zwei Neon-Wegweiser und drei zusätzliche instanzierte Pfützen. Wand-/Banddetails lokal bis 16 m, höchstens sechs Wandmaterialien bzw. vier pro Maschine/Haufen; keine zusätzlichen Punktlichter/Detailschatten. Drei vorhandene Lampen/zwei Flackerlampen, Regen/Nebel/Post-Processing, Graffiti und Street-Instancing erhalten. Keine Spieler-/NPC-/Mechanikänderung; Monster erst nach Bens Freigabe.
-- Ein Build + 10/10 direkte Schrotttor-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Ben prüft Optik/FPS. Eigener PR und Merge folgen. Danach Bens Optik-/FPS-Rückmeldungen und konkrete Fehler bearbeiten; aus dem Abschluss der Bezirke folgt keine Monster-Freigabe. Ko-fi/Zahlungsserver bleiben übersprungen.
+- PR #81 gemergt/live: fünf eigene Dächer/Werkstattfassaden, fünf Randmauerkappen, zwei Förderbänder, fünf Schrotthaufen, zwei Torblöcke und fünf vollständige Zaunsegmente detailliert. Fünf flache Rostzonen, fünf Prop-Details, Kanalluke, zwei Neon-Wegweiser und drei zusätzliche instanzierte Pfützen. Wand-/Banddetails lokal bis 16 m, höchstens sechs Wandmaterialien bzw. vier pro Maschine/Haufen; keine zusätzlichen Punktlichter/Detailschatten. Drei vorhandene Lampen/zwei Flackerlampen, Regen/Nebel/Post-Processing, Graffiti und Street-Instancing erhalten. Keine Spieler-/NPC-/Mechanikänderung; **Monster erst nach Freigabe** durch Ben.
+- Ein Build + 10/10 direkte Schrotttor-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Ben prüft Optik/FPS. Alle geplanten Bezirks-Pakete haben jetzt einen Implementierungsstand. Offen: Bens Optik-/FPS-Rückmeldungen und konkrete Fehler; aus dem Abschluss der Bezirke folgt keine Monster-Freigabe. Ko-fi/Zahlungsserver bleiben übersprungen.
+
+- Source `369aed854e69cdc3ee281b47ad748578ae85caad`; PR CI40467271354/Main CI40467413392/Pages40467413464 grün. Live JS `index-BIdYeBXJ.js`, SHA256 `3950a6233501b1b967b88f535d244eb0523dba55156bc4a83a0cbb1704b67f2e`; JS/CSS/fonts bytegleich, Stable unverändert (`v73-deploy-proof.json`).
 
 ## Vorheriger Stand
 
