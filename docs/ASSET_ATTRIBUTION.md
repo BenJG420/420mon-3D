@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Aquarium and fish — v74
+
+- Fish bodies, fins, gills, eyes and species-specific anatomy, planted habitat, gravel, rocks, driftwood, glass, bubbles and procedural surface/lighting details are project-authored in `src/game/aquarium-fish.ts` and `src/game/aquarium-habitat.ts`. Original fish IDs, names and color palettes from `src/game/data/fish.ts` are retained. No external model or texture pack is added.
+- Three.js (MIT), including its procedural `RoomEnvironment`, provides the reflection environment. Existing 2D catalogue art, player/NPC assets and monster licensing remain unchanged.
+
 ## Kabelkeller detail — v58
 
 - Service racks/junction boxes, cooling fans, patch leads, electrical trench,
