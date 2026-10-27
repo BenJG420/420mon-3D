@@ -1,3 +1,12 @@
+# Aktuelle Arbeit — Nischen v72
+
+Annahme v72: Die neun Original-Nischen erhalten gefaltete Sichtschutz-Trennwände auf ihren bestehenden Zaunflächen; die beiden Gitter bei Glow und alle Eingänge bleiben offen wie im 2D-Grundriss, ohne neue Möbel oder Kollisionen.
+
+- Branch `feat/nischen-details-v72`: neun eigene Metall-/Teerpappenkappen, lokale Gangdetails mit Polstern/Lüftung/Leitungen/rosa Neon, 23 Stoff-Trennwände und zwei Eisengitter, zehn Teppichzonen, drei Kisten, Kanalluke und zwei Wegweiser. Spieler/NPCs, Originalwege, Interaktionen und Saves unverändert. Wandteile ≤16 m/≤5 Materialien, Trennwände ≤4 Materialien, Gitter ≤3 Materialien; drei zusätzliche instanzierte Pfützen (35 insgesamt). Keine zusätzlichen Punktlichter/Detailschatten; vorhandenes Street-Instancing, Graffiti und Flackerlampen bleiben erhalten.
+- Ein Build + 10/10 direkte Nischen-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Ben prüft Optik/FPS. Eigener PR und Merge folgen. Danach Schrotttor. **Monster erst nach Freigabe** durch Ben; Ko-fi/Zahlungsserver bleiben übersprungen.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — Labyrinth v71 veröffentlicht; Nischen als Nächstes
 
 Annahme v71: Das Labyrinth bleibt ein offener Einblick in die originalen Innenkorridore; alle Wandhöhen und Wege bleiben erhalten, Details ragen höchstens 12 cm aus Wandflächen, und beide Gitter folgen vollständig ihren gesperrten Originalrechtecken ohne Hushs schmalen Durchgang zu verengen.
