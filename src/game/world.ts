@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { MAPS, mapSketch, ASH_HOT, DRAIN_WATER, CHEM_VATS, CHEM_FILL, RING_CHALK, LAB_SHADE, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y, type MapDef, type MapObj, type Rect } from "./data/maps";
+import { MAPS, mapSketch, ASH_HOT, DRAIN_WATER, CHEM_VATS, CHEM_FILL, RING_CHALK, LAB_SHADE, NISCHE_PINK, CAPSULE_SPAWN_X, CAPSULE_SPAWN_Y, type MapDef, type MapObj, type Rect } from "./data/maps";
 import { WORLD_SCALE, mapToWorld, worldToMap, collidesOnMap, safeSpawn, isDefeatedGate } from "./worldGeometry";
 import { getSave, saveProgress } from "./save";
 import { recordVisit, setQuestState } from "./quests";
@@ -28,6 +28,7 @@ import { appendDrainFacadeDetails, appendDrainBoundaryDetails, appendDrainWaterD
 import { appendChemFacadeDetails, appendChemBoundaryDetails, appendChemVatDetails, appendChemBlockDetails, appendChemPropDetails, appendChemVatMarkings, type ChemFinish, type ChemDetailEmitter } from "./chem-details";
 import { appendRingFacadeDetails, appendRingBoundaryDetails, appendRingFenceDetails, appendRingBlockDetails, appendRingCrateDetails, appendRingFloorDetails, type RingFinish, type RingDetailEmitter } from "./ring-details";
 import { appendLabyrinthWallDetails, appendLabyrinthFenceDetails, appendLabyrinthCrateDetails, appendLabyrinthShadeDetails, type LabyrinthFinish, type LabyrinthDetailEmitter } from "./labyrinth-details";
+import { appendNischeWallDetails, appendNischePartitionDetails, appendNischeCrateDetails, appendNischeFloorDetails, type NischeFinish, type NischeDetailEmitter } from "./nische-details";
 
 /** Geometry, object positions and routes come from the original 2D game. */
 export type MapInfo = {
@@ -258,6 +259,11 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
           (finish, geometry, feature) => emit(finish === "amber" ? "paper" : finish === "cyan" ? "glow" : finish === "moss" ? "dark" : finish, geometry, feature)), g, false);
         detail.userData.sourceObject = obj;
       }
+      if (id === "nische") {
+        const detail = nischeDetailGroup("nische-hatch-detail", new THREE.Vector3(), emit => appendSewerHatchDetails(w, d,
+          (finish, geometry, feature) => emit(finish === "amber" ? "paper" : finish === "cyan" ? "glow" : finish === "moss" ? "dark" : finish === "rust" ? "metal" : finish, geometry, feature)), g, false);
+        detail.userData.sourceObject = obj;
+      }
       disc.userData.hatch = true; return;
     }
     if (obj.id.startsWith("pad_") || obj.id.startsWith("kai_cast")) {
@@ -377,6 +383,10 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const detail = labyrinthDetailGroup("labyrinth-crate-detail", new THREE.Vector3(), emit => appendLabyrinthCrateDetails(w, d, emit), g, false);
       detail.userData.sourceObject = obj;
     }
+    if (id === "nische" && obj.kind === "prop") {
+      const detail = nischeDetailGroup("nische-crate-detail", new THREE.Vector3(), emit => appendNischeCrateDetails(w, d, emit), g, false);
+      detail.userData.sourceObject = obj;
+    }
     if (obj.kind === "starter" || obj.id === "term" || obj.id.includes("slot_")) tag(g, obj.label, Math.max(1.4, Math.min(w, 2.5)), 1.75);
   }
   function terminalSpeaker(g: THREE.Object3D, x: number, z: number) {
@@ -397,7 +407,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     else if (obj.kind === "door" || obj.kind === "manhole") door(obj, g);
     else if (obj.kind === "sign") {
       tag(g, obj.label, 1.8, 1.6); box(g, .08, 1.5, .08, mat(palette.dark, "metal"));
-      if (id === "alley" || id === "yard" || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash" || id === "drain" || id === "chem" || id === "ring" || id === "labyrinth") {
+      if (id === "alley" || id === "yard" || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash" || id === "drain" || id === "chem" || id === "ring" || id === "labyrinth" || id === "nische") {
         const pieces: THREE.BufferGeometry[] = [];
         const trim = (w: number, h: number, x: number, y: number) => {
           const piece = new THREE.BoxGeometry(w, h, .055); piece.translate(x, y, -.035); pieces.push(piece);
@@ -406,12 +416,12 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         trim(.045, .52, -.95, 1.6); trim(.045, .52, .95, 1.6);
         const neon = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
         if (neon) {
-          const light = mesh(neon, mat(id === "labyrinth" ? 0x78618f : 0x486e71, undefined, id === "labyrinth" ? 0xae8df5 : 0x568b8a), g, 0, 0, 0, false);
+          const light = mesh(neon, mat(id === "nische" ? 0x90627d : id === "labyrinth" ? 0x78618f : 0x486e71, undefined, id === "nische" ? 0xef78b5 : id === "labyrinth" ? 0xae8df5 : 0x568b8a), g, 0, 0, 0, false);
           light.name = `${id}-sign-neon`;
         }
         const casing = box(g, 1.93, .51, .09, mat(0x293b42, "metal"), 0, 1.6, -.09);
         casing.name = `${id}-sign-casing`;
-        if (id === "ash" || id === "drain" || id === "chem" || id === "ring" || id === "labyrinth") casing.castShadow = false;
+        if (id === "ash" || id === "drain" || id === "chem" || id === "ring" || id === "labyrinth" || id === "nische") casing.castShadow = false;
       }
     }
     else if (obj.kind === "lamp") {
@@ -531,7 +541,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const outside = !active.indoor && (!edge || (id === "alley" && !!building?.name)) && r.w >= 56 && r.h >= 56;
       const kinoStage = id === "kino" && i === 5;
       const height = kinoStage ? .28 : id === "kai" && i === 4 ? .65 : outside ? 3.7 + seeded(i + 17) * 4.8 : edge ? (r.y > active.h / 2 || r.x > active.w / 2 ? .72 : 2.85) : 2.25;
-      const m = region(r, height, mat(id === "labyrinth" ? 0x626070 : id === "ring" ? 0x685d55 : id === "chem" ? 0x576152 : id === "drain" ? 0x526760 : id === "ash" ? outside ? 0x64554b : 0x5a5550 : outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : id === "sewer" ? 0x4d625d : palette.plaster, id === "sewer" || id === "drain" ? "stone" : "plaster"));
+      const m = region(r, height, mat(id === "nische" ? 0x6b5c66 : id === "labyrinth" ? 0x626070 : id === "ring" ? 0x685d55 : id === "chem" ? 0x576152 : id === "drain" ? 0x526760 : id === "ash" ? outside ? 0x64554b : 0x5a5550 : outside ? new THREE.Color(building?.tone ?? "#546269").lerp(new THREE.Color(0x3a4a53), .72) : id === "sewer" ? 0x4d625d : palette.plaster, id === "sewer" || id === "drain" ? "stone" : "plaster"));
       const firstPart = occluders.length;
       m.name = `original-wall:${i}`; occluder(m);
       // Dark plinth and narrow cap keep the rooms readable as a cutaway diorama.
@@ -543,6 +553,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const chemFacade = id === "chem" && outside;
       const ringFacade = id === "ring" && outside;
       const roofKind = id === "alley" && outside ? alleyRoofKind(building?.variant ?? i)
+        : id === "nische" ? !edge && r.w >= 32 && r.h >= 80 ? "roof-felt" : "roof-metal"
         : id === "labyrinth" ? !edge && r.w >= 56 && r.h >= 56 ? "roof-felt" : "roof-metal"
         : id === "ring" ? ringFacade ? alleyRoofKind(i) : "roof-metal"
         : id === "chem" ? chemFacade ? CHEM_FILL.includes(r) ? "roof-felt" : alleyRoofKind(i) : "roof-metal"
@@ -552,6 +563,28 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       const roofTint = roofKind === "roof-tile" ? 0x896f5b : roofKind === "roof-metal" ? 0x718087 : roofKind === "roof-felt" ? 0x454d4c : outside ? 0x626c6b : 0x7d8681;
       const roof = occluder(region(r, .1, mat(roofTint, roofKind ?? "stone"), height + .02));
       if (roofKind) { roof.name = id === "kai" || id === "sewer" ? `${id}-cap` : `${id}-roof`; roof.userData.roofKind = roofKind; }
+      if (id === "nische") {
+        roof.name = "nische-cap";
+        const centre = at(r.x + r.w / 2, r.y + r.h / 2);
+        // Interior corridors run on both sides of the original solids. Split each
+        // face into small frustum-bounded groups without spanning a whole block.
+        const faces = edge ? [r.w < r.h ? r.x < active.w / 2 ? 1 : 3 : r.y > active.h / 2 ? 2 : 0] : [0, 1, 2, 3];
+        for (const face of faces) {
+          const length = (face % 2 ? r.h : r.w) * WORLD_SCALE;
+          const depth = (face % 2 ? r.w : r.h) * WORLD_SCALE;
+          const count = Math.ceil(length / 16), span = length / count, angle = face * Math.PI / 2;
+          for (let chunk = 0; chunk < count; chunk++) {
+            const offset = -length / 2 + (chunk + .5) * span;
+            const position = centre.clone().add(new THREE.Vector3(
+              Math.cos(angle) * offset + Math.sin(angle) * depth / 2, 0,
+              -Math.sin(angle) * offset + Math.cos(angle) * depth / 2));
+            const group = nischeDetailGroup("nische-wall-detail", position,
+              emit => appendNischeWallDetails(span, 0, height, i * 29 + face * 7 + chunk, emit));
+            group.rotation.y = angle; group.userData.sourceRect = r;
+            group.userData.face = face; group.userData.chunk = chunk;
+          }
+        }
+      }
       if (id === "labyrinth") {
         roof.name = "labyrinth-cap";
         const centre = at(r.x + r.w / 2, r.y + r.h / 2);
@@ -793,6 +826,28 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       part.name = `${group.name}:${finish}`;
       if (fading) { occluder(part); part.userData.occlusionGroup = group.uuid; }
     }
+  }
+  /** Local corridor fittings share cached finishes and their source wall's fade. */
+  function nischeDetailGroup(name: string, position: THREE.Vector3, append: (emit: NischeDetailEmitter) => void, parent: THREE.Object3D = root, fading = true) {
+    const group = new THREE.Group(); group.name = name; group.position.copy(position); parent.add(group);
+    group.userData.districtDetail = "nische";
+    const finishes: Record<NischeFinish, THREE.Material> = {
+      stone: mat(0x8a7a7d, "plaster"), metal: mat(0x9a8771, "metal"), dark: mat(0x342b36, "metal"),
+      fabric: mat(0x814b69, "plaster"), paper: mat(0xc2b8ae, "plaster"),
+      glow: mat(0x965d7c, undefined, 0xef78b5), wood: mat(0x776255, "wood"),
+    };
+    const batches = new Map<NischeFinish, THREE.BufferGeometry[]>(), features = new Set<string>();
+    append((finish, geometry, feature) => {
+      const pieces = batches.get(finish) ?? []; pieces.push(geometry); batches.set(finish, pieces); features.add(feature);
+    });
+    group.userData.nischeFeatures = [...features];
+    for (const [finish, pieces] of batches) {
+      const geometry = mergeGeometries(pieces, false); for (const piece of pieces) piece.dispose();
+      if (!geometry) continue;
+      const part = mesh(geometry, finishes[finish], group, 0, 0, 0, false); part.name = `${name}:${finish}`;
+      if (fading) { occluder(part); part.userData.occlusionGroup = group.uuid; }
+    }
+    return group;
   }
   /** Local corridor fittings share cached finishes and their source wall's fade. */
   function labyrinthDetailGroup(name: string, position: THREE.Vector3, append: (emit: LabyrinthDetailEmitter) => void, parent: THREE.Object3D = root, fading = true) {
@@ -1058,6 +1113,13 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   function renderObstacle(rect: Rect & { kind: string }) {
     const p = at(rect.x + rect.w / 2, rect.y + rect.h / 2);
     const w = rect.w * WORLD_SCALE, d = rect.h * WORLD_SCALE;
+    if (id === "nische" && rect.kind === "fence") {
+      const gate = rect.x === 1472 && rect.w === 28;
+      const group = nischeDetailGroup("nische-partition-detail", p,
+        emit => appendNischePartitionDetails(w, d, gate, rect.x + rect.y, emit));
+      group.userData.sourceRect = rect; group.userData.gate = gate;
+      return;
+    }
     if (id === "labyrinth" && rect.kind === "fence") {
       const group = labyrinthDetailGroup("labyrinth-fence-detail", p, emit => appendLabyrinthFenceDetails(w, d, rect.x + rect.y, emit));
       group.userData.sourceRect = rect;
@@ -1162,7 +1224,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     const w = active.w * WORLD_SCALE, d = active.h * WORLD_SCALE;
     box(root, w + .25, .45, d + .25, mat(palette.dark, "stone"), 0, -.27);
     const indoor = getDistrictGraphics(id).wetness < .15;
-    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "labyrinth" ? 0x656171 : id === "ring" ? 0x65665d : id === "chem" ? 0x5b6554 : id === "drain" ? 0x536a69 : id === "ash" ? 0x60564d : id === "cable" ? 0x43575a : id === "market" ? 0x586567 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash" || id === "drain" || id === "chem" || id === "ring" || id === "labyrinth" ? "stone" : "asphalt"), root, 0, .002, 0);
+    const floor = mesh(new THREE.PlaneGeometry(w, d), mat(id === "capsule" ? 0x8a7760 : id === "nische" ? 0x655a63 : id === "labyrinth" ? 0x656171 : id === "ring" ? 0x65665d : id === "chem" ? 0x5b6554 : id === "drain" ? 0x536a69 : id === "ash" ? 0x60564d : id === "cable" ? 0x43575a : id === "market" ? 0x586567 : indoor ? 0x697378 : id === "yard" ? 0x4b594e : 0x65727b, id === "capsule" ? "wood" : indoor || id === "cable" || id === "market" || id === "kai" || id === "sewer" || id === "ash" || id === "drain" || id === "chem" || id === "ring" || id === "labyrinth" || id === "nische" ? "stone" : "asphalt"), root, 0, .002, 0);
     floor.rotation.x = -Math.PI / 2;
     const sketch = mapSketch(id);
     if (!active.indoor) for (const r of sketch.walk) {
@@ -1172,8 +1234,9 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     for (const { r, fill } of sketch.extras) {
       const water = id === "drain" || (id === "kai" && r.y === 220);
       const color = new THREE.Color(fill);
-      const m = region(r, .025, mat(id === "labyrinth" ? 0x4e485d : color.lerp(new THREE.Color(water ? 0x1c3945 : 0x3c5146), .7), water ? "metal" : "stone"), .025);
+      const m = region(r, .025, mat(id === "nische" ? 0x604452 : id === "labyrinth" ? 0x4e485d : color.lerp(new THREE.Color(water ? 0x1c3945 : 0x3c5146), .7), water ? "metal" : id === "nische" ? "plaster" : "stone"), .025);
       if (id === "labyrinth") { m.name = "labyrinth-shade-floor"; m.userData.sourceRect = r; m.castShadow = false; }
+      if (id === "nische") { m.name = "nische-rug-floor"; m.userData.sourceRect = r; m.castShadow = false; }
       if (id === "kai") m.name = water ? "kai-water" : "kai-transfer-pad";
       if (id === "drain") { m.name = "drain-water"; m.userData.sourceRect = r; m.castShadow = false; }
       if (water) { const material = m.material as THREE.MeshPhysicalMaterial; material.roughness = .15; material.clearcoat = .9; }
@@ -1214,6 +1277,18 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       }
     }
     if (id === "alley") decorations.push(...alleyRunoffPuddles(active, at));
+    if (id === "nische") {
+      floor.name = "nische-damp-paving";
+      for (const [index, rect] of NISCHE_PINK.entries()) {
+        const group = nischeDetailGroup("nische-floor-detail", at(rect.x + rect.w / 2, rect.y + rect.h / 2),
+          emit => appendNischeFloorDetails(rect.w * WORLD_SCALE, rect.h * WORLD_SCALE, index, emit), root, false);
+        group.userData.sourceRect = rect;
+      }
+      for (const bin of active.objs.filter(obj => obj.kind === "bin")) {
+        const p = at(bin.x + bin.w / 2, bin.y + bin.h + 12); p.y = .059;
+        decorations.push({ kind: "puddle", position: p, size: 1.3, angle: .3, stretch: .4 });
+      }
+    }
     if (id === "labyrinth") {
       floor.name = "labyrinth-damp-paving";
       for (const [index, rect] of LAB_SHADE.entries()) {
