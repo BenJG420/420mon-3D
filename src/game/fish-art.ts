@@ -3,11 +3,12 @@ import { FISH, type FishDef } from "./data/fish";
 import { paintFishSheet } from "./fishArt";
 import { getSave } from "./save";
 import type { DistrictTravel } from "./world";
+import { createAquariumSchool } from "./aquarium-school";
+import { createAquariumHabitat } from "./aquarium-habitat";
 
 // Keep the original four-pose artwork intact; portraits and sprites select one
 // cell rather than showing the complete sheet as a single fish.
 const sheets = new Map<string, HTMLCanvasElement>();
-const fishMaterials = new Map<string, THREE.SpriteMaterial>();
 
 function artKey(fish: FishDef): string {
   return [fish.id, fish.main, fish.acc, fish.dress, fish.skin].join(":");
@@ -38,26 +39,7 @@ export function fishPortrait(fish: FishDef): HTMLCanvasElement {
   return canvas;
 }
 
-function fishMaterial(fish: FishDef, right: boolean): THREE.SpriteMaterial {
-  const key = `${artKey(fish)}:${right ? "right" : "left"}`;
-  let material = fishMaterials.get(key);
-  if (!material) {
-    const texture = new THREE.CanvasTexture(getFishSheet(fish));
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.magFilter = texture.minFilter = THREE.NearestFilter;
-    texture.generateMipmaps = false;
-    // The first pose is top-left. A negative repeat mirrors only that cell.
-    texture.repeat.set(right ? -.5 : .5, .5);
-    texture.offset.set(right ? .5 : 0, .5);
-    material = new THREE.SpriteMaterial({ map: texture, transparent: true,
-      alphaTest: .08, depthWrite: false, toneMapped: false });
-    fishMaterials.set(key, material);
-  }
-  return material;
-}
-
 type FishingWorld = Pick<DistrictTravel, "current" | "getRoot" | "getMapInfo" | "toWorld">;
-type Swimmer = { sprite: THREE.Sprite; fish: FishDef; index: number; width: number; depth: number };
 
 /** Adds owned details to the existing map. The caller owns the frame loop. */
 export function createFishingWorld(world: FishingWorld): { update: (dt: number) => void; dispose: () => void } {
@@ -66,14 +48,16 @@ export function createFishingWorld(world: FishingWorld): { update: (dt: number) 
   let key = "";
   let elapsed = 0;
   let disposed = false;
-  const swimmers: Swimmer[] = [];
+  let school: ReturnType<typeof createAquariumSchool> | undefined;
+  let habitat: ReturnType<typeof createAquariumHabitat> | undefined;
+  let lastAnimation = -Infinity;
   const geometry = new Set<THREE.BufferGeometry>();
   const materials = new Set<THREE.Material>();
 
   function clear() {
+    school?.dispose(); habitat?.dispose(); school = undefined; habitat = undefined;
     root.removeFromParent();
     root.clear();
-    swimmers.length = 0;
     for (const value of geometry) value.dispose();
     for (const value of materials) value.dispose();
     geometry.clear();
@@ -136,14 +120,12 @@ export function createFishingWorld(world: FishingWorld): { update: (dt: number) 
     if (!tank) return;
     const center = world.toWorld(tank.x + tank.w / 2, tank.y + tank.h / 2);
     const scale = world.getMapInfo().scale;
-    // The collection UI contains all 42 species; the enlarged tank shows all 42
-    // distinct caught species to keep the water readable and draw calls bounded.
-    for (const [index, fish] of species.entries()) {
-      const sprite = new THREE.Sprite(fishMaterial(fish, false));
-      sprite.scale.setScalar(.4 + index % 3 * .035);
-      const holder = new THREE.Group(); holder.position.copy(center); holder.add(sprite); root.add(holder);
-      swimmers.push({ sprite, fish, index, width: tank.w * scale * .39, depth: tank.h * scale * .25 });
-    }
+    const holder = new THREE.Group(); holder.name = "capsule-aquarium";
+    holder.position.copy(center); holder.position.y = .37;
+    holder.scale.set((tank.w * scale - .12) / 10, 1.78 / 4, (tank.h * scale - .12) / 4);
+    habitat = createAquariumHabitat({ compact: true });
+    school = createAquariumSchool(Object.fromEntries(species.map(fish => [fish.id, 1])));
+    holder.add(habitat.root, school.root); root.add(holder);
   }
 
   function update(dt: number) {
@@ -151,15 +133,11 @@ export function createFishingWorld(world: FishingWorld): { update: (dt: number) 
     elapsed += Number.isFinite(dt) ? Math.max(0, Math.min(dt, .1)) : 0;
     const caught = getSave().fishCaught;
     const counts = caught && typeof caught === "object" ? caught as Record<string, unknown> : {};
-    const species = FISH.filter(fish => typeof counts[fish.id] === "number" && Number(counts[fish.id]) > 0);
+    const species = FISH.filter(fish => typeof counts[fish.id] === "number" && Number.isFinite(counts[fish.id]) && Number(counts[fish.id]) > 0);
     const nextKey = `${world.current()}:${world.current() === "capsule" ? species.map(fish => fish.id).join(",") : ""}`;
     if (key !== nextKey || root.parent !== world.getRoot()) { key = nextKey; rebuild(species); }
-    for (const swimmer of swimmers) {
-      const { sprite, fish, index, width, depth } = swimmer;
-      const phase = elapsed * (.24 + index % 4 * .025) + index * 2.4;
-      sprite.position.set(Math.sin(phase) * width, .65 + index % 5 * .27 + Math.sin(phase * 1.7 + index) * .06,
-        Math.cos(phase * .7 + index) * depth);
-      sprite.material = fishMaterial(fish, Math.cos(phase) > 0);
+    if (elapsed - lastAnimation >= 1 / 30) {
+      lastAnimation = elapsed; school?.update(elapsed); habitat?.update(elapsed);
     }
   }
 

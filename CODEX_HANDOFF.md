@@ -1,3 +1,12 @@
+# Aktueller Wiedereinstieg — Aquarium/Fische v74 implementiert; PR/Veröffentlichung ausstehend
+
+Annahme v74: Alle 42 Original-Fischarten behalten Namen, Farben, Fanghistorie und Boni; ihre Becken-Darstellung erhält anatomisch passende 3D-Fischformen. Katalog-Porträts bleiben original, das Kapsel-Aquarium behält seinen Grundriss.
+
+- Bens neuer Auftrag vor den Monstern, eigener PR: detaillierte 3D-Fische mit Körper-/Flossenbewegung; Glas/Tiefe/Lichtbrechung, Kaustik, Wasserpflanzen, Kies/Steine/Deko und Blasen. Gemeinsame Modelle für Kapsel und Nahansicht; begrenzte Instanzen und 30-fps-Animation, keine Spieler-/NPC-/Mechanik-/Saveänderung.
+- Ein Build + 24/24 direkte Aquarium-/Angeln-/Weltgeometrie-Tests in einer lokalen Runde grün; keine Browserläufe. Bens Optik-/FPS-Prüfung steht aus. Körper-Winding, Transparenz-Tiefenschreiben, Shader-Cache und Pflanzen-/Schwimmabstände vor der ersten Prüfrunde korrigiert. Drei gemeinsame Fisch-Shaderprogramme, drei Meshes/<7k Dreiecke pro Fisch; Nahansicht mit halber Refractionsauflösung, Kapsel ohne Transmission. **Monster erst nach Freigabe**. PR/Merge/Veröffentlichung noch ausstehend.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — Schrotttor v73 veröffentlicht; Bezirks-Pakete umgesetzt
 
 Annahme v73: Die zwei originalen Förderbänder und fünf Schrottflächen erhalten erkennbare Rollen-/Altmetallformen statt der bisherigen generischen Boxhaufen; die .75-m-Sockel, Coils exakt 16 Pixel breiter Durchgang und alle Originalkollisionen bleiben erhalten.
