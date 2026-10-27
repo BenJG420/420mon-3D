@@ -55,7 +55,8 @@ Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds
    Do not change player/NPC assets or behavior in district packages.
 7. Ben 2026-10-24, BEFORE further districts, own PR each: DONE Eddi inventory-style bulk shop PR #67 / v60 and smoking animation PR #68 / v61; DONE botanical cannabis growth v62 PR #69; DONE brighter Kabelkeller v63 PR #70. Kino v64 PR #72 and Neonkai v65 PR #73 merged/live; publication tracked in TEST_BUILD. Kanal v66 DONE (PR #74), Aschegang v67 DONE (PR #75), Abfluss v68 DONE (PR #76), Chemiegasse v69 DONE (PR #77), Ring v70 DONE (PR #78), Labyrinth v71 DONE (PR #79), Nischen v72 DONE (PR #80), Schrotttor v73 DONE (PR #81), NEXT concrete feedback fixes and Ben’s device FPS/visual checks. Eddi purchase hotfix PR #71 is merged/live. Only build + directly affected tests.
 8. DONE — PR #82, merged/live; Ben 2026-10-27, BEFORE monsters: Aquarium/Fische v74 — detailed smooth 3D fish, natural swimming, physical glass/refraction, caustics, planted gravel/rocks/wood and bubbles; preserve original catches/bonuses and tank footprint. Build + directly affected tests only, own PR; Ben checks appearance/FPS.
-9. Monster erst nach Freigabe: only resume sculpts at #97 after Ben explicitly
+9. Ben 2026-10-27 — Finish/merge Aquarium-Modal v75: immersive close view for “Dein Becken”, larger detailed fish, depth, planting/lighting/caustics. Only build + directly affected tests. After publication wait for Ben’s feedback; no further package until then. Physical room tank/player/NPCs retained.
+10. Monster erst nach Freigabe: only resume sculpts at #97 after Ben explicitly
    approves. First finish fixes and all district graphics/details. Retain the 96 existing models
    and shared PBR/cache. Do not claim 324 reconstructions are authored HD anatomy.
 No new game or restarted old packages. Preserve gameplay/saves and licensed rigs.

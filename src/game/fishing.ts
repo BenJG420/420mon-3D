@@ -8,6 +8,7 @@ import type { DistrictTravel } from "./world";
 import type { MapObj } from "./data/maps";
 import "./fishing.css";
 import { mountAquarium } from "./aquarium-view";
+import { aquariumCollectionKey } from "./aquarium-school";
 
 /** Fishing and the aquarium share the original catalogue and the existing save. */
 export function createFishingSystem(world: DistrictTravel) {
@@ -26,6 +27,7 @@ export function createFishingSystem(world: DistrictTravel) {
   const persist = () => { ownSave = true; const saved = saveProgress(); ownSave = false; return saved; };
   const running = () => session.phase === "wait" || session.phase === "wheel";
   const say = (lines: string[]) => { note.textContent = lines.join(" "); };
+  let tankKey = "";
   let disposeAquarium: (() => void) | undefined;
   function clearAquarium() { disposeAquarium?.(); disposeAquarium = undefined; delete host.dataset.aquarium; }
   function close() {
@@ -93,9 +95,10 @@ export function createFishingSystem(world: DistrictTravel) {
     if (tab === "tank") {
       const stage = document.createElement("div"); stage.className = "aquarium-stage"; content.append(stage);
       host.dataset.aquarium = "open";
+      tankKey = aquariumCollectionKey(state.fishCaught as Record<string, unknown>);
       disposeAquarium = mountAquarium(stage, state.fishCaught as Record<string, unknown>);
-      const hint = document.createElement("p"); hint.className = "fish-intro";
-      hint.textContent = count ? "Jede gefangene Art schwimmt hier einmal. Katalog und Fischbeutel bleiben oben erreichbar." : "Dein Becken wartet auf die ersten Fänge vom Neonkai."; content.append(hint);
+      const hint = document.createElement("p"); hint.className = "aquarium-hint";
+      hint.textContent = count ? "Ziehen: Blick verschieben · Pfeile: Fisch ansehen" : "Dein Becken wartet auf die ersten Fänge vom Neonkai."; content.append(hint);
     } else if (tab === "cast") {
       if (session.phase === "wait") {
         const wait = document.createElement("div"); wait.className = "fish-wait";
@@ -164,7 +167,12 @@ export function createFishingSystem(world: DistrictTravel) {
     if (event.code === "Escape") { event.preventDefault(); close(); }
     else if (session.phase === "wheel" && ["Space","Enter","KeyE"].includes(event.code)) { event.preventDefault(); hook(); }
   });
-  window.addEventListener("420mon-save-changed", () => { if (!ownSave && !host.hidden && !running()) render(); });
+  window.addEventListener("420mon-save-changed", () => {
+    if (ownSave || host.hidden || running()) return;
+    // Autosaves and unrelated rewards must not reset the swimming view/camera.
+    if (tab === "tank" && tankKey === aquariumCollectionKey(state.fishCaught as Record<string, unknown>)) return;
+    render();
+  });
   window.addEventListener("420mon-district-change", () => { if (!host.hidden) close(); });
   window.addEventListener("pagehide", () => { clearAquarium(); if (abortFish(state, session).changed) persist(); });
   document.addEventListener("visibilitychange", () => { if (document.hidden && !host.hidden) { const result = abortFish(state, session); if(result.changed){persist();say(result.lines);render();} } });

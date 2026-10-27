@@ -1,3 +1,13 @@
+# Aktueller Wiedereinstieg — Aquarium-Nahansicht v75 geprüft, PR/Veröffentlichung ausstehend
+
+Annahme v75: „Dein Becken“ startet direkt vor der Frontscheibe und folgt dem ausgewählten gefangenen Fisch; Gesamtbecken bleibt optional. Die Kapsel-Darstellung bleibt bei v74, nur die Modalansicht erhält die zusätzliche Detailstufe.
+
+- Bens Feedback: Das v74-Modal wirkte wie ein kleines flaches Kastenbild mit winzigen Fischen. v75 nutzt fast die ganze Bildschirmhöhe, eine nahe Perspektivkamera statt Gesamtbecken-Einpassung, Fischwahl und Verschieben per Maus/Touch. Größere, rundere Detailmodelle mit Kiemendeckeln/Seitenlinien/Schuppenrelief, stärkere Tiefenbahnen; niedrigere Grundhelligkeit mit gerichteter Lichtführung und Kaustik, Vordergrundpflanzen/Flusssteine, felsiger bepflanzter Hintergrund, Lichtschächte und zweite Blasensäule.
+- Drei Fischmaterialien/-Shaderprogramme pro Detailstufe; instanzierte Dekoration, begrenzte DPR/30 fps und halbe Refractionsauflösung bleiben. Autosaves ohne neue Fischart setzen Kamera/Schwimmen nicht mehr zurück. Spieler/NPCs, Kapsel-Assets, Angeln/Boni/Saves und Monster unverändert.
+- Nur Build + direkt betroffene Tests, keine Browserläufe. Ein Build + 20/20 direkte Aquarium-/Nahansicht-/Angeln-Tests in einer lokalen Runde grün. Projektionsmathematik prüft deutlich größere Fische und bildfüllende Scheibe bei 360×560 und 1100×620, keine GPU-/Sichtprüfung. PR/Merge/Veröffentlichung ausstehend. Danach **auf Bens Feedback warten**, kein weiteres Paket beginnen. **Monster erst nach Freigabe**.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — Aquarium/Fische v74 veröffentlicht, PR #82
 
 Annahme v74: Alle 42 Original-Fischarten behalten Namen, Farben, Fanghistorie und Boni; ihre Becken-Darstellung erhält anatomisch passende 3D-Fischformen. Katalog-Porträts bleiben original, das Kapsel-Aquarium behält seinen Grundriss.
