@@ -36,7 +36,7 @@ post-v75 waiting instructions below are historical and superseded. PR #83 / v75
 is merged/live. Only build + directly affected tests; no heavy browser runs.
 Player/NPC assets and all mechanics/saves remain unchanged. Current package:
 v76, Dex #97–102 implemented (102 authored / 318 reconstructions), with build +
-10 directly affected tests passed; merge/publication pending. Next package v77:
+13 directly affected tests passed; merge/publication pending. Next package v77:
 Dex #103–108. Continue from the next unfinished Dex after each completed PR.
 
 ## Previous priority order (user instruction, 2026-10-22)
