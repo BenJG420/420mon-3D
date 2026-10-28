@@ -27,7 +27,19 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 9. Do not overwrite or delete the original 2D repository. Preserve source attribution and be mindful that its content is private; access requires authorization.
 10. Report what is implemented, tested, missing, and deployed factually in German. Do not repeatedly ask what to work on next when the goal is clear.
 
-## Current priority order (user instruction, 2026-10-22)
+## Current authorization — Ben, 2026-10-28
+
+Ben explicitly approved all remaining monster sculptures. Resume at Dex #97,
+package by package with one PR each, detailed original-sprite anatomy, clean
+silhouettes and high-resolution PBR. The prior “Monster erst nach Freigabe” and
+post-v75 waiting instructions below are historical and superseded. PR #83 / v75
+is merged/live. Only build + directly affected tests; no heavy browser runs.
+Player/NPC assets and all mechanics/saves remain unchanged. Current package:
+v76, Dex #97–102 implemented (102 authored / 318 reconstructions), with build +
+13 directly affected tests passed; merge/publication pending. Next package v77:
+Dex #103–108. Continue from the next unfinished Dex after each completed PR.
+
+## Previous priority order (user instruction, 2026-10-22)
 
 PR #54 / v47 (Dex #91–96) is merged and published. Coverage is 96 authored /
 324 smooth reconstructions. **Monster erst nach Freigabe**: remaining sculpts
@@ -55,7 +67,7 @@ Follow `docs/TEST_BUILD.md`, one finished package/PR, maximum three check rounds
    Do not change player/NPC assets or behavior in district packages.
 7. Ben 2026-10-24, BEFORE further districts, own PR each: DONE Eddi inventory-style bulk shop PR #67 / v60 and smoking animation PR #68 / v61; DONE botanical cannabis growth v62 PR #69; DONE brighter Kabelkeller v63 PR #70. Kino v64 PR #72 and Neonkai v65 PR #73 merged/live; publication tracked in TEST_BUILD. Kanal v66 DONE (PR #74), Aschegang v67 DONE (PR #75), Abfluss v68 DONE (PR #76), Chemiegasse v69 DONE (PR #77), Ring v70 DONE (PR #78), Labyrinth v71 DONE (PR #79), Nischen v72 DONE (PR #80), Schrotttor v73 DONE (PR #81), NEXT concrete feedback fixes and Ben’s device FPS/visual checks. Eddi purchase hotfix PR #71 is merged/live. Only build + directly affected tests.
 8. DONE — PR #82, merged/live; Ben 2026-10-27, BEFORE monsters: Aquarium/Fische v74 — detailed smooth 3D fish, natural swimming, physical glass/refraction, caustics, planted gravel/rocks/wood and bubbles; preserve original catches/bonuses and tank footprint. Build + directly affected tests only, own PR; Ben checks appearance/FPS.
-9. Ben 2026-10-27 — Finish/merge Aquarium-Modal v75: immersive close view for “Dein Becken”, larger detailed fish, depth, planting/lighting/caustics. Only build + directly affected tests. After publication wait for Ben’s feedback; no further package until then. Physical room tank/player/NPCs retained.
+9. DONE — PR #83 merged/live; Ben 2026-10-27 — Aquarium-Modal v75: immersive close view for “Dein Becken”, larger detailed fish, depth, planting/lighting/caustics. Only build + directly affected tests. After publication wait for Ben’s feedback; no further package until then. Physical room tank/player/NPCs retained.
 10. Monster erst nach Freigabe: only resume sculpts at #97 after Ben explicitly
    approves. First finish fixes and all district graphics/details. Retain the 96 existing models
    and shared PBR/cache. Do not claim 324 reconstructions are authored HD anatomy.

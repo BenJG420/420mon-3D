@@ -1,13 +1,14 @@
 import * as THREE from "three";
-import { createMonsterSurface } from "./monster-surface";
+import { createMonsterSurface, type MonsterSurface } from "./monster-surface";
 import { DEX } from "./data/dex";
 import { SPRITE_FRAME, spriteUrl } from "./sprites";
 import { acquireMonsterModel, type MonsterModelLease } from "./monster-models";
 
 const surface = createMonsterSurface(typeof navigator !== "undefined" && /Android|iPhone|iPad/i.test(navigator.userAgent) ? 512 : 1024);
-function materialFor(id: string) {
+function materialFor(id: string, source = surface, maskedGlow = false) {
+  if (maskedGlow && id === "mon_growbulb") return source.glow;
   const types=DEX[id]?.types ?? [];
-  return types.includes("steel") ? surface.metal : types.some(t=>t==="water"||t==="poison") ? surface.wet : surface.material;
+  return types.includes("steel") ? source.metal : types.some(t=>t==="water"||t==="poison") ? source.wet : source.material;
 }
 const shadowGeometry = new THREE.CircleGeometry(.48, 20);
 const haloGeometry = new THREE.TorusGeometry(.57, .012, 4, 32);
@@ -65,7 +66,7 @@ function acquireFallback(speciesId: string): { material: THREE.SpriteMaterial; r
   };
 }
 
-type ArtState = { generation: number; disposed: boolean; lease?: MonsterModelLease; fallback?: { release(): void }; pivot: THREE.Group };
+type ArtState = { generation: number; disposed: boolean; lease?: MonsterModelLease; fallback?: { release(): void }; pivot: THREE.Group; surface: MonsterSurface };
 const states = new WeakMap<THREE.Group, ArtState>();
 
 function clearArt(state: ArtState): void {
@@ -74,7 +75,7 @@ function clearArt(state: ArtState): void {
 }
 
 /** The first child remains the same animation pivot throughout async loads. */
-export function createMonsterArt(speciesId: string, glow = 0x56ead0): THREE.Group {
+export function createMonsterArt(speciesId: string, glow = 0x56ead0, options: { surface?: MonsterSurface } = {}): THREE.Group {
   const group = new THREE.Group();
   const pivot = new THREE.Group(); pivot.position.y = .82; pivot.name = "monster-animation-pivot";
   group.add(pivot);
@@ -82,7 +83,7 @@ export function createMonsterArt(speciesId: string, glow = 0x56ead0): THREE.Grou
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = .016; group.add(shadow);
   const halo = new THREE.Mesh(haloGeometry, new THREE.MeshBasicMaterial({ color: glow, transparent: true, opacity: .64, depthWrite: false }));
   halo.rotation.x = -Math.PI / 2; halo.position.y = .03; group.add(halo);
-  states.set(group, { generation: 0, disposed: false, pivot });
+  states.set(group, { generation: 0, disposed: false, pivot, surface: options.surface ?? surface });
   setMonsterArt(group, speciesId, glow);
   return group;
 }
@@ -102,10 +103,10 @@ export function setMonsterArt(group: THREE.Group, speciesId: string, glow = 0x56
   void acquireMonsterModel(speciesId).then(lease => {
     if (state.disposed || state.generation !== generation) { lease.release(); return; }
     clearArt(state); state.lease = lease;
-    const mesh = new THREE.Mesh(lease.geometry, materialFor(speciesId));
+    const mesh = new THREE.Mesh(lease.geometry, materialFor(speciesId, state.surface, lease.geometry.userData.glowSurface === true && !!lease.geometry.getAttribute("glowWeight")));
     mesh.name = `monster-model-${speciesId}`; mesh.castShadow = true; mesh.receiveShadow = false;
     state.pivot.add(mesh);
-    Object.assign(group.userData, { modelStatus: "ready", mode: "source-volume", modelKind: lease.kind, sourceSprite: lease.data.sourceSprite, sourceHash: lease.data.sourceHash });
+    Object.assign(group.userData, { modelStatus: "ready", mode: "source-volume", modelKind: lease.kind, sourceSprite: lease.data.sourceSprite, sourceHash: lease.data.sourceHash, surfaceTextureSize: state.surface.textureSize });
   }).catch(() => {
     if (state.disposed || state.generation !== generation) return;
     Object.assign(group.userData, { modelStatus: "error", mode: "sprite-fallback", modelKind: "sprite-fallback" });

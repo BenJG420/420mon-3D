@@ -1,10 +1,23 @@
-# Aktueller Wiedereinstieg — Aquarium-Nahansicht v75 geprüft, PR/Veröffentlichung ausstehend
+# Aktueller Wiedereinstieg — v76 Dex #97–102 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v76: Die bestehende Paketgröße von sechs Arten bleibt; die erste Original-Sprite-Pose bestimmt Silhouette/Farben. 4K-PBR gilt geräteabhängig für die Modell-Nahansicht, die Welt behält ihr Speicherbudget.
+
+- Ben hat am 2026-10-28 alle restlichen Monster-Sculpts ausdrücklich freigegeben; frühere Warte-/Freigabe-Sperren sind überholt. V76: Weldmask, Drainplug, Callbox, Hydrant, Growbulb und Patchcoil (#97–102) mit eigenen gerundeten Geometrien, offenen Ketten/Kabelwindungen, Tasten/Anschlüssen/Gewinden und lokalem Lampenkern-Leuchten. Alle sechs <30k Dreiecke, ein Modellmesh je Art; Original-Sprites/Hashreferenzen bleiben erhalten.
+- Nahansicht mit feineren deterministischen Normal-/Rauheitstexturen, gepackt in eine gemeinsame RGBA-Textur: 4096² auf Desktop ab gemeldeten 8 GB, sonst 2048² bzw. 1024² bei Touch/kleinem Speicher, begrenzt durch GPU-Limit. Bestehende Weltmaterialien/Geometriecache und vorherige 96 Geometrien erhalten; Viewer gibt eigene Materialien/Textur beim Schließen frei. Spieler/NPCs/Mechanik/Saves unverändert.
+- **Ein Build + 13/13 direkt betroffene Tests über zwei lokale Runden grün**, einschließlich realer 4096²-Texturerzeugung, Geometrie-/Quellreferenzen, UV-/Cache-Integration, Glow-Maske, asynchronem Wechsel und Freigabe. CI fand zunächst die veraltete Restzahl 324 (jetzt 318); nur die drei betroffenen PBR-Tests nach der Testkorrektur erneut ausgeführt, kein zweiter Build nötig. Kein Browserlauf, keine gemessene Geräte-FPS-/Sichtqualitätszusage. Build: `index-Df6dlsAx.js`. Merge/Veröffentlichung noch ausstehend.
+- Coverage: **102 individuell modelliert / 318 Rekonstruktionen**. Nächstes eigenes Paket: **v77, Dex #103–108: Flicker, Plunger, Beakerling, Gumguard, Shardtile, Heelsole**. Freigabe liegt vor; nur Build + direkt betroffene Tests.
+- V75 / PR #83 ist gemergt/live: Source `029f8dea7de5bd22f488d4acadfe20724d55b1dd`; Main CI40707256278/Pages40707256616 grün; JS/CSS/fonts bytegleich (`v75-deploy-proof.json`). Keine erneuten Aquarium-Tests nötig.
+
+## Vorheriger Stand (Freigabe-Sperren durch Bens Auftrag vom 2026-10-28 überholt)
+
+# Aktueller Wiedereinstieg — Aquarium-Nahansicht v75 veröffentlicht, PR #83; auf Bens Feedback warten
 
 Annahme v75: „Dein Becken“ startet direkt vor der Frontscheibe und folgt dem ausgewählten gefangenen Fisch; Gesamtbecken bleibt optional. Die Kapsel-Darstellung bleibt bei v74, nur die Modalansicht erhält die zusätzliche Detailstufe.
 
 - Bens Feedback: Das v74-Modal wirkte wie ein kleines flaches Kastenbild mit winzigen Fischen. v75 nutzt fast die ganze Bildschirmhöhe, eine nahe Perspektivkamera statt Gesamtbecken-Einpassung, Fischwahl und Verschieben per Maus/Touch. Größere, rundere Detailmodelle mit Kiemendeckeln/Seitenlinien/Schuppenrelief, stärkere Tiefenbahnen; niedrigere Grundhelligkeit mit gerichteter Lichtführung und Kaustik, Vordergrundpflanzen/Flusssteine, felsiger bepflanzter Hintergrund, Lichtschächte und zweite Blasensäule.
 - Drei Fischmaterialien/-Shaderprogramme pro Detailstufe; instanzierte Dekoration, begrenzte DPR/30 fps und halbe Refractionsauflösung bleiben. Autosaves ohne neue Fischart setzen Kamera/Schwimmen nicht mehr zurück. Spieler/NPCs, Kapsel-Assets, Angeln/Boni/Saves und Monster unverändert.
-- Nur Build + direkt betroffene Tests, keine Browserläufe. Ein Build + 20/20 direkte Aquarium-/Nahansicht-/Angeln-Tests in einer lokalen Runde grün. Projektionsmathematik prüft deutlich größere Fische und bildfüllende Scheibe bei 360×560 und 1100×620, keine GPU-/Sichtprüfung. PR/Merge/Veröffentlichung ausstehend. Danach **auf Bens Feedback warten**, kein weiteres Paket beginnen. **Monster erst nach Freigabe**.
+- Nur Build + direkt betroffene Tests, keine Browserläufe. Ein Build + 20/20 direkte Aquarium-/Nahansicht-/Angeln-Tests in einer lokalen Runde grün. Projektionsmathematik prüft deutlich größere Fische und bildfüllende Scheibe bei 360×560 und 1100×620, keine GPU-/Sichtprüfung. PR #83 gemergt/live.
+- Source `029f8dea7de5bd22f488d4acadfe20724d55b1dd`; PR CI40560137773/Main CI40707256278/Pages40707256616 grün. Live JS `index-B6WH6gvV.js`, SHA256 `54c66db40ebc86c92de82366b393e976024aa32d4d4951dce4c12087b92b0c69`; JS/CSS/fonts bytegleich, Stable unverändert (`v75-deploy-proof.json`). Danach **auf Bens Feedback warten**, kein weiteres Paket beginnen. **Monster erst nach Freigabe**.
 
 ## Vorheriger Stand
 
