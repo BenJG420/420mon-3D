@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v76, Dex #97–102
+
+- Weldmask, Drainplug, Callbox, Hydrant, Growbulb and Patchcoil are project-authored geometry in `src/game/monster-sculpts-l-machines.ts` and `src/game/monster-sculpts-l-fixtures.ts`, based on the retained original first-pose sprites. The complete 2D source sheets remain unchanged; exact hashes are recorded in `monster-authored.ts`.
+- The high-detail sculpt primitives and high-resolution PBR normal/roughness tiles are authored locally. No external model, image or texture pack is introduced; Three.js and its geometry helpers retain their MIT license. Player/NPC models and their existing licenses are unchanged.
+
 ## Aquarium modal detail — v75
 
 - Additional close-view fish body/fin/eye geometry, opercula, lateral lines and procedural scale relief are project-authored extensions in `src/game/aquarium-fish.ts`. Layered rear rocks, foreground stones/plants, branched aquatic leaves and soft animated light shafts extend `src/game/aquarium-habitat.ts`. No external model, photograph or texture pack added. The original fish identities/colors and all player/NPC/monster assets remain unchanged.

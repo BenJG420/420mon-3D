@@ -1,10 +1,13 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 
 type Point = [number, number, number];
 /** Small source-art sculpting toolkit. Each finished species is one colored mesh. */
 export class Sculpt {
   private readonly parts: THREE.BufferGeometry[] = [];
+  private readonly high: boolean;
+  constructor(options: { detail?: "high" } = {}) { this.high = options.detail === "high"; }
   private add(geometry: THREE.BufferGeometry, color: THREE.ColorRepresentation, position: Point, scale: Point = [1, 1, 1], rotation: Point = [0, 0, 0]) {
     const transform = new THREE.Matrix4().compose(new THREE.Vector3(...position), new THREE.Quaternion().setFromEuler(new THREE.Euler(...rotation)), new THREE.Vector3(...scale));
     geometry.applyMatrix4(transform);
@@ -18,7 +21,7 @@ export class Sculpt {
     return this;
   }
   ellipsoid(color: THREE.ColorRepresentation, x: number, y: number, z: number, sx: number, sy: number, sz: number) {
-    return this.add(new THREE.SphereGeometry(1, 12, 8), color, [x, y, z], [sx, sy, sz]);
+    return this.add(new THREE.SphereGeometry(1, this.high ? 24 : 12, this.high ? 16 : 8), color, [x, y, z], [sx, sy, sz]);
   }
   /** Closed upper half-ellipsoid: a smooth bell with a flat underside. */
   dome(color: THREE.ColorRepresentation, x: number, y: number, z: number, sx: number, sy: number, sz: number) {
@@ -28,24 +31,32 @@ export class Sculpt {
   /** Smooth curved cord with round, closed ends; existing rod geometry is unchanged. */
   tube(color: THREE.ColorRepresentation, points: Point[], radius = .02, segments = 32) {
     const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(...p)));
-    this.add(new THREE.TubeGeometry(curve, segments, radius, 10, false), color, [0, 0, 0]);
+    this.add(new THREE.TubeGeometry(curve, segments, radius, this.high ? 16 : 10, false), color, [0, 0, 0]);
     for (const p of [points[0], points[points.length - 1]]) this.ellipsoid(color, ...p, radius, radius, radius);
     return this;
   }
   /** Revolved profile; start/end at radius zero to close a solid, or repeat a ring profile. */
   lathe(color: THREE.ColorRepresentation, profile: [number, number][], x: number, y: number, z: number, rx = 0, ry = 0, rz = 0) {
-    return this.add(new THREE.LatheGeometry(profile.map(p => new THREE.Vector2(...p)), 32), color, [x, y, z], [1, 1, 1], [rx, ry, rz]);
+    return this.add(new THREE.LatheGeometry(profile.map(p => new THREE.Vector2(...p)), this.high ? 64 : 32), color, [x, y, z], [1, 1, 1], [rx, ry, rz]);
   }
   box(color: THREE.ColorRepresentation, x: number, y: number, z: number, sx: number, sy: number, sz: number, rx = 0, ry = 0, rz = 0) {
     return this.add(new THREE.BoxGeometry(1, 1, 1), color, [x, y, z], [sx, sy, sz], [rx, ry, rz]);
   }
+  /** Closed bevelled surfaces with real edge highlights, used by new authored sculpts. */
+  roundedBox(color: THREE.ColorRepresentation, x: number, y: number, z: number, sx: number, sy: number, sz: number, radius = .04, rx = 0, ry = 0, rz = 0) {
+    return this.add(new RoundedBoxGeometry(sx, sy, sz, this.high ? 3 : 2, Math.min(radius, sx/2, sy/2, sz/2)), color, [x,y,z], [1,1,1], [rx,ry,rz]);
+  }
+  /** Hollow ring in local XY: chain openings remain actual negative space. */
+  torus(color: THREE.ColorRepresentation, x: number, y: number, z: number, radius: number, tube: number, rx = 0, ry = 0, rz = 0) {
+    return this.add(new THREE.TorusGeometry(radius,tube,this.high ? 10 : 8,this.high ? 32 : 24),color,[x,y,z],[1,1,1],[rx,ry,rz]);
+  }
   cone(color: THREE.ColorRepresentation, x: number, y: number, z: number, radius: number, height: number, rx = 0, ry = 0, rz = 0) {
-    return this.add(new THREE.ConeGeometry(radius, height, 10), color, [x, y, z], [1, 1, 1], [rx, ry, rz]);
+    return this.add(new THREE.ConeGeometry(radius, height, this.high ? 20 : 10), color, [x, y, z], [1, 1, 1], [rx, ry, rz]);
   }
   rod(color: THREE.ColorRepresentation, from: Point, to: Point, radius = .04) {
     const start = new THREE.Vector3(...from), end = new THREE.Vector3(...to), direction = end.clone().sub(start);
     if (direction.lengthSq() < .000001) return this;
-    const geometry = new THREE.CylinderGeometry(radius, radius, direction.length(), 10);
+    const geometry = new THREE.CylinderGeometry(radius, radius, direction.length(), this.high ? 16 : 10);
     const rotation = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
     geometry.applyQuaternion(rotation);
     return this.add(geometry, color, start.add(end).multiplyScalar(.5).toArray() as Point);

@@ -3,6 +3,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { DEX, dexNum } from "./data/dex";
 import { createMonsterArt, disposeMonsterArt } from "./monster-art";
 import { spriteUrl } from "./sprites";
+import { createMonsterSurface, monsterStudioSurfaceSize, type MonsterSurface } from "./monster-surface";
 import "./monster-viewer.css";
 
 export type MonsterViewer = {
@@ -17,6 +18,7 @@ export function createMonsterViewer(): MonsterViewer {
   let renderer: THREE.WebGLRenderer | undefined;
   let scene: THREE.Scene | undefined;
   let reflection: THREE.WebGLRenderTarget | undefined;
+  let studioSurface: MonsterSurface | undefined;
   let camera: THREE.PerspectiveCamera | undefined;
   let monster: THREE.Group | undefined;
   let viewport: HTMLDivElement | undefined;
@@ -155,6 +157,7 @@ export function createMonsterViewer(): MonsterViewer {
     window.removeEventListener("keydown", onKeyDown, true);
     if (monster) disposeMonsterArt(monster);
     monster = undefined;
+    studioSurface?.dispose(); studioSurface = undefined;
     for (const resource of stageResources) resource.dispose();
     stageResources.length = 0;
     reflection?.dispose(); reflection = undefined;
@@ -262,6 +265,11 @@ export function createMonsterViewer(): MonsterViewer {
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1;
       renderer.setClearColor(0x081619);
+      const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+      const mobile = /Android|iPhone|iPad/i.test(navigator.userAgent) || window.matchMedia("(pointer: coarse)").matches;
+      const surfaceSize = monsterStudioSurfaceSize(renderer.capabilities.maxTextureSize, memory, mobile);
+      studioSurface = createMonsterSurface(surfaceSize, { studio: true, anisotropy: renderer.capabilities.getMaxAnisotropy() });
+      overlay.dataset.surfaceTextureSize = String(surfaceSize);
       const canvas = renderer.domElement;
       canvas.className = "monster-model-canvas";
       canvas.tabIndex = 0;
@@ -314,6 +322,7 @@ export function createMonsterViewer(): MonsterViewer {
       frame = requestAnimationFrame(animate);
     } catch {
       // The authentic portrait remains useful if the device cannot open WebGL.
+      studioSurface?.dispose(); studioSurface = undefined;
       renderer?.dispose();
       renderer?.forceContextLoss();
       renderer = undefined;
@@ -345,7 +354,7 @@ export function createMonsterViewer(): MonsterViewer {
     modelState = "";
     reset();
     if (renderer && scene) {
-      monster = createMonsterArt(speciesId);
+      monster = createMonsterArt(speciesId, 0x56ead0, { surface: studioSurface });
       scene.add(monster);
       monster.rotation.y = yaw;
       readModelStatus();
