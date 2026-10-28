@@ -2,14 +2,20 @@ import * as THREE from "three";
 import { FISH } from "./data/fish";
 import { createAquariumFish } from "./aquarium-fish";
 
-/** A read-only view of collection history, shared by the room and close view. */
-export function createAquariumSchool(caught: Record<string, unknown>) {
-  const species = FISH.filter(fish => typeof caught[fish.id] === "number" &&
+export function aquariumSpecies(caught: Record<string, unknown>) {
+  return FISH.filter(fish => typeof caught[fish.id] === "number" &&
     Number.isFinite(caught[fish.id]) && Number(caught[fish.id]) > 0);
+}
+export const aquariumCollectionKey = (caught: Record<string, unknown>) => aquariumSpecies(caught).map(fish => fish.id).join(",");
+
+/** A read-only view of collection history, shared by the room and close view. */
+export function createAquariumSchool(caught: Record<string, unknown>, options: { immersive?: boolean } = {}) {
+  const species = aquariumSpecies(caught), immersive = options.immersive === true;
   const root = new THREE.Group(); root.name = "aquarium-school";
   const swimmers = species.map(fish => {
     // Catalogue index, not catch order: existing fish retain their route on a new catch.
-    const index = FISH.indexOf(fish), model = createAquariumFish(fish, index);
+    const index = FISH.indexOf(fish), model = createAquariumFish(fish, index, { detailed: immersive });
+    if (immersive) model.root.scale.setScalar(1.15 + index % 3 * .065);
     root.add(model.root);
     return { model, index };
   });
@@ -20,12 +26,14 @@ export function createAquariumSchool(caught: Record<string, unknown>) {
       // Ellipses turn through depth instead of snapping to a mirrored image.
       const speed = .17 + index % 7 * .011;
       const phase = seconds * speed + index * 2.399963;
-      const width = 3.45 + index % 3 * .12, depth = .52 + index % 4 * .07;
+      const width = immersive ? 3.1 + index % 3 * .12 : 3.45 + index % 3 * .12;
+      const low = index % 6 < 2;
+      const depth = immersive ? (low ? .42 : .87) : .52 + index % 4 * .07;
       const vertical = phase * 2 + index;
-      const y = 1.2 + index % 6 * .34 + Math.sin(vertical) * .085;
+      const y = (immersive ? 1.32 + index % 6 * .31 : 1.2 + index % 6 * .34) + Math.sin(vertical) * .085;
       const dx = Math.cos(phase) * width, dz = -Math.sin(phase) * depth;
       const dy = Math.cos(vertical) * .17;
-      model.root.position.set(Math.sin(phase) * width, y, .55 + Math.cos(phase) * depth);
+      model.root.position.set(Math.sin(phase) * width, y, (immersive ? (low ? .65 : .25) : .55) + Math.cos(phase) * depth);
       model.root.rotation.set(0, -Math.atan2(dz, dx), Math.atan2(dy, Math.hypot(dx, dz)), "YXZ");
       model.update(seconds);
     }

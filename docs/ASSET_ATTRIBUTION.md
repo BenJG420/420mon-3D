@@ -1,5 +1,9 @@
 # Asset attribution
 
+## Aquarium modal detail — v75
+
+- Additional close-view fish body/fin/eye geometry, opercula, lateral lines and procedural scale relief are project-authored extensions in `src/game/aquarium-fish.ts`. Layered rear rocks, foreground stones/plants, branched aquatic leaves and soft animated light shafts extend `src/game/aquarium-habitat.ts`. No external model, photograph or texture pack added. The original fish identities/colors and all player/NPC/monster assets remain unchanged.
+
 ## Aquarium and fish — v74
 
 - Fish bodies, fins, gills, eyes and species-specific anatomy, planted habitat, gravel, rocks, driftwood, glass, bubbles and procedural surface/lighting details are project-authored in `src/game/aquarium-fish.ts` and `src/game/aquarium-habitat.ts`. Original fish IDs, names and color palettes from `src/game/data/fish.ts` are retained. No external model or texture pack is added.

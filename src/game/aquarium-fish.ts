@@ -41,11 +41,14 @@ function hash(id: string) { let h = 0; for (const c of id) h = (Math.imul(h, 31)
  * All parts share one travelling bend, including the eyes, gills and fin roots.
  * No texture fetch, external model, canvas, cached ownership or per-frame geometry work.
  */
-export function createAquariumFish(fish: FishDef, index: number) {
+export function createAquariumFish(fish: FishDef, index: number, options: { detailed?: boolean } = {}) {
+  const detailed = options.detailed === true;
   const root = new THREE.Group();
-  const form = aquariumFishForm(fish), profile = PROFILES[form], seed = hash(fish.id);
+  const form = aquariumFishForm(fish), sourceProfile = PROFILES[form], seed = hash(fish.id);
+  // The modal gets rounder flanks. The room retains the original v74 mesh.
+  const profile = detailed ? { ...sourceProfile, width: sourceProfile.width * (form === "flatfish" ? 1 : 1.2) } : sourceProfile;
   root.name = `aquarium-fish-${fish.id}`;
-  root.userData.fishId = fish.id; root.userData.form = form;
+  root.userData.fishId = fish.id; root.userData.form = form; root.userData.detailed = detailed;
   root.userData.swimEnvelope = { length: 1.35, height: .8, depth: .8 };
   const base = new THREE.Color(fish.main), accent = new THREE.Color(fish.acc);
   const belly = base.clone().lerp(new THREE.Color(0xe5e0c3), .64);
@@ -76,7 +79,7 @@ export function createAquariumFish(fish: FishDef, index: number) {
     return geometry;
   }
   function ellipsoid(x: number, y: number, z: number, rx: number, ry: number, rz: number, color: THREE.Color, bucket = 0) {
-    const g = new THREE.SphereGeometry(1, 12, 8); g.scale(rx, ry, rz); g.translate(x, y, z); add(g, bucket, color);
+    const g = new THREE.SphereGeometry(1, detailed ? 18 : 12, detailed ? 12 : 8); g.scale(rx, ry, rz); g.translate(x, y, z); add(g, bucket, color);
   }
   function line(points: THREE.Vector3[], radius: number, color: THREE.Color, bucket = 2, fin = 0) {
     const curve = new THREE.CatmullRomCurve3(points);
@@ -86,7 +89,7 @@ export function createAquariumFish(fish: FishDef, index: number) {
   }
 
   // Closed elliptical ring body with a caudal peduncle and rounded snout.
-  const rings = form === "eel" ? 40 : 32, sides = 24;
+  const rings = detailed ? (form === "eel" ? 56 : 48) : (form === "eel" ? 40 : 32), sides = detailed ? 32 : 24;
   const positions: number[] = [], uv: number[] = [], indices: number[] = [], bodyColors: number[] = [];
   const radiusAt = (t: number) => {
     if (form === "eel") return Math.pow(Math.sin(Math.PI * t), .48) * (.32 + .68 * t);
@@ -118,11 +121,11 @@ export function createAquariumFish(fish: FishDef, index: number) {
 
   // Ribbed membrane fans: several radial strips, curved rather than flat triangles.
   function fan(origin: THREE.Vector3, outline: THREE.Vector3[], color = finColor, strength = 1) {
-    const rays = outline.length, steps = 4;
+    const rays = outline.length, steps = detailed ? 8 : 4;
     const p: number[] = [], u: number[] = [], ix: number[] = [];
     for (let ray = 0; ray < rays; ray++) for (let step = 0; step <= steps; step++) {
       const t = step / steps, end = outline[ray];
-      p.push(THREE.MathUtils.lerp(origin.x, end.x, t), THREE.MathUtils.lerp(origin.y, end.y, t), THREE.MathUtils.lerp(origin.z, end.z, t) + Math.sin(t * Math.PI) * .008);
+      p.push(THREE.MathUtils.lerp(origin.x, end.x, t), THREE.MathUtils.lerp(origin.y, end.y, t), THREE.MathUtils.lerp(origin.z, end.z, t) + Math.sin(t * Math.PI) * (.008 + (detailed ? Math.sin(ray * 1.8) * .004 : 0)));
       u.push(ray / (rays - 1), t);
       if (ray < rays - 1 && step < steps) {
         const n = ray * (steps + 1) + step;
@@ -136,9 +139,10 @@ export function createAquariumFish(fish: FishDef, index: number) {
     for (let ray = 0; ray < rays; ray++) for (let step = 0; step <= steps; step++) {
       const n = ray * (steps + 1) + step, t = step / steps;
       const c = color.clone().lerp(belly, .2 * t).multiplyScalar(.82 + .18 * t);
+      if (detailed) c.multiplyScalar(1 - .09 * Math.sin(ray * Math.PI / 2) ** 2 * Math.sin(t * Math.PI));
       colors.setXYZ(n, c.r, c.g, c.b); weights.setX(n, t * strength);
     }
-    for (let ray = 0; ray < rays; ray += 2) {
+    for (let ray = 0; ray < rays; ray += detailed ? 1 : 2) {
       const end = outline[ray], middle = origin.clone().lerp(end, .55); middle.z += .008;
       line([origin, middle, end], .0019, color.clone().lerp(belly, .35), 1, strength);
     }
@@ -191,6 +195,39 @@ export function createAquariumFish(fish: FishDef, index: number) {
     } else line([point(gx, profile.height * .65, gz * .66), point(gx - .033, .01, gz * 1.05), point(gx, -profile.height * .65, gz * .73)], .0034, dark);
     line([point(profile.nose - .018, -.008, .012 * sign), point(profile.nose - .05, -.021, profile.width * .38 * sign), point(profile.nose - .1, -.026, profile.width * .51 * sign)], .0028, dark);
   }
+  if (detailed) {
+    // Raised opercula follow the actual body surface, rather than floating ovals.
+    // Lateral sensory lines and paired lip rims remain within the fish envelope.
+    for (const sign of [-1, 1]) {
+      if (form !== "shark" && form !== "eel") {
+        const p: number[] = [], u: number[] = [], ix: number[] = [];
+        const rows = 8, columns = 8;
+        for (let i = 0; i <= rows; i++) for (let j = 0; j <= columns; j++) {
+          const across = i / rows, angle = .2 * Math.PI + j / columns * .6 * Math.PI;
+          const x = profile.nose - .29 + across * .105 + .012 * Math.sin(angle);
+          const radius = radiusAt((x - profile.tail) / (profile.nose - profile.tail));
+          const ridge = .001 + .006 * Math.sin(across * Math.PI) * Math.sin(j / columns * Math.PI);
+          p.push(x, Math.cos(angle) * (profile.height * radius + ridge), sign * Math.sin(angle) * (profile.width * radius + ridge));
+          u.push(across, j / columns);
+          if (i < rows && j < columns) {
+            const n = i * (columns + 1) + j;
+            if (sign > 0) ix.push(n, n + 1, n + columns + 1, n + 1, n + columns + 2, n + columns + 1);
+            else ix.push(n, n + columns + 1, n + 1, n + 1, n + columns + 1, n + columns + 2);
+          }
+        }
+        const patch = new THREE.BufferGeometry();
+        patch.setAttribute("position", new THREE.Float32BufferAttribute(p, 3));
+        patch.setAttribute("uv", new THREE.Float32BufferAttribute(u, 2)); patch.setIndex(ix); patch.computeVertexNormals();
+        add(patch, 0, base.clone().lerp(accent, .12));
+      }
+      const sideLine = Array.from({ length: 10 }, (_, i) => {
+        const t = .23 + i / 9 * .43, radius = radiusAt(t);
+        return point(THREE.MathUtils.lerp(profile.tail, profile.nose, t), profile.height * radius * .06, sign * (profile.width * radius + .002));
+      });
+      line(sideLine, .0016, base.clone().lerp(accent, .25), 0);
+      line([point(profile.nose - .022, -.008, sign * .012), point(profile.nose - .052, -.014, profile.width * sign * .34), point(profile.nose - .09, -.02, profile.width * sign * .5)], .0032, belly.clone().lerp(base, .45), 0);
+    }
+  }
   if (form === "catfish" || /barbe|karpfen|stoer/.test(fish.id)) {
     for (const sign of [-1, 1]) for (let i = 0; i < (form === "catfish" ? 2 : 1); i++) {
       line([point(profile.nose - .055, -.015, sign * .04), point(profile.nose - .025, -.045 - i * .025, sign * .12), point(profile.nose - .15 - i * .06, -.085, sign * (form === "catfish" ? .26 : .17))], .0032, belly, 1, .4);
@@ -220,8 +257,8 @@ export function createAquariumFish(fish: FishDef, index: number) {
   for (let bucket = 0; bucket < buckets.length; bucket++) {
     const material = new THREE.MeshPhysicalMaterial({
       color: 0xffffff, vertexColors: true, metalness: bucket === 0 ? .12 : .02,
-      roughness: bucket === 2 ? .13 : bucket === 1 ? .49 : .36,
-      clearcoat: bucket === 2 ? 1 : .5, clearcoatRoughness: .19,
+      roughness: bucket === 2 ? (detailed ? .07 : .13) : bucket === 1 ? .49 : (detailed ? .31 : .36),
+      clearcoat: bucket === 2 ? 1 : (detailed ? .72 : .5), clearcoatRoughness: detailed ? .13 : .19,
       side: bucket === 1 ? THREE.DoubleSide : THREE.FrontSide,
       sheen: bucket === 1 ? .3 : .12, sheenColor: accent, sheenRoughness: .6,
     });
@@ -230,12 +267,13 @@ export function createAquariumFish(fish: FishDef, index: number) {
       shader.uniforms.aquariumTime = clock;
       shader.uniforms.aquariumMotion = motion;
       shader.uniforms.aquariumPattern = pattern;
-      shader.vertexShader = bendGLSL + shader.vertexShader;
+      shader.vertexShader = (detailed ? "varying vec3 vAquariumWorld;\n" : "") + bendGLSL + shader.vertexShader;
       shader.vertexShader = shader.vertexShader.replace("#include <beginnormal_vertex>", "#include <beginnormal_vertex>\nobjectNormal.x -= aquariumBend(position.x).y * objectNormal.z;");
       shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", `#include <begin_vertex>
         transformed.z += aquariumBend(position.x).x;
         transformed.y += sin(aquariumTime * 7.4 + position.x * 13.0 + aquariumMotion.z) * finWeight * 0.011;
         vAquariumUv = uv; vAquariumFin = finWeight;
+        ${detailed ? "vAquariumWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;" : ""}
       `);
       shader.fragmentShader = "uniform vec4 aquariumMotion; uniform vec2 aquariumPattern; varying vec2 vAquariumUv; varying float vAquariumFin;\n" + shader.fragmentShader;
       if (bucket === 0) {
@@ -250,8 +288,29 @@ export function createAquariumFish(fish: FishDef, index: number) {
         `);
         shader.fragmentShader = shader.fragmentShader.replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor + sin(vAquariumUv.x * 265.0) * sin(vAquariumUv.y * 138.0) * .035, .18, .7);");
       } else if (bucket === 1) shader.fragmentShader = shader.fragmentShader.replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.rgb *= .94 + .06 * pow(abs(sin(vAquariumUv.x * 65.0)), 6.0);");
+      if (detailed) {
+        shader.fragmentShader = "uniform float aquariumTime; varying vec3 vAquariumWorld;\n" + shader.fragmentShader;
+        if (bucket === 0) shader.fragmentShader = shader.fragmentShader.replace("#include <normal_fragment_maps>", `#include <normal_fragment_maps>
+          // Derivative bump follows the lit surface, making the scale edges catch light.
+          float skinRelief = (1.0 - scaleRim) * .0007 * aquariumPattern.x / .075;
+          vec3 aqDx = dFdx(-vViewPosition), aqDy = dFdy(-vViewPosition);
+          vec3 aqR1 = cross(aqDy, normal), aqR2 = cross(normal, aqDx);
+          float aqDet = dot(aqDx, aqR1);
+          if (abs(aqDet) > 0.0000000001) {
+            vec3 aqGrad = sign(aqDet) * (dFdx(skinRelief) * aqR1 + dFdy(skinRelief) * aqR2);
+            normal = normalize(abs(aqDet) * normal - aqGrad);
+          }
+        `);
+        shader.fragmentShader = shader.fragmentShader.replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
+          vec2 waterPoint = vAquariumWorld.xz * 3.1 + vAquariumWorld.y * .23;
+          float waterA = sin(waterPoint.x + aquariumTime * .41 + sin(waterPoint.y * 1.22 - aquariumTime * .3));
+          float waterB = sin(waterPoint.y * 1.4 - aquariumTime * .34 + sin(waterPoint.x * .87 + aquariumTime * .23));
+          float focusedLight = pow(max(0.0, 1.0 - abs(waterA + waterB) * .72), 12.0);
+          totalEmissiveRadiance += vec3(.045, .075, .065) * focusedLight;
+        `);
+      }
     };
-    material.customProgramCacheKey = () => `aquarium-fish-v74-${bucket}`;
+    material.customProgramCacheKey = () => detailed ? `aquarium-fish-v75-detailed-${bucket}` : `aquarium-fish-v74-${bucket}`;
     const pieces = buckets[bucket], merged = mergeGeometries(pieces, false)!;
     for (const geometry of pieces) geometry.dispose();
     merged.computeBoundingBox(); merged.computeBoundingSphere();
