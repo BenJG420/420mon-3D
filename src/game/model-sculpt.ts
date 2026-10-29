@@ -8,6 +8,10 @@ export class Sculpt {
   private readonly parts: THREE.BufferGeometry[] = [];
   private readonly high: boolean;
   constructor(options: { detail?: "high" } = {}) { this.high = options.detail === "high"; }
+  /** Consume an authored local-space surface, retaining its sculpted normals. */
+  surface(color: THREE.ColorRepresentation, geometry: THREE.BufferGeometry) {
+    return this.add(geometry, color, [0, 0, 0]);
+  }
   private add(geometry: THREE.BufferGeometry, color: THREE.ColorRepresentation, position: Point, scale: Point = [1, 1, 1], rotation: Point = [0, 0, 0]) {
     const transform = new THREE.Matrix4().compose(new THREE.Vector3(...position), new THREE.Quaternion().setFromEuler(new THREE.Euler(...rotation)), new THREE.Vector3(...scale));
     geometry.applyMatrix4(transform);

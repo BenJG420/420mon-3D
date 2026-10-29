@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v77 Dex #103–108 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v77: Sechs Arten nach der ersten Original-Sprite-Pose; der vorhandene adaptive 1K/2K/4K-PBR-Pfad bleibt. Beakerlings Glas wird als modellierte klare Rand-/Reflexflächen mit sichtbarem Inhalt dargestellt, ohne zusätzliche Transmissions-/Renderpässe.
+
+- Flicker, Plunger, Beakerling, Gumguard, Shardtile und Heelsole (#103–108) haben eigene volle 3D-Geometrien nach den authentischen lokalen Original-Sprites: hohler aufgeklappter Deckel mit Scharnier/Windschutz und lokal leuchtender Flamme; offene Saugglocke mit Gummifalten; Becherwand/Ausguss mit gewelltem Flüssigkeitspegel und Messstrichen; runder Körper mit Fäusten/Zehen und 16 Zähnen; 13 dicke gebrochene Spiegelfliesen mit Auge; echte offene Schuhschale mit Innenfutter, gewölbter Sohle und dünnem Absatz.
+- Alle sechs <30k Dreiecke/ein Modellmesh; vorhandene PBR-Texturen bis 4096² geräteabhängig, ursprüngliche 102 Geometrien/Cache erhalten. Zwei analytisch erkannte Winding-Fehler vor dem ersten Prüfblock korrigiert, Spiegel-Kronen unter dem Geometriebudget gehalten. Spieler/NPCs/Mechanik/Saves unverändert.
+- **Ein Build + 10/10 direkt betroffene Tests in einer lokalen Runde grün**: Quellhashes, sechs individuelle Geometrien/Budgets/glatte Normalen/UVs, tatsächliche Außenseiten per CPU-Raycaster, Glow/PBR-Auswahl und Cache-/Async-/Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-CshGxDMf.js`. Merge/Veröffentlichung v77 ausstehend.
+- Coverage: **108 individuell modelliert / 312 Rekonstruktionen**. Nächstes eigenes Paket: **v78, Dex #109–114: Crushcan, Tidegauge, Parkmeter, Newsbox, Sprinkler, Bladeu**. Bens ausdrückliche Freigabe für alle restlichen Monster liegt vor; nur Build + direkt betroffene Tests.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v76 Dex #97–102 veröffentlicht, PR #84; nächstes Paket #103–108
 
 Annahme v76: Die bestehende Paketgröße von sechs Arten bleibt; die erste Original-Sprite-Pose bestimmt Silhouette/Farben. 4K-PBR gilt geräteabhängig für die Modell-Nahansicht, die Welt behält ihr Speicherbudget.
