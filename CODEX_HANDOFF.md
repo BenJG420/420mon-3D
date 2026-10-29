@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v80 Dex #121–126 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v80: Weiter sechs Arten nach der ersten Original-Sprite-Pose; Original-Oberflächenspuren werden als weiche Geometrie/Relief ausgearbeitet. Switchbox verwendet den vorhandenen lokalen LED-Glow und adaptiven PBR bis 4K, ohne neue Licht-/Renderpässe.
+
+- Jerrycan, Floatball, Letterbox, Bollard, Shears und Switchbox (#121–126) sind individuell modelliert: voller Olivkanister mit offenem Griff/hohlem gebogenem Ausguss, Verschluss, Rost/Wulstnähten und Rückseitenrippen; gedrungener violetter Körper mit Fingern/Zehen, Moosspuren und großem porigem Elfenbein-Schwimmer am geknickten Stab; Runddach-Briefkasten mit tatsächlichem Schlitz/vertiefter Augentür, Rost, Scharnieren, Kurbel und Rückseitenbeschlägen; schräger gelber Gusspoller mit umlaufenden Lackabplatzungen, Deckelringen, Sockelschrauben und Rundaugen; zwei separat gebogene Stahlklingen, gerippte grüne Griffe, Gelenk und gezahntes Blatt; tiefes Switch-Gehäuse mit sechs offenen RJ45-Buchsen/je acht Kontakten, zwei begrenzt leuchtenden LEDs, Lüftung, Füßen und Rückseitenanschlüssen.
+- Ein Mesh je Art, **15.002–29.732 Dreiecke**; ursprüngliche 120 Modelle, PBR bis 4096² nach Gerätebudget sowie UV-/Geometriecache bleiben. Original-Sprites/Quellhashes erhalten; Spieler/NPCs/Mechanik/Saves unverändert. Keine externen Assets.
+- **Ein Build + 7/7 direkt betroffene Tests in einer lokalen Runde grün**: Quellhashes, individuelle Geometrien/glatte Normalen/Budgets/UVs, tatsächlicher offener Griff per CPU-Raycaster, isolierter Switchbox-Glow plus bestehender Bladeu-Pfad, Ressourcenbesitz und Registry/Cache/Async. Keine Browserläufe; Ben prüft Optik/FPS. Build `index-Cw8NrAGu.js`. Merge/Veröffentlichung v80 ausstehend.
+- Coverage: **126 individuell modelliert / 294 Rekonstruktionen**. Nächstes Paket: **v81, Dex #127–132: Matchbook, Shutoff, Goggles, Speedbag, Yarnball, Choker**. Bens Freigabe für alle restlichen Monster gilt weiter.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v79 Dex #115–120 veröffentlicht, PR #87; nächstes Paket #121–126
 
 Annahme v79: Sechserpaket nach der ersten Original-Sprite-Pose; Pipettes Glas und Compacts Spiegel werden als offene Sichtlinie bzw. gewölbte Reflexflächen mit dem vorhandenen PBR bis 4K umgesetzt, ohne zusätzliche Transparenz-/Reflexionspässe; Cigpacks Rauch bleibt ein modellierter Schwung der Vorlage.

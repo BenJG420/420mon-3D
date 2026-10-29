@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v80, Dex #121–126
+
+- Jerrycan, Floatball, Letterbox, Bollard, Shears and Switchbox are project-authored geometry in `src/game/monster-sculpts-p-metal.ts`, `monster-sculpts-p-creatures.ts` and `monster-sculpts-p-boxes.ts`, using the retained first-pose source artwork. Original sheets remain unchanged, with exact source hashes in `monster-authored.ts`.
+- Custom local curved surfaces, existing Sculpt/Three.js helpers and adaptive PBR maps up to 4096² provide the detail; Switchbox uses the existing masked LED emission. No external mesh/photo/texture added. Three.js/helpers retain MIT attribution; player/NPC assets/licenses unchanged.
+
 ## Original-sprite monster sculptures — v79, Dex #115–120
 
 - Cigpack, Seatring, Pipette, Belltimer, Compass and Compact are project-authored geometry in `src/game/monster-sculpts-o-objects.ts`, `monster-sculpts-o-hinged.ts` and `monster-sculpts-o-instruments.ts`, based on the retained first-pose source sprites. Full source sheets remain intact; authentic hashes are registered in `monster-authored.ts`.
