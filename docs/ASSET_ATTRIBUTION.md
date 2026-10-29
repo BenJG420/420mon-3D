@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v81, Dex #127–132
+
+- Matchbook, Shutoff, Goggles, Speedbag, Yarnball and Choker are project-authored geometry in `src/game/monster-sculpts-q-objects.ts`, `monster-sculpts-q-soft.ts` and `monster-sculpts-q-creatures.ts`, following the retained first-pose source artwork. Complete source sheets are unchanged; exact hashes remain registered in `monster-authored.ts`.
+- Custom curved surfaces and existing Sculpt/Three.js helpers supply the new geometry. The existing device-adaptive PBR maps up to 4096² remain. No external model, photograph or texture added. Three.js/helpers keep MIT attribution; player/NPC assets and licenses unchanged.
+
 ## Original-sprite monster sculptures — v80, Dex #121–126
 
 - Jerrycan, Floatball, Letterbox, Bollard, Shears and Switchbox are project-authored geometry in `src/game/monster-sculpts-p-metal.ts`, `monster-sculpts-p-creatures.ts` and `monster-sculpts-p-boxes.ts`, using the retained first-pose source artwork. Original sheets remain unchanged, with exact source hashes in `monster-authored.ts`.

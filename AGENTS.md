@@ -35,9 +35,9 @@ silhouettes and high-resolution PBR. The prior “Monster erst nach Freigabe” 
 post-v75 waiting instructions below are historical and superseded. PR #83 / v75
 is merged/live. Only build + directly affected tests; no heavy browser runs.
 Player/NPC assets and all mechanics/saves remain unchanged. Current package:
-v80 / PR #88, Dex #121–126 merged/live.
-Coverage: 126 authored / 294 reconstructions; build + 7 directly affected tests
-passed in one local round. Next package v81: Dex #127–132. Continue from the next unfinished Dex after each completed PR.
+v81, Dex #127–132 implemented; merge/publication pending.
+Coverage: 132 authored / 288 reconstructions; build + 7 directly affected tests
+passed across two local rounds. Next package v82: Dex #133–138. Continue from the next unfinished Dex after each completed PR.
 
 ## Previous priority order (user instruction, 2026-10-22)
 
