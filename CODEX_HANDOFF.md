@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v78 Dex #109–114 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v78: Weiter in Sechserpaketen nach der ersten Original-Sprite-Pose, mit der vorhandenen adaptiven PBR-Nahansicht bis 4K; Wasserstrahlen bleiben modellierte Tropfen wie in der Vorlage, ohne neue Partikel-/Lichtpässe oder Mechanikänderung.
+
+- Crushcan, Tidegauge, Parkmeter, Newsbox, Sprinkler und Bladeu (#109–114) haben eigene detaillierte Rundkörper, Rückseiten und Innenformen: zerknitterte Dose mit ausgeschnittener Zackenöffnung/vertieftem Mund, Ringlasche und Rostfalten; sechs gespaltene Holzstäbe mit Messmarken/Bindungen/Blauaugen; Parkuhr mit offenen Display-/Münzöffnungen, Ständer und Dreifuß; Zeitungskasten mit tiefer Papiernische, Druckrelief, Falte, Rippendach/Scharnieren; segmentierte Messinghaube, Düsen und einzelne Wassertropfen; volles Servergehäuse mit Leiterbahnen, Lamellen, Griff und neun lokal leuchtenden LEDs.
+- Je ein Modellmesh, gemessen 16.456–28.874 Dreiecke. Adaptiver 1K/2K/4K-Studio-PBR und Welt-/Geometriecache bleiben, ursprüngliche 108 Geometrien/Spieler/NPCs/Mechanik/Saves unverändert. Original-Sprite-Hashes sind registriert; keine externen Assets oder zusätzlichen Renderpässe.
+- **Build + 8/8 direkt betroffene Tests über zwei lokale Runden grün.** Runde 1 fand einen ungültigen BufferGeometry-Rotationsaufruf in den Maschinen; auf Quaternion-Anwendung korrigiert, danach nur Build und fehlgeschlagene Tests wiederholt. Prüft Quellhashes, volle glatte Geometrien/Budgets/UVs, tatsächliche Mundtiefe/Außenseite per CPU-Raycaster, isolierte LEDs, PBR-/Cache-/Async-Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-CEjooGCw.js`. Merge/Veröffentlichung v78 ausstehend.
+- Coverage: **114 individuell modelliert / 306 Rekonstruktionen**. Nächstes eigenes Paket: **v79, Dex #115–120: Cigpack, Seatring, Pipette, Belltimer, Compass, Compact**. Freigabe für alle restlichen Monster liegt vor.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v77 Dex #103–108 veröffentlicht, PR #85; nächstes Paket #109–114
 
 Annahme v77: Sechs Arten nach der ersten Original-Sprite-Pose; der vorhandene adaptive 1K/2K/4K-PBR-Pfad bleibt. Beakerlings Glas wird als modellierte klare Rand-/Reflexflächen mit sichtbarem Inhalt dargestellt, ohne zusätzliche Transmissions-/Renderpässe.
