@@ -197,11 +197,11 @@ test("model validation rejects corrupt coordinates, duplicate columns and invali
   single.dispose();
 });
 
-test("108 authored source species have individual mesh geometry, honest metadata and no fake unknown-species model", async () => {
+test("114 authored source species have individual mesh geometry, honest metadata and no fake unknown-species model", async () => {
   const { byId } = await assets();
-  assert.equal(AUTHORED_MONSTER_IDS.length, 108);
-  assert.equal(new Set(AUTHORED_MONSTER_IDS).size, 108);
-  const expected = DEX_ORDER.slice(0, 108);
+  assert.equal(AUTHORED_MONSTER_IDS.length, 114);
+  assert.equal(new Set(AUTHORED_MONSTER_IDS).size, 114);
+  const expected = DEX_ORDER.slice(0, 114);
   assert.deepEqual([...AUTHORED_MONSTER_IDS].sort(), expected.sort());
   const signatures = new Set();
   for (const id of AUTHORED_MONSTER_IDS) {
@@ -221,7 +221,7 @@ test("108 authored source species have individual mesh geometry, honest metadata
       signatures.add(geometryHash(geometry));
     } finally { geometry.dispose(); }
   }
-  assert.equal(signatures.size, 108);
+  assert.equal(signatures.size, 114);
   assert.equal(authoredMonsterGeometry("mon_not_real"), null);
   const automatic = DEX_ORDER.find(id => !AUTHORED_MONSTER_IDS.includes(id));
   assert.equal(authoredMonsterGeometry(automatic), null, "automatic volumes are not mislabeled as authored sculpts");

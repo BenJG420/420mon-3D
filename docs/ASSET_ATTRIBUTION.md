@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v78, Dex #109–114
+
+- Crushcan, Tidegauge, Parkmeter, Newsbox, Sprinkler and Bladeu are project-authored geometry in `src/game/monster-sculpts-n-salvage.ts`, `monster-sculpts-n-street.ts` and `monster-sculpts-n-mechanisms.ts`, using the retained original first-pose sprites. The source sheets remain intact; exact hashes are registered in `monster-authored.ts`.
+- Existing Sculpt/Three.js helpers and locally authored surfaces supply all new geometry; the device-adaptive PBR path up to 4096² is retained. No external mesh, photo or texture pack added. Three.js/helpers retain MIT attribution, and player/NPC assets/licenses remain unchanged.
+
 ## Original-sprite monster sculptures — v77, Dex #103–108
 
 - Flicker, Plunger, Beakerling, Gumguard, Shardtile and Heelsole are project-authored geometry in `src/game/monster-sculpts-m-objects.ts` and `src/game/monster-sculpts-m-creatures.ts`, based on the retained original first-pose sprites. Full source sheets remain unchanged; source hashes are recorded in `monster-authored.ts`.
