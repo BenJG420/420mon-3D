@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v81 Dex #127–132 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v81: Weiter sechs Arten nach der ersten Original-Sprite-Pose; Goggles' Beschlag/Dampfwölkchen bleiben modellierte helle Oberflächen der Vorlage, mit vorhandenem PBR bis 4K und ohne zusätzliche Transparenz-/Partikelpässe.
+
+- Matchbook, Shutoff, Goggles, Speedbag, Yarnball und Choker (#127–132) sind individuell modelliert: gefaltetes offenes Streichholzheft mit schrägem Deckel, vier einzelnen Streichhölzern, Papierlagen/Klammer/Reibfläche; rotes Rad mit echten offenen Speichenräumen, Gusssockel, Rippen, Korrosion und Augenplatte; vollständiger violetter Körper mit gelben Brillenfassungen, gewölbten beschlagenen Gläsern, umlaufendem Band, Tropfen und Dampfwölkchen; durchgehender roter Birnenkörper mit genähten Bahnen, Rückenschnürung und offener Aufhängöse; 24 gekreuzte Garnwicklungen mit tatsächlich ausgeschnittenen vertieften Augen, Randfasern und langem Faden; gehörnte violette Figur mit einzelnen Zähnen/Krallen, grauem Bauch, umlaufendem Halsband und freiem Schlossbügel/Schlüsselloch.
+- Ein Mesh je Art, **16.460–29.408 Dreiecke**. Ursprüngliche 126 Modelle, adaptiver 1K/2K/4K-Studio-PBR und Welt-/UV-/Geometriecache erhalten. Quell-Sprites/Hashes, Spieler/NPCs/Mechanik/Saves unverändert, keine externen Assets.
+- **Build + 7/7 direkt betroffene Tests über zwei lokale Runden grün.** Runde 1 fand Shutoff mit 32.104 Dreiecken über dem 30k-Budget; nur kleine Gussteil-Unterteilungen reduziert (jetzt 28.680), danach Build und betroffene Budget-/Speichen-/Registry-Tests wiederholt. Prüft Quellen, glatte Geometrien/UVs, reale Speichenöffnungen/Augenvertiefungen per CPU-Raycaster und Cache-/Async-Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-C7zxNR03.js`. Merge/Veröffentlichung v81 ausstehend.
+- Coverage: **132 individuell modelliert / 288 Rekonstruktionen**. Nächstes Paket: **v82, Dex #133–138: Vicegrip, Soapbar, Padlock, Drumcan, Watercan, Powerbrick**. Bens Freigabe für alle restlichen Monster gilt weiter.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v80 Dex #121–126 veröffentlicht, PR #88; nächstes Paket #127–132
 
 Annahme v80: Weiter sechs Arten nach der ersten Original-Sprite-Pose; Original-Oberflächenspuren werden als weiche Geometrie/Relief ausgearbeitet. Switchbox verwendet den vorhandenen lokalen LED-Glow und adaptiven PBR bis 4K, ohne neue Licht-/Renderpässe.
