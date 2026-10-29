@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v79, Dex #115–120
+
+- Cigpack, Seatring, Pipette, Belltimer, Compass and Compact are project-authored geometry in `src/game/monster-sculpts-o-objects.ts`, `monster-sculpts-o-hinged.ts` and `monster-sculpts-o-instruments.ts`, based on the retained first-pose source sprites. Full source sheets remain intact; authentic hashes are registered in `monster-authored.ts`.
+- Custom local surfaces and existing Sculpt/Three.js helpers supply the details. Existing device-adaptive PBR maps up to 4096² remain. No external mesh, photograph or texture pack added. Three.js/helpers retain MIT attribution; player/NPC assets and licenses are unchanged.
+
 ## Original-sprite monster sculptures — v78, Dex #109–114
 
 - Crushcan, Tidegauge, Parkmeter, Newsbox, Sprinkler and Bladeu are project-authored geometry in `src/game/monster-sculpts-n-salvage.ts`, `monster-sculpts-n-street.ts` and `monster-sculpts-n-mechanisms.ts`, using the retained original first-pose sprites. The source sheets remain intact; exact hashes are registered in `monster-authored.ts`.
