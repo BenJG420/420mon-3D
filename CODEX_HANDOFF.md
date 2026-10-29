@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v79 Dex #115–120 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v79: Sechserpaket nach der ersten Original-Sprite-Pose; Pipettes Glas und Compacts Spiegel werden als offene Sichtlinie bzw. gewölbte Reflexflächen mit dem vorhandenen PBR bis 4K umgesetzt, ohne zusätzliche Transparenz-/Reflexionspässe; Cigpacks Rauch bleibt ein modellierter Schwung der Vorlage.
+
+- Cigpack, Seatring, Pipette, Belltimer, Compass und Compact (#115–120) erhalten eigene detaillierte Rundkörper und Rückseiten: offene gefaltete Schachtel mit Folie, Klappdeckel, zwei Filterstummeln und müden Augen; echter offener Sitzring mit tiefem magentafarbenem Becken/Deckel/Schanieren; durchgehende birnenförmige Gummikappe, offene Glasfront, grüner Flüssigkeitskörper/Meniskus/Messstriche und Tropfen; tiefes Timer-Gehäuse mit rotem Zifferblatt, Gravuren/Druckknopf und Rückseitenschrauben; Messingkompass mit plastischer zweifarbiger Nadel, Windrose/Skala/Edelsteinen und offenem Aufhängering; tiefe Puderdose mit Pulverrelief, plastischen Augen, gewölbtem gekipptem Spiegel, Scharnier und Verschluss.
+- Je ein Modellmesh, gemessen 14.848–24.192 Dreiecke. Vorhandener adaptiver 1K/2K/4K-Studio-PBR, Welt-/Geometriecache und ursprüngliche 114 Modelle bleiben erhalten; Spieler/NPCs/Mechanik/Saves unverändert. Authentische Sprite-Hashes registriert, keine externen Assets oder zusätzlichen Renderpässe.
+- **Ein Build + 7/7 direkt betroffene Tests in einer lokalen Runde grün.** Prüft Quellhashes, individuelle glatte Geometrien/Budgets/UVs, echte Schachtelöffnung und sichtbare Flüssigkeit per CPU-Raycaster, vollständige Registry sowie Cache-/Async-Ressourcenbesitz. Keine Browserläufe; Ben prüft Optik/FPS. Build `index-BSlCC-R8.js`. Merge/Veröffentlichung v79 ausstehend.
+- Coverage: **120 individuell modelliert / 300 Rekonstruktionen**. Nächstes Paket: **v80, Dex #121–126: Jerrycan, Floatball, Letterbox, Bollard, Shears, Switchbox**. Freigabe für alle restlichen Monster liegt vor.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v78 Dex #109–114 veröffentlicht, PR #86; nächstes Paket #115–120
 
 Annahme v78: Weiter in Sechserpaketen nach der ersten Original-Sprite-Pose, mit der vorhandenen adaptiven PBR-Nahansicht bis 4K; Wasserstrahlen bleiben modellierte Tropfen wie in der Vorlage, ohne neue Partikel-/Lichtpässe oder Mechanikänderung.
