@@ -14,7 +14,7 @@ const ids=['weldmask','drainplug','callbox','hydrant','growbulb','patchcoil'].ma
 
 test('Dex 97–102 are distinct full-volume authored sculpts with authenticated original references', async()=>{
   assert.deepEqual(DEX_ORDER.slice(96,102),ids);
-  assert.equal(AUTHORED_MONSTER_IDS.length,102);
+  assert.deepEqual(AUTHORED_MONSTER_IDS.slice(96,102),ids);
   const signatures=new Set();
   for(const id of ids){
     const geometry=authoredMonsterGeometry(id), slug=id.slice(4);
@@ -42,7 +42,7 @@ test('Dex 97–102 are distinct full-volume authored sculpts with authenticated 
     } finally {geometry.dispose();}
   }
   assert.equal(signatures.size,6);
-  assert.equal(authoredMonsterGeometry('mon_flicker'),null,'next package stays honestly marked as reconstruction');
+  assert.equal(authoredMonsterGeometry('mon_not_real'),null,'unknown species do not receive an invented model');
 });
 
 test('new sculpts enter the existing leased UV/PBR cache without fetching replacement artwork',async()=>{

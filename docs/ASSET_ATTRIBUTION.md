@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v77, Dex #103–108
+
+- Flicker, Plunger, Beakerling, Gumguard, Shardtile and Heelsole are project-authored geometry in `src/game/monster-sculpts-m-objects.ts` and `src/game/monster-sculpts-m-creatures.ts`, based on the retained original first-pose sprites. Full source sheets remain unchanged; source hashes are recorded in `monster-authored.ts`.
+- Custom local surfaces and existing Three.js/Sculpt helpers provide the geometry. The adaptive high-resolution PBR path from v76 is retained. No external mesh, photograph or texture pack added; Three.js/helpers keep their MIT license. Player/NPC assets and licenses are unchanged.
+
 ## Original-sprite monster sculptures — v76, Dex #97–102
 
 - Weldmask, Drainplug, Callbox, Hydrant, Growbulb and Patchcoil are project-authored geometry in `src/game/monster-sculpts-l-machines.ts` and `src/game/monster-sculpts-l-fixtures.ts`, based on the retained original first-pose sprites. The complete 2D source sheets remain unchanged; exact hashes are recorded in `monster-authored.ts`.
