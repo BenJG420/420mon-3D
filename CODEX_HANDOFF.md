@@ -1,10 +1,10 @@
-# Aktueller Wiedereinstieg — v77 Dex #103–108 fertig, Merge/Veröffentlichung ausstehend
+# Aktueller Wiedereinstieg — v77 Dex #103–108 veröffentlicht, PR #85; nächstes Paket #109–114
 
 Annahme v77: Sechs Arten nach der ersten Original-Sprite-Pose; der vorhandene adaptive 1K/2K/4K-PBR-Pfad bleibt. Beakerlings Glas wird als modellierte klare Rand-/Reflexflächen mit sichtbarem Inhalt dargestellt, ohne zusätzliche Transmissions-/Renderpässe.
 
 - Flicker, Plunger, Beakerling, Gumguard, Shardtile und Heelsole (#103–108) haben eigene volle 3D-Geometrien nach den authentischen lokalen Original-Sprites: hohler aufgeklappter Deckel mit Scharnier/Windschutz und lokal leuchtender Flamme; offene Saugglocke mit Gummifalten; Becherwand/Ausguss mit gewelltem Flüssigkeitspegel und Messstrichen; runder Körper mit Fäusten/Zehen und 16 Zähnen; 13 dicke gebrochene Spiegelfliesen mit Auge; echte offene Schuhschale mit Innenfutter, gewölbter Sohle und dünnem Absatz.
 - Alle sechs <30k Dreiecke/ein Modellmesh; vorhandene PBR-Texturen bis 4096² geräteabhängig, ursprüngliche 102 Geometrien/Cache erhalten. Zwei analytisch erkannte Winding-Fehler vor dem ersten Prüfblock korrigiert, Spiegel-Kronen unter dem Geometriebudget gehalten. Spieler/NPCs/Mechanik/Saves unverändert.
-- **Ein Build + 10/10 direkt betroffene Tests in einer lokalen Runde grün**: Quellhashes, sechs individuelle Geometrien/Budgets/glatte Normalen/UVs, tatsächliche Außenseiten per CPU-Raycaster, Glow/PBR-Auswahl und Cache-/Async-/Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-CshGxDMf.js`. Merge/Veröffentlichung v77 ausstehend.
+- **Ein Build + 10/10 direkt betroffene Tests in einer lokalen Runde grün**: Quellhashes, sechs individuelle Geometrien/Budgets/glatte Normalen/UVs, tatsächliche Außenseiten per CPU-Raycaster, Glow/PBR-Auswahl und Cache-/Async-/Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-CshGxDMf.js`. PR #85 gemergt/live. Source `33a931658e6fb9889692e19e7b79bbf7bcd74d61`; PR CI40806466183/Main CI40806621492/Pages40806621368 grün. Live JS `index-CshGxDMf.js`, SHA256 `466120589e977d8bcbbfa3613ba0acb7c3e95b8ee148057e7daf4ef2e01fa95f`; JS/CSS/fonts bytegleich, Stable unverändert (`v77-deploy-proof.json`).
 - Coverage: **108 individuell modelliert / 312 Rekonstruktionen**. Nächstes eigenes Paket: **v78, Dex #109–114: Crushcan, Tidegauge, Parkmeter, Newsbox, Sprinkler, Bladeu**. Bens ausdrückliche Freigabe für alle restlichen Monster liegt vor; nur Build + direkt betroffene Tests.
 
 ## Vorheriger Stand
