@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v83 Dex #139–144 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v83: Sechs Arten nach der ersten Original-Sprite-Pose; Bunsens Flamme bleibt modellierte lokale Emission im bestehenden PBR-Pfad bis 4K, ohne neue Licht-/Partikelpässe; Rizlas Papier und Garters Band erhalten echte Dicke/offene Formen.
+
+- Rizla, Loobrush, Bunsen, Boxglove, Doorknob und Garter (#139–144) sind individuell modelliert: gefaltete orange Papierpackung mit gestapelten Kanten, geschlossener geschwungener Papierbahn und Rückseitenfalten; voller Bürstenkopf mit 88 gebogenen Einzelborsten, 14 Kronenbüscheln, langem türkisfarbenem Griff und offener Öse; metallischer Brenner mit Hohldüse, Gasanschluss/Schlauch und sechs volumetrischen blau-weißen Flammenzungen; gepolsterter roter Handschuh mit eigenem Daumen, offenem tiefem Bündchen, Nähten und Rückenschnürung; runder Messingknauf mit tatsächlich vertieften dunklen Augen, Gebrauchsspuren, gedrehtem Sockel und Rückseitenbeschlag; vollständige gehörnte violette Kreatur mit Krallen, gelben Schlitzaugen, gekrümmtem gestreiftem Schwanz und umlaufendem rosa Band mit offener Schnalle.
+- Ein Mesh je Art, **13.124–28.632 Dreiecke**. Bestehender adaptiver 1K/2K/4K-Studio-PBR, Welt-/UV-/Geometriecache und ursprüngliche 138 Modelle bleiben. Original-Sprites/Hashes, Spieler/NPCs/Mechanik/Saves unverändert, keine externen Assets.
+- **Ein Build + 7/7 direkt betroffene Tests in einer lokalen Runde grün.** Prüft Quellhashes, glatte vollständige Geometrien/Budgets/UVs, Doorknobs echte dunkle Augenvertiefungen per CPU-Raycaster, isolierte Bunsen-Emission plus bestehenden Powerbrick-Pfad sowie Registry/Cache/Async-Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-DXjCvkXK.js`. Merge/Veröffentlichung v83 ausstehend.
+- Coverage: **144 individuell modelliert / 276 Rekonstruktionen**. Nächstes Paket: **v84, Dex #145–150: Wrench, Gratecover, Stoplight, Ladder, Humidifier, Usbstick**. Bens Freigabe für alle restlichen Monster gilt weiter.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v82 Dex #133–138 veröffentlicht, PR #90; nächstes Paket #139–144
 
 Annahme v82: Sechserpaket nach der ersten Original-Sprite-Pose; Rostflächen und Soapbars Risse werden als feines Oberflächenrelief modelliert. Powerbrick nutzt den vorhandenen lokalen LED-Glow und adaptiven Studio-PBR bis 4K, ohne zusätzliche Licht-/Renderpässe.

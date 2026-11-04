@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v83, Dex #139–144
+
+- Rizla, Loobrush, Bunsen, Boxglove, Doorknob and Garter are project-authored geometry in `src/game/monster-sculpts-s-objects.ts`, `monster-sculpts-s-surfaces.ts` and `monster-sculpts-s-creatures.ts`, following the retained original first-pose sprites. Full source sheets remain intact; exact source hashes are registered in `monster-authored.ts`.
+- Custom curved surfaces and existing Sculpt/Three.js helpers provide the geometry; existing device-adaptive PBR maps up to 4096² and masked emission are reused. No external mesh, photo or texture pack added. Three.js/helpers retain MIT attribution; player/NPC assets and licenses unchanged.
+
 ## Original-sprite monster sculptures — v82, Dex #133–138
 
 - Vicegrip, Soapbar, Padlock, Drumcan, Watercan and Powerbrick are project-authored geometry in `src/game/monster-sculpts-r-hardware.ts`, `monster-sculpts-r-surfaces.ts` and `monster-sculpts-r-appliances.ts`, based on the original first-pose sprites. Complete source sheets remain intact; authentic source hashes are registered in `monster-authored.ts`.

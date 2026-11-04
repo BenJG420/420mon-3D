@@ -1,4 +1,6 @@
-> **Ben’s explicit approval, 2026-10-28:** all remaining monster sculpts are now authorized. This supersedes every historical “Monster erst nach Freigabe” and the post-v75 feedback wait below. Continue detailed original-sprite sculptures with high-resolution PBR, one finished package/PR at a time, only build + directly affected tests; players/NPCs/mechanics/saves unchanged. **V82 Dex #133–138 merged/live, PR #90. Next v83: Dex #139–144.**
+> **Ben’s explicit approval, 2026-10-28:** all remaining monster sculpts are now authorized. This supersedes every historical “Monster erst nach Freigabe” and the post-v75 feedback wait below. Continue detailed original-sprite sculptures with high-resolution PBR, one finished package/PR at a time, only build + directly affected tests; players/NPCs/mechanics/saves unchanged. **V83 Dex #139–144 implemented; merge/publication pending. Next v84: Dex #145–150.**
+
+> **V83 — Dex #139–144 implemented; merge/publication pending:** Rizla gains a thick folded orange packet, stacked paper edges, a genuinely closed curling sheet, angular eyes and rear seams. Loobrush has 88 individual curved tapered bristles, 14 crown tufts, exposed glossy eyes, a long leaning teal handle/grip rings and open eyelet. Bunsen has a complete rolled metal burner, hollow nozzle, vents, side gas inlet/hose and six curved blue/cyan/white flame lobes with localized emission. Boxglove gains a full padded red body, separate thumb/palm fold, genuinely open deep cuff, stitches, strap holes and rear lacing. Doorknob has a rounded brass shell with actual recessed dark eye cavities, turned neck/pedestal, cast wear, fittings and rear spindle cover. Garter is a complete horned purple creature with sculpted muzzle, claws, slit eyes, curled striped tail and a fitted full pink waist band with stitching, open buckle and hanging clip. **13,124–28,632 triangles, one mesh each**; existing adaptive 1K/2K/4K studio PBR, world texture budget and shared UV/geometry cache retained. Original source sheets/hashes and previous 138 models retained; player/NPC assets, gameplay and saves unchanged. No external assets or new light/render passes. **Build + 7/7 directly affected tests passed in one local round**: source references, smooth full-volume geometry/budgets/UVs, actual Doorknob eye depth/dark interiors under CPU ray/culling checks, isolated Bunsen emission plus existing Powerbrick regression, registry and shared/async resource ownership. No browser runs; Ben checks appearance/device FPS. **Coverage 144 authored / 276 reconstructions; next v84 Dex #145–150 (Wrench, Gratecover, Stoplight, Ladder, Humidifier, Usbstick).**
 
 > v82 publication: Source `8c3a84dd89b74520d157079ed4ca7bd941929151`; PR CI41857798028/Main CI41858088774/Pages41858088662 grün. Live JS `index-Cxb2OkXg.js`, SHA256 `1615f42aff9d83a1245ff93b71ab6062bcee41dd7dd198fb6e4e7bd2c17b9687`; JS/CSS/fonts bytegleich, Stable unverändert (`v82-deploy-proof.json`).
 
@@ -1004,8 +1006,8 @@ check in the published test build. Validation here is build + affected tests onl
 
 ## Remaining work — Bens neue Prioritäten (2026-10-23)
 
-V82 / PR #90 is merged/live with Dex #133–138. Coverage is 138 individual
-sculptures / 282 smooth reconstructions. Ben approved all remaining monster work
+V83 implements Dex #139–144; merge/publication pending. Coverage is 144 individual
+sculptures / 276 smooth reconstructions. Ben approved all remaining monster work
 on 2026-10-28. The new owner order below supersedes every older
 NEXT/order note. One complete playable package per PR. **Latest rule (Ben 2026-10-22):
 build + directly affected tests only; no broad suites, combination sweeps or browser
@@ -1075,7 +1077,7 @@ are historical; existing repository CI may run automatically.
    **All listed district implementation packages delivered:** Schrotttor PR #81 / v73 closes this list. Remaining: Ben’s device visual/gameplay feedback and actual FPS comparisons from item 5; address concrete reported issues in their own PRs. Ben explicitly approved the remaining monster sculpts on 2026-10-28.
 12. **DONE — Aquarium/Fische v74 (Ben 2026-10-27), PR #82 merged/live:** replace flat tank sprites with detailed smooth 3D fish and natural body/tail/fin motion for all 42 original species. Add transparent glass/refraction, depth and water lighting/caustics, planted gravel/rocks/driftwood, bubbles and underwater atmosphere. Reuse a lighter habitat in the physical Kapsel aquarium; preserve its footprint, fishing/collection/bonuses/saves and all player/NPC assets. Build + 24/24 directly affected tests passed in one local round; no browser runs. Ben checks appearance/FPS in the test build.
 13. **DONE — Aquarium-Modal v75, PR #83 merged/live:** Ben found the v74 “Dein Becken” modal small/flat and fish too tiny. Replace its distant fitted-box framing with a nearly screen-filling close window through the front glass; visible detailed 3D fish, natural depth swimming, foreground/middle/background planting and hardscape, moving caustics, directional lighting and bubbles. Retain the physical room tank, player/NPC assets, fish collection/rules/saves. Build + directly affected tests only, no browser loops. The original feedback wait was superseded by Ben’s explicit monster approval on 2026-10-28.
-14. **AUTHORIZED — Ben 2026-10-28: remaining monster sculpts.** **DONE V82 / PR #90 Dex #133–138 merged/live. Build + 7/7 direct tests passed. NEXT v83 Dex #139–144.** Continue the remaining 282 species in individual finished packages/PRs with detailed geometry, clean source silhouettes and high-resolution PBR. Preserve the 138 authored models and shared UV/cache; players/NPCs/mechanics/saves unchanged. This explicit approval supersedes prior waiting instructions.
+14. **AUTHORIZED — Ben 2026-10-28: remaining monster sculpts.** **DONE V83 Dex #139–144 implemented; merge/publication pending. Build + 7/7 direct tests passed. NEXT v84 Dex #145–150.** Continue the remaining 276 species in individual finished packages/PRs with detailed geometry, clean source silhouettes and high-resolution PBR. Preserve the 144 authored models and shared UV/cache; players/NPCs/mechanics/saves unchanged. This explicit approval supersedes prior waiting instructions.
    Known v47 visual follow-up: Ypipe branches partly cover its eyes in the initial
    viewer angle; the right opening is shallow at that angle. Three check rounds
    are exhausted; no fourth loop. Rotation works, no gameplay/save error found.
@@ -1229,9 +1231,9 @@ Original references/hashes and shared PBR/UV/cache remain; previous 90
 geometries, toolkit, renderer and gameplay/saves are unchanged.
 
 **APPROVED by Ben 2026-10-28:** individual
-anatomy/detail work for the remaining **282 original species, starting Dex #139**,
+anatomy/detail work for the remaining **276 original species, starting Dex #145**,
 following the 2D artwork and reference. Current
-coverage is 138 authored / 282 smooth reconstructions.
+coverage is 144 authored / 276 smooth reconstructions.
 This pass does not claim 420 individually sculpted/production-4K creatures.
 Physical Android/native 4K visual/performance verification remains a device test.
 
