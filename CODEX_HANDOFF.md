@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v82 Dex #133–138 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v82: Sechserpaket nach der ersten Original-Sprite-Pose; Rostflächen und Soapbars Risse werden als feines Oberflächenrelief modelliert. Powerbrick nutzt den vorhandenen lokalen LED-Glow und adaptiven Studio-PBR bis 4K, ohne zusätzliche Licht-/Renderpässe.
+
+- Vicegrip, Soapbar, Padlock, Drumcan, Watercan und Powerbrick (#133–138) sind individuell modelliert: getrennte gebogene Zangenarme mit gezahnten offenen Backen, Gelenken/Feder und amberfarbenen Augen; weicher Elfenbein-Seifenblock mit verzweigten Risslinien über Ober-/Vorder-/Rückseiten, müden Augen und großem Tropfen; rostiges Schloss mit offenem U-Bügel, tatsächlich vertieftem dunklem Schlüsselloch, Schrauben und Füßen; gebogenes blaues Fass mit geschlossenen Deckeln, gerollten Ringen, gekrümmten Rostflächen und plastischer Y-Falte; offene grüne Gießkanne mit tiefem Füllraum, offenem Henkel, hohlem Ausguss und sieben echten Brausenlöchern; vollständiges Netzteil mit zwei lokal leuchtenden Linsen, Lüftung, Kabel/Knicksicherung und offenem Kontaktstecker.
+- Ein Mesh je Art, **19.400–25.748 Dreiecke**. Bestehender adaptiver 1K/2K/4K-Studio-PBR, Welt-/UV-/Geometriecache sowie ursprüngliche 132 Modelle bleiben. Original-Sprites/Hashes, Spieler/NPCs/Mechanik/Saves unverändert, keine externen Assets.
+- **Ein Build + 7/7 direkt betroffene Tests in einer lokalen Runde grün.** Prüft Quellhashes, volle glatte Geometrien/Budgets/UVs, tatsächlich offenen Schlossbügel und dunklen vertieften Schlüsselkanal per CPU-Raycaster, Powerbrick-Glow plus bestehenden Switchbox-Pfad sowie Registry/Cache/Async-Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-Cxb2OkXg.js`. Merge/Veröffentlichung v82 ausstehend.
+- Coverage: **138 individuell modelliert / 282 Rekonstruktionen**. Nächstes Paket: **v83, Dex #139–144: Rizla, Loobrush, Bunsen, Boxglove, Doorknob, Garter**. Bens Freigabe für alle restlichen Monster gilt weiter.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v81 Dex #127–132 veröffentlicht, PR #89; nächstes Paket #133–138
 
 Annahme v81: Weiter sechs Arten nach der ersten Original-Sprite-Pose; Goggles' Beschlag/Dampfwölkchen bleiben modellierte helle Oberflächen der Vorlage, mit vorhandenem PBR bis 4K und ohne zusätzliche Transparenz-/Partikelpässe.
