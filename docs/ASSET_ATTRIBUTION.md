@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v82, Dex #133–138
+
+- Vicegrip, Soapbar, Padlock, Drumcan, Watercan and Powerbrick are project-authored geometry in `src/game/monster-sculpts-r-hardware.ts`, `monster-sculpts-r-surfaces.ts` and `monster-sculpts-r-appliances.ts`, based on the original first-pose sprites. Complete source sheets remain intact; authentic source hashes are registered in `monster-authored.ts`.
+- Custom local curved surfaces and existing Sculpt/Three.js helpers provide the detail; device-adaptive PBR maps up to 4096² and the existing LED emission path remain. No external mesh, photo or texture pack added. Three.js/helpers retain MIT attribution; player/NPC assets and licenses unchanged.
+
 ## Original-sprite monster sculptures — v81, Dex #127–132
 
 - Matchbook, Shutoff, Goggles, Speedbag, Yarnball and Choker are project-authored geometry in `src/game/monster-sculpts-q-objects.ts`, `monster-sculpts-q-soft.ts` and `monster-sculpts-q-creatures.ts`, following the retained first-pose source artwork. Complete source sheets are unchanged; exact hashes remain registered in `monster-authored.ts`.
