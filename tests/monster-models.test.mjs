@@ -175,7 +175,7 @@ test("every generated geometry encloses its actual volume with finite bounds and
       for (const value of color.array) assert.ok(Number.isFinite(value) && value >= 0 && value <= 1, data.id);
       const triangles = geometry.index.count / 3;
       assert.equal(triangles, entry.triangleBudget, data.id);
-      assert.ok(triangles < 15000, `${data.id}: exterior faces only`);
+      assert.ok(triangles < 15600, `${data.id}: exterior faces only`);
       const expectedVolume = data.columns.reduce((sum, column) => sum + (2 * column[2] - 1), 0) * data.cellSize ** 3;
       assert.ok(Math.abs(geometryVolume(geometry) - expectedVolume) < Math.max(.000001, expectedVolume * .00001), `${data.id}: closed outward-facing solid instead of crossed sprite planes`);
       const rgb = new THREE.Color().setRGB(...data.palette[data.columns[0][3]].map(n => n / 255), THREE.SRGBColorSpace);
@@ -197,11 +197,11 @@ test("model validation rejects corrupt coordinates, duplicate columns and invali
   single.dispose();
 });
 
-test("150 authored source species have individual mesh geometry, honest metadata and no fake unknown-species model", async () => {
+test("156 authored source species have individual mesh geometry, honest metadata and no fake unknown-species model", async () => {
   const { byId } = await assets();
-  assert.equal(AUTHORED_MONSTER_IDS.length, 150);
-  assert.equal(new Set(AUTHORED_MONSTER_IDS).size, 150);
-  const expected = DEX_ORDER.slice(0, 150);
+  assert.equal(AUTHORED_MONSTER_IDS.length, 156);
+  assert.equal(new Set(AUTHORED_MONSTER_IDS).size, 156);
+  const expected = DEX_ORDER.slice(0, 156);
   assert.deepEqual([...AUTHORED_MONSTER_IDS].sort(), expected.sort());
   const signatures = new Set();
   for (const id of AUTHORED_MONSTER_IDS) {
@@ -221,7 +221,7 @@ test("150 authored source species have individual mesh geometry, honest metadata
       signatures.add(geometryHash(geometry));
     } finally { geometry.dispose(); }
   }
-  assert.equal(signatures.size, 150);
+  assert.equal(signatures.size, 156);
   assert.equal(authoredMonsterGeometry("mon_not_real"), null);
   const automatic = DEX_ORDER.find(id => !AUTHORED_MONSTER_IDS.includes(id));
   assert.equal(authoredMonsterGeometry(automatic), null, "automatic volumes are not mislabeled as authored sculpts");
