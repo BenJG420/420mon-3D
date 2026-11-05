@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v87, Dex #163–168
+
+- Bong, Ubend, Teststrip, Heavybag, Mapscrap and Whip are project-authored geometry in `src/game/monster-sculpts-w-vessels.ts`, `monster-sculpts-w-flexible.ts` and `monster-sculpts-w-surfaces.ts`, based on retained original first-pose sprites. Full source sheets remain intact; authentic hashes are registered in `monster-authored.ts`.
+- Custom curved/extruded surfaces and existing Sculpt/Three.js helpers supply the detail. Existing device-adaptive PBR maps up to 4096² are reused. No external mesh, photo, font or texture pack added. Three.js/helpers retain MIT attribution; player/NPC assets and licenses unchanged.
+
 ## Original-sprite monster sculptures — v86, Dex #157–162
 
 - Bolt, Sumpump, Streetlamp, Spraycan, Phmeter and Keycap are project-authored geometry in `src/game/monster-sculpts-v-metal.ts`, `monster-sculpts-v-street.ts` and `monster-sculpts-v-devices.ts`, based on retained original first-pose sprites. Full sheets remain intact; authentic hashes are registered in `monster-authored.ts`.
