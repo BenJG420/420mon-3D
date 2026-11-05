@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v85 Dex #151–156 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v85: Sechs Arten nach der ersten Original-Sprite-Pose; Lantern erhält einen offenen Sichtbereich mit schmalen Glasrand-Glanzlinien und lokal leuchtender plastischer Flamme im vorhandenen PBR-Pfad bis 4K, ohne zusätzliche Transparenz-/Lichtpässe.
+
+- Roachclip, Faucet, Mortar, Jumprope, Lantern und Fishnet (#151–156) sind individuell modelliert: runder Silberkörper mit großen Augen, getrennten Zahnbacken, braunem Stummel, vier Gelenkbeinen, schrägem gerilltem Griff und Rückseitenbeschlägen; vollständiger gebogener Wasserhahn mit freiem Bogen, hohlem Ausguss, Tropfen, T-Ventil, Augenplatte und umlaufendem Rost; tiefe graue Steinschale mit korrekter Innenwand, 38 einzelnen grünen Inhalten, schrägem Stößel, Augen und Steineinschlüssen; vollständiges violettes Seilbündel mit 13 umlaufenden Wicklungen, Kronenlagen, zwei roten Griffen und separat hängender roter Schlaufe; verwitterter Messingrahmen mit offenem Sichtbereich, vollständiger violetter Flamme und dunklen Augen, Stufenfuß, Lüftung und offenem Seitenbügel; runder pinker Körper unter 20 gegenläufigen Netzsträngen, sichtbaren wütenden Augen, dickem gefaltetem Knoten und sechs Zehen.
+- Ein Mesh je Art, **24.096–28.212 Dreiecke**. Bestehender adaptiver 1K/2K/4K-Studio-PBR, Welt-/UV-/Geometriecache sowie ursprüngliche 150 Modelle bleiben. Original-Sprites/Hashes, Spieler/NPCs/Mechanik/Saves unverändert, keine externen Assets.
+- **Ein Build + 8/8 direkt betroffene Tests in einer lokalen Runde grün.** Prüft Quellhashes, vollständige glatte Geometrien/Budgets/UVs, sichtbare Lantern-/Fishnet-Pupillen mit korrekten Vorderseiten, echten freien Wasserhahn-Bogen und tiefe Mörserinhalte per CPU-Raycaster, begrenzte Flammen-Emission mit dunklen Augen plus bisherigen Stoplight-Pfad sowie Registry/Cache/Async-Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-CSNFoZJ0.js`. Merge/Veröffentlichung v85 ausstehend.
+- Coverage: **156 individuell modelliert / 264 Rekonstruktionen**. Nächstes Paket: **v86, Dex #157–162: Bolt, Sumpump, Streetlamp, Spraycan, Phmeter, Keycap**. Bens Freigabe für alle restlichen Monster gilt weiter.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v84 Dex #145–150 veröffentlicht, PR #92; nächstes Paket #151–156
 
 Annahme v84: Sechserpaket nach der ersten Original-Sprite-Pose; Humidifiers Dampf bleibt eine plastische helle Form der Vorlage, Ampel/USB verwenden lokale Emission und vorhandenen adaptiven PBR bis 4K ohne neue Licht-/Partikelpässe.

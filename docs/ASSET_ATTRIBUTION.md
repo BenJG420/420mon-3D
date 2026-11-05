@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v85, Dex #151–156
+
+- Roachclip, Faucet, Mortar, Jumprope, Lantern and Fishnet are project-authored geometry in `src/game/monster-sculpts-u-metal.ts`, `monster-sculpts-u-curved.ts` and `monster-sculpts-u-creatures.ts`, following the retained first-pose original artwork. Complete source sheets remain intact; authentic hashes are registered in `monster-authored.ts`.
+- Custom curved surfaces, extrusions and existing Sculpt/Three.js helpers provide the details. Existing device-adaptive PBR maps up to 4096² and isolated emission are reused. No external mesh, photo or texture pack added. Three.js/helpers retain MIT attribution; player/NPC assets and licenses unchanged.
+
 ## Original-sprite monster sculptures — v84, Dex #145–150
 
 - Wrench, Gratecover, Stoplight, Ladder, Humidifier and Usbstick are project-authored geometry in `src/game/monster-sculpts-t-hardware.ts`, `monster-sculpts-t-fixtures.ts` and `monster-sculpts-t-devices.ts`, based on the retained first-pose source artwork. Original sheets remain intact; authentic hashes are registered in `monster-authored.ts`.
