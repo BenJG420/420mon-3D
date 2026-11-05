@@ -175,7 +175,7 @@ test("every generated geometry encloses its actual volume with finite bounds and
       for (const value of color.array) assert.ok(Number.isFinite(value) && value >= 0 && value <= 1, data.id);
       const triangles = geometry.index.count / 3;
       assert.equal(triangles, entry.triangleBudget, data.id);
-      assert.ok(triangles < 15600, `${data.id}: exterior faces only`);
+      assert.ok(triangles < 15000, `${data.id}: exterior faces only`);
       const expectedVolume = data.columns.reduce((sum, column) => sum + (2 * column[2] - 1), 0) * data.cellSize ** 3;
       assert.ok(Math.abs(geometryVolume(geometry) - expectedVolume) < Math.max(.000001, expectedVolume * .00001), `${data.id}: closed outward-facing solid instead of crossed sprite planes`);
       const rgb = new THREE.Color().setRGB(...data.palette[data.columns[0][3]].map(n => n / 255), THREE.SRGBColorSpace);
