@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v86, Dex #157–162
+
+- Bolt, Sumpump, Streetlamp, Spraycan, Phmeter and Keycap are project-authored geometry in `src/game/monster-sculpts-v-metal.ts`, `monster-sculpts-v-street.ts` and `monster-sculpts-v-devices.ts`, based on retained original first-pose sprites. Full sheets remain intact; authentic hashes are registered in `monster-authored.ts`.
+- Custom curved/extruded surfaces and existing Sculpt/Three.js helpers provide the details, including the geometry-based LCD. Existing device-adaptive PBR maps up to 4096² and masked emission are reused. No external mesh, photo, font or texture pack added. Three.js/helpers retain MIT attribution; player/NPC assets and licenses unchanged.
+
 ## Original-sprite monster sculptures — v85, Dex #151–156
 
 - Roachclip, Faucet, Mortar, Jumprope, Lantern and Fishnet are project-authored geometry in `src/game/monster-sculpts-u-metal.ts`, `monster-sculpts-u-curved.ts` and `monster-sculpts-u-creatures.ts`, following the retained first-pose original artwork. Complete source sheets remain intact; authentic hashes are registered in `monster-authored.ts`.

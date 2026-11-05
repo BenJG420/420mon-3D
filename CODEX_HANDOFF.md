@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v86 Dex #157–162 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v86: Sechs Arten nach der ersten Original-Sprite-Pose; Phmeter zeigt die originale 7.02 als plastische LCD-Segmente, Spraycans kleine Wolke bleibt modelliertes Volumen; Streetlamp/Keycap nutzen nur vorhandene lokale Emission und adaptiven PBR bis 4K.
+
+- Bolt, Sumpump, Streetlamp, Spraycan, Phmeter und Keycap (#157–162) sind individuell modelliert: zwei gerundete Sechskantköpfe mit sichtbaren Augen, durchgehendem 6,3-fachem Schraubgewinde, Gelenkarmen und Rost; voller Pumpentank mit offenem Hals, 22-fach geriffeltem Schlauch, sichtbarem Ventil, Augen und Algendrips; schlanker Gussmast mit offenem Bogen, gerippter gelber Laterne und schläfrigem Gesicht; pinke Runddose mit echter Düsenvertiefung, wütenden Augen, umlaufenden Lackschäden und plastischer kleiner Wolke; vollständiges Messgerät mit vertiefter Anzeige 7.02, Tasten, runder Sonde und Batterierückwand; dicke Tastenkappe mit konkaver geschlossener Oberseite, hohlem Unterbau/Kreuzaufnahme, vertieften pinken Leuchtaugen und Gelenkfüßen.
+- Ein Mesh je Art, **20.432–27.896 Dreiecke**. Vorhandener adaptiver 1K/2K/4K-Studio-PBR, Welt-/UV-/Geometriecache und ursprüngliche 156 Modelle bleiben. Original-Sprites/Hashes, Spieler/NPCs/Mechanik/Saves unverändert, keine externen Assets.
+- **Ein Build + 8/8 direkt betroffene Tests in einer lokalen Runde grün.** Prüft Quellen, glatte Volumengeometrie/Budgets/UVs, sichtbare tatsächlich vertiefte Keycap-Augen und Spraycan-Düse, offenen Streetlamp-Bogen per CPU-Raycaster, isolierte Streetlamp-/Keycap-Emission mit dunklen Pupillen plus bisherigen Lantern-Pfad sowie Registry/Cache/Async-Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-B0Z9Bo5i.js`. Merge/Veröffentlichung v86 ausstehend.
+- Coverage: **162 individuell modelliert / 258 Rekonstruktionen**. Nächstes Paket: **v87, Dex #163–168: Bong, Ubend, Teststrip, Heavybag, Mapscrap, Whip**. Bens Freigabe für alle restlichen Monster gilt weiter.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v85 Dex #151–156 veröffentlicht, PR #93; nächstes Paket #157–162
 
 Annahme v85: Sechs Arten nach der ersten Original-Sprite-Pose; Lantern erhält einen offenen Sichtbereich mit schmalen Glasrand-Glanzlinien und lokal leuchtender plastischer Flamme im vorhandenen PBR-Pfad bis 4K, ohne zusätzliche Transparenz-/Lichtpässe.
