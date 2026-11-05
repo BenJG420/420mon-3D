@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v84 Dex #145–150 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v84: Sechserpaket nach der ersten Original-Sprite-Pose; Humidifiers Dampf bleibt eine plastische helle Form der Vorlage, Ampel/USB verwenden lokale Emission und vorhandenen adaptiven PBR bis 4K ohne neue Licht-/Partikelpässe.
+
+- Wrench, Gratecover, Stoplight, Ladder, Humidifier und Usbstick (#145–150) sind individuell modelliert: dicke rostige Schmiedeform mit tatsächlich offener Backe, gerundeten Kanten, Griffrelief und Schraubenaugen; vollständiger geneigter Gussdeckel mit echten Gitteröffnungen, tiefem Becken, dahinter sichtbaren rosa Augen und Füßen; dreilinsiger Signalkasten mit gewölbten gerillten Linsen, offenen Blenden, wütendem roten Gesicht, Dach, Lüftung und Servicerückwand; offene Leiter mit drei Tritten plus Augenleiste, Holmen, Schrauben, Rost und Rückseitenreparaturen; runder weiß/mintfarbener Tank mit schläfrigen Augen, Tropfenrelief, offener Düse, Rückseitenanschluss und volumetrischen Dampfschwüngen; diagonaler grüner USB-Körper mit tatsächlich hohlem Goldstecker, vier Kontakten, zwei LED-Augen, offener Öse und ausgearbeiteter Rückseite.
+- Ein Mesh je Art, **21.290–29.290 Dreiecke**. Vorhandener adaptiver 1K/2K/4K-Studio-PBR, Welt-/UV-/Geometriecache und ursprüngliche 144 Modelle bleiben. Original-Sprites/Hashes, Spieler/NPCs/Mechanik/Saves unverändert, keine externen Assets.
+- **Build + 8/8 direkt betroffene Tests über zwei lokale Runden grün.** Runde 1 fand Gratecover (35.732) und Stoplight (30.250) über dem 30k-Budget; nur kleine Ring-/Rillenunterteilungen reduziert auf 29.204 bzw. 29.290. Runde 2 wiederholte Build und betroffene Geometrie-/Gitter-/Emissions-/Registry-Tests. Prüft Quellen, glatte Volumengeometrie/UVs/Budgets, offene Leiter-/Zangenräume und sichtbare vertiefte Gitteraugen per CPU-Raycaster, isolierte Ampel-/USB-Emission plus bisherigen Bunsen-Pfad sowie Cache/Async-Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-Bd3Fq6bU.js`. Merge/Veröffentlichung v84 ausstehend.
+- Coverage: **150 individuell modelliert / 270 Rekonstruktionen**. Nächstes Paket: **v85, Dex #151–156: Roachclip, Faucet, Mortar, Jumprope, Lantern, Fishnet**. Bens Freigabe für alle restlichen Monster gilt weiter.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v83 Dex #139–144 veröffentlicht, PR #91; nächstes Paket #145–150
 
 Annahme v83: Sechs Arten nach der ersten Original-Sprite-Pose; Bunsens Flamme bleibt modellierte lokale Emission im bestehenden PBR-Pfad bis 4K, ohne neue Licht-/Partikelpässe; Rizlas Papier und Garters Band erhalten echte Dicke/offene Formen.

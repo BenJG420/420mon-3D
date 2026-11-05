@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v84, Dex #145–150
+
+- Wrench, Gratecover, Stoplight, Ladder, Humidifier and Usbstick are project-authored geometry in `src/game/monster-sculpts-t-hardware.ts`, `monster-sculpts-t-fixtures.ts` and `monster-sculpts-t-devices.ts`, based on the retained first-pose source artwork. Original sheets remain intact; authentic hashes are registered in `monster-authored.ts`.
+- Custom curved/extruded surfaces and existing Sculpt/Three.js helpers supply the detail. Existing device-adaptive PBR maps up to 4096² and local masked emission are reused. No external mesh, photo or texture pack added. Three.js/helpers retain MIT attribution; player/NPC assets and licenses unchanged.
+
 ## Original-sprite monster sculptures — v83, Dex #139–144
 
 - Rizla, Loobrush, Bunsen, Boxglove, Doorknob and Garter are project-authored geometry in `src/game/monster-sculpts-s-objects.ts`, `monster-sculpts-s-surfaces.ts` and `monster-sculpts-s-creatures.ts`, following the retained original first-pose sprites. Full source sheets remain intact; exact source hashes are registered in `monster-authored.ts`.
