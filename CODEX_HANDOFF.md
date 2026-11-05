@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v87 Dex #163–168 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v87: Sechs Arten nach der ersten Original-Sprite-Pose; Bongs Glaswirkung entsteht aus modellierten Rändern/Reflexlinien und bestehendem PBR bis 4K ohne neuen Transparenzpass; Mapscrap bleibt ein tatsächlich gebogenes dickes Blatt mit offenen Augenausschnitten.
+
+- Bong, Ubend, Teststrip, Heavybag, Mapscrap und Whip (#163–168) sind individuell modelliert: vollständiger Lavendel-Glaskörper mit hohlem geneigtem Hals, offener Seitenschale, schläfrigen Augen und Quell-Blase; dickwandiges U-Rohr mit zwei tiefen offenen Mündungen, grünen Augen, Schleim und Rost; dicke weiße Testkassette mit zwei vertieften Messfeldern, Augen, gefaltetem oberen Streifen, Rückseitenrippen und Tropfen; voller roter Ledersack mit Nähten/Rückenschnürung, sieben offenen Kettengliedern, Augen und Füßen; gekrümmtes eingerissenes Pergament mit analytisch angepassten glatten Normalen, tatsächlichen Augenöffnungen, violettem Rand und Bruchlinien vorne/hinten; vollständige 3,8-fache hohle Wicklung mit 84 Flechtsegmenten, angehobenem Kopf, braunem Griff und dünner Schwanzschlaufe.
+- Ein Mesh je Art, **19.872–28.104 Dreiecke**. Vorhandener adaptiver 1K/2K/4K-Studio-PBR, Welt-/UV-/Geometriecache sowie ursprüngliche 162 Modelle bleiben. Original-Sprites/Hashes, Spieler/NPCs/Mechanik/Saves unverändert, keine externen Assets oder zusätzlichen Renderpässe.
+- **Ein Build + 8/8 direkt betroffene Tests in einer lokalen Runde grün.** Prüft Quellen, glatte Volumengeometrie/Budgets/UVs, sichtbare vertiefte Teststrip-Felder und Mapscrap-Augen, Ubends echte innere Rohrwände und offene Heavybag-Kettenglieder per CPU-Raycaster, vorhandene Studio-Materialien sowie Registry/Cache/Async-Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-D9H4_8Qa.js`. Merge/Veröffentlichung v87 ausstehend.
+- Coverage: **168 individuell modelliert / 252 Rekonstruktionen**. Nächstes Paket: **v88, Dex #169–174: Circsaw, Tidegate, Sawhorse, Gutter, Growtimer, Mouse**. Bens Freigabe für alle restlichen Monster gilt weiter.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v86 Dex #157–162 veröffentlicht, PR #94; nächstes Paket #163–168
 
 Annahme v86: Sechs Arten nach der ersten Original-Sprite-Pose; Phmeter zeigt die originale 7.02 als plastische LCD-Segmente, Spraycans kleine Wolke bleibt modelliertes Volumen; Streetlamp/Keycap nutzen nur vorhandene lokale Emission und adaptiven PBR bis 4K.
