@@ -6,7 +6,7 @@ import { acquireMonsterModel, type MonsterModelLease } from "./monster-models";
 
 const surface = createMonsterSurface(typeof navigator !== "undefined" && /Android|iPhone|iPad/i.test(navigator.userAgent) ? 512 : 1024);
 function materialFor(id: string, source = surface, maskedGlow = false) {
-  if (maskedGlow && (id === "mon_growbulb" || id === "mon_flicker" || id === "mon_bladeu" || id === "mon_switchbox" || id === "mon_powerbrick" || id === "mon_bunsen" || id === "mon_stoplight" || id === "mon_usbstick" || id === "mon_lantern" || id === "mon_streetlamp" || id === "mon_keycap")) return source.glow;
+  if (maskedGlow && (id === "mon_growbulb" || id === "mon_flicker" || id === "mon_bladeu" || id === "mon_switchbox" || id === "mon_powerbrick" || id === "mon_bunsen" || id === "mon_stoplight" || id === "mon_usbstick" || id === "mon_lantern" || id === "mon_streetlamp" || id === "mon_keycap" || id === "mon_tidegate" || id === "mon_growtimer" || id === "mon_mouse")) return source.glow;
   const types=DEX[id]?.types ?? [];
   return types.includes("steel") ? source.metal : types.some(t=>t==="water"||t==="poison") ? source.wet : source.material;
 }

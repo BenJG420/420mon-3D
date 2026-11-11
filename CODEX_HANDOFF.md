@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v88 Dex #169–174 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v88: Sechs Arten nach der ersten Original-Sprite-Pose; Growtimers analoge Skala und Mouse-Tasten werden als echte Geometrie ausgeführt, Tidegate/Growtimer/Mouse verwenden nur vorhandene lokale Emission und adaptiven PBR bis 4K.
+
+- Circsaw, Tidegate, Sawhorse, Gutter, Growtimer und Mouse (#169–174) sind individuell modelliert: dickes verwittertes Sägeblatt mit 24 angeschrägten Zähnen, Nabe, Motorkopf und offenem Tragebügel; vollständiges Schleusentor mit echten Augenöffnungen, vertieften bernsteinfarbenen Linsen, vier plastischen Stäben und tiefer Wasserkammer; runder Holzbalken mit Maserung/Stirnringen, vier gespreizten Beinen und gebogenem magentafarbenem Tuch; tiefer offener Steintrog mit echter Innenwand, unregelmäßigem Rand, 31 gekrümmten Blättern, Augen und Tropfen; vollständige cremefarbene Zeitschaltuhr mit geneigtem Zifferblatt, 60 Indizes, modellierten Zahlen/Zeigern, grünen Augen, Füßen und Kabelschlaufe; ergonomische dunkle Maus mit getrennten gewölbten Tasten, geriffeltem Scrollrad, grünen Linsen, Unterseite und aufragendem Kabelschwanz.
+- Ein Mesh je Art, **25.156–29.448 Dreiecke**. Vorhandener adaptiver 1K/2K/4K-Studio-PBR, Welt-/UV-/Geometriecache sowie ursprüngliche 168 Modelle bleiben. Original-Sprites/Hashes, Spieler/NPCs/Mechanik/Saves unverändert, keine externen Assets oder zusätzlichen Renderpässe.
+- **Build + 9/9 direkt betroffene Tests über zwei lokale Runden grün.** Vor dem ersten Test korrigierte das Review die Verdeckung des unteren Growtimer-Zifferblatts; ein direkter CPU-Ray-Test sichert dessen Sichtbarkeit. Runde 1: Build grün, 7/9 direkte Tests grün; nur Growtimers Budgetüberschreitung (30.600 Dreiecke) verursachte zwei Fehler. Kleinere Fußkanten geringer unterteilt (29.448 Dreiecke); zweiter Build, sechs Sculpt-Tests und betroffene Registry-Prüfung grün. Cache-/Async-Prüfungen waren bereits in Runde 1 grün. Die direkten Tests prüfen Quellen, glatte Volumengeometrie/Budgets/UVs, echte Tidegate-Augenöffnungen/Kammertiefe, offenen Circsaw-Bügel, tiefe Gutter-Inhalte, freie Timer-Skala, lokale Emission und Registry/Cache/Async-Ressourcenbesitz. Kein Browserlauf; Ben prüft Optik/FPS. Build `index-CyWl_Iwk.js`. Merge/Veröffentlichung v88 ausstehend.
+- Coverage: **174 individuell modelliert / 246 Rekonstruktionen**. Nächstes Paket: **v89, Dex #175–180: Grinder, Squeegee, Funnel, Headgear, Chalk, Cuff**. Bens Freigabe für alle restlichen Monster gilt weiter.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v87 Dex #163–168 veröffentlicht, PR #95; nächstes Paket #169–174
 
 Annahme v87: Sechs Arten nach der ersten Original-Sprite-Pose; Bongs Glaswirkung entsteht aus modellierten Rändern/Reflexlinien und bestehendem PBR bis 4K ohne neuen Transparenzpass; Mapscrap bleibt ein tatsächlich gebogenes dickes Blatt mit offenen Augenausschnitten.
