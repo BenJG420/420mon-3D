@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v89 Dex #175–180 fertig, Merge/Veröffentlichung ausstehend
+
+Annahme v89: Die erste Original-Sprite-Pose bestimmt die sechs Modelle; Headgear behält beide Augenpaare, Funnel und Cuff erhalten echte durchgehende Öffnungen, der bestehende adaptive PBR bis 4K bleibt.
+
+- Grinder, Squeegee, Funnel, Headgear, Chalk und Cuff (#175–180) sind individuell modelliert: vollständiger gestufter Metallgrinder mit vertieften Griffschlitzen, solidem Deckel, Augen, modellierten Körnchen, Füßen und Unterseite; plastisches grünes Wesen mit asymmetrischen Augen, erhobenem Abzieher samt Holzgriff, Metallschiene, Gummileiste und Tropfen; durchgehend hohler grüner Trichter mit Innenwand, offenem Hals, tangentialen Augen, Flanschen und Tropfen; brauner Körper mit rotem gepolstertem Kopfschutz, beiden originalen Augenpaaren, Ohr-/Wangenpolstern, Nähten, Krallen und Schwanz; rundes gebrochenes Kreidestück mit unregelmäßigen Bruchflächen, Pulverrillen, Augen und Staubschweif; zwei echte offene Handschellenringe mit violetter Innenbeschichtung, Nieten, sechs ineinandergreifenden Kettengliedern, Augen und kleinen Füßen.
+- Ein Mesh je Art, **24.916–28.988 Dreiecke**; vorhandener adaptiver 1K/2K/4K-Studio-PBR, Welt-/UV-/Geometriecache und die bisherigen 174 Modelle bleiben. Original-Sprites/Hashes, Spieler/NPCs/Mechanik/Saves unverändert, keine externen Assets oder zusätzlichen Renderpässe.
+- **Build + 9/9 direkt betroffene Tests in einer lokalen Runde grün.** Sechs Pakettests prüfen Original-Quellhashes, unterschiedliche glatte Volumengeometrie/Budgets/UVs, gemeinsame Geometrieleases, freie Squeegee-Augen und beide Headgear-Augenpaare, durchgehenden Funnel-Hals mit korrekt gerichteter Innenwand, beide offenen Cuff-Ringe, die nach außen gerichtete Chalk-Bruchfläche sowie bestehende Metall-/Nass-/Standard-PBR-Materialwahl und Texturbesitz. Drei Integrationstests bestätigen die 180 registrierten Modelle sowie gemeinsamen Cache und asynchronen Ressourcenbesitz. Der Kopfschutz erhielt vor dem ersten Test einen plastischen unteren Saum. Build `index-CheoFBCI.js`. Kein Browserlauf; Ben prüft Optik/FPS. Merge/Veröffentlichung v89 ausstehend.
+- Coverage: **180 individuell modelliert / 240 Rekonstruktionen**. Nächstes Paket: **v90, Dex #181–186: Weldtorch, Lifering, Cautiontape, Pallet, Co2tank, Webcam**. Bens Freigabe für alle restlichen Monster gilt weiter.
+
+## Vorheriger Stand
+
 # Aktueller Wiedereinstieg — v88 Dex #169–174 veröffentlicht, PR #96; nächstes Paket #175–180
 
 Annahme v88: Sechs Arten nach der ersten Original-Sprite-Pose; Growtimers analoge Skala und Mouse-Tasten werden als echte Geometrie ausgeführt, Tidegate/Growtimer/Mouse verwenden nur vorhandene lokale Emission und adaptiven PBR bis 4K.
