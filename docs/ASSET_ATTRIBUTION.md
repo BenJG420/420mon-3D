@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Original-sprite monster sculptures — v89, Dex #175–180
+
+- Grinder, Squeegee, Funnel, Headgear, Chalk and Cuff are project-authored geometry in `src/game/monster-sculpts-y-vessels.ts`, `monster-sculpts-y-creatures.ts` and `monster-sculpts-y-relics.ts`, based on retained original first-pose sprites. Full source sheets remain intact; authentic hashes are registered in `monster-authored.ts`.
+- Custom curved/revolved surfaces and existing Sculpt/Three.js helpers supply the detail, including true funnel/cuff openings, individual chain links, padded headguard seams and fractured chalk. Existing device-adaptive PBR maps up to 4096² are reused. No external mesh, photo, font or texture pack added. Three.js/helpers retain MIT attribution; player/NPC assets and licenses unchanged.
+
 ## Original-sprite monster sculptures — v88, Dex #169–174
 
 - Circsaw, Tidegate, Sawhorse, Gutter, Growtimer and Mouse are project-authored geometry in `src/game/monster-sculpts-x-metal.ts`, `monster-sculpts-x-materials.ts` and `monster-sculpts-x-devices.ts`, based on retained original first-pose sprites. Full source sheets remain intact; authentic hashes are registered in `monster-authored.ts`.
