@@ -37,7 +37,7 @@ stash `Paused v90 Dex 181–186 at Ben request; do not finish or merge` on
 `feat/monster-sculpts-v90`; it has no PR or merge. Do not resume it.
 
 Implement separate finished packages/PRs in this order:
-1. **CURRENT v90 free camera implemented; merge/publication pending.** Freely
+1. **DONE v90 free camera / PR #98 merged/live.** Freely
    orbit the player and zoom with mouse/touch drag and wheel/pinch, with
    comfortable camera-relative movement. Build + 14/14 directly affected tests passed in one local round.
 2. **NEXT v91 — graffiti/district variety:** up to 420 different graffiti motifs

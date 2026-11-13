@@ -1,6 +1,8 @@
-> **Latest instruction — Ben, 2026-11-12: STOP monster sculpts.** Do not finish or merge Dex #181–186. This supersedes the 2026-10-28 approval and all historical monster NEXT instructions below. Published monster coverage remains **180 authored / 240 reconstructions (v89 / PR #97)**. New order: free camera, graffiti/district variety, expandable capsule; one complete package/PR each, build + directly affected tests only, no heavy browser runs, player/NPC models unchanged. **V90 free camera implemented; merge/publication pending. Next: graffiti/district variety.**
+> **Latest instruction — Ben, 2026-11-12: STOP monster sculpts.** Do not finish or merge Dex #181–186. This supersedes the 2026-10-28 approval and all historical monster NEXT instructions below. Published monster coverage remains **180 authored / 240 reconstructions (v89 / PR #97)**. New order: free camera, graffiti/district variety, expandable capsule; one complete package/PR each, build + directly affected tests only, no heavy browser runs, player/NPC models unchanged. **V90 free camera merged/live, PR #98. Next: graffiti/district variety.**
 
-> **V90 — free player camera implemented; merge/publication pending:** 360° orbit through left/right mouse drag or one finger; zoom through wheel (pixel/line/page units) or two-finger pinch. Elevation is bounded to .12–1.35 radians, outdoor radius 5–32; indoors use a .66 scale with a minimum radius of 4. Smooth angular/radius interpolation avoids a path through the player. WASD/arrows and the analog joystick move relative to the current visible camera. Only the world canvas accepts gestures; menus, battles and studio cancel active gestures. Joystick capture/focus loss and second pointers are handled. The pause menu includes camera reset; Help explains mouse/touch controls. Camera preferences last for the session. Existing building occlusion, wardrobe preview, player/NPC models and saves are retained. **Build + 14/14 directly affected tests passed in one local round.** Six camera-model tests cover orbit/limits, smoothing/reset, indoor framing and camera-relative analog movement; five input tests cover drag, wheel/pinch, capture/focus cleanup and modal blocking; three existing occlusion tests passed. Build `index-D2USdxOi.js`, CSS `index-Kq1bkK4v.css`. No browser runs. Ben checks appearance and control feel in the published build.
+> v90 camera publication: Source `e6cb339dc0a0a10061017b503d5a736fbc0967c4`; PR CI43345143289/Main CI43345350917/Pages43345350964 grün. Live JS `index-D2USdxOi.js`, SHA256 `8b77de182cd98f4a25b1dc42dd1749b0e82d1b0bea2db700b18bced7a8693f74`; JS/CSS/fonts bytegleich, Stable unverändert (`v90-camera-deploy-proof.json`).
+
+> **Published V90 — free player camera, [PR #98](https://github.com/BenJG420/420mon-3D/pull/98):** 360° orbit through left/right mouse drag or one finger; zoom through wheel (pixel/line/page units) or two-finger pinch. Elevation is bounded to .12–1.35 radians, outdoor radius 5–32; indoors use a .66 scale with a minimum radius of 4. Smooth angular/radius interpolation avoids a path through the player. WASD/arrows and the analog joystick move relative to the current visible camera. Only the world canvas accepts gestures; menus, battles and studio cancel active gestures. Joystick capture/focus loss and second pointers are handled. The pause menu includes camera reset; Help explains mouse/touch controls. Camera preferences last for the session. Existing building occlusion, wardrobe preview, player/NPC models and saves are retained. **Build + 14/14 directly affected tests passed in one local round.** Six camera-model tests cover orbit/limits, smoothing/reset, indoor framing and camera-relative analog movement; five input tests cover drag, wheel/pinch, capture/focus cleanup and modal blocking; three existing occlusion tests passed. Build `index-D2USdxOi.js`, CSS `index-Kq1bkK4v.css`. No browser runs. Ben checks appearance and control feel in the published build.
 
 > Cancelled monster-v90/Dex #181–186 is preserved separately on `feat/monster-sculpts-v90`, stash `Paused v90 Dex 181–186 at Ben request; do not finish or merge`; no PR or merge. Do not resume these sculpts.
 
@@ -1036,15 +1038,15 @@ check in the published test build. Validation here is build + affected tests onl
 
 ## Remaining work — Bens neue Prioritäten (2026-11-12)
 
-V90 free camera implemented; merge/publication pending. Build + 14/14 directly affected tests passed in one local round; no browser runs.
+V90 free camera / PR #98 is merged/live. Build + 14/14 directly affected tests passed in one local round; no browser runs.
 Monster work is stopped by Ben's explicit 2026-11-12 instruction. Coverage stays
 180 authored / 240 smooth reconstructions, last published monster package v89 /
 PR #97. Dex #181–186 must not be finished or merged; its unmerged local work is
 saved in the named stash on `feat/monster-sculpts-v90`, as recorded above.
 
 **Current queue — one finished package/PR each:**
-1. **CURRENT — free camera v90:** orbit around the player, mouse/touch drag,
-   wheel/pinch zoom and usable camera-relative movement. Finish/publish this first.
+1. **DONE — free camera v90 / PR #98:** orbit around the player, mouse/touch drag,
+   wheel/pinch zoom and usable camera-relative movement. Merged/published; continue with graffiti/district variety.
 2. **NEXT — graffiti/district variety v91:** replace the small repeated motif set
    with up to 420 different graffiti motifs distributed across all districts;
    add more distinctive details for each district, keeping performance budgets.
