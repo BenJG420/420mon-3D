@@ -23,6 +23,10 @@ canvas {
   height: 100%;
 }
 
+/* Only the world owns orbit gestures; dialog canvases and menu scrolling stay independent. */
+.world-canvas { touch-action: none; cursor: grab; }
+.world-canvas.is-orbiting { cursor: grabbing; }
+
 .hud {
   position: fixed;
   inset: 0;

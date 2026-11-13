@@ -1,3 +1,14 @@
+# Aktueller Wiedereinstieg — v90 freie Kamera umgesetzt, Merge/Veröffentlichung ausstehend
+
+Annahme Kamera v90: WASD/Pfeile und Joystick bewegen relativ zur sichtbaren Kamera; Kamerawinkel/Zoom gelten für die Sitzung, bestehende Gebäude-Verdeckung und Kleider-Vorschau bleiben erhalten.
+
+- **Bens neue Priorität vom 2026-11-12: Monster gestoppt.** Dex #181–186 nicht fertigstellen oder mergen. Der Zwischenstand liegt getrennt auf `feat/monster-sculpts-v90` im Stash `Paused v90 Dex 181–186 at Ben request; do not finish or merge`; kein PR/kein Merge. Die Freigabe vom 2026-10-28 und alle älteren Monster-NEXT-Vermerke sind damit überholt. Veröffentlichte Monster bleiben **180 individuell modelliert / 240 Rekonstruktionen**, letzter Monster-PR #97 / v89.
+- Aktuelles Paket **v90 freie Kamera**: 360° um die Figur drehen per linker/rechter Maustaste oder einem Finger, Zoom per Mausrad oder Zwei-Finger-Pinch. Neigung 0,12–1,35 rad, Außenradius 5–32; Innenräume nutzen Faktor 0,66 mit Mindestabstand 4. Winkel und Abstand werden sanft geglättet, ohne beim Drehen durch die Figur zu fahren. WASD/Pfeile und analoger Joystick richten sich nach dem sichtbaren Kamerawinkel. Kameraeingaben gelten nur auf der Spielwelt; Menüs/Kampf/Studio brechen laufende Gesten ab. Der Joystick behandelt zweite Zeiger, verlorene Pointer-Capture und Fokusverlust sauber. Im Pause-Menü gibt es „Kamera zurücksetzen“, die Hilfe erklärt Maus/Touch. Kameraeinstellungen gelten nur für die Sitzung. Bestehende Gebäude-Verdeckung und Kleidervorschau sowie Spieler-/NPC-Modelle und Spielstände unverändert.
+- **Build + 14/14 direkt betroffene Tests in einer lokalen Runde grün.** Sechs Kameramodell-Tests prüfen Standard-/Innenansicht, Drehung über die Winkelgrenze, Neigungs-/Distanzlimits, sanfte Bewegung, Reset, kamerabezogene Analogbewegung und ungültige Eingaben. Fünf Gestentests prüfen Drag, Wheel/Pinch, Capture-/Fokusverlust und Sperre durch Menüs; drei bestehende Verdeckungstests bleiben grün. Build `index-D2USdxOi.js`, CSS `index-Kq1bkK4v.css`. Kein schwerer Browserlauf; Ben prüft Steuergefühl/Optik im Testbuild. Merge/Veröffentlichung Kamera v90 ausstehend.
+- Neue Reihenfolge, je eigener PR: **1. Kamera abschließen, 2. v91 bis zu 420 unterschiedliche Graffiti-Motive über alle Bezirke plus bezirkstypische Details, 3. ausbaubare Kapsel (Böden, RGB-Licht, Deko, Upgrades).** Keine weiteren Monster-Sculpts ohne neue ausdrückliche Anweisung.
+
+## Vorheriger Stand — historische Monster-Freigaben sind durch den Stopp vom 2026-11-12 überholt
+
 # Aktueller Wiedereinstieg — v89 Dex #175–180 veröffentlicht, PR #97; nächstes Paket #181–186
 
 Annahme v89: Die erste Original-Sprite-Pose bestimmt die sechs Modelle; Headgear behält beide Augenpaare, Funnel und Cuff erhalten echte durchgehende Öffnungen, der bestehende adaptive PBR bis 4K bleibt.

@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { createPlayerOcclusion } from "./game/occlusion";
+import { createPlayerCamera } from "./game/player-camera";
+import { bindPlayerCameraInput } from "./game/camera-input";
 import { isTakenStarter } from "./game/starter-state";
 import { createMonsterGame } from "./game/monsters";
 import { createGameSystems } from "./game/systems";
@@ -62,6 +64,8 @@ renderer.toneMappingExposure = 1.15;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 app.appendChild(renderer.domElement);
+renderer.domElement.classList.add("world-canvas");
+renderer.domElement.setAttribute("aria-label", "Spielwelt – Ziehen dreht die Kamera, Mausrad oder zwei Finger zoomen");
 
 const environment = createEnvironment(scene, renderer);
 const postProcessing = createPostProcessing(renderer, scene, camera);
@@ -492,6 +496,7 @@ function updateJoystick(event: PointerEvent) {
   knob.style.transform = `translate(${touch.x * radius}px, ${-touch.y * radius}px)`;
 }
 joystick.addEventListener("pointerdown", event => {
+  if (joystickPointer !== null) return;
   joystickPointer = event.pointerId;
   joystick.setPointerCapture(event.pointerId);
   updateJoystick(event);
@@ -507,6 +512,7 @@ function releaseJoystick(event: PointerEvent) {
 }
 joystick.addEventListener("pointerup", releaseJoystick);
 joystick.addEventListener("pointercancel", releaseJoystick);
+joystick.addEventListener("lostpointercapture", releaseJoystick);
 const sprintButton = controls.querySelector<HTMLButtonElement>(".sprint-button")!;
 sprintButton.addEventListener("pointerdown", event => {
   sprintButton.setPointerCapture(event.pointerId);
@@ -516,6 +522,7 @@ sprintButton.addEventListener("pointerup", () => { touch.sprint = false; });
 sprintButton.addEventListener("pointercancel", () => { touch.sprint = false; });
 window.addEventListener("blur", () => {
   touch.x = 0; touch.y = 0; touch.sprint = false;
+  joystickPointer = null;
   knob.style.transform = "translate(0px, 0px)";
 });
 
@@ -526,6 +533,7 @@ function clearModalMovement() {
   touch.x = 0; touch.y = 0; touch.sprint = false;
   joystickPointer = null; knob.style.transform = "translate(0px, 0px)";
   velocity.set(0, 0, 0);
+  worldCameraInput.cancel();
 }
 window.addEventListener("420mon-model-opened", clearModalMovement);
 window.addEventListener("420mon-slot-opened", clearModalMovement);
@@ -533,11 +541,14 @@ window.addEventListener("420mon-fish-opened", clearModalMovement);
 window.addEventListener("420mon-menu-opened", clearModalMovement);
 const cameraTarget = new THREE.Vector3();
 const desiredCamera = new THREE.Vector3();
-const up = new THREE.Vector3(0, 1, 0);
 const playerOcclusion = createPlayerOcclusion();
 const cameraDirection = new THREE.Vector3();
-const cameraOffset = new THREE.Vector3(8, 13, 12);
-const cameraMinDistance = 8;
+const movement = new THREE.Vector3();
+const WORLD_CAMERA_BLOCKERS = ".monster-collection:not([hidden]),.systems-panel:not([hidden]),.studio-panel.is-open,.grow-backdrop:not([hidden]),.home-dialog:not([hidden]),.fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden]),.performance-overlay:not([hidden])";
+const worldCamera = createPlayerCamera(camera);
+const worldCameraInput = bindPlayerCameraInput(renderer.domElement, worldCamera,
+  () => !monsterGame.inBattle && !document.querySelector(WORLD_CAMERA_BLOCKERS));
+window.addEventListener("420mon-camera-reset", () => { worldCameraInput.cancel(); worldCamera.reset(); });
 const mapCanvas = hud.querySelector<HTMLCanvasElement>("#local-map-canvas")!;
 const mapContext = mapCanvas.getContext("2d")!;
 let mapClock = 0;
@@ -639,15 +650,14 @@ function animate(frameTime?: number) {
   mapClock += dt;
   if (mapClock > 0.15) { mapClock = 0; drawLocalMap(); }
 
-  const input = new THREE.Vector3(
+  const input = worldCamera.movement(
     Number(state.right) - Number(state.left) + touch.x,
-    0,
-    Number(state.backward) - Number(state.forward) - touch.y,
+    Number(state.forward) - Number(state.backward) + touch.y,
+    movement,
   );
 
-  if (input.lengthSq() > 0) input.normalize();
-
-  const overlayOpen = !!document.querySelector(".monster-collection:not([hidden]),.systems-panel:not([hidden]), .studio-panel.is-open, .grow-backdrop:not([hidden]), .home-dialog:not([hidden]), .fish-overlay:not([hidden]),.achievement-overlay:not([hidden]),.monster-model-overlay:not([hidden]),.story-overlay:not([hidden]),.radio-overlay:not([hidden]),.support-overlay:not([hidden]),.slot-overlay:not([hidden]),.performance-overlay:not([hidden])");
+  const overlayOpen = !!document.querySelector(WORLD_CAMERA_BLOCKERS);
+  if (overlayOpen || monsterGame.inBattle) worldCameraInput.cancel();
   const speed = monsterGame.inBattle || overlayOpen ? 0 : ((state.sprint || touch.sprint) ? 7.5 : 4.2) * fishEffectMultiplier(getSave(), "speed");
   velocity.lerp(input.multiplyScalar(speed), 1 - Math.pow(0.001, dt));
   blockedThisFrame = false;
@@ -685,20 +695,16 @@ function animate(frameTime?: number) {
   cameraTarget.copy(player.position);
   cameraTarget.y += 1.0;
 
-  // Keep a comfortable third-person view. Occluding buildings become
-  // translucent instead of forcing the camera into the character.
+  // Wardrobe keeps its own framing. World orbit retains the existing building fade.
   const indoor = !!districtWorld.getMapInfo().map.indoor;
   const editing = studioPanel.classList.contains("is-open");
-  const desiredOffset = editing ? new THREE.Vector3(3, 2.4, 5).applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y + previewTurn) : indoor ? cameraOffset.clone().multiplyScalar(0.66) : cameraOffset;
-  desiredCamera.copy(player.position).add(desiredOffset);
-  camera.position.lerp(desiredCamera, 1 - Math.pow(0.00001, dt));
-  // Never allow the third-person camera to collapse into the player.
-  cameraDirection.subVectors(camera.position, cameraTarget);
-  const minCameraDistance = editing ? 4.5 : cameraMinDistance;
-  if (cameraDirection.length() < minCameraDistance) {
-    camera.position.copy(cameraTarget).add(cameraDirection.normalize().multiplyScalar(minCameraDistance));
-  }
-  camera.lookAt(cameraTarget);
+  if (editing) {
+    desiredCamera.set(3, 2.4, 5).applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y + previewTurn).add(player.position);
+    camera.position.lerp(desiredCamera, 1 - Math.pow(0.00001, dt));
+    cameraDirection.subVectors(camera.position, cameraTarget);
+    if (cameraDirection.length() < 4.5) camera.position.copy(cameraTarget).add(cameraDirection.normalize().multiplyScalar(4.5));
+    camera.lookAt(cameraTarget);
+  } else worldCamera.update(cameraTarget, dt, indoor);
   const faded = playerOcclusion.update(districtWorld.getOccluders(), camera.position, player.position, dt);
   renderer.domElement.dataset.occludedBuildings = String(faded);
 

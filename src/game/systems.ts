@@ -94,6 +94,8 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
       }
       const displayHint = document.createElement("p"); displayHint.textContent = mode === "handy" ? "Kompaktes HUD. Touch-Steuerung bleibt direkt erreichbar." : "Schnellzugriffe als Leiste. Die Welt bleibt im Blick.";
       display.append(legend, modes, displayHint); body.append(display);
+      row("Kamera zurücksetzen", () => { window.dispatchEvent(new Event("420mon-camera-reset")); close(); },
+        "Freie Spielfläche ziehen: drehen · Mausrad oder zwei Finger: zoomen · Laufen folgt der Blickrichtung.");
       const graphics = document.querySelector<HTMLSelectElement>('[aria-label="Grafikqualität"]');
       if (graphics) {
         const label = document.createElement("label"); label.className = "menu-graphics"; label.textContent = "Grafikqualität";
@@ -119,6 +121,7 @@ export function createGameSystems(world: DistrictTravel, openGrowShop?: () => vo
       title(titles[tab]);
       if (tab === "help") {
         row("Unterwegs", undefined, "WASD/Pfeile oder Stick laufen · E/Touch untersuchen · Shift sprinten · I Inventar · B Dex · M Karte · H Hilfe · Esc zurück.");
+        row("Freie Kamera", undefined, "Maus oder einen Finger über die freie Spielfläche ziehen: rundum drehen und neigen. Mausrad oder zwei Finger auseinander/zusammen: zoomen. Der linke Stick bleibt zum Laufen; zurücksetzen im Pause-Menü.");
         row("Inventar", undefined, "Kategorie aufklappen, Menge lesen und Benutzen wählen. Heilitems öffnen die Partnerauswahl. k.o. bleibt k.o.; eine physische Matratze belebt wieder.");
         row("Grow und Angeln", undefined, "Grow am Topf pflegen für kürzere Zeiten und mehr Ertrag. Am Neonkai mit Weed-Samen angeln; Fischsammlung im Aquarium ansehen.");
         row("Charakter ansehen", () => { close(); window.dispatchEvent(new Event("420mon-preview-clothes")); });

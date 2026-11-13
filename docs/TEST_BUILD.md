@@ -1,4 +1,8 @@
-> **Ben’s explicit approval, 2026-10-28:** all remaining monster sculpts are now authorized. This supersedes every historical “Monster erst nach Freigabe” and the post-v75 feedback wait below. Continue detailed original-sprite sculptures with high-resolution PBR, one finished package/PR at a time, only build + directly affected tests; players/NPCs/mechanics/saves unchanged. **V89 Dex #175–180 merged/live, PR #97. Next v90: Dex #181–186.**
+> **Latest instruction — Ben, 2026-11-12: STOP monster sculpts.** Do not finish or merge Dex #181–186. This supersedes the 2026-10-28 approval and all historical monster NEXT instructions below. Published monster coverage remains **180 authored / 240 reconstructions (v89 / PR #97)**. New order: free camera, graffiti/district variety, expandable capsule; one complete package/PR each, build + directly affected tests only, no heavy browser runs, player/NPC models unchanged. **V90 free camera implemented; merge/publication pending. Next: graffiti/district variety.**
+
+> **V90 — free player camera implemented; merge/publication pending:** 360° orbit through left/right mouse drag or one finger; zoom through wheel (pixel/line/page units) or two-finger pinch. Elevation is bounded to .12–1.35 radians, outdoor radius 5–32; indoors use a .66 scale with a minimum radius of 4. Smooth angular/radius interpolation avoids a path through the player. WASD/arrows and the analog joystick move relative to the current visible camera. Only the world canvas accepts gestures; menus, battles and studio cancel active gestures. Joystick capture/focus loss and second pointers are handled. The pause menu includes camera reset; Help explains mouse/touch controls. Camera preferences last for the session. Existing building occlusion, wardrobe preview, player/NPC models and saves are retained. **Build + 14/14 directly affected tests passed in one local round.** Six camera-model tests cover orbit/limits, smoothing/reset, indoor framing and camera-relative analog movement; five input tests cover drag, wheel/pinch, capture/focus cleanup and modal blocking; three existing occlusion tests passed. Build `index-D2USdxOi.js`, CSS `index-Kq1bkK4v.css`. No browser runs. Ben checks appearance and control feel in the published build.
+
+> Cancelled monster-v90/Dex #181–186 is preserved separately on `feat/monster-sculpts-v90`, stash `Paused v90 Dex 181–186 at Ben request; do not finish or merge`; no PR or merge. Do not resume these sculpts.
 
 > v89 publication: Source `f0498d680294989a5433740d2851c9f461832c3a`; PR CI43208219933/Main CI43208441911/Pages43208441972 grün. Live JS `index-CheoFBCI.js`, SHA256 `cd05ff40cc3da9d17c7652e5782e40c35f7cd14c1bf6d452326c7ab416164a94`; JS/CSS/fonts bytegleich, Stable unverändert (`v89-deploy-proof.json`).
 
@@ -1030,15 +1034,28 @@ Evidence: `/workspace/scratch/420mon-audit/v51-reference-notes.md`, reference
 screenshots and recorded guest observations. Ben performs the next visual/gameplay
 check in the published test build. Validation here is build + affected tests only.
 
-## Remaining work — Bens neue Prioritäten (2026-10-23)
+## Remaining work — Bens neue Prioritäten (2026-11-12)
 
-V89 / PR #97 is merged/live with Dex #175–180. Coverage is 180 individual
-sculptures / 240 smooth reconstructions. Ben approved all remaining monster work
-on 2026-10-28. The new owner order below supersedes every older
-NEXT/order note. One complete playable package per PR. **Latest rule (Ben 2026-10-22):
-build + directly affected tests only; no broad suites, combination sweeps or browser
-runs. Ben tests gameplay in the published test build.** Older check budgets below
-are historical; existing repository CI may run automatically.
+V90 free camera implemented; merge/publication pending. Build + 14/14 directly affected tests passed in one local round; no browser runs.
+Monster work is stopped by Ben's explicit 2026-11-12 instruction. Coverage stays
+180 authored / 240 smooth reconstructions, last published monster package v89 /
+PR #97. Dex #181–186 must not be finished or merged; its unmerged local work is
+saved in the named stash on `feat/monster-sculpts-v90`, as recorded above.
+
+**Current queue — one finished package/PR each:**
+1. **CURRENT — free camera v90:** orbit around the player, mouse/touch drag,
+   wheel/pinch zoom and usable camera-relative movement. Finish/publish this first.
+2. **NEXT — graffiti/district variety v91:** replace the small repeated motif set
+   with up to 420 different graffiti motifs distributed across all districts;
+   add more distinctive details for each district, keeping performance budgets.
+3. **Expandable capsule:** floors, RGB lighting, decoration and player upgrades.
+
+**Validation:** build + directly affected tests only; no broad suites,
+combination sweeps or heavy browser runs. Ben tests gameplay/control feel in the
+published test build. Player/NPC models stay unchanged. Older check budgets and
+monster authorizations below are historical; repository CI may run automatically.
+
+### Previous packages and historical notes
 
 1. **DONE — Kleidung, PR #55 / v48:** separate freely combinable slots for **Oberteil, Jacke,
    Hose, Schuhe, Kopf, Accessoires**, including Latzhose with Lederjacke. Swapping
@@ -1103,7 +1120,7 @@ are historical; existing repository CI may run automatically.
    **All listed district implementation packages delivered:** Schrotttor PR #81 / v73 closes this list. Remaining: Ben’s device visual/gameplay feedback and actual FPS comparisons from item 5; address concrete reported issues in their own PRs. Ben explicitly approved the remaining monster sculpts on 2026-10-28.
 12. **DONE — Aquarium/Fische v74 (Ben 2026-10-27), PR #82 merged/live:** replace flat tank sprites with detailed smooth 3D fish and natural body/tail/fin motion for all 42 original species. Add transparent glass/refraction, depth and water lighting/caustics, planted gravel/rocks/driftwood, bubbles and underwater atmosphere. Reuse a lighter habitat in the physical Kapsel aquarium; preserve its footprint, fishing/collection/bonuses/saves and all player/NPC assets. Build + 24/24 directly affected tests passed in one local round; no browser runs. Ben checks appearance/FPS in the test build.
 13. **DONE — Aquarium-Modal v75, PR #83 merged/live:** Ben found the v74 “Dein Becken” modal small/flat and fish too tiny. Replace its distant fitted-box framing with a nearly screen-filling close window through the front glass; visible detailed 3D fish, natural depth swimming, foreground/middle/background planting and hardscape, moving caustics, directional lighting and bubbles. Retain the physical room tank, player/NPC assets, fish collection/rules/saves. Build + directly affected tests only, no browser loops. The original feedback wait was superseded by Ben’s explicit monster approval on 2026-10-28.
-14. **AUTHORIZED — Ben 2026-10-28: remaining monster sculpts.** **DONE V89 / PR #97 Dex #175–180 merged/live. Build + 9/9 direct tests passed. NEXT v90 Dex #181–186.** Continue the remaining 240 species in individual finished packages/PRs with detailed geometry, clean source silhouettes and high-resolution PBR. Preserve the 180 authored models and shared UV/cache; players/NPCs/mechanics/saves unchanged. This explicit approval supersedes prior waiting instructions.
+14. **STOPPED — Ben 2026-11-12: no further monster sculpts.** V89 / PR #97 Dex #175–180 remains merged/live (build + 9/9 direct tests passed). Dex #181–186 is cancelled before PR/merge and preserved only in the recorded local stash; do not finish or merge it. Coverage stays 180 authored / 240 reconstructions. The 2026-10-28 approval is superseded. Camera, graffiti/district variety and capsule upgrades take priority; retain existing models and shared UV/cache.
    Known v47 visual follow-up: Ypipe branches partly cover its eyes in the initial
    viewer angle; the right opening is shallow at that angle. Three check rounds
    are exhausted; no fourth loop. Rotation works, no gameplay/save error found.
@@ -1256,10 +1273,10 @@ sign and post), Spotlamp (round lens, magenta housing, neck and tripod).
 Original references/hashes and shared PBR/UV/cache remain; previous 90
 geometries, toolkit, renderer and gameplay/saves are unchanged.
 
-**APPROVED by Ben 2026-10-28:** individual
-anatomy/detail work for the remaining **240 original species, starting Dex #181**,
-following the 2D artwork and reference. Current
-coverage is 180 authored / 240 smooth reconstructions.
+**STOPPED by Ben 2026-11-12:** the earlier 2026-10-28 monster approval is
+superseded. Do not finish/merge Dex #181–186 or continue the remaining
+**240 original species, starting Dex #181**. Published
+coverage remains 180 authored / 240 smooth reconstructions.
 This pass does not claim 420 individually sculpted/production-4K creatures.
 Physical Android/native 4K visual/performance verification remains a device test.
 

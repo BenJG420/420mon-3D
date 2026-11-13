@@ -27,18 +27,27 @@ Read [CODEX_HANDOFF.md](CODEX_HANDOFF.md) before editing. The user explicitly wa
 9. Do not overwrite or delete the original 2D repository. Preserve source attribution and be mindful that its content is private; access requires authorization.
 10. Report what is implemented, tested, missing, and deployed factually in German. Do not repeatedly ask what to work on next when the goal is clear.
 
-## Current authorization — Ben, 2026-10-28
+## Current priorities — Ben, 2026-11-12
 
-Ben explicitly approved all remaining monster sculptures. Resume at Dex #97,
-package by package with one PR each, detailed original-sprite anatomy, clean
-silhouettes and high-resolution PBR. The prior “Monster erst nach Freigabe” and
-post-v75 waiting instructions below are historical and superseded. PR #83 / v75
-is merged/live. Only build + directly affected tests; no heavy browser runs.
-Player/NPC assets and all mechanics/saves remain unchanged. Current package:
-v89 / PR #97, Dex #175–180 merged/live.
-Coverage: 180 authored / 240 reconstructions; build + 9 directly affected tests
-passed in one local round.
-Next package v90: Dex #181–186. Continue from the next unfinished Dex after each completed PR.
+**STOP all further monster sculptures.** Dex #181–186 must not be finished or
+merged. This supersedes the 2026-10-28 monster approval and every historical
+NEXT monster instruction below. Published coverage remains 180 authored /
+240 reconstructions (v89 / PR #97). The cancelled monster-v90 work is saved in
+stash `Paused v90 Dex 181–186 at Ben request; do not finish or merge` on
+`feat/monster-sculpts-v90`; it has no PR or merge. Do not resume it.
+
+Implement separate finished packages/PRs in this order:
+1. **CURRENT v90 free camera implemented; merge/publication pending.** Freely
+   orbit the player and zoom with mouse/touch drag and wheel/pinch, with
+   comfortable camera-relative movement. Build + 14/14 directly affected tests passed in one local round.
+2. **NEXT v91 — graffiti/district variety:** up to 420 different graffiti motifs
+   distributed throughout all districts, plus more distinctive district details.
+3. **Expandable capsule:** player upgrades such as floors, RGB lighting,
+   decorations and further improvements.
+
+Only build + directly affected tests; no heavy browser runs. Ben checks the
+published test build. Player/NPC models remain unchanged. Preserve gameplay,
+saves, existing district detail, occlusion and wardrobe behavior.
 
 ## Previous priority order (user instruction, 2026-10-22)
 
