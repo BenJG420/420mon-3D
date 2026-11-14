@@ -40,9 +40,10 @@ Implement separate finished packages/PRs in this order:
 1. **DONE v90 free camera / PR #98 merged/live.** Freely
    orbit the player and zoom with mouse/touch drag and wheel/pinch, with
    comfortable camera-relative movement. Build + 14/14 directly affected tests passed in one local round.
-2. **NEXT v91 — graffiti/district variety:** up to 420 different graffiti motifs
-   distributed throughout all districts, plus more distinctive district details.
-3. **Expandable capsule:** player upgrades such as floors, RGB lighting,
+2. **CURRENT v91 — graffiti/district variety:** 420 subject/layout compositions
+   across fourteen districts and 28 local prop models; build + 13/13 direct tests
+   passed in three short rounds, publication pending.
+3. **NEXT — expandable capsule:** player upgrades such as floors, RGB lighting,
    decorations and further improvements.
 
 Only build + directly affected tests; no heavy browser runs. Ben checks the

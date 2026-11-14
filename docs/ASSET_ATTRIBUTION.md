@@ -1,5 +1,10 @@
 # Asset attribution
 
+## Graffiti and district props — v91
+
+- Project-authored vector illustrations in `src/game/graffiti-symbols.ts` and compositions/lettering in `graffiti-catalog.ts`: 42 illustrated subjects × ten layouts = 420 deterministic compositions, grouped into fourteen district palettes/themes. These are composed procedural artworks, not downloaded images or 420 individually hand-painted pieces. Canvas uses installed generic sans-serif fonts; no additional font files or external art packs.
+- Twenty-eight original small prop models in `district-prop-models.ts` use Three.js primitives, curves and rounded boxes, rendered with the existing shared world PBR materials. No external mesh/texture/model asset introduced; Three.js and its helper geometry remain MIT. Player/NPC assets and their existing licenses are unchanged.
+
 ## Original-sprite monster sculptures — v89, Dex #175–180
 
 - Grinder, Squeegee, Funnel, Headgear, Chalk and Cuff are project-authored geometry in `src/game/monster-sculpts-y-vessels.ts`, `monster-sculpts-y-creatures.ts` and `monster-sculpts-y-relics.ts`, based on retained original first-pose sprites. Full source sheets remain intact; authentic hashes are registered in `monster-authored.ts`.

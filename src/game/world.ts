@@ -13,6 +13,7 @@ import { createStaticBatches, type StaticDecoration, type StaticBatchStats } fro
 import { alleyRoofKind, appendAlleyBuildingDetails, appendAlleyBinDetails, alleyRunoffPuddles, type AlleyFinish } from "./alley-details";
 import { appendYardShedDetails, appendYardBoundaryDetails, appendMossInteriorDetails, type YardFinish, type YardDetailEmitter } from "./yard-details";
 import { createStreetDetails, isDetailedDistrict } from "./street-details";
+import { createDistrictProps } from "./district-props";
 import { createWallArt } from "./wall-art";
 import { lampFlicker } from "./lamp-flicker";
 import { appendCableRackDetails, appendCableWallDetails, appendCableLiveDetails, appendCableTerminalDetails, type CableFinish, type CableDetailEmitter } from "./cable-details";
@@ -109,6 +110,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   let performanceMode = true;
   let staticBatches: ReturnType<typeof createStaticBatches> | undefined;
   let streetDetails: ReturnType<typeof createStreetDetails> | undefined;
+  let districtProps: ReturnType<typeof createDistrictProps> | undefined;
   let kinoLitter: ReturnType<typeof createKinoLitter> | undefined;
   let kaiLitter: ReturnType<typeof createKaiLitter> | undefined;
   const sewerDetailGroups: THREE.Group[] = [];
@@ -515,7 +517,8 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
   }
 
   function buildWalls() {
-    let artCount = 0;
+    let artCount = 0, motifStart = 0;
+    if (isDetailedDistrict(id)) { wallArt ??= createWallArt(); wallArt.setDistrict(id); }
     for (let i = 0; i < active.walls.length; i++) {
       const r = active.walls[i];
       const edge = r.x <= 0 || r.y <= 0 || r.x + r.w >= active.w || r.y + r.h >= active.h;
@@ -771,11 +774,16 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
         wallArt ??= createWallArt();
         // House windows keep their ground-floor band; blank perimeter walls have more room.
         const band = edge && !outside ? Math.min(1.8, height - .12) : yardShed ? .85 : .6;
-        const geometry = wallArt.geometry(r.w * WORLD_SCALE, r.h * WORLD_SCALE, height, i, band);
+        // Perimeter murals face the playable map, never its unreachable exterior.
+        const faces = [r.y + r.h < active.h ? 0 : -1, r.y > 0 ? 1 : -1,
+          r.x + r.w < active.w ? 2 : -1, r.x > 0 ? 3 : -1].filter(face => face >= 0);
+        const geometry = wallArt.geometry(r.w * WORLD_SCALE, r.h * WORLD_SCALE, height, i, band, { faces, motifStart });
         if (geometry) {
           const p = at(r.x + r.w / 2, r.y + r.h / 2);
           const art = occluder(mesh(geometry, wallArt.material, root, p.x, 0, p.z, false));
-          art.name = "district-wall-art"; art.userData.artTypes = geometry.userData.wallArtTypes; artCount++;
+          art.name = "district-wall-art"; art.userData.artTypes = geometry.userData.wallArtTypes;
+          art.userData.graffitiIds = geometry.userData.graffitiIds; art.userData.district = id;
+          motifStart += geometry.userData.graffitiIds.length; artCount++;
         }
       }
       for (const part of occluders.slice(firstPart)) part.userData.occlusionGroup = m.uuid;
@@ -1586,6 +1594,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     for (const actor of npcActors.values()) actor.dispose(); npcActors.clear();
     staticBatches?.dispose(); staticBatches = undefined;
     streetDetails?.dispose(); streetDetails = undefined;
+    districtProps?.dispose(); districtProps = undefined;
     kinoLitter?.dispose(); kinoLitter = undefined;
     kaiLitter?.dispose(); kaiLitter = undefined;
     animatedLamps.length = 0; sewerDetailGroups.length = 0;
@@ -1681,6 +1690,11 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       glass: streetGlass, metal: mat(0x8a9691, "metal"),
       rubber: mat(0x29312f), cardboard: mat(0x9a8055, "plaster"),
     });
+    districtProps = createDistrictProps(root, active, {
+      metal: mat(0x88958f, "metal"), wood: mat(0x98754d, "wood"),
+      rubber: mat(0x29312f), paint: mat(id === "kai" ? 0xc78b55 : id === "kino" || id === "nische" ? 0xa15c7b
+        : id === "chem" || id === "yard" ? 0x789653 : id === "cable" || id === "labyrinth" ? 0x8270ac : 0x658b89, "metal"),
+    });
     const desired = x !== undefined && y !== undefined ? { x, y }
       : id === "capsule" ? { x: CAPSULE_SPAWN_X, y: CAPSULE_SPAWN_Y }
       : id === "studio" ? { x: 440, y: 140 }
@@ -1691,7 +1705,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
       })();
     const spawn = safeSpawn(active, desired.x, desired.y, .48, progress.deadWild, progress.starterId);
     player.position.copy(at(spawn.x, spawn.y)); player.rotation.y = 0;
-    streetDetails.update(player.position); updateSewerDetails();
+    streetDetails.update(player.position); districtProps.update(player.position); updateSewerDetails();
     lastPosition = { x: NaN, y: NaN }; saveLocation();
     localStorage.setItem("420mon-current-map", id); localStorage.setItem("420mon-district", id);
     nearby = undefined; interactionMessage = undefined; prompt.hidden = true;
@@ -1776,7 +1790,7 @@ export function createDistrictWorld(scene: THREE.Scene, player: THREE.Group): Di
     root.userData.riggedNpcs = [...mapObjects.values()].filter(group => group.userData.npcModel === "rocketbox-rigged").length;
     if (time - lastLightSelection > 350) {
       lastLightSelection = time;
-      streetDetails?.update(player.position); updateSewerDetails();
+      streetDetails?.update(player.position); districtProps?.update(player.position); updateSewerDetails();
       const closest = lampLights.map(light => ({ light, distance: light.getWorldPosition(lightPosition).distanceToSquared(player.position) }));
       closest.sort((a, b) => a.distance - b.distance);
       const count = active.indoor ? 5 : 4;
