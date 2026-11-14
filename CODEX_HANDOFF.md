@@ -1,3 +1,15 @@
+# Aktueller Wiedereinstieg — v91 Graffiti-/Bezirksvielfalt, danach ausbaubare Kapsel
+
+Annahme v91: 420 Motive entstehen aus 42 eigenen Vektor-Illustrationen in zehn unterschiedlichen Kompositionen (30 pro Bezirk); neue Deko nutzt vorhandene Straßenanker, im Kino vorhandene Geräte mit vollem Interaktionsabstand.
+
+- **Aktuelles Paket v91:** 420 deterministische Graffiti-Kompositionen, verteilt auf Gasse A, Grow-Hinterhöfe, Kabelkeller, Markt, Kino, Neonkai, Kanal, Aschegang, Abfluss, Chemiegasse, Ring, Labyrinth, Nischen und Schrotttor. Drei eigene Bildthemen je Bezirk, zehn Layouts je Thema; keine Behauptung von 420 einzeln gemalten Bildern. Plakate/Sticker passen zum Bezirk. Wandkunst richtet sich an Randwänden nach innen, folgt der vorhandenen Gebäude-Verdeckung und bleibt unter Fenstern/Kanten.
+- Ein wiederverwendbarer Atlas lädt nur die 30 aktuellen Graffiti plus Plakat/Sticker: 2048×1024 Desktop, 1024×512 Touch; keine zusätzlichen Texturdownloads, kein Malen pro Frame. Reihenfolge nutzt alle 30 Motive vor Wiederholung, Bildthemen abwechselnd.
+- 28 eigene kleine Requisiten (zwei je Bezirk), darunter Sprühdosen-Träger, Setzlingstabletts/Schlauchrollen, Kabeltrommeln, Marktwaagen, Filmrollen, Bojen/Seile, Rohrbündel, Sicherheitskanister, Hanteln, Kerzen, Hocker und Zahnräder. Maximal acht Platzierungen je Bezirk, mit Abstand zu ursprünglichen Wänden, Objekten, Figuren und vorhandenen Straßenrequisiten. 16-m-Instancing-Zellen/48-m-Sichtweite, gemeinsame PBR-Materialien, keine neuen Licht-/Schattenpässe. Bestehende Bezirksdetails, Kollisionen, Interaktionen, Saves und Spieler-/NPC-Modelle unverändert.
+- Build + 13/13 direkt betroffene Tests grün: ein Build, drei kurze lokale Testrunden; nur der erweiterte Wandkunst-Test wurde nach Korrektur alter Kino-/Neonkai-Lichtannahmen wiederholt. Vier Katalog-, vier Requisiten-, drei Wandkunst-/Welt- und zwei bestehende Straßenrequisiten-Tests prüfen alle 420 Motive in den 14 Szenen, vollständige Modellradien/Budgets, freie Originalwege, Instancing/Culling und Ressourcenbesitz. Build `index-Dowu2bKC.js`, CSS `index-Kq1bkK4v.css`. **Veröffentlichung v91: ausstehend.** Nur Build + direkt betroffene Tests, keine Browserläufe; Ben prüft Optik/FPS.
+- **Danach NEXT: ausbaubare Kapsel**, eigener PR (Böden, RGB-Licht, Deko, Upgrades). **Monster bleiben gestoppt:** Dex #181–186 nicht fertigstellen/mergen; 180 individuelle Modelle/240 Rekonstruktionen. Der aufgezeichnete Monster-Stash bleibt unangetastet.
+
+## Vorheriger veröffentlichter Stand
+
 # Aktueller Wiedereinstieg — v90 freie Kamera veröffentlicht, PR #98; nächstes Paket Graffiti/Bezirksdetails
 
 Annahme Kamera v90: WASD/Pfeile und Joystick bewegen relativ zur sichtbaren Kamera; Kamerawinkel/Zoom gelten für die Sitzung, bestehende Gebäude-Verdeckung und Kleider-Vorschau bleiben erhalten.
